@@ -1,0 +1,6 @@
+php_flag short_open_tag on
+php_flag display_errors on
+RewriteEngine On
+
+# Relay everything to index.php
+RewriteRule ^(.*)$ index.php [L]
