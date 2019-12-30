@@ -1,0 +1,9 @@
+{
+  "_" : {
+    "extends":"entity",
+    "storage" : {"type":"file", "parse":"json","path":"data/accounts.json"}
+  },
+  "email" : {"type" : "string", "regex":"^TODO$"},
+  "title" : {"type" : "string", "regex":"^TODO$"},
+  "id" : {"type" : "number", "storage":{"key":true}}
+}

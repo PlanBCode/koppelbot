@@ -1,0 +1,87 @@
+POST api/account/13,23,34/A.B,C.D,E
+   {
+    "identifier" : {method:"PUT", class:"account", id:"*", property:"A.B", content:"D", filter:"", parameters:""}
+   }
+
+
+GET /api/account/12/name,email
+200:{account: {12: {name:'Henk',email:'henk@mail.com'}}
+
+
+GET /api/account/12,23/name,email
+207: {account : {
+         status: 207,
+         content: {
+           12: {status: 200, content: {name:'Henk',email:'henk@mail.com'}},
+           23: {status: 404, content: "Account 23 not found"}
+         }
+}
+
+{status,get|put|head|delete}
+{status,error}
+
+
+
+HttpRequest::ApiRequest -> StorageRequests[] -> PropertyRequests[]
+-> PropertyResponses[] -> StorageResponses[] -> EntityResponses[] -> RequestResponses[] -> HttpResponse::ApiResponse
+
+
+
+
+
+
+
+
+method
+
+HEAD => check if exists
+
+GET
+PUT => PUT or CREATE
+
+PATCH =>
+
+CREATE
+DELETE
+
+
+POST => combined method
+
+APPEND
+SPLICE
+INSERT
+REMOVE
+DEFINE
+
+
+
+get  -> x
+put  x->y
+insert "xxx" -> "xyxx"
+remove "xyxx" -> "xxx"
+append [x]->[x,y]
+patch {x:1} -> {x:1,y:1}
+delete {x:1,y:1} -> {x:1}
+
+
+
+
+GET /ACCOUNT/*?group->admin
+
+GET /ACCOUNT/13,23,34?A.B=C
+GET /ACCOUNT?ID=13,23,34&A.B=C
+GET ?class=account&id=13,23,34&A.B=C
+
+     classes    ids      properties
+GET /ACCOUNT/13,23,34/A.B,C.D,E
+GET /ACCOUNT/*/A.B,C.D,E
+
+     classes    ids      properties
+PUT /ACCOUNT/13,23,34/A.B,C.D,E
+$value
+
+PUT /SESSION  = login
+{
+username:
+passwordHash:
+}
