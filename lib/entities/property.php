@@ -142,8 +142,12 @@ class Property {
         return $this->storageString;
     }
 
-    public function getSetting($settingName){
-        return $this->settings[$settingName];//TODO check if exists
+    public function getStorageSetting($settingName){
+        if(array_key_exists($settingName,$this->storage)){
+            return $this->storage[$settingName];//TODO check if exists
+        }else{
+            return null;
+        }
     }
 
 };

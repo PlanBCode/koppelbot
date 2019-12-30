@@ -153,12 +153,11 @@ class Storage_file extends BasicStorage { //TODO in separate file, separate fold
                 $entity = $this->data[$entityId];
                 $property = $propertyRequest->getProperty();
                 $propertyName = $property->getName();
-                if(array_key_exists($propertyName, $entity)){
-                    //                    if($propertyRequest->getProperty()->getSetting('key')){
-                    //  $content = $propertyName;
-                    //}else{
-                        $content = $entity[$propertyName];
-                        //}
+                if($propertyRequest->getProperty()->getStorageSetting('key')){
+                    $content = $entityId;
+                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content );
+                }else if(array_key_exists($propertyName, $entity)){
+                    $content = $entity[$propertyName];
                     $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content );
                 }else{
                     $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, 'Not found');//TODO pass something
@@ -185,7 +184,11 @@ class Storage_file extends BasicStorage { //TODO in separate file, separate fold
                 $entity = $this->data[$entityId];
                 $property = $propertyRequest->getProperty();
                 $propertyName = $property->getName();
-                if(array_key_exists($propertyName, $entity)){
+                if($propertyRequest->getProperty()->getStorageSetting('key')){
+                    $content = $propertyRequest->getContent();
+                    $this->data[$content] = $this->data[$entityId];
+                    unset($this->data[$entityId]);
+                }else if(array_key_exists($propertyName, $entity)){
                     $content = $propertyRequest->getContent();
                     $this->data[$entityId][$propertyName] = $content;
                     $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content );
