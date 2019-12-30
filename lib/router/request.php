@@ -70,9 +70,9 @@ class ApiRequest extends HttpRequest2
         $this->parseContent();
         $requestResponses = [];
 
-        foreach ($this->storageRequests as $storageString => $storageRequest) {
+        foreach ($this->storageRequests as $storageRequest) {
 
-            $storageResponse = $storageString != 'ERROR' ? Storage::$storages[$storageString]->createResponse($storageRequest) : Storage::createErrorResponse($storageRequest);
+            $storageResponse = Storage::getStorageResponse($storageRequest);
 
             foreach ($storageResponse->getRequestResponses() as $requestId => $requestResponse) {
                 if (!array_key_exists($requestId, $requestResponses)) {

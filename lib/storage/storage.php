@@ -66,6 +66,8 @@ class StorageResponse extends Response
 
 abstract class Storage
 {
+    const STORAGE_STRING_ERROR = 'ERROR';
+
     /** @var Storage[] */
     private static $storages = []; // string $storageString -> Storage
 
@@ -97,7 +99,19 @@ abstract class Storage
         return $storageString;
     }
 
-    abstract static protected function getStorageString($settings/*, $method, $entityClass, $entityId, $content, $query*/);//TODO
+    public static function getStorageResponse(StorageRequest $storageRequest): StorageResponse
+    {
+        /** @var PropertyRequest|null $propertyRequest */
+        $propertyRequest = array_get($storageRequest->getPropertyRequests(), 0);
+        if (!$propertyRequest instanceof PropertyRequest) {
+            return Storage::createErrorResponse($storageRequest);
+        }
+        $storageString = $propertyRequest->getProperty()->getStorageString();
+
+        return $storageString != self::STORAGE_STRING_ERROR ? Storage::$storages[$storageString]->createResponse($storageRequest) : Storage::createErrorResponse($storageRequest);
+    }
+
+    abstract static protected function getStorageString(array $settings/*, $method, $entityClass, $entityId, $content, $query*/): string;//TODO
 
     abstract public function createResponse(StorageRequest $storageRequest): StorageResponse;
 }
@@ -166,7 +180,7 @@ class Storage_file extends BasicStorage
         $this->path = array_get($settings, 'path');
     }
 
-    static protected function getStorageString(array $settings/*, $method, $entityClass, $entityId, $content, $query*/)
+    static protected function getStorageString(array $settings/*, $method, $entityClass, $entityId, $content, $query*/): string
     {
         return array_get($settings, 'path');
     }

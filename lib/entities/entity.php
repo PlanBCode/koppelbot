@@ -45,9 +45,9 @@ class Entity
         /** @var Property|string $property */
         foreach ($properties as $propertyName => $property) {
             $propertyRequest = new PropertyRequest($requestId, $method, $this->entityClass, $entityId, $property, $content, $query);
-            $storageString = is_string($property) ? 'ERROR' : $property->getStorageString($method/* TODO, $this->entityClass, $entityId, $content, $query */);
+            $storageString = is_string($property) ? Storage::STORAGE_STRING_ERROR : $property->getStorageString($method/* TODO, $this->entityClass, $entityId, $content, $query */);
             if (!array_key_exists($storageString, $storageRequests)) {
-                $storageRequests[$storageString] = new StorageRequest();
+                $storageRequests[$storageString] = new StorageRequest($storageString);
             }
             $storageRequests[$storageString]->add($propertyRequest);
         }
