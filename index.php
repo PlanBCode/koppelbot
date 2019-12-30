@@ -5,7 +5,7 @@ require('./lib/storage/storage.php');
 require('./lib/entities/entity.php');
 require('./lib/router/request.php');
 
-$uri =    $_SERVER['REQUEST_URI'];
+$uri = substr($_SERVER['REQUEST_URI'], strlen(dirname($_SERVER['SCRIPT_NAME'])));
 if (strpos($uri, '/api/') === 0) {
     $request = new ApiRequest(
         $_SERVER['REQUEST_METHOD'],
