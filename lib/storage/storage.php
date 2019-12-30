@@ -1,107 +1,155 @@
-<?
+<?php
 /*
 
   if for multiple properties storage json is the same except for property then offer them merged to Storage
 
  */
 
-class StorageRequest{
-    protected $propertyRequests = array();
+class StorageRequest
+{
+    /** @var PropertyRequest[] */
+    protected $propertyRequests = [];
 
-    public function add($properyRequest){
-        $this->propertyRequests[] = $properyRequest;
+    public function add($propertyRequest): void
+    {
+        $this->propertyRequests[] = $propertyRequest;
     }
 
-    public function merge($storageRequest){
-        $this->propertyRequests->push(...$storageRequest->propertyRequests);
+    public function merge($storageRequest): void
+    {
+        array_push($this->propertyRequests, ...$storageRequest->propertyRequests);
     }
 
-    public function getPropertyRequests(){
+    public function getPropertyRequests(): array
+    {
         return $this->propertyRequests;
     }
-};
+}
 
-class StorageResponse extends Response {
-    protected $requestResponses = array();
+class StorageResponse extends Response
+{
+    /** @var RequestResponse[] */
+    protected $requestResponses = [];
 
-    public function __construct(int $status=200){
+    public function __construct(int $status = 200)
+    {
         $this->addStatus($status);
     }
 
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, string $propertyName, $content ){
+    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, string $propertyName, $content): void
+    {
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
-        if(!array_key_exists($requestId,$this->requestResponses)){
+        if (!array_key_exists($requestId, $this->requestResponses)) {
             $this->requestResponses[$requestId] = new RequestResponse($requestId);
         }
         $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyName, $content);
     }
 
-    public function merge(StorageResponse $storageResponse){
+    public function merge(StorageResponse $storageResponse): void
+    {
         $this->addStatus($storageResponse->getStatus());
-        foreach($storageResponse->requestResponses as $requestId=>$requestResponse){
-            if(!array_key_exists($requestId,$this->requestResponses)){
+        foreach ($storageResponse->requestResponses as $requestId => $requestResponse) {
+            if (!array_key_exists($requestId, $this->requestResponses)) {
                 $this->requestResponses[$requestId] = $requestResponse;
-            }else{
+            } else {
                 $this->requestResponses[$requestId]->merge($requestResponse);
             }
         }
     }
 
-    public function getRequestResponses(){
+    public function getRequestResponses(): array
+    {
         return $this->requestResponses;
     }
-};
+}
 
-abstract class Storage {
-    public static $storages = array(); // string $storageString -> Storage
-    public static function createErrorResponse($storageRequest){
+abstract class Storage
+{
+    /** @var Storage[] */
+    private static $storages = []; // string $storageString -> Storage
+
+    public static function createErrorResponse(StorageRequest $storageRequest): StorageResponse
+    {
         $storageResponse = new StorageResponse();
-        foreach($storageRequest->getPropertyRequests() as $propertyRequest){
+        foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
             $propertyName = $propertyRequest->getProperty();
-            $storageResponse->add(404, $propertyRequest, $propertyRequest->getEntityId(), 'error', 'Property '.$propertyName.' not found for '.$propertyRequest->getEntityClass());//TODO
+            $storageResponse->add(404, $propertyRequest, $propertyRequest->getEntityId(), 'error', 'Property ' . $propertyName . ' not found for ' . $propertyRequest->getEntityClass());//TODO
         }
+
         return $storageResponse;
     }
-    abstract static public function getStorageString($settings/*, $method, $entityClass, $entityId, $content, $query*/);//TODO
 
-    abstract public function createReponse($storageRequest);
-};
+    public static function addStorage(string $type, array $storageSettings)
+    {
+        $storageClass = 'Storage_' . $type;
+        if (!class_exists($storageClass)) {
+            return null;
+        }
 
+        $storageString = $type . '_' . $storageClass::getStorageString($storageSettings);
+        if (!array_key_exists($storageString, self::$storages)) {
+            self::$storages[$storageString] = new $storageClass($storageSettings);
+        } else {
+            // TODO check if the existing storage class matched the requested type
+        }
 
-abstract class BasicStorage extends Storage {
-    public static $storages = array(); // string $storageString -> Storage
+        return $storageString;
+    }
 
-    public function createReponse($storageRequest){
+    abstract static protected function getStorageString($settings/*, $method, $entityClass, $entityId, $content, $query*/);//TODO
+
+    abstract public function createResponse(StorageRequest $storageRequest): StorageResponse;
+}
+
+abstract class BasicStorage extends Storage
+{
+    public function createResponse(StorageRequest $storageRequest): StorageResponse
+    {
         $storageResponse = $this->open($storageRequest);
-        foreach($storageRequest->getPropertyRequests() as $propertyRequest){
+        foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
             $storageResponse->merge($this->createPropertyResponse($propertyRequest));
         }
         $storageResponse->merge($this->close($storageRequest));
+
         return $storageResponse;
     }
 
-
-    protected function createPropertyResponse($propertyRequest){
-        switch($propertyRequest->getMethod()){
-        case 'GET': return $this->get($propertyRequest);
-        case 'PUT': return $this->put($propertyRequest);
-        case 'HEAD': return $this->head($propertyRequest);
-        case 'DELETE': return $this->delete($propertyRequest);
-        default: //TODO error
+    /**
+     * @param PropertyRequest $propertyRequest
+     *
+     * @return StorageResponse|void
+     */
+    protected function createPropertyResponse(PropertyRequest $propertyRequest)
+    {
+        switch ($propertyRequest->getMethod()) {
+            case 'GET':
+                return $this->get($propertyRequest);
+            case 'PUT':
+                return $this->put($propertyRequest);
+            case 'HEAD':
+                return $this->head($propertyRequest);
+            case 'DELETE':
+                return $this->delete($propertyRequest);
+            default: //TODO error
         }
     }
 
-    abstract protected function open($storageRequest);
-    abstract protected function close($storageRequest);
+    abstract protected function open(StorageRequest $storageRequest): StorageResponse;
 
-    abstract protected function get($propertyRequest);
-    abstract protected function put($propertyRequest);
-    abstract protected function head($propertyRequest);
-    abstract protected function delete($propertyRequest);
-};
+    abstract protected function close(StorageRequest $storageRequest): StorageResponse;
 
-class Storage_file extends BasicStorage { //TODO in separate file, separate folder (not lib)
+    abstract protected function get(PropertyRequest $propertyRequest): StorageResponse;
+
+    abstract protected function put(PropertyRequest $propertyRequest): StorageResponse;
+
+    abstract protected function head(PropertyRequest $propertyRequest): StorageResponse;
+
+    abstract protected function delete(PropertyRequest $propertyRequest): StorageResponse;
+}
+
+class Storage_file extends BasicStorage
+{ //TODO in separate file, separate folder (not lib)
     /*
     create directories if required
 
@@ -113,56 +161,60 @@ class Storage_file extends BasicStorage { //TODO in separate file, separate fold
     protected $path;
     protected $data;
 
-    public function __construct($settings){
-        $this->path = $settings['path']; //TODO check if available
+    public function __construct(array $settings)
+    {
+        $this->path = array_get($settings, 'path');
     }
 
-    static public function getStorageString($settings/*, $method, $entityClass, $entityId, $content, $query*/){
-        return $settings['path']; //TODO check if available
+    static protected function getStorageString(array $settings/*, $method, $entityClass, $entityId, $content, $query*/)
+    {
+        return array_get($settings, 'path');
     }
 
-    protected function open($storageRequest){
+    protected function open(StorageRequest $storageRequest): StorageResponse
+    {
         //TODO lock file
-        // TODO check if file exists
+        //TODO check if file exists
         $fileContent = file_get_contents($this->path);
         //TODO error if fails
-        $this->data = json_decode($fileContent,true);
+        $this->data = json_decode($fileContent, true);
+
         return new StorageResponse(200);
     }
 
-    protected function close($storageRequest){
+    protected function close(StorageRequest $storageRequest): StorageResponse
+    {
         $fileContent = json_encode($this->data);
-        if($fileContent){
+        if ($fileContent) {
             file_put_contents($this->path, $fileContent);//TODO only on write
         }
+
         //TODO unlock file
         return new StorageResponse(200);
     }
 
-    protected function get($propertyRequest){
+    protected function get(PropertyRequest $propertyRequest): StorageResponse
+    {
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();
-        $entityIds = $entityIdList=='*'
-                   ? array_keys($this->data)
-                   : explode(',',$entityIdList);
-        $requestId = $propertyRequest->getRequestId();
+        $entityIds = $entityIdList == '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
-        //Loop through enityIds and add properties
-        foreach($entityIds as $entityId){
-            if(array_key_exists($entityId, $this->data)){
+        //Loop through entityIds and add properties
+        foreach ($entityIds as $entityId) {
+            if (array_key_exists($entityId, $this->data)) {
                 $entity = $this->data[$entityId];
                 $property = $propertyRequest->getProperty();
                 $propertyName = $property->getName();
-                if($propertyRequest->getProperty()->getStorageSetting('key')){
+                if ($propertyRequest->getProperty()->getStorageSetting('key')) {
                     $content = $entityId;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content );
-                }else if(array_key_exists($propertyName, $entity)){
+                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                } elseif (array_key_exists($propertyName, $entity)) {
                     $content = $entity[$propertyName];
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content );
-                }else{
+                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                } else {
                     $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, 'Not found');//TODO pass something
                 }
-            }else{
+            } else {
                 $storageResponse->add(404, $propertyRequest, $entityId, '*', 'Not found');//TODO
             }
         }
@@ -170,32 +222,30 @@ class Storage_file extends BasicStorage { //TODO in separate file, separate fold
         return $storageResponse;
     }
 
-      protected function put($propertyRequest){
+    protected function put(PropertyRequest $propertyRequest): StorageResponse
+    {
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();
-        $entityIds = $entityIdList=='*'
-                   ? array_keys($this->data)
-                   : explode(',',$entityIdList);
-        $requestId = $propertyRequest->getRequestId();
+        $entityIds = $entityIdList == '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
-        //Loop through enityIds and add properties
-        foreach($entityIds as $entityId){
-            if(array_key_exists($entityId, $this->data)){
+        //Loop through entityIds and add properties
+        foreach ($entityIds as $entityId) {
+            if (array_key_exists($entityId, $this->data)) {
                 $entity = $this->data[$entityId];
                 $property = $propertyRequest->getProperty();
                 $propertyName = $property->getName();
-                if($propertyRequest->getProperty()->getStorageSetting('key')){
+                if ($propertyRequest->getProperty()->getStorageSetting('key')) {
                     $content = $propertyRequest->getContent();
                     $this->data[$content] = $this->data[$entityId];
                     unset($this->data[$entityId]);
-                }else if(array_key_exists($propertyName, $entity)){
+                } elseif (array_key_exists($propertyName, $entity)) {
                     $content = $propertyRequest->getContent();
                     $this->data[$entityId][$propertyName] = $content;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content );
-                }else{
+                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                } else {
                     $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, 'Not found');//TODO pass something
                 }
-            }else{
+            } else {
                 $storageResponse->add(404, $propertyRequest, $entityId, '*', 'Not found');//TODO
             }
         }
@@ -203,10 +253,16 @@ class Storage_file extends BasicStorage { //TODO in separate file, separate fold
         return $storageResponse;
     }
 
+    protected function head(PropertyRequest $propertyRequest): StorageResponse
+    {
+        return new StorageResponse();
+    }
 
-    protected function head($propertyRequest){}
-    protected function delete($propertyRequest){}
-};
+    protected function delete(PropertyRequest $propertyRequest): StorageResponse
+    {
+        return new StorageResponse();
+    }
+}
 
 /*
 
@@ -231,5 +287,3 @@ class MySqlStorage extends Storage {
     }
 
  */
-
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Integer extends Type {
 
