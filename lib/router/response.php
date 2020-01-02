@@ -1,135 +1,164 @@
-<?
-class Response {
+<?php
+class Response
+{
+    /** @var int */
     protected $status;
 
-    protected function addStatus(int $status){
-        if(isset($this->status)){
-            if($this->status != $status){
+    protected function addStatus(int $status): void
+    {
+        if (isset($this->status)) {
+            if ($this->status != $status) {
                 $this->status = 207; //TODO no magic number
             }
-        }else{
+        } else {
             $this->status = $status;
         }
     }
 
-    public function getStatus(){
+    public function getStatus(): int
+    {
         return $this->status;
     }
-};
+}
 
-
-class RequestResponse extends Response{
+class RequestResponse extends Response
+{
     protected $requestId;
-    protected $entityClassReponses = array();
 
-    public function __construct($requestId){
+    /** @var EntityClassResponse[] */
+    protected $entityClassResponses = [];
+
+    public function __construct($requestId)
+    {
         $this->requestId = $requestId;
     }
 
-    public function add(int $status, string $entityClass, string $entityId, string $propertyName, $content){
+    public function add(int $status, string $entityClass, string $entityId, string $propertyName, $content): void
+    {
         $this->addStatus($status);
-        if(!array_key_exists($entityClass,$this->entityClassReponses)){
-            $this->entityClassReponses[$entityClass] = new EntityClassResponse($entityClass);
+        if (!array_key_exists($entityClass, $this->entityClassResponses)) {
+            $this->entityClassResponses[$entityClass] = new EntityClassResponse($entityClass);
         }
-        $this->entityClassReponses[$entityClass]->add($status,  $entityId, $propertyName, $content);
+        $this->entityClassResponses[$entityClass]->add($status, $entityId, $propertyName, $content);
     }
 
-    public function merge(RequestResponse $requestResponse){
+    public function merge(RequestResponse $requestResponse): void
+    {
         $this->addStatus($requestResponse->getStatus());
-        foreach($requestResponse->entityClassReponses as $entityClass=>$entityClassReponse){
-            if(!array_key_exists($entityClass, $this->entityClassReponses)){
-                $this->entityClassReponses[$entityClass]= $entityClassReponse;
-            }else{
-                $this->entityClassReponses[$entityClass]->merge($entityClassReponse);
+        foreach ($requestResponse->entityClassResponses as $entityClass => $entityClassResponse) {
+            if (!array_key_exists($entityClass, $this->entityClassResponses)) {
+                $this->entityClassResponses[$entityClass] = $entityClassResponse;
+            } else {
+                $this->entityClassResponses[$entityClass]->merge($entityClassResponse);
             }
         }
     }
 
-    public function getContent(){
-        $content = array();
-        foreach($this->entityClassReponses as $entityClass=>$entityClassReponse){ //TODO use a map
-            if($this->status == 207){
-                $content[$entityClass] = array("status" => $entityClassReponse->getStatus(), "content" => $entityClassReponse->getContent());
-            }else{
-                $content[$entityClass] = $entityClassReponse->getContent();
+    public function getContent()
+    {
+        $content = [];
+        foreach ($this->entityClassResponses as $entityClass => $entityClassResponse) { //TODO use a map
+            if ($this->status == 207) {
+                $content[$entityClass] = [
+                    "status" => $entityClassResponse->getStatus(),
+                    "content" => $entityClassResponse->getContent(),
+                ];
+            } else {
+                $content[$entityClass] = $entityClassResponse->getContent();
             }
         }
+
         return $content;
     }
-};
+}
 
-class HttpResponse extends Response{
+class HttpResponse2 extends Response
+{
+    /** @var array <string> */
     protected $headers;
+
+    /** @var string */
     protected $content;
 
-    public function __construct(int $status, $content, $headers = array()){
+    public function __construct(int $status, string $content, array $headers = [])
+    {
         $this->status = $status;
         $this->content = $content;
         $this->headers = $headers;
     }
 
-    private function setHeaders(){
-        foreach($this->headers as $key=>$value){
-            header($key.': '.$value);
+    private function echoHeaders(): void
+    {
+        foreach ($this->headers as $key => $value) {
+            header($key . ': ' . $value);
         }
     }
-    private function setStatus(){
+
+    private function echoStatus(): void
+    {
         http_response_code($this->status);
     }
 
-    private function setContent(){
+    private function echoContent(): void
+    {
         echo $this->content;
     }
 
-    public function echo(){
-        $this->setHeaders();
-        $this->setStatus();
-        $this->setContent();
+    public function echo(): void
+    {
+        $this->echoHeaders();
+        $this->echoStatus();
+        $this->echoContent();
     }
-};
+}
 
-class ApiResponse extends HttpResponse{
-    public function __construct(string $method,$requestResponses){
+class ApiResponse extends HttpResponse2
+{
+    public function __construct(string $method, $requestResponses)
+    {
         $count = count($requestResponses);
-        if($count == 0){
-            parent::__construct(400,'Request was empty',array());
-        }else if($method!='POST'){
+        if ($count == 0) {
+            parent::__construct(400, 'Request was empty');
+        } elseif ($method != 'POST') {
             $requestResponse = array_values($requestResponses)[0];
             $data = $requestResponse->getContent();
-            parent::__construct($requestResponse->getStatus(),json_encode($data),array());
-        }else{
-            $data = array();
-            foreach($requestResponses as $requestId=>$requestResponse){
+            parent::__construct($requestResponse->getStatus(), json_encode($data));
+        } else {
+            $data = [];
+            foreach ($requestResponses as $requestId => $requestResponse) {
                 $this->addStatus($requestResponse->getStatus());
-                $data[$requestId] = array(status => $requestResponse->getStatus(), result => $requestResponse->getContent());
+                $data[$requestId] = [
+                    'status' => $requestResponse->getStatus(),
+                    'result' => $requestResponse->getContent(),
+                ];
             }
-            parent::__construct($this->status,json_encode($data),array());
-        }
-    }
-};
-
-class ContentResponse extends HttpResponse{
-    public function __construct($uri){
-        if($uri=='/'){
-            if(file_exists('custom/content/index.html') ){
-                $fileContent = file_get_contents('custom/content/index.html');
-                parent::__construct(200,$fileContent,array());
-            }else{
-                parent::__construct(200,'Hello World',array());
-            }
-        }else if($uri=='/script.js'){
-            $fileContent = file_get_contents('lib/front-end/script.js');
-            parent::__construct(200,$fileContent,array());
-        }else if(file_exists('custom/content'.$uri) ){
-            $fileContent = file_get_contents('custom/content'.$uri);//TODO make safe!
-            parent::__construct(200,$fileContent,array());
-        }else if(file_exists('custom/errors/404.html') ){
-            $fileContent = file_get_contents('custom/errors/404.html');
-            parent::__construct(404,$fileContent,array());
-        }else{
-            parent::__construct(404,'Page Not Found',array());//TODO use (default) error page
+            parent::__construct($this->status, json_encode($data));
         }
     }
 }
 
-?>
+class ContentResponse extends HttpResponse2
+{
+    public function __construct($uri)
+    {
+        if ($uri == '/') {
+            if (file_exists('custom/content/index.html')) {
+                $fileContent = file_get_contents('custom/content/index.html');
+                parent::__construct(200, $fileContent);
+            } else {
+                parent::__construct(200, 'Hello World');
+            }
+        } elseif ($uri == '/script.js') {
+            $fileContent = file_get_contents('lib/front-end/script.js');
+            parent::__construct(200, $fileContent);
+        } elseif (file_exists('custom/content' . $uri)) {
+            $fileContent = file_get_contents('custom/content' . $uri);//TODO make safe!
+            parent::__construct(200, $fileContent);
+        } elseif (file_exists('custom/errors/404.html')) {
+            $fileContent = file_get_contents('custom/errors/404.html');
+            parent::__construct(404, $fileContent);
+        } else {
+            parent::__construct(404, 'Page Not Found');//TODO use (default) error page
+        }
+    }
+}

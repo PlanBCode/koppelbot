@@ -22,8 +22,8 @@ GET /api/account/12,23/name,email
 
 
 
-HttpRequest::ApiRequest -> StorageRequests[] -> PropertyRequests[]
--> PropertyResponses[] -> StorageResponses[] -> EntityResponses[] -> RequestResponses[] -> HttpResponse::ApiResponse
+HttpRequest2::ApiRequest -> StorageRequests[] -> PropertyRequests[]
+-> PropertyResponses[] -> StorageResponses[] -> EntityResponses[] -> RequestResponses[] -> HttpResponse2::ApiResponse
 
 
 

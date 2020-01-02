@@ -1,39 +1,46 @@
-<?
+<?php
 
-
-function getMergedSetting($name,$settings,$rootSettings){
-    if(array_key_exists($name,$settings) ){
+function getMergedSetting($name, $settings, $rootSettings)
+{
+    if (array_key_exists($name, $settings)) {
         return $settings[$name];
-    }else if(array_key_exists($name,$rootSettings) ){
+    } elseif (array_key_exists($name, $rootSettings)) {
         return $rootSettings[$name];
-    }else{
+    } else {
         return null;
     }
 }
 
-function getSingleSetting($name,$settings,$rootSettings){
-    if(array_key_exists($name,$settings) && array_key_exists($name,$rootSettings) ){
-        return array_merge($rootSettings[$name],$settings[$name]);
-    }else if(array_key_exists($name,$settings) ){
+function getSingleSetting($name, $settings, $rootSettings)
+{
+    if (array_key_exists($name, $settings) && array_key_exists($name, $rootSettings)) {
+        return array_merge($rootSettings[$name], $settings[$name]);
+    } elseif (array_key_exists($name, $settings)) {
         return $settings[$name];
-    }else if(array_key_exists($name,$rootSettings) ){
+    } elseif (array_key_exists($name, $rootSettings)) {
         return $rootSettings[$name];
-    }else{
-        return array();
+    } else {
+        return [];
     }
 }
 
-class  PropertyRequest{
+class  PropertyRequest
+{
     protected $requestId;
 
     protected $method;
     protected $entityClass;
     protected $entityId;
+    /** @var Property */
     protected $property;
+    /** @var mixed */
     protected $content;
     protected $query;
 
-    public function __construct($requestId, string $method,string $entityClass, string $entityId, $property, $content, $query){
+    protected $storageString;
+
+    public function __construct($requestId, string $method, string $entityClass, string $entityId, $property, $content, Query $query)
+    {
         $this->requestId = $requestId;
         $this->method = $method;
         $this->entityId = $entityId;
@@ -41,46 +48,81 @@ class  PropertyRequest{
         $this->property = $property;
         $this->content = $content;
         $this->query = $query;
+        if(is_string($property)){ //TODO perhaps a nicer way of handling errors
+            $this->storageString = Storage::STORAGE_STRING_ERROR;
+        }else{
+            $storageSettings = $this->property->getStorageSettings();
+            $storageType = array_get($storageSettings,'type');
+            $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $query);
+            if ($this->storageString === null) {
+                $this->storageString = Storage::STORAGE_STRING_ERROR;
+            }
+        }
     }
 
-    public function getRequestId(){
+    public function getRequestId()
+    {
         return $this->requestId;
     }
-    public function getMethod(){
+
+    public function getMethod(): string
+    {
         return $this->method;
     }
-    public function getEntityId(){
+
+    public function getEntityId(): string
+    {
         return $this->entityId;
     }
-    public function getEntityClass(){
+
+    public function getEntityClass(): string
+    {
         return $this->entityClass;
     }
-    public function getProperty(){
+
+    public function getProperty(): Property
+    {
         return $this->property;
     }
-    public function getContent(){
+
+    public function getContent()
+    {
         return $this->content;
     }
-    public function getQuery(){
+
+    public function getQuery(): Query
+    {
         return $this->query;
     }
 
-};
+    public function getStorageString()
+    {
+        return $this->storageString;
+    }
+}
 
-class PropertyResponse extends Response{
+class PropertyResponse extends Response
+{
     protected $content;
 
-    public function __construct(int $status, string $propertyName, $content = NULL){
+    public function __construct(int $status, $content = null)
+    {
         $this->addStatus($status);
         $this->content = $content;
     }
 
-    public function getContent(){
+    public function getContent()
+    {
         return $this->content;
     }
 }
 
-class Property {
+class Property
+{
+    const PROPERTY_TYPE    = 'type';
+    const PROPERTY_STORAGE = 'storage';
+    const PROPERTY_ACCESS  = 'access';
+
     protected $propertyName;
 
     protected $type;//TODO string,number
@@ -88,69 +130,40 @@ class Property {
 
     protected $storage;
     protected $access;
-    protected $storageString;
+
     /* TODO
        required
       audit
       default*/
 
-    public function __construct(string $propertyName,$settings,$rootSettings){
+    public function __construct(string $propertyName, $settings, $rootSettings)
+    {
         $this->propertyName = $propertyName;
         $this->settings = $settings;
 
-        $this->type = getSingleSetting('type',$settings,$rootSettings);
-        $this->storage = getMergedSetting('storage',$settings,$rootSettings);
-        $this->access = getMergedSetting('access',$settings,$rootSettings);
+        $this->type = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
 
-        if(array_key_exists('storage',$settings) && array_key_exists('storage',$rootSettings) ){
-            $this->storage = array_merge($rootSettings['storage'],$settings['storage']);
-        }else if(array_key_exists('storage',$settings) ){
-            $this->storage = $settings['storage'];
-        }else if(array_key_exists('storage',$rootSettings) ){
-            $this->storage = $rootSettings['storage'];
-        }else{
-            $this->storage = array();
-            //TODO 500 error
-        }
+        $this->storage = getMergedSetting(self::PROPERTY_STORAGE, $settings, $rootSettings);
+        $this->access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
 
-        if(array_key_exists('type',$this->storage)){
-            $type = $this->storage['type'];
-        }else{
-            //TODO 500 error
-        }
-
-        //TODO setupAccess  -> 403
-
-        $storageClass = 'Storage_'.$type;
-        if(class_exists($storageClass)){
-            $this->storageString = $type.'_'.$storageClass::getStorageString($this->storage);
-            if(!array_key_exists($this->storageString,Storage::$storages)){
-                Storage::$storages[$this->storageString] = new $storageClass($this->storage);
-            }else{
-                // TODO check if the existing storage class matched the requested type
-            }
-        }else{
-            //TODO 500 error
-        }
+        $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
+        $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
+        $this->storage = array_merge($rootSettingStorage, $settingStorage);
     }
 
-    public function getName(){
+    public function getName()
+    {
         return $this->propertyName;
     }
 
-    public function getStorageString(){
-        return $this->storageString;
+    public function getStorageSettings()
+    {
+        return $this->storage;
     }
 
-    public function getStorageSetting($settingName){
-        if(array_key_exists($settingName,$this->storage)){
-            return $this->storage[$settingName];//TODO check if exists
-        }else{
-            return null;
-        }
+    public function getStorageSetting($settingName)
+    {
+        return array_get($this->storage, $settingName);
+        return $this->storage;
     }
-
-};
-
-
-?>
+}
