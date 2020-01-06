@@ -1,14 +1,28 @@
 <html>
-  <head>
+<head>
     <script type="text/javascript" src="script.js"></script>
-  </head>
-  <body>
-    Hello World!
+    <style>
+        .list-header, .item-header {
+            background-color: blue;
+            color: white;
+        }
 
-    <script>xyz.table('/account/*/title,email,id')</script>
+        .list-item:hover {
+            background-color: lightblue;
+        }
 
-    <script>xyz.edit('/account/aap/title')</script>
+        .drillDown {
+            background-color: yellow;
+        }
 
+    </style>
+</head>
+<body>
+Hello World!
 
-  </body>
+<script>xyz.ui('/list/account/*/title,email,id', {drillDown: 'account'})</script>
+
+<script>xyz.ui('/edit/account/aap/title')</script>
+
+</body>
 </html>

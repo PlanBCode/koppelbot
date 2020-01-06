@@ -45,22 +45,22 @@ class ApiRequest extends HttpRequest2
         $path = explode('/', $this->uri);
         $entityClass = count($path) > 1 ? $path[1] : '*';
         $entityId = count($path) > 2 ? $path[2] : '*';
-        $property = count($path) > 3 ? $path[3] : '*';
+        $propertyName = count($path) > 3 ? $path[3] : '*';
         $query = new Query($this->queryString);
         if ($this->method === 'GET' || $this->method === 'DELETE' || $this->method === 'HEAD') {
-            $this->add(null, $this->method, $entityClass, $entityId, $property, null, $query);
+            $this->add(null, $this->method, $entityClass, $entityId, $propertyName, null, $query);
         } elseif ($this->method === 'PUT') {
-            $this->add(null, $this->method, $entityClass, $entityId, $property, $this->content, $query);
+            $this->add(null, $this->method, $entityClass, $entityId, $propertyName, $this->content, $query);
         } elseif ($this->method === 'POST') { // Multi requests
             $jsonContent = json_decode($this->content, true); //TODO catch errors
             foreach ($jsonContent as $requestId => $subRequest) {
                 $subEntityClass = array_get($subRequest, 'class', $entityClass);
                 $subEntityId = array_get($subRequest, 'id', $entityId);
-                $subProperty = array_get($subRequest, 'property', $property);
+                $subPropertyName = array_get($subRequest, 'property', $propertyName);
                 $subQuery = array_key_exists('query',$subRequest) ? $query->add($subRequest['query']) : $query;
                 $subMethod = array_get($subRequest, 'method', 'GET');
                 $subContent = array_get($subRequest, 'content', null);
-                $this->add($requestId, $subMethod, $subEntityClass, $subEntityId, $subProperty, $subContent, $subQuery);
+                $this->add($requestId, $subMethod, $subEntityClass, $subEntityId, $subPropertyName, $subContent, $subQuery);
             }
         }
     }
@@ -84,6 +84,22 @@ class ApiRequest extends HttpRequest2
         }
 
         return new ApiResponse($this->method, $requestResponses);
+    }
+}
+
+class UiRequest extends HttpRequest2
+{
+
+    public function createResponse(): UiResponse
+    {
+        $query = new Query($this->queryString);
+
+        $path = explode('/', $this->uri);
+        $action = count($path) > 0 ? $path[0] : '*';
+        $entityClass = count($path) > 1 ? $path[1] : '*';
+        $entityId = count($path) > 2 ? $path[2] : '*';
+        $propertyName = count($path) > 3 ? $path[3] : '*';
+        return new UiResponse($action,$entityClass, $entityId, $propertyName, $query);
     }
 }
 

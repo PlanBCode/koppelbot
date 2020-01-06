@@ -4,5 +4,5 @@
     "storage" : {"type":"directory", "parse":"json","path":"data/", "extension":"json"}
   },
   "aap" : {"type" : "string", "regex":"^TODO$"},
-  "id" : {"type" : "number", "storage":{"key":true}}
+  "id" : {"type" : "string", "storage":{"key":true}}
 }

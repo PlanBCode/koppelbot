@@ -1,4 +1,5 @@
 <?php
+require './lib/types/type.php';
 
 function getMergedSetting($name, $settings, $rootSettings)
 {
@@ -141,7 +142,7 @@ class Property
         $this->propertyName = $propertyName;
         $this->settings = $settings;
 
-        $this->type = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
+        $typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
 
         $this->storage = getMergedSetting(self::PROPERTY_STORAGE, $settings, $rootSettings);
         $this->access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
@@ -149,14 +150,25 @@ class Property
         $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
         $this->storage = array_merge($rootSettingStorage, $settingStorage);
+
+        $typeClass = 'Type_' . $typeName;
+        if (!class_exists($typeClass)) {
+            //return null; //TODO ERROR
+        }
+        $this->type = new $typeClass();
     }
 
-    public function getName()
+    public function getUiComponentHtml(string $action, string $entityId, $content, Query $query) : string
+    {
+        return $this->type->getUiComponentHtml($this->propertyName, $action, $entityId, $content, $this->settings, $query);
+    }
+
+    public function getName() : string
     {
         return $this->propertyName;
     }
 
-    public function getStorageSettings()
+    public function getStorageSettings() : array
     {
         return $this->storage;
     }

@@ -6,8 +6,4 @@ class Integer extends Type {
 
     }
 
-
-
 }
-
-?>

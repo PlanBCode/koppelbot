@@ -1,4 +1,5 @@
 <?php
+
 class Response
 {
     /** @var int */
@@ -54,10 +55,15 @@ class RequestResponse extends Response
         }
     }
 
+    public function getEntityClassResponses(): array
+    {
+        return $this->entityClassResponses;
+    }
+
     public function getContent()
     {
         $content = [];
-        foreach ($this->entityClassResponses as $entityClass => $entityClassResponse) { //TODO use a map
+        foreach ($this->entityClassResponses as $entityClass => $entityClassResponse) {
             if ($this->status == 207) {
                 $content[$entityClass] = [
                     "status" => $entityClassResponse->getStatus(),
@@ -149,7 +155,7 @@ class ContentResponse extends HttpResponse2
                 parent::__construct(200, 'Hello World');
             }
         } elseif ($uri == '/script.js') {
-            $fileContent = file_get_contents('lib/front-end/script.js');
+            $fileContent = file_get_contents('lib/ui/script.js');
             parent::__construct(200, $fileContent);
         } elseif (file_exists('custom/content' . $uri)) {
             $fileContent = file_get_contents('custom/content' . $uri);//TODO make safe!

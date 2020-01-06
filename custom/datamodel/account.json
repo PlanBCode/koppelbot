@@ -5,5 +5,5 @@
   },
   "email" : {"type" : "string", "regex":"^TODO$"},
   "title" : {"type" : "string", "regex":"^TODO$"},
-  "id" : {"type" : "number", "storage":{"key":true}}
+  "id" : {"type" : "string", "storage":{"key":true}}
 }
