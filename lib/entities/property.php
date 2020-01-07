@@ -38,6 +38,8 @@ class  PropertyRequest
     protected $content;
     protected $query;
 
+    protected $status;
+
     protected $storageString;
 
     public function __construct($requestId, string $method, string $entityClass, string $entityId, $property, $content, Query $query)
@@ -49,16 +51,30 @@ class  PropertyRequest
         $this->property = $property;
         $this->content = $content;
         $this->query = $query;
-        if(is_string($property)){ //TODO perhaps a nicer way of handling errors
+        if (is_string($property)) { //TODO perhaps a nicer way of handling errors
+            $this->status = 404;
             $this->storageString = Storage::STORAGE_STRING_ERROR;
-        }else{
+            $this->content = 'Property ' . $property . ' not found for ' . $entityClass . '.';
+        } elseif ($method === 'PUT' && !$property->validate($content)) {
+            $this->status = 400;
+            $this->storageString = Storage::STORAGE_STRING_ERROR;
+            $this->content = 'Invalid content for /' . $entityClass . '/' . $entityId . '/' . $property . '.';
+        } else {
+            $this->status = 200;
             $storageSettings = $this->property->getStorageSettings();
-            $storageType = array_get($storageSettings,'type');
+            $storageType = array_get($storageSettings, 'type');
             $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $query);
             if ($this->storageString === null) {
+                $this->status = 500;
+                $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . $property . '.';
                 $this->storageString = Storage::STORAGE_STRING_ERROR;
             }
         }
+    }
+
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     public function getRequestId()
@@ -120,13 +136,13 @@ class PropertyResponse extends Response
 
 class Property
 {
-    const PROPERTY_TYPE    = 'type';
+    const PROPERTY_TYPE = 'type';
     const PROPERTY_STORAGE = 'storage';
-    const PROPERTY_ACCESS  = 'access';
+    const PROPERTY_ACCESS = 'access';
 
     protected $propertyName;
 
-    protected $type;//TODO string,number
+    protected $type;
     protected $settings;
 
     protected $storage;
@@ -159,23 +175,28 @@ class Property
         $this->type = new $typeClass();
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->propertyName;
     }
 
-    public function getStorageSettings() : array
+    public function getStorageSettings(): array
     {
         return $this->storage;
     }
-    public function getMeta() : array
+
+    public function getMeta(): array
     {
         return $this->settings;
+    }
+
+    public function validate($content): bool
+    {
+        return $this->type->validate($content, $this->settings);
     }
 
     public function getStorageSetting($settingName)
     {
         return array_get($this->storage, $settingName);
-        return $this->storage;
     }
 }

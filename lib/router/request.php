@@ -57,7 +57,7 @@ class ApiRequest extends HttpRequest2
                 $subEntityClass = array_get($subRequest, 'class', $entityClass);
                 $subEntityId = array_get($subRequest, 'id', $entityId);
                 $subPropertyName = array_get($subRequest, 'property', $propertyName);
-                $subQuery = array_key_exists('query',$subRequest) ? $query->add($subRequest['query']) : $query;
+                $subQuery = array_key_exists('query', $subRequest) ? $query->add($subRequest['query']) : $query;
                 $subMethod = array_get($subRequest, 'method', 'GET');
                 $subContent = array_get($subRequest, 'content', null);
                 $this->add($requestId, $subMethod, $subEntityClass, $subEntityId, $subPropertyName, $subContent, $subQuery);
@@ -99,7 +99,7 @@ class UiRequest extends HttpRequest2
         $entityClass = count($path) > 1 ? $path[1] : '*';
         $entityId = count($path) > 2 ? $path[2] : '*';
         $propertyName = count($path) > 3 ? $path[3] : '*';
-        return new UiResponse($display,$entityClass, $entityId, $propertyName, $query);
+        return new UiResponse($display, $entityClass, $entityId, $propertyName, $query);
     }
 }
 

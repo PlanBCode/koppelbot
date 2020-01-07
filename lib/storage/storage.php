@@ -96,18 +96,15 @@ abstract class Storage
     {
         $storageResponse = new StorageResponse();
         foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
-            $propertyName = $propertyRequest->getProperty();
-            $storageResponse->add(404, $propertyRequest, $propertyRequest->getEntityId(), 'error', 'Property ' . $propertyName . ' not found for ' . $propertyRequest->getEntityClass());//TODO
+            //TODO propertyName?
+            $storageResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), 'error', $propertyRequest->getContent());
         }
-
         return $storageResponse;
     }
 
     public static function addStorage(string $type, array $storageSettings, string $method, string $entityClass, string $entityId, Query $query)
     {
-        //tODO if meta
-
-        if($query->checkToggle('meta')){
+        if ($query->checkToggle('meta')) {
             return self::STORAGE_STRING_META;
         }
 

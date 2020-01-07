@@ -1,13 +1,13 @@
-http://localhost:8888/account/aap/email
-
-
-
 TODO
-create (mixed) response
+
+ui: dynamic updating / state syncing
+
+types:
+ - file  (mime, max-size)
+ - number (min,max,step)
+ - time
+ - datetime
 
 create http status code LUT
-
-id needs to get storage property to define it as the json key in the object
-same for filename, timestamp etc in dir list storage
 
 entity inheritance
