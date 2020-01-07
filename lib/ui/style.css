@@ -1,0 +1,12 @@
+.xyz-list-header, .xyz-item-header {
+    background-color: blue;
+    color: white;
+}
+
+.xyz-list-item:hover {
+    background-color: lightblue;
+}
+
+.xyz-list-highlight {
+    background-color: yellow;
+}

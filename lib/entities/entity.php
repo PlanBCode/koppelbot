@@ -29,7 +29,7 @@ class Entity
 
     protected function getPropertiesFromPropertyName($propertyName): array
     {
-        if ($propertyName == '*') {
+        if ($propertyName === '*') {
             $properties = $this->properties;
         } else {
             $properties = [];
@@ -60,72 +60,6 @@ class Entity
         }
 
         return $storageRequests;
-    }
-
-    public function getUiComponentHtml(string $action, string $entityId, string $propertyName, Query $query): string
-    {
-        $html = '';
-        $query = new Query('');
-        // TODO method based on action new/delete -> 'HEAD'
-        $storageRequests = $this->createStorageRequests(null, 'GET', $entityId, $propertyName, null, $query);
-        if ($action === 'list') {
-            $html .= '<table class="list">';
-            $html .= '<tr class="list-header">';
-            $properties = $this->getPropertiesFromPropertyName($propertyName);
-            $html .= '<td></td>'; //TODO select all
-
-            foreach ($properties as $propertyName => $property) {
-                $html .= '<td>' . $propertyName . '</td>';
-            }
-            $html .= '</tr>';
-        }
-        foreach ($storageRequests as $storageRequest) {
-
-            $storageResponse = Storage::getStorageResponse($storageRequest);
-
-            foreach ($storageResponse->getRequestResponses() as $requestResponse) {
-                //TODO catch errors
-                foreach ($requestResponse->getEntityClassResponses() as $entityClassResponse) {
-                    //TODO catch errors
-                    foreach ($entityClassResponse->getEntityResponses() as $entityResponse) {
-                        //TODO catch errors
-                        $entityId = $entityResponse->getEntityId();
-                        if ($action === 'list') {
-                            $html .= '<tr class="list-item" onclick="xyz.eventDrillDown(event,\''.$entityId.'\')">';
-                            $html .= '<td><input type="' . ($query->checkToggle('multi-select') ?  'checkbox':'radio') . '" name="TODO"></td>';//TODO choose name
-                        } else {
-                            $html .= '<div>';
-                            $html .= '<div class="item-header">' . $entityId. '</div>';
-                        }
-                        foreach ($entityResponse->getPropertyResponses() as $propertyName => $propertyResponse) {
-                            //TODO catch errors
-                            $property = $this->properties[$propertyName];
-                            $content = $propertyResponse->getContent();
-                            if ($action === 'list') {
-                                $html .= '<td>';
-                            }
-                            if (!$query->checkToggle('no_label') && $action !== 'list') {
-                                //TODO pass or generate and use id
-                                $html .= '<label for="TODO">' . $propertyName . '</label>';
-                            }
-                            $html .= $property->getUiComponentHtml($action, $entityId, $content, $query);
-                            if ($action === 'list') {
-                                $html .= '</td>';
-                            }
-                        }
-                        if ($action === 'list') {
-                            $html .= '</tr>';
-                        } else {
-                            $html .= '</div>';
-                        }
-                    }
-                }
-            }
-        }
-        if ($action === 'list') {
-            $html .= '</table>';
-        }
-        return $html;
     }
 }
 
@@ -216,6 +150,11 @@ class EntityClassResponse extends Response
                 $this->entityResponses[$entityId]->merge($entityResponse);
             }
         }
+    }
+
+    public function getEntityClass(): string
+    {
+        return $this->entityClass;
     }
 
     public function getEntityResponses(): array

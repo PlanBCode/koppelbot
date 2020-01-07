@@ -73,7 +73,6 @@ class RequestResponse extends Response
                 $content[$entityClass] = $entityClassResponse->getContent();
             }
         }
-
         return $content;
     }
 }
@@ -154,8 +153,16 @@ class ContentResponse extends HttpResponse2
             } else {
                 parent::__construct(200, 'Hello World');
             }
+        } elseif ($uri == '/style.css') {
+            $fileContent = file_get_contents('lib/ui/style.css');
+            parent::__construct(200, $fileContent);
         } elseif ($uri == '/script.js') {
             $fileContent = file_get_contents('lib/ui/script.js');
+            $typeFilePaths = glob('lib/types/*.js');
+            foreach ($typeFilePaths as $typeFilePath) {
+                $type = basename($typeFilePath, '.js');
+                $fileContent .= "\n xyz.types." . file_get_contents($typeFilePath);
+            }
             parent::__construct(200, $fileContent);
         } elseif (file_exists('custom/content' . $uri)) {
             $fileContent = file_get_contents('custom/content' . $uri);//TODO make safe!

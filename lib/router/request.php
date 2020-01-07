@@ -95,11 +95,11 @@ class UiRequest extends HttpRequest2
         $query = new Query($this->queryString);
 
         $path = explode('/', $this->uri);
-        $action = count($path) > 0 ? $path[0] : '*';
+        $display = count($path) > 0 ? $path[0] : '*';
         $entityClass = count($path) > 1 ? $path[1] : '*';
         $entityId = count($path) > 2 ? $path[2] : '*';
         $propertyName = count($path) > 3 ? $path[3] : '*';
-        return new UiResponse($action,$entityClass, $entityId, $propertyName, $query);
+        return new UiResponse($display,$entityClass, $entityId, $propertyName, $query);
     }
 }
 

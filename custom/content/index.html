@@ -1,28 +1,13 @@
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
     <script type="text/javascript" src="script.js"></script>
-    <style>
-        .list-header, .item-header {
-            background-color: blue;
-            color: white;
-        }
-
-        .list-item:hover {
-            background-color: lightblue;
-        }
-
-        .drillDown {
-            background-color: yellow;
-        }
-
-    </style>
 </head>
 <body>
 Hello World!
 
-<script>xyz.ui('/list/account/*/title,email,id', {drillDown: 'account'})</script>
-
-<script>xyz.ui('/edit/account/aap/title')</script>
+<script>xyz.ui('/account/*/title,email,id', {display:'list',drillDown: 'account'})</script>
+<script>xyz.ui('/account/$account/title')</script>
 
 </body>
 </html>

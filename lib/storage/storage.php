@@ -76,10 +76,21 @@ class StorageResponse extends Response
 
 abstract class Storage
 {
+    const STORAGE_STRING_META = 'META';
     const STORAGE_STRING_ERROR = 'ERROR';
 
     /** @var Storage[] */
     private static $storages = []; // string $storageString -> Storage
+
+    public static function createMetaResponse(StorageRequest $storageRequest): StorageResponse
+    {
+        $storageResponse = new StorageResponse();
+        foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
+            $property = $propertyRequest->getProperty();
+            $storageResponse->add(200, $propertyRequest, $propertyRequest->getEntityId(), $property->getName(), $property->getMeta());
+        }
+        return $storageResponse;
+    }
 
     public static function createErrorResponse(StorageRequest $storageRequest): StorageResponse
     {
@@ -94,6 +105,12 @@ abstract class Storage
 
     public static function addStorage(string $type, array $storageSettings, string $method, string $entityClass, string $entityId, Query $query)
     {
+        //tODO if meta
+
+        if($query->checkToggle('meta')){
+            return self::STORAGE_STRING_META;
+        }
+
         $storageClass = 'Storage_' . $type;
         if (!class_exists($storageClass)) {
             return null;
@@ -119,7 +136,14 @@ abstract class Storage
         }
         $storageString = $propertyRequest->getStorageString();
 
-        return $storageString != self::STORAGE_STRING_ERROR ? Storage::$storages[$storageString]->createResponse($storageRequest) : Storage::createErrorResponse($storageRequest);
+        switch ($storageString) {
+            case self::STORAGE_STRING_ERROR:
+                return Storage::createErrorResponse($storageRequest);
+            case self::STORAGE_STRING_META:
+                return Storage::createMetaResponse($storageRequest);
+            default:
+                return Storage::$storages[$storageString]->createResponse($storageRequest);
+        }
     }
 
     abstract static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, Query $query): string;

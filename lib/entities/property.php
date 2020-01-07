@@ -152,15 +152,11 @@ class Property
         $this->storage = array_merge($rootSettingStorage, $settingStorage);
 
         $typeClass = 'Type_' . $typeName;
+        //TODO require file
         if (!class_exists($typeClass)) {
             //return null; //TODO ERROR
         }
         $this->type = new $typeClass();
-    }
-
-    public function getUiComponentHtml(string $action, string $entityId, $content, Query $query) : string
-    {
-        return $this->type->getUiComponentHtml($this->propertyName, $action, $entityId, $content, $this->settings, $query);
     }
 
     public function getName() : string
@@ -171,6 +167,10 @@ class Property
     public function getStorageSettings() : array
     {
         return $this->storage;
+    }
+    public function getMeta() : array
+    {
+        return $this->settings;
     }
 
     public function getStorageSetting($settingName)
