@@ -161,7 +161,7 @@ class ContentResponse extends HttpResponse2
             $typeFilePaths = glob('lib/types/*.js');
             foreach ($typeFilePaths as $typeFilePath) {
                 $type = basename($typeFilePath, '.js');
-                $fileContent .= "\n xyz.types." . file_get_contents($typeFilePath);
+                $fileContent .= "\n" . file_get_contents($typeFilePath);
             }
             parent::__construct(200, $fileContent);
         } elseif (file_exists('custom/content' . $uri)) {

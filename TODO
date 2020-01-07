@@ -1,9 +1,21 @@
 TODO
 
+
+put create new
+- check required values
+- use default values
+
+
+property "*": {type='string|json=mixed'}  dynamic number of properties
+
+submit button
 ui: dynamic updating / state syncing
 
+
+$variable usage in /ui endpoints (generate inputs to update)
+
 types:
- - file  (mime, max-size)
+ - file  (accept, max-size)
  - number (min,max,step)
  - time
  - datetime

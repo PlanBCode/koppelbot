@@ -72,6 +72,11 @@ class  PropertyRequest
         }
     }
 
+    public function readOnly(): bool
+    {
+        return $this->method !== 'PUT' && $this->method !== 'DELETE';
+    }
+
     public function getStatus()
     {
         return $this->status;
@@ -168,7 +173,9 @@ class Property
         $this->storage = array_merge($rootSettingStorage, $settingStorage);
 
         $typeClass = 'Type_' . $typeName;
-        //TODO require file
+        //TODO error if file does not exist
+        require_once './lib/types/'.$typeName.'.php';
+
         if (!class_exists($typeClass)) {
             //return null; //TODO ERROR
         }

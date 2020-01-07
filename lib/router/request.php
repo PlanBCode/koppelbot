@@ -50,7 +50,16 @@ class ApiRequest extends HttpRequest2
         if ($this->method === 'GET' || $this->method === 'DELETE' || $this->method === 'HEAD') {
             $this->add(null, $this->method, $entityClass, $entityId, $propertyName, null, $query);
         } elseif ($this->method === 'PUT') {
-            $this->add(null, $this->method, $entityClass, $entityId, $propertyName, $this->content, $query);
+            $propertyNames = explode(',',$propertyName);
+            if(count($propertyNames)===1) {
+                $this->add(null, $this->method, $entityClass, $entityId, $propertyName, $this->content, $query);
+            }else{
+                $content = json_decode($this->content,true);
+                foreach($propertyNames as $propertyName){
+                    $subContent = $content[$propertyName];
+                    $this->add($propertyName, $this->method, $entityClass, $entityId, $propertyName, $subContent, $query);
+                }
+            }
         } elseif ($this->method === 'POST') { // Multi requests
             $jsonContent = json_decode($this->content, true); //TODO catch errors
             foreach ($jsonContent as $requestId => $subRequest) {

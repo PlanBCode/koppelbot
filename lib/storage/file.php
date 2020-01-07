@@ -33,19 +33,33 @@ class Storage_file extends BasicStorage
         //TODO lock file
         //TODO check if file exists
         $fileContent = file_get_contents($this->path);
+
+        $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+
         //TODO error if fails
-        $this->data = json_decode($fileContent, true);
+        if ($parse === 'json') {
+            $this->data = json_decode($fileContent, true);
+        } else { //TODO xml, yaml,csv,tsv
+            return new StorageResponse(500);
+        }
 
         return new StorageResponse(200);
     }
 
     protected function close(StorageRequest $storageRequest): StorageResponse
     {
-        $fileContent = json_encode($this->data);
-        if ($fileContent) {
-            file_put_contents($this->path, $fileContent);//TODO only on write
-        }
+        if(!$storageRequest->readOnly()) {
+            $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+            if ($parse === 'json') {
+                $fileContent = json_encode($this->data);
+            } else { //TODO xml, yaml,csv,tsv
+                return new StorageResponse(500);
+            }
 
+            if ($fileContent) {
+                file_put_contents($this->path, $fileContent);
+            }
+        }
         //TODO unlock file
         return new StorageResponse(200);
     }

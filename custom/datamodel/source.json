@@ -1,8 +1,8 @@
 {
   "_" : {
     "extends":"entity",
-    "storage" : {"type":"directory", "parse":"json","path":"data/", "extension":"json"}
+    "storage" : {"type":"directory", "parse":"none","path":"data/sources/", "extension":"txt"}
   },
-  "aap" : {"type" : "string", "regex":"^TODO$"},
+  "content" : {"type" : "string", "storage": {"content": true}, "key":"id", "accept":"TODO"},
   "id" : {"type" : "string", "storage":{"key":true}}
 }

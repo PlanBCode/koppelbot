@@ -31,18 +31,19 @@ class Storage_directory extends BasicStorage
     public function __construct(array $settings)
     {
         $this->path = array_get($settings, 'path');
-        $this->extension = array_get($settings, 'extension','*');
+        $this->extension = array_get($settings, 'extension', '*');
     }
 
-    protected function createFilePath(string $entityId){
-        return $this->path.$entityId.($this->extension!='*'?('.'.$this->extension):''); //TODO join paths properly
+    protected function createFilePath(string $entityId)
+    {
+        return $this->path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
     }
 
     static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, Query $query): string
     {
         $path = array_get($settings, 'path');
-        $extension = array_get($settings, 'extension','*');
-        return $path.$entityId.'.'.$extension;
+        $extension = array_get($settings, 'extension', '*');
+        return $path . $entityId . '.' . $extension;
     }
 
     protected function open(StorageRequest $storageRequest): StorageResponse
@@ -51,46 +52,63 @@ class Storage_directory extends BasicStorage
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
 
         $propertyRequest = $storageRequest->getFirstPropertyRequest();
-        if(!$propertyRequest){
+        if (!$propertyRequest) {
             return new StorageResponse(500);
         }
         $entityId = $propertyRequest->getEntityId();
-        if($entityId==='*'){
+        if ($entityId === '*') {
             $filePaths = glob($this->createFilePath('*'));
-        }else{
+        } else {
             $filePaths = [$this->createFilePath($entityId)];
         }
         $this->data = [];
-        foreach($filePaths as $filePath){
-            $entityId = basename($filePath, '.'.$this->extension);
-
+        $parse = $propertyRequest->getProperty()->getStorageSetting('parse');
+        foreach ($filePaths as $filePath) {
+            $entityId = $this->extension === '*' ? $filePath : basename($filePath, '.' . $this->extension);
             //TODO lock file
             //TODO check if file exists
             $fileContent = file_get_contents($filePath);
             //TODO error if fails
-            $this->data[$entityId] = json_decode($fileContent, true);
+            if ($parse === 'json') {
+                $this->data[$entityId] = json_decode($fileContent, true);
+            } else { //TODO xml,yaml,csv,tsv
+                $this->data[$entityId] = $fileContent;
+            }
         }
         return new StorageResponse(200);
     }
 
     protected function close(StorageRequest $storageRequest): StorageResponse
     {
-        /*TODO $propertyRequest = $storageRequest->getFirstPropertyRequest();
-        if(!$propertyRequest){
+        if (!$storageRequest->readOnly()) {
+            echo 'Close ' . serialize($this->data) . PHP_EOL;
+        }
+        $propertyRequest = $storageRequest->getFirstPropertyRequest();
+        if (!$propertyRequest) {
             return new StorageResponse(500);
         }
-        $entityId = $propertyRequest->getEntityId();
+        $parse = $propertyRequest->getProperty()->getStorageSetting('parse');
+        foreach ($this->data as $entityId => $data) {
 
-        $fileContent = json_encode($this->data);
-        if ($fileContent) {
-            file_put_contents($this->createFilePath($entityId), $fileContent);//TODO only on write
+            if (!$storageRequest->readOnly($entityId)) { //TODO dit gaat mis als de key gewijzigd wordt
+                if ($parse === 'json') {
+                    $fileContent = json_encode($data);
+                } else {//TODO xml,yaml,csv,tsv
+                    $fileContent = $data;
+                }
+                echo $entityId . ' ' . $fileContent . PHP_EOL;
+                if ($fileContent) {
+                    file_put_contents($this->createFilePath($entityId), $fileContent);
+                }
+            }
+            //TODO unlock file
         }
-        //TODO unlock file*/
         return new StorageResponse(200);
     }
 
     protected function get(PropertyRequest $propertyRequest): StorageResponse
     {
+
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
@@ -103,6 +121,9 @@ class Storage_directory extends BasicStorage
                 $propertyName = $property->getName();
                 if ($propertyRequest->getProperty()->getStorageSetting('key')) {
                     $content = $entityId;
+                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
+                    $content = $entity;
                     $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
                 } elseif (array_key_exists($propertyName, $entity)) {
                     $content = $entity[$propertyName];
@@ -132,8 +153,15 @@ class Storage_directory extends BasicStorage
                 $propertyName = $property->getName();
                 if ($propertyRequest->getProperty()->getStorageSetting('key')) {
                     $content = $propertyRequest->getContent();
+                    $content = $this->extension === '*' ? $content : basename($content, '.' . $this->extension);
                     $this->data[$content] = $this->data[$entityId];
+                    $this->data[$entityId] = null;
                     unset($this->data[$entityId]);
+                    $storageResponse->add(200, $propertyRequest, $content, $propertyName, $content);
+                } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
+                    $content = $propertyRequest->getContent();
+                    $this->data[$entityId] = $content;
+                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
                 } elseif (array_key_exists($propertyName, $entity)) {
                     $content = $propertyRequest->getContent();
                     $this->data[$entityId][$propertyName] = $content;
@@ -145,7 +173,6 @@ class Storage_directory extends BasicStorage
                 $storageResponse->add(404, $propertyRequest, $entityId, '*', 'Not found');//TODO
             }
         }
-
         return $storageResponse;
     }
 

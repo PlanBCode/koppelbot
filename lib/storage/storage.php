@@ -34,6 +34,16 @@ class StorageRequest
     {
         return reset($this->propertyRequests);
     }
+
+    public function readOnly(string $entityId = ''): bool
+    {
+        foreach ($this->propertyRequests as $propertyRequest) {
+            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->readOnly()) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
 class StorageResponse extends Response
@@ -96,8 +106,9 @@ abstract class Storage
     {
         $storageResponse = new StorageResponse();
         foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
-            //TODO propertyName?
-            $storageResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), 'error', $propertyRequest->getContent());
+            $property = $propertyRequest->getProperty();
+            $propertyName = is_string($property) ? $property : $property->getName();
+            $storageResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyName, $propertyRequest->getContent());
         }
         return $storageResponse;
     }
@@ -114,7 +125,7 @@ abstract class Storage
         }
 
         $storageString = $type . '_' . $storageClass::getStorageString($storageSettings, $method, $entityClass, $entityId, $query);
-        //(array $settings, string $method, string $entityClass, string $entityId, Query $query)
+
         if (!array_key_exists($storageString, self::$storages)) {
             self::$storages[$storageString] = new $storageClass($storageSettings);
         } else {
