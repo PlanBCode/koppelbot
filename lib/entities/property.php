@@ -153,6 +153,7 @@ class Property
     protected $storage;
     protected $access;
 
+    protected $subProperties;
     /* TODO
        required
       audit
@@ -174,12 +175,17 @@ class Property
 
         $typeClass = 'Type_' . $typeName;
         //TODO error if file does not exist
-        require_once './lib/types/'.$typeName.'.php';
+        require_once './lib/types/' . $typeName . '.php';
 
         if (!class_exists($typeClass)) {
             //return null; //TODO ERROR
         }
         $this->type = new $typeClass();
+    }
+
+    public function getCombinedProperties(): array
+    {
+        return array_get($this->settings, 'combined');
     }
 
     public function getName(): string

@@ -5,12 +5,30 @@ put create new
 - check required values
 - use default values
 
+combined properties:
+"file": {"combined":{"key":"id","content":"content"}},"type":"file"}
+
+/source/*/file/key
+
+custom view html definition:
+"label": {"combined":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
+"url": {"type":"string","view":"<a href='$'>$</a>}
+
+
+client side parsing json|none
+
+readOnly for property
+
 
 property "*": {type='string|json=mixed'}  dynamic number of properties
 
-submit button
+ui: pass submit button  {submit:id, action:edit|delete}
+
+file type: viewer   https://viewerjs.org/
+
 ui: dynamic updating / state syncing
 
+proper file locks
 
 $variable usage in /ui endpoints (generate inputs to update)
 

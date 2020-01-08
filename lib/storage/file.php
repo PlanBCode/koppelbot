@@ -48,7 +48,7 @@ class Storage_file extends BasicStorage
 
     protected function close(StorageRequest $storageRequest): StorageResponse
     {
-        if(!$storageRequest->readOnly()) {
+        if (!$storageRequest->readOnly()) {
             $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
             if ($parse === 'json') {
                 $fileContent = json_encode($this->data);
@@ -83,10 +83,10 @@ class Storage_file extends BasicStorage
                     $content = $entity[$propertyName];
                     $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
                 } else {
-                    $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, 'Not found');//TODO pass something
+                    $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/' . $propertyName . ' not found.');
                 }
             } else {
-                $storageResponse->add(404, $propertyRequest, $entityId, '*', 'Not found');//TODO
+                $storageResponse->add(404, $propertyRequest, $entityId, '*', '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/* not found.');
             }
         }
 
@@ -101,23 +101,19 @@ class Storage_file extends BasicStorage
 
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
-            if (array_key_exists($entityId, $this->data)) {
-                $entity = $this->data[$entityId];
-                $property = $propertyRequest->getProperty();
-                $propertyName = $property->getName();
-                if ($propertyRequest->getProperty()->getStorageSetting('key')) {
-                    $content = $propertyRequest->getContent();
-                    $this->data[$content] = $this->data[$entityId];
-                    unset($this->data[$entityId]);
-                } elseif (array_key_exists($propertyName, $entity)) {
-                    $content = $propertyRequest->getContent();
-                    $this->data[$entityId][$propertyName] = $content;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
-                } else {
-                    $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, 'Not found');//TODO pass something
-                }
+            if (!array_key_exists($entityId, $this->data)) {
+                $this->data[$entityId] = [];
+            }
+            $property = $propertyRequest->getProperty();
+            $propertyName = $property->getName();
+            if ($propertyRequest->getProperty()->getStorageSetting('key')) {
+                $content = $propertyRequest->getContent();
+                $this->data[$content] = $this->data[$entityId];
+                unset($this->data[$entityId]);
             } else {
-                $storageResponse->add(404, $propertyRequest, $entityId, '*', 'Not found');//TODO
+                $content = $propertyRequest->getContent();
+                $this->data[$entityId][$propertyName] = $content;
+                $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
             }
         }
 

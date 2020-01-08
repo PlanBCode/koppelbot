@@ -27,17 +27,29 @@ class Entity
         }
     }
 
-    protected function getPropertiesFromPropertyName($propertyName): array
+    protected function getPropertiesFromPropertyName($propertyNames): array
     {
-        if ($propertyName === '*') {
-            $properties = $this->properties;
+        $properties = [];
+        if ($propertyNames === '*') {
+            foreach ($this->properties as $propertyName => $property) {
+                if (!$property->isCombined()) {
+                    $properties[$propertyName] = $property;
+                }
+            }
         } else {
-            $properties = [];
-            foreach (explode(',', $propertyName) as $p) {
-                if (array_key_exists($p, $this->properties)) {
-                    $properties[$p] = $this->properties[$p];
+            foreach (explode(',', $propertyNames) as $propertyName) {
+                $property = array_get($this->properties, $propertyName);
+                if ($property) {
+                    $combinedProperties = $property->getCombinedProperties();
+                    if ($combinedProperties) {
+                        foreach ($combinedProperties as $label=>$propertyName) {
+                            $properties[$propertyName] = array_get($this->properties, $propertyName, $propertyName);
+                        }
+                    } else {
+                        $properties[$propertyName] = $property;
+                    }
                 } else {
-                    $properties[$p] = $p;
+                    $properties[$propertyName] = $propertyName;
                 }
             }
         }
