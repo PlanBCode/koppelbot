@@ -89,7 +89,6 @@ class Storage_file extends BasicStorage
                 $storageResponse->add(404, $propertyRequest, $entityId, '*', '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/* not found.');
             }
         }
-
         return $storageResponse;
     }
 

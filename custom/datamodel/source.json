@@ -1,10 +1,31 @@
 {
-  "_" : {
-    "extends":"entity",
-    "storage" : {"type":"directory", "parse":"none","path":"data/sources/", "extension":"txt"}
+  "_": {
+    "extends": "entity",
+    "storage": {
+      "type": "directory",
+      "parse": "none",
+      "path": "data/sources/",
+      "extension": "txt"
+    }
   },
-  "content" : {"type" : "string", "storage": {"content": true}, "key":"id", "accept":"TODO"},
-  "meta" : {"type" : "string", "storage": {"type":"directory", "parse":"none","path":"data/sources/", "extension":"meta","content": true}, "key":"id", "accept":"TODO"},
-  "id" : {"type" : "string", "storage":{"key":true}},
-  "file": {"combined":{"key":"id","content":"content"},"type":"file"}
+
+  "file": {
+    "combined": {
+      "content": {
+        "type": "string",
+        "storage": {
+          "content": true
+        },
+        "key": "id",
+        "accept": "TODO"
+      },
+      "id": {
+        "type": "string",
+        "storage": {
+          "key": true
+        }
+      }
+    },
+    "type": "file"
+  }
 }

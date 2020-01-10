@@ -1,14 +1,32 @@
 TODO
 
+Add type signatures
+
+File::getSignature() = "string"
+File::getSignature() = {content:"string",id:"string"{
+
+
+Reinstate meta (dual file storage)
+"meta": {
+    "type": "string",
+    "storage": {
+      "type": "directory",
+      "parse": "none",
+      "path": "data/sources/",
+      "extension": "meta",
+      "content": true
+    },
+    "key": "id",
+    "accept": "TODO"
+  },
+
 
 put create new
 - check required values
 - use default values
 
-combined properties:
-"file": {"combined":{"key":"id","content":"content"}},"type":"file"}
-
-/source/*/file/key
+Entity primitive property
+  /class/id = "value"  (no properties)
 
 custom view html definition:
 "label": {"combined":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}

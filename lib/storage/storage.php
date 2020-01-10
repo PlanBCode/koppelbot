@@ -107,7 +107,7 @@ abstract class Storage
         $storageResponse = new StorageResponse();
         foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
             $property = $propertyRequest->getProperty();
-            $propertyName = is_string($property) ? $property : $property->getName();
+            $propertyName = is_null($property) ? '*' : $property->getName();
             $storageResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyName, $propertyRequest->getContent());
         }
         return $storageResponse;

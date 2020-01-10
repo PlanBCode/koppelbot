@@ -17,7 +17,7 @@ class Entity
         $properties = json_decode($fileContent, true);
 
         //TODO resolve inheritance
-
+        //TODO check for primitive property
         $rootSettings = array_key_exists('_', $properties) ? $properties['_'] : [];
 
         foreach ($properties as $property => $settings) {
@@ -27,50 +27,49 @@ class Entity
         }
     }
 
-    protected function getPropertiesFromPropertyName($propertyNames): array
+    protected function expand($propertyPath): array
     {
-        $properties = [];
-        if ($propertyNames === '*') {
-            foreach ($this->properties as $propertyName => $property) {
-                if (!$property->isCombined()) {
-                    $properties[$propertyName] = $property;
-                }
-            }
+        //TODO if entity is primitive them return the entities primitive property
+        // return [new X($this->primitiveProperty)];
+
+        $propertyList = array_get($propertyPath, 0, '*');
+        if ($propertyList === '*') {
+            $propertyNames = array_keys($this->properties);
         } else {
-            foreach (explode(',', $propertyNames) as $propertyName) {
-                $property = array_get($this->properties, $propertyName);
-                if ($property) {
-                    $combinedProperties = $property->getCombinedProperties();
-                    if ($combinedProperties) {
-                        foreach ($combinedProperties as $label=>$propertyName) {
-                            $properties[$propertyName] = array_get($this->properties, $propertyName, $propertyName);
-                        }
-                    } else {
-                        $properties[$propertyName] = $property;
-                    }
-                } else {
-                    $properties[$propertyName] = $propertyName;
+            $propertyNames = explode(',', $propertyList);
+        }
+
+        $propertyHandles = [];
+        foreach ($propertyNames as $propertyName) {
+            if (!array_key_exists($propertyName, $this->properties)) {
+                return [new PropertyHandle(404, 'Property "' . $propertyName . '" does not exist.', $propertyPath)]; //TODO expand error message
+            } else {
+                $property = $this->properties[$propertyName];
+                $expandedPropertyHandles = $property->expand($propertyPath, 1);
+                if (count($expandedPropertyHandles) > 0) {
+                    array_push($propertyHandles, ...$expandedPropertyHandles);
                 }
             }
         }
-        return $properties;
+        return $propertyHandles;
     }
 
-    public function createStorageRequests($requestId, string $method, string $entityId, string $propertyName, $content, Query $query)
+    public function createStorageRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query $query)
     {
+        /** @var StorageRequest[] */
         $storageRequests = [];
-        $properties = $this->getPropertiesFromPropertyName($propertyName);
+        /** @var PropertyHandle[] */
+        $propertyHandles = $this->expand($propertyPath);
+        foreach ($propertyHandles as $propertyHandle) {
+            /** @var PropertyRequest */
+            $propertyRequest = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
+            $storageString = $propertyRequest->getStorageString();
 
-        /** @var Property|string $property */
-        foreach ($properties as $propertyName => $property) {
-            $propertyRequest = new PropertyRequest($requestId, $method, $this->entityClass, $entityId, $property, $content, $query);
-            $storageString = is_string($property) ? Storage::STORAGE_STRING_ERROR : $propertyRequest->getStorageString();
             if (!array_key_exists($storageString, $storageRequests)) {
                 $storageRequests[$storageString] = new StorageRequest();
             }
             $storageRequests[$storageString]->add($propertyRequest);
         }
-
         return $storageRequests;
     }
 }
@@ -126,7 +125,6 @@ class EntityResponse extends Response
                 $content[$propertyName] = $propertyResponse->getContent();
             }
         }
-
         return $content;
     }
 }
