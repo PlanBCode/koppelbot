@@ -102,8 +102,8 @@ class UiRequest extends HttpRequest2
         $display = count($path) > 0 ? $path[0] : '*';
         $entityClass = count($path) > 1 ? $path[1] : '*';
         $entityId = count($path) > 2 ? $path[2] : '*';
-        $propertyName = count($path) > 3 ? $path[3] : '*';
-        return new UiResponse($display, $entityClass, $entityId, $propertyName, $query);
+        $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
+        return new UiResponse($display, $entityClass, $entityId, $propertyPath, $query);
     }
 }
 

@@ -34,13 +34,13 @@ class RequestResponse extends Response
         $this->requestId = $requestId;
     }
 
-    public function add(int $status, string $entityClass, string $entityId, string $propertyName, $content): void
+    public function add(int $status, string $entityClass, string $entityId, array $propertyPath, $content): void
     {
         $this->addStatus($status);
         if (!array_key_exists($entityClass, $this->entityClassResponses)) {
             $this->entityClassResponses[$entityClass] = new EntityClassResponse($entityClass);
         }
-        $this->entityClassResponses[$entityClass]->add($status, $entityId, $propertyName, $content);
+        $this->entityClassResponses[$entityClass]->add($status, $entityId, $propertyPath, $content);
     }
 
     public function merge(RequestResponse $requestResponse): void

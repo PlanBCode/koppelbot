@@ -36,10 +36,10 @@ class  PropertyRequest
     protected $entityClass;
     /** @var string */
     protected $entityId;
-    /** @var ?Property */
+    /** @var Property */
     protected $property;
     /** @var string[] */
-    protected $subPropertyPath;
+    protected $propertyPath;
     /** @var mixed */
     protected $content;
     /** @var Query */
@@ -57,7 +57,7 @@ class  PropertyRequest
         $this->method = $method;
         $this->entityId = $entityId;
         $this->entityClass = $entityClass;
-        $this->subPropertyPath = $propertyPath;
+        $this->propertyPath = $propertyPath;
         $this->query = $query;
         if ($status !== 200) {
             $this->status = $status;
@@ -73,16 +73,15 @@ class  PropertyRequest
             if ($method === 'PUT' && !$this->property->validate($content)) {
                 $this->status = 400;
                 $this->storageString = Storage::STORAGE_STRING_ERROR;
-                $this->content = 'Invalid content for /' . $entityClass . '/' . $entityId . '/' . $this->property->getName() . '.';
+                $this->content = 'Invalid content for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
             } else {
                 $this->status = 200;
                 $storageSettings = $this->property->getStorageSettings();
                 $storageType = array_get($storageSettings, 'type');
-                $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $query);
-                if ($this->storageString === null) {
+                $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
+                if ($this->storageString === Storage::STORAGE_STRING_ERROR) {
                     $this->status = 500;
-                    $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . $this->property->getName() . '.';
-                    $this->storageString = Storage::STORAGE_STRING_ERROR;
+                    $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
                 }
             }
         }
@@ -91,6 +90,11 @@ class  PropertyRequest
     public function readOnly(): bool
     {
         return $this->method !== 'PUT' && $this->method !== 'DELETE';
+    }
+
+    public function getPropertyPath(): array
+    {
+        return $this->propertyPath;
     }
 
     public function getStatus(): int
@@ -142,16 +146,23 @@ class  PropertyRequest
 class PropertyResponse extends Response
 {
     protected $content;
+    protected $propertyPath;
 
-    public function __construct(int $status, $content = null)
+    public function __construct(int $status, array $propertyPath, $content = null)
     {
         $this->addStatus($status);
         $this->content = $content;
+        $this->propertyPath = $propertyPath;
     }
 
     public function getContent()
     {
         return $this->content;
+    }
+
+    public function getPropertyPath(): array
+    {
+        return $this->propertyPath;
     }
 }
 
@@ -179,11 +190,8 @@ class PropertyHandle
 
     public function createPropertyRequest($requestId, string $method, string $entityClass, string $entityId, $content, Query $query): PropertyRequest
     {
-        if ($this->status === 200) {
-            return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $this->property, $this->propertyPath, $content, $query);
-        } else {
-            return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $this->error, $this->propertyPath, $content, $query);
-        }
+        $propertyOrError = $this->status === 200 ? $this->property : $this->error;
+        return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $propertyOrError, $this->propertyPath, $content, $query);
     }
 }
 
@@ -245,14 +253,24 @@ class Property
         }
     }
 
-    public function expand(array $propertyPath, int $depth): array
+    public function expand(array $propertyPath, int $depth, Query &$query): array
     {
-        if (count($propertyPath) <= $depth && count($this->subProperties) === 0) {
-            return [new PropertyHandle(200, $this, $propertyPath)];
+        if (count($propertyPath) < $depth) {
+            $propertyPath[] = $this->propertyName;
+        }
+
+        if (count($propertyPath) === $depth ) {
+            if(count($this->subProperties) === 0 || $query->checkToggle('meta')) {
+                return [new PropertyHandle(200, $this, $propertyPath)];
+            }
         }
 
         if (count($this->subProperties) === 0) {
-            return [new PropertyHandle(404, 'No subproperties available.', $propertyPath)]; //TODO expand error message
+            $last = count($propertyPath)-1;
+            $partialPropertyPath = array_slice($propertyPath,0,$last);
+            $subPropertyName = $propertyPath[$last];
+            //TODO expand error with entiy class and id
+            return [new PropertyHandle(400, 'No subproperties available for /'.implode('/',$partialPropertyPath), $propertyPath)];
         }
 
         $subPropertyList = array_get($propertyPath, $depth, '*');
@@ -264,11 +282,15 @@ class Property
 
         $propertyHandles = [];
         foreach ($subPropertyNames as $subPropertyName) {
+            $propertyPathSingular = $propertyPath;
+            $propertyPathSingular[$depth] = $subPropertyName;
             if (!array_key_exists($subPropertyName, $this->subProperties)) {
-                return [new PropertyHandle(404, 'Subproperty "' . $subPropertyName . '" does not exist.', $propertyPath)]; //TODO expand error message
+                //TODO expand error with entiy class and id
+                $propertyHandle = new PropertyHandle(400, '/'.implode('/',$propertyPathSingular). ' does not exist.', $propertyPathSingular);
+                array_push($propertyHandles, $propertyHandle);
             } else {
                 $subProperty = $this->subProperties[$subPropertyName];
-                $expandedPropertyHandles = $subProperty->expand($propertyPath, $depth + 1);
+                $expandedPropertyHandles = $subProperty->expand($propertyPathSingular, $depth + 1, $query);
                 array_push($propertyHandles, ...$expandedPropertyHandles);
             }
         }

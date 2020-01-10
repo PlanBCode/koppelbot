@@ -1,10 +1,25 @@
 TODO
 
+
+dit werkt nog niet goed:
+
+<script>xyz.ui('/source/*/file/content', {display: 'list', drillDown: 'source'});</script>
+
+multi dimensional data
+
+
 Add type signatures
+  File::getSignature() = "string"
+  File::getSignature() = {content:"string",id:"string"{
 
-File::getSignature() = "string"
-File::getSignature() = {content:"string",id:"string"{
 
+put create new
+- check required values
+- use default values
+
+
+
+Pass more stuff by reference
 
 Reinstate meta (dual file storage)
 "meta": {
@@ -21,10 +36,6 @@ Reinstate meta (dual file storage)
   },
 
 
-put create new
-- check required values
-- use default values
-
 Entity primitive property
   /class/id = "value"  (no properties)
 
@@ -32,11 +43,11 @@ custom view html definition:
 "label": {"combined":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
 
-
 client side parsing json|none
 
 readOnly for property
 
+pass option to get unwrapped response
 
 property "*": {type='string|json=mixed'}  dynamic number of properties
 

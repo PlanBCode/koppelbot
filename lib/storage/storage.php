@@ -56,14 +56,14 @@ class StorageResponse extends Response
         $this->addStatus($status);
     }
 
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, string $propertyName, $content): void
+    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): void
     {
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
         if (!array_key_exists($requestId, $this->requestResponses)) {
             $this->requestResponses[$requestId] = new RequestResponse($requestId);
         }
-        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyName, $content);
+        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
     }
 
     public function merge(StorageResponse $storageResponse): void
@@ -97,7 +97,7 @@ abstract class Storage
         $storageResponse = new StorageResponse();
         foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
             $property = $propertyRequest->getProperty();
-            $storageResponse->add(200, $propertyRequest, $propertyRequest->getEntityId(), $property->getName(), $property->getMeta());
+            $storageResponse->add(200, $propertyRequest, $propertyRequest->getEntityId(), $property->getMeta());
         }
         return $storageResponse;
     }
@@ -106,14 +106,15 @@ abstract class Storage
     {
         $storageResponse = new StorageResponse();
         foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
+            /** @var Property */
             $property = $propertyRequest->getProperty();
             $propertyName = is_null($property) ? '*' : $property->getName();
-            $storageResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyName, $propertyRequest->getContent());
+            $storageResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyRequest->getContent());
         }
         return $storageResponse;
     }
 
-    public static function addStorage(string $type, array $storageSettings, string $method, string $entityClass, string $entityId, Query $query)
+    public static function addStorage(string $type, array $storageSettings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
     {
         if ($query->checkToggle('meta')) {
             return self::STORAGE_STRING_META;
@@ -121,10 +122,10 @@ abstract class Storage
 
         $storageClass = 'Storage_' . $type;
         if (!class_exists($storageClass)) {
-            return null;
+            return self::STORAGE_STRING_ERROR;
         }
 
-        $storageString = $type . '_' . $storageClass::getStorageString($storageSettings, $method, $entityClass, $entityId, $query);
+        $storageString = $type . '_' . $storageClass::getStorageString($storageSettings, $method, $entityClass, $entityId, $propertyPath, $query);
 
         if (!array_key_exists($storageString, self::$storages)) {
             self::$storages[$storageString] = new $storageClass($storageSettings);
@@ -154,7 +155,7 @@ abstract class Storage
         }
     }
 
-    abstract static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, Query $query): string;
+    abstract static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
 
     abstract public function createResponse(StorageRequest $storageRequest): StorageResponse;
 }

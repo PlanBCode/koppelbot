@@ -36,7 +36,7 @@ class Storage_directory extends BasicStorage
         return $this->path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
     }
 
-    static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, Query $query): string
+    static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
     {
         $path = array_get($settings, 'path');
         $extension = array_get($settings, 'extension', '*');
@@ -115,18 +115,18 @@ class Storage_directory extends BasicStorage
                 $propertyName = $property->getName();
                 if ($propertyRequest->getProperty()->getStorageSetting('key')) {
                     $content = $entityId;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                    $storageResponse->add(200, $propertyRequest, $entityId, $content);
                 } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
                     $content = $entity;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                    $storageResponse->add(200, $propertyRequest, $entityId, $content);
                 } elseif (array_key_exists($propertyName, $entity)) {
                     $content = $entity[$propertyName];
-                    $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                    $storageResponse->add(200, $propertyRequest, $entityId, $content);
                 } else {
-                    $storageResponse->add(404, $propertyRequest, $entityId, $propertyName, 'Not found');//TODO pass something
+                    $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO pass something
                 }
             } else {
-                $storageResponse->add(404, $propertyRequest, $entityId, '*', 'Not found');//TODO
+                $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
             }
         }
 
@@ -152,15 +152,15 @@ class Storage_directory extends BasicStorage
                 $this->data[$content] = $this->data[$entityId];
                 $this->data[$entityId] = null;
                 unset($this->data[$entityId]);
-                $storageResponse->add(200, $propertyRequest, $content, $propertyName, $content);
+                $storageResponse->add(200, $propertyRequest, $content, $content);
             } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId] = $content;
-                $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                $storageResponse->add(200, $propertyRequest, $entityId, $content);
             } else{
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId][$propertyName] = $content;
-                $storageResponse->add(200, $propertyRequest, $entityId, $propertyName, $content);
+                $storageResponse->add(200, $propertyRequest, $entityId, $content);
             }
         }
         return $storageResponse;

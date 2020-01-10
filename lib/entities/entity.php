@@ -27,10 +27,11 @@ class Entity
         }
     }
 
-    protected function expand($propertyPath): array
+    protected function expand(array $propertyPath, Query &$query): array
     {
         //TODO if entity is primitive them return the entities primitive property
         // return [new X($this->primitiveProperty)];
+        // account for meta calls
 
         $propertyList = array_get($propertyPath, 0, '*');
         if ($propertyList === '*') {
@@ -41,11 +42,15 @@ class Entity
 
         $propertyHandles = [];
         foreach ($propertyNames as $propertyName) {
+            $propertyPathSingular = $propertyPath;
+            $propertyPathSingular[0] = $propertyName;
             if (!array_key_exists($propertyName, $this->properties)) {
-                return [new PropertyHandle(404, 'Property "' . $propertyName . '" does not exist.', $propertyPath)]; //TODO expand error message
+                //TODO expand error message using $propertyPathSingular
+                $propertyHandle = new PropertyHandle(404, 'Property "' . $propertyName . '" does not exist.', $propertyPathSingular);
+                array_push($propertyHandles, $propertyHandle);
             } else {
                 $property = $this->properties[$propertyName];
-                $expandedPropertyHandles = $property->expand($propertyPath, 1);
+                $expandedPropertyHandles = $property->expand($propertyPathSingular, 1, $query);
                 if (count($expandedPropertyHandles) > 0) {
                     array_push($propertyHandles, ...$expandedPropertyHandles);
                 }
@@ -54,12 +59,12 @@ class Entity
         return $propertyHandles;
     }
 
-    public function createStorageRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query $query)
+    public function createStorageRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query &$query)
     {
         /** @var StorageRequest[] */
         $storageRequests = [];
         /** @var PropertyHandle[] */
-        $propertyHandles = $this->expand($propertyPath);
+        $propertyHandles = $this->expand($propertyPath, $query);
         foreach ($propertyHandles as $propertyHandle) {
             /** @var PropertyRequest */
             $propertyRequest = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
@@ -71,6 +76,32 @@ class Entity
             $storageRequests[$storageString]->add($propertyRequest);
         }
         return $storageRequests;
+    }
+}
+
+function cleanWrapping(array &$wrapper, int $status)
+{
+    if ($status === 207) {
+        foreach ($wrapper as $subPropertyName => &$subWrapper) {
+            if (array_key_exists('content2', $subWrapper)) {
+                $subWrapper['content'] = $subWrapper['content2'];
+                unset($subWrapper['content2']); //TODO more efficient
+            } else {
+                $subContent =& $subWrapper['content'];
+                $subStatus = $subWrapper['status'];
+                cleanWrapping($subContent, $subStatus);
+            }
+        }
+    } else {
+        foreach ($wrapper as $subPropertyName => &$subWrapper) {
+            $subStatus = $subWrapper['status']; // TODO Should match with $status;
+            if (array_key_exists('content2', $subWrapper)) {
+                $wrapper[$subPropertyName] = $subWrapper['content2'];
+            } else {
+                $wrapper[$subPropertyName] = $subWrapper['content'];
+                cleanWrapping($subWrapper, $subStatus);
+            }
+        }
     }
 }
 
@@ -86,19 +117,17 @@ class EntityResponse extends Response
         $this->entityId = $entityId;
     }
 
-    public function add(int $status, string $propertyName, $content)
+    public function add(int $status, array $propertyPath, $content)
     {
         $this->addStatus($status);
-        if (!array_key_exists($propertyName, $this->propertyResponses)) {
-            $this->propertyResponses[$propertyName] = new PropertyResponse($status, $content);
-        }
+        $this->propertyResponses[] = new PropertyResponse($status, $propertyPath, $content);
     }
 
     public function merge(EntityResponse $entityResponse)
     {
         $this->addStatus($entityResponse->getStatus());
-        foreach ($entityResponse->propertyResponses as $propertyName => $propertyResponse) {
-            $this->propertyResponses[$propertyName] = $propertyResponse; //TODO check for duplicate responses for propertyName ?
+        foreach ($entityResponse->propertyResponses as $propertyResponse) {
+            $this->propertyResponses[] = $propertyResponse; //TODO check for duplicate responses for propertyName ?
         }
     }
 
@@ -107,24 +136,33 @@ class EntityResponse extends Response
         return $this->entityId;
     }
 
-    public function getPropertyResponses(): array
-    {
-        return $this->propertyResponses;
-    }
-
     public function getContent()
     {
         $content = [];
-        foreach ($this->propertyResponses as $propertyName => $propertyResponse) { //TODO use a map
-            if ($this->status == 207) {
-                $content[$propertyName] = [
-                    "status" => $propertyResponse->getStatus(),
-                    "content" => $propertyResponse->getContent(),
-                ];
-            } else {
-                $content[$propertyName] = $propertyResponse->getContent();
+        foreach ($this->propertyResponses as $propertyResponse) {
+            $propertyPath = $propertyResponse->getPropertyPath();
+            $wrapperIterator =& $content;
+            foreach ($propertyPath as $depth => $subPropertyName) {
+                $subStatus = $propertyResponse->getStatus();
+                if ($depth === count($propertyPath) - 1) {
+                    $subContent = $propertyResponse->getContent();
+                    $wrapperIterator[$subPropertyName] = ["status" => $subStatus, "content2" => $subContent];
+                } else {
+                    if (!array_key_exists($subPropertyName, $wrapperIterator)) {
+                        $wrapperIterator[$subPropertyName] = ["status" => $subStatus, "content" => []];
+                        $wrapperIterator =& $wrapperIterator[$subPropertyName]['content'];
+                    } else {
+                        $currentStatus = $wrapperIterator[$subPropertyName]['status'];
+                        if ($subStatus !== $currentStatus) {
+                            $wrapperIterator[$subPropertyName]['status'] = 207;
+                        }
+                        $wrapperIterator =& $wrapperIterator[$subPropertyName]['content'];
+                    }
+                }
             }
         }
+         cleanWrapping($content, $this->getStatus());
+
         return $content;
     }
 }
@@ -141,13 +179,13 @@ class EntityClassResponse extends Response
         $this->entityClass = $entityClass;
     }
 
-    public function add(int $status, string $entityId, string $propertyName, $content)
+    public function add(int $status, string $entityId, array $propertyPath, $content)
     {
         $this->addStatus($status);
         if (!array_key_exists($entityId, $this->entityResponses)) {
             $this->entityResponses[$entityId] = new EntityResponse($entityId);
         }
-        $this->entityResponses[$entityId]->add($status, $propertyName, $content);
+        $this->entityResponses[$entityId]->add($status, $propertyPath, $content);
     }
 
     public function merge(EntityClassResponse $entityClassResponse)
