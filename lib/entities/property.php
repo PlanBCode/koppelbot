@@ -236,7 +236,6 @@ class Property
         }
 
         $this->type = new $typeClass();
-
         $this->storage = getMergedSetting(self::PROPERTY_STORAGE, $settings, $rootSettings);
         $this->access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
 
@@ -246,9 +245,23 @@ class Property
 
         $combinedProperties = array_get($this->settings, 'combined');
         if ($combinedProperties) {
-            foreach ($combinedProperties as $subPropertyName => $subSettings) {
-                //TODO check if type signature  {"content":"string"} supports these subProperties
-                $this->subProperties[$subPropertyName] = new Property($subPropertyName, $subSettings, $rootSettings);
+            $signature = $typeClass::signature();
+            if ($this->type !== $signature) {
+                // TODO this signature is an alias, do a lookup
+            }
+            if (!is_array($signature)) {
+                echo 'Incorrect signature!';
+                //TODO error
+            } else {
+                foreach ($combinedProperties as $subPropertyName => $subSettings) {
+                    if (!array_key_exists($subPropertyName, $signature)) {
+                        echo 'Incorrect signature!';
+                        //TODO error
+                    } else {
+                        //TODO check if type signature  {"content":"string"} supports these subProperties
+                        $this->subProperties[$subPropertyName] = new Property($subPropertyName, $subSettings, $rootSettings);
+                    }
+                }
             }
         }
     }
@@ -259,18 +272,18 @@ class Property
             $propertyPath[] = $this->propertyName;
         }
 
-        if (count($propertyPath) === $depth ) {
-            if(count($this->subProperties) === 0 || $query->checkToggle('meta')) {
+        if (count($propertyPath) === $depth) {
+            if (count($this->subProperties) === 0 || $query->checkToggle('meta')) {
                 return [new PropertyHandle(200, $this, $propertyPath)];
             }
         }
 
         if (count($this->subProperties) === 0) {
-            $last = count($propertyPath)-1;
-            $partialPropertyPath = array_slice($propertyPath,0,$last);
+            $last = count($propertyPath) - 1;
+            $partialPropertyPath = array_slice($propertyPath, 0, $last);
             $subPropertyName = $propertyPath[$last];
             //TODO expand error with entiy class and id
-            return [new PropertyHandle(400, 'No subproperties available for /'.implode('/',$partialPropertyPath), $propertyPath)];
+            return [new PropertyHandle(400, 'No subproperties available for /' . implode('/', $partialPropertyPath), $propertyPath)];
         }
 
         $subPropertyList = array_get($propertyPath, $depth, '*');
@@ -286,7 +299,7 @@ class Property
             $propertyPathSingular[$depth] = $subPropertyName;
             if (!array_key_exists($subPropertyName, $this->subProperties)) {
                 //TODO expand error with entiy class and id
-                $propertyHandle = new PropertyHandle(400, '/'.implode('/',$propertyPathSingular). ' does not exist.', $propertyPathSingular);
+                $propertyHandle = new PropertyHandle(400, '/' . implode('/', $propertyPathSingular) . ' does not exist.', $propertyPathSingular);
                 array_push($propertyHandles, $propertyHandle);
             } else {
                 $subProperty = $this->subProperties[$subPropertyName];

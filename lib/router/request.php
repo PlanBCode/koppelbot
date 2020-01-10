@@ -13,6 +13,8 @@ class HttpRequest2
     public function __construct(string $method, string $uri, string $queryString, array $headers, string $content)
     {
         $this->method = $method;
+        $uri = rtrim($uri,'/'); // remove trailing slashes
+        $uri = preg_replace('/\/+/', '/',$uri); // remove multiple slashes
         $this->uri = $uri;
         $this->queryString = $queryString;
         $this->headers = $headers;
@@ -97,7 +99,6 @@ class UiRequest extends HttpRequest2
     public function createResponse(): UiResponse
     {
         $query = new Query($this->queryString);
-
         $path = explode('/', $this->uri);
         $display = count($path) > 0 ? $path[0] : '*';
         $entityClass = count($path) > 1 ? $path[1] : '*';
