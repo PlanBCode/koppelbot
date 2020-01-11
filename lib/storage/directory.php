@@ -135,6 +135,8 @@ class Storage_directory extends BasicStorage
 
     protected function put(PropertyRequest $propertyRequest): StorageResponse
     {
+
+
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
@@ -147,6 +149,7 @@ class Storage_directory extends BasicStorage
             $property = $propertyRequest->getProperty();
             $propertyName = $property->getName();
             if ($propertyRequest->getProperty()->getStorageSetting('key')) {
+                echo $propertyName.':key ';
                 $content = $propertyRequest->getContent();
                 $content = $this->extension === '*' ? $content : basename($content, '.' . $this->extension);
                 $this->data[$content] = $this->data[$entityId];
@@ -154,6 +157,7 @@ class Storage_directory extends BasicStorage
                 unset($this->data[$entityId]);
                 $storageResponse->add(200, $propertyRequest, $content, $content);
             } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
+                echo $propertyName.':content ';
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId] = $content;
                 $storageResponse->add(200, $propertyRequest, $entityId, $content);
