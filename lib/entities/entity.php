@@ -59,17 +59,37 @@ class Entity
         return $propertyHandles;
     }
 
-    public function createStorageRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query &$query)
+    protected function createPropertyRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query &$query): array
     {
-        /** @var StorageRequest[] */
-        $storageRequests = [];
+        /** @var PropertyRequest[] */
+        $propertyRequests = [];
         /** @var PropertyHandle[] */
         $propertyHandles = $this->expand($propertyPath, $query);
         foreach ($propertyHandles as $propertyHandle) {
-            /** @var PropertyRequest */
-            $propertyRequest = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
-            $storageString = $propertyRequest->getStorageString();
+            $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
+        }
+        return $propertyRequests;
+    }
 
+    public function createStorageRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query &$query)
+    {
+        /** @var PropertyRequest[] */
+        $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityId, $propertyPath, $content, $query);
+
+        //TODO only when adding new : check if entity exists
+        //TODO check if required properties are handled
+        if ($method === 'PUT') {
+            foreach ($this->properties as $propertyName => $property) {
+                if ($property->isRequired()) {
+                    //TODO check if this property is properly defien in one of the property requests
+                }
+            }
+        }
+
+        /** @var StorageRequest[] */
+        $storageRequests = [];
+        foreach ($propertyRequests as $propertyRequest) {
+            $storageString = $propertyRequest->getStorageString();
             if (!array_key_exists($storageString, $storageRequests)) {
                 $storageRequests[$storageString] = new StorageRequest();
             }
@@ -161,7 +181,7 @@ class EntityResponse extends Response
                 }
             }
         }
-         cleanWrapping($content, $this->getStatus());
+        cleanWrapping($content, $this->getStatus());
 
         return $content;
     }

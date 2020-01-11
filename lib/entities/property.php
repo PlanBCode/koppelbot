@@ -200,6 +200,8 @@ class Property
     const PROPERTY_TYPE = 'type';
     const PROPERTY_STORAGE = 'storage';
     const PROPERTY_ACCESS = 'access';
+    const PROPERTY_REQUIRED = 'required';
+
     /** @var string */
     protected $propertyName;
     /** @var Type */
@@ -214,8 +216,10 @@ class Property
     /** @var Property[] */
     protected $subProperties = [];
 
+    /** @var bool */
+    protected $required = false;
+
     /* TODO
-       required
       audit
       default*/
 
@@ -238,7 +242,7 @@ class Property
         $this->type = new $typeClass();
         $this->storage = getMergedSetting(self::PROPERTY_STORAGE, $settings, $rootSettings);
         $this->access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
-
+        $this->required = getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings);
         $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
         $this->storage = array_merge($rootSettingStorage, $settingStorage);
@@ -259,7 +263,11 @@ class Property
                         //TODO error
                     } else {
                         //TODO check if type signature  {"content":"string"} supports these subProperties
-                        $this->subProperties[$subPropertyName] = new Property($subPropertyName, $subSettings, $rootSettings);
+                        $subProperty = new Property($subPropertyName, $subSettings, $rootSettings);
+                        if ($subProperty->isRequired()) {
+                            $this->required = true;
+                        }
+                        $this->subProperties[$subPropertyName] = $subProperty;
                     }
                 }
             }
@@ -311,6 +319,11 @@ class Property
     }
 
     public function getName(): string
+    {
+        return $this->propertyName;
+    }
+
+    public function isRequired(): string
     {
         return $this->propertyName;
     }

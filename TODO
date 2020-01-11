@@ -2,16 +2,11 @@ TODO
 
 handle 207,etc in front end
 
-dit werkt nog niet goed:
-   <script>xyz.ui('/source/*/file/content,id', {display: 'list', drillDown: 'source'});</script>
-   de table header wordt niet goed gegenereerd
-
-multi dimensional data
-
 problem:
 http://localhost:8888/site/ui/view/source/aap
 
 put create new
+- check if existing (using head)
 - check required values
 - use default values
 

@@ -146,7 +146,7 @@ class ContentResponse extends HttpResponse2
 {
     public function __construct($uri)
     {
-        if ($uri == '/') {
+        if ($uri === '') {
             if (file_exists('custom/content/index.html')) {
                 $fileContent = file_get_contents('custom/content/index.html');
                 parent::__construct(200, $fileContent);
