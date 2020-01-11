@@ -7,23 +7,10 @@ put create new
 - check required values
 - use default values
 
+add dot notation: /source/*/file.content,id
+
 
 Pass more stuff by reference
-
-Reinstate meta (dual file storage)
-"meta": {
-    "type": "string",
-    "storage": {
-      "type": "directory",
-      "parse": "none",
-      "path": "data/sources/",
-      "extension": "meta",
-      "content": true
-    },
-    "key": "id",
-    "accept": "TODO"
-  },
-
 
 Entity primitive property
   /class/id = "value"  (no properties)

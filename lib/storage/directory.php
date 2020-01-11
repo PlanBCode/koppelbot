@@ -63,7 +63,9 @@ class Storage_directory extends BasicStorage
         foreach ($filePaths as $filePath) {
             $entityId = $this->extension === '*' ? $filePath : basename($filePath, '.' . $this->extension);
             //TODO lock file
-            //TODO check if file exists
+            if(!file_exists($filePath)){// TODO pass an error message?
+                return new StorageResponse(404);
+            }
             $fileContent = file_get_contents($filePath);
             //TODO error if fails
             if ($parse === 'json') {

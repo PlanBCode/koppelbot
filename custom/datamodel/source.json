@@ -27,5 +27,18 @@
       }
     },
     "type": "file"
+  },
+
+  "meta": {
+    "type": "string",
+    "storage": {
+      "type": "directory",
+      "parse": "none",
+      "path": "data/sources/",
+      "extension": "meta",
+      "content": true
+    },
+    "key": "id",
+    "accept": "TODO"
   }
 }

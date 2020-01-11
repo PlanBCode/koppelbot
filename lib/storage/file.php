@@ -31,7 +31,10 @@ class Storage_file extends BasicStorage
     protected function open(StorageRequest $storageRequest): StorageResponse
     {
         //TODO lock file
-        //TODO check if file exists
+        if(!file_exists($this->path)){// TODO pass an error message?
+            return new StorageResponse(404);
+        }
+
         $fileContent = file_get_contents($this->path);
 
         $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
