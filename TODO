@@ -5,7 +5,7 @@ put create new
 - check if existing (using head)
 - check required values
 - use default values
-
+- werkend maken: xyz.create('/$type', {});
 
 
 
