@@ -8,7 +8,8 @@
   },
   "email": {
     "type": "string",
-    "regex": "^TODO$"
+    "regex": "^TODO$",
+    "default": "hello@default.com"
   },
   "title": {
     "type": "string",
