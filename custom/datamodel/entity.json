@@ -1,4 +1,24 @@
 {
-  "id" : {"type": "string"},
-  "title" : {"type":"string"}
+  "_": {
+    "storage": {
+      "type": "directory",
+      "parse": "json",
+      "path": "custom/datamodel/",
+      "extension": "json"
+    }
+  },
+  "id": {
+    "type": "string",
+    "storage": {
+      "key": true
+    },
+    "accept": "TODO"
+  },
+  "content": {
+    "type": "string",
+    "storage": {
+      "content": true
+    },
+    "accept": "TODO"
+  }
 }

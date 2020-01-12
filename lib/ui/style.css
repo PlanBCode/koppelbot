@@ -10,3 +10,7 @@
 .xyz-list-selected {
     background-color: yellow;
 }
+
+.xyz-waiting{
+    color:grey;
+}

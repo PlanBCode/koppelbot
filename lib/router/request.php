@@ -26,12 +26,13 @@ class ApiRequest extends HttpRequest2
 {
     protected $storageRequests = [];
 
-    private function add($requestId, string $method, string $entityClassList, string $entityId, array $propertyPath, $content, Query $query): void
+    private function add($requestId, string $method, string $entityClassList, string $entityIdList, array $propertyPath, $content, Query $query): void
     {
         $entityClasses = explode(',', $entityClassList);
+
         foreach ($entityClasses as $entityClass) {
             $entity = new Entity($entityClass); //TODO static
-            $storageRequests = $entity->createStorageRequests($requestId, $method, $entityId, $propertyPath, $content, $query);
+            $storageRequests = $entity->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $content, $query);
             foreach ($storageRequests as $storageString => $storageRequest) {
                 if (!array_key_exists($storageString, $this->storageRequests)) {
                     $this->storageRequests[$storageString] = $storageRequests[$storageString];
@@ -45,16 +46,16 @@ class ApiRequest extends HttpRequest2
     private function parseContent(): void
     {
         $path = explode('/', $this->uri);
-        $entityClass = count($path) > 1 ? $path[1] : '*';
-        $entityId = count($path) > 2 ? $path[2] : '*';
+        $entityClassList = count($path) > 1 ? $path[1] : '*';
+        $entityIdList = count($path) > 2 ? $path[2] : '*';
 
         $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
 
         $query = new Query($this->queryString);
         if ($this->method === 'GET' || $this->method === 'DELETE' || $this->method === 'HEAD') {
-            $this->add(null, $this->method, $entityClass, $entityId, $propertyPath, null, $query);
+            $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, null, $query);
         } elseif ($this->method === 'PUT') {
-            $this->add(null, $this->method, $entityClass, $entityId, $propertyPath, $this->content, $query);
+            $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, $this->content, $query);
         } elseif ($this->method === 'POST') { // Multi requests
             $jsonContent = json_decode($this->content, true); //TODO catch errors
             foreach ($jsonContent as $requestId => $subRequest) {

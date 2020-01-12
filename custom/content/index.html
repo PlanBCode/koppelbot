@@ -9,16 +9,21 @@
 <table id="main">
     <tr><td colspan="2" id="header">Koppelbot</td></tr>
     <tr>
-        <td id="nav" width="20%" valign="top">
+        <td rowspan="2" id="nav" width="20%" valign="top">
             <script>
-                xyz.ui('/source/*/file/content,id', {display: 'list', select: 'source', multiSelect:'msource'});
+                xyz.ui('/source/*/file/id', {display: 'list', select: 'source', multiSelect:'multiSource'});
             </script>
         </td>
         <td valign="top">
             <script>xyz.ui('/source/$source/file/id', {action: 'view', showLabel:false});</script>
             <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel:false});</script>
 
-            <script>xyz.ui('/source/$msource/file/id', {action: 'view', dynamic: true});</script>
+
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <script>xyz.ui('/source/$multiSource/file/id', {action: 'view', dynamic: true, showLabel:false});</script>
         </td>
     </tr>
 </table>

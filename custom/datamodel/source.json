@@ -1,6 +1,5 @@
 {
   "_": {
-    "extends": "entity",
     "storage": {
       "type": "directory",
       "parse": "none",

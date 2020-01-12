@@ -1,13 +1,5 @@
 TODO
 
-multi entity select weergave gaat niet goed
-- http://localhost:8888/site/api/source/groente,zuivel/file/id
-
-meta entity
-- property "*": {type='string|json=mixed'}  dynamic number of properties
-- /meta/source
-- - property "*" : { "signature":{type:type:"","*":"*"}
-
 put create new
 - check if existing (using head)
 - check required values
@@ -17,11 +9,23 @@ werkt niet:  http://localhost:8888/site/api/*?meta
 - - zou het moeten werken?
 - - iig goede foutmelding
 
+
+meta entity
+- property "*": {type='string|json=mixed'}  dynamic number of properties
+- /meta/source
+- - property "*" : { "signature":{type:type:"","*":"*"}
+- move to non custom data model
+- - Storage_directory: split directory on spaces,comma's or (semi)colons
+- - - to browse multiple directories
+
+
+
+
+
+
+
+
 add dot notation: /source/*/file.content,id
-
-xyz.registerType
-css class to indicate that object is waiting for variable
-
 
 create /doc endpoint for documentation
 - /doc/api
@@ -33,9 +37,6 @@ create /doc endpoint for documentation
 
 Pass more stuff by reference
 
-Entity primitive property
-  /class/id = "value"  (no properties)
-
 custom view html definition:
 "label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
@@ -45,7 +46,6 @@ client side parsing json|none
 readOnly for property
 
 pass option to get unwrapped response
-
 
 ui: pass submit button  {submit:id, action:edit|delete}
 
@@ -58,11 +58,6 @@ proper file locks
 $variable usage in /ui endpoints (generate inputs to update)
 navigation in /ui endpoints
 
-
-
-
-
-
 types:
  - file  (accept, max-size)
  - number (min,max,step)
@@ -71,4 +66,4 @@ types:
 
 create http status code LUT
 
-entity inheritance
+maybe entity inheritance

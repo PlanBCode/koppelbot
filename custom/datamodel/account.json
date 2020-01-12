@@ -1,6 +1,5 @@
 {
   "_" : {
-    "extends":"entity",
     "storage" : {"type":"file", "parse":"json","path":"data/accounts.json"}
   },
   "email" : {"type" : "string", "regex":"^TODO$"},

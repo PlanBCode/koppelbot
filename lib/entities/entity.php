@@ -5,41 +5,43 @@ class Entity
 {
     /** @var Property[] */
     protected $properties = []; // decoded json properties object
+    /** @var string */
     protected $entityClass;
 
     public function __construct(string $entityClass)
     {
         $this->entityClass = $entityClass;
+        $fileName = './custom/datamodel/' . $entityClass . '.json'; // TODO or lib/datamodel
+        if(file_exists($fileName )) {
+            $fileContent = file_get_contents($fileName); //TODO make safe
+            //TODO check if this goes well
+            $properties = json_decode($fileContent, true);
 
-        //TODO check if file exists
-        $fileContent = file_get_contents('./custom/datamodel/' . $entityClass . '.json'); //TODO make safe
-        //TODO check if this goes well
-        $properties = json_decode($fileContent, true);
+            //TODO maybe resolve inheritance
+            $rootSettings = array_key_exists('_', $properties) ? $properties['_'] : [];
 
-        //TODO resolve inheritance
-        //TODO check for primitive property
-        $rootSettings = array_key_exists('_', $properties) ? $properties['_'] : [];
-
-        foreach ($properties as $property => $settings) {
-            if ($property != '_') {
-                $this->properties[$property] = new Property($property, $settings, $rootSettings);
+            foreach ($properties as $property => $settings) {
+                if ($property != '_') {
+                    $this->properties[$property] = new Property($property, $settings, $rootSettings);
+                }
             }
+        }else{
+            //TODO error
         }
     }
 
     protected function expand(array $propertyPath, Query &$query): array
     {
-        //TODO if entity is primitive them return the entities primitive property
-        // return [new X($this->primitiveProperty)];
-        // account for meta calls
 
+        // TODO account for meta calls
+
+        /** @var string */
         $propertyList = array_get($propertyPath, 0, '*');
         if ($propertyList === '*') {
             $propertyNames = array_keys($this->properties);
         } else {
             $propertyNames = explode(',', $propertyList);
         }
-
         $propertyHandles = [];
         foreach ($propertyNames as $propertyName) {
             $propertyPathSingular = $propertyPath;
@@ -59,22 +61,32 @@ class Entity
         return $propertyHandles;
     }
 
-    protected function createPropertyRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query &$query): array
+    protected function createPropertyRequests($requestId, string $method, string $entityIdList, array $propertyPath, $content, Query &$query): array
     {
+        /** @var string[] */
+        $entityIds = [];
+        if($entityIdList==='*'){
+            $entityIds = ['*'];// TODO retrieve all ids
+        }else{
+            $entityIds = explode(',',$entityIdList);
+        }
         /** @var PropertyRequest[] */
         $propertyRequests = [];
         /** @var PropertyHandle[] */
         $propertyHandles = $this->expand($propertyPath, $query);
-        foreach ($propertyHandles as $propertyHandle) {
-            $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
+
+        foreach ($entityIds as $entityId) {
+            foreach ($propertyHandles as $propertyHandle) {
+                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
+            }
         }
         return $propertyRequests;
     }
 
-    public function createStorageRequests($requestId, string $method, string $entityId, array $propertyPath, $content, Query &$query)
+    public function createStorageRequests($requestId, string $method, string $entityIdList, array $propertyPath, $content, Query &$query)
     {
         /** @var PropertyRequest[] */
-        $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityId, $propertyPath, $content, $query);
+        $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $content, $query);
 
         //TODO only when adding new : check if entity exists
         //TODO check if required properties are handled
