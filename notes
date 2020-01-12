@@ -9,10 +9,20 @@ Property
 propertyName
 
 signature
+
 uri
+- /$entityClassName/$entityId/$propertyName...
 path
+- ['$entityClassName','$entityId'.'$propertyName']
 
+action
+- edit
+- view
 
+display
+- create
+- list
+- view
 
 
 

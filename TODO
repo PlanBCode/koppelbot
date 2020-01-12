@@ -1,13 +1,17 @@
 TODO
 
+
 put create new
 - check if existing (using head)
 - check required values
 - use default values
 
-werkt niet:  http://localhost:8888/site/api/*?meta
-- - zou het moeten werken?
-- - iig goede foutmelding
+
+
+
+
+
+
 
 
 meta entity
@@ -18,11 +22,9 @@ meta entity
 - - Storage_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
-
-
-
-
-
+werkt niet:  http://localhost:8888/site/api/*?meta
+- - zou het moeten werken?
+- - iig goede foutmelding
 
 
 add dot notation: /source/*/file.content,id
@@ -44,8 +46,6 @@ custom view html definition:
 client side parsing json|none
 
 readOnly for property
-
-pass option to get unwrapped response
 
 ui: pass submit button  {submit:id, action:edit|delete}
 
