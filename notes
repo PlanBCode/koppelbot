@@ -1,3 +1,22 @@
+
+
+EntityClass
+Entity
+entityId
+entityClassName
+
+Property
+propertyName
+
+signature
+uri
+path
+
+
+
+
+
+
 POST api/account/13,23,34/A.B,C.D,E
    {
     "identifier" : {method:"PUT", class:"account", id:"*", property:"A.B", content:"D", filter:"", parameters:""}

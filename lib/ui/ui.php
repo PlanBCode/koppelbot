@@ -10,8 +10,8 @@ class UiResponse extends HttpResponse2
             '<html>
             <head>
                 <title></title>
-                <link rel="stylesheet" type="text/css" href="' . $rootUri . 'style.css"/>
-                <script type="text/javascript" src="' . $rootUri . 'script.js"></script>        
+                <link rel="stylesheet" type="text/css" href="' . $rootUri . 'xyz-style.css"/>
+                <script type="text/javascript" src="' . $rootUri . 'xyz-script.js"></script>        
             </head>
             <body>
                 <script>xyz.ui("' . $uri . '",{display:"' . $display . '"});</script>

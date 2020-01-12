@@ -10,7 +10,7 @@
   },
 
   "file": {
-    "combined": {
+    "signature": {
       "content": {
         "type": "string",
         "storage": {

@@ -1,15 +1,28 @@
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="xyz-style.css"/>
+    <script type="text/javascript" src="xyz-script.js"></script>
+
     <link rel="stylesheet" type="text/css" href="style.css"/>
-    <script type="text/javascript" src="script.js"></script>
 </head>
 <body>
-Hello World!
+<table id="main">
+    <tr><td colspan="2" id="header">Koppelbot</td></tr>
+    <tr>
+        <td id="nav" width="20%" valign="top">
+            <script>
+                xyz.ui('/source/*/file/content,id', {display: 'list', select: 'source', multiSelect:'msource'});
+            </script>
+        </td>
+        <td valign="top">
+            <script>xyz.ui('/source/$source/file/id', {action: 'view', showLabel:false});</script>
+            <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel:false});</script>
 
-<script>xyz.ui('/source/*/file/content,id', {display: 'list', drillDown: 'source'});</script>
+            <script>xyz.ui('/source/$msource/file/id', {action: 'view', dynamic: true});</script>
+        </td>
+    </tr>
+</table>
 
-<script>xyz.ui('/source/$source', {action: 'view', dynamic:true});</script>
-<script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic:true});</script>
 
 </body>
 </html>

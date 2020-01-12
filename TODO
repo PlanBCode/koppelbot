@@ -1,13 +1,35 @@
 TODO
 
-handle 207,etc in front end
+multi select weergave gaat niet goed
+http://localhost:8888/site/ui/view/source/fruit
+
+
+meta entity
+- property "*": {type='string|json=mixed'}  dynamic number of properties
+- /meta/source
+- - property "*" : { "signature":{type:type:"","*":"*"}
 
 put create new
 - check if existing (using head)
 - check required values
 - use default values
 
+werkt niet:  http://localhost:8888/site/api/*?meta
+- - zou het moeten werken?
+- - iig goede foutmelding
+
 add dot notation: /source/*/file.content,id
+
+xyz.registerType
+css class to indicate that object is waiting for variable
+
+
+create /doc endpoint for documentation
+- /doc/api
+- /doc/api/entity/$entityClass[/$property/...]
+- /doc/api/type/$typeName
+- /doc/ui
+- /doc/ui/display/$display
 
 
 Pass more stuff by reference
@@ -16,7 +38,7 @@ Entity primitive property
   /class/id = "value"  (no properties)
 
 custom view html definition:
-"label": {"combined":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
+"label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
 
 client side parsing json|none
@@ -25,7 +47,6 @@ readOnly for property
 
 pass option to get unwrapped response
 
-property "*": {type='string|json=mixed'}  dynamic number of properties
 
 ui: pass submit button  {submit:id, action:edit|delete}
 

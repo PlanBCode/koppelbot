@@ -1,0 +1,18 @@
+html,body{
+    padding:0;
+    margin:0;
+}
+#nav {
+    background-color: lightpink;
+}
+#main{
+    padding:0;
+    margin:0;
+    width:100%;
+    height:100%;
+}
+#header{
+    color:white;
+    height:2em;
+    background-color:red;
+}

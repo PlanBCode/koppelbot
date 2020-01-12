@@ -247,8 +247,8 @@ class Property
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
         $this->storage = array_merge($rootSettingStorage, $settingStorage);
 
-        $combinedProperties = array_get($this->settings, 'combined');
-        if ($combinedProperties) {
+        $signatureProperties = array_get($this->settings, 'signature');
+        if ($signatureProperties) {
             $signature = $typeClass::signature();
             if ($this->type !== $signature) {
                 // TODO this signature is an alias, do a lookup
@@ -257,7 +257,7 @@ class Property
                 echo 'Incorrect signature!';
                 //TODO error
             } else {
-                foreach ($combinedProperties as $subPropertyName => $subSettings) {
+                foreach ($signatureProperties as $subPropertyName => $subSettings) {
                     if (!array_key_exists($subPropertyName, $signature)) {
                         echo 'Incorrect signature!';
                         //TODO error
