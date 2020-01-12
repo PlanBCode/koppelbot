@@ -1,5 +1,8 @@
 TODO
 
+PUT  /$ENTITY/$ID   {entity: {...}}
+POST /$ENTITY       {entity: {...}}  requires autoincrement or something?
+PATCH /$ENTITY/$ID/$PROP  {entity: {id: {prop: {...}}}
 
 put create new
 - check if existing (using head)
@@ -11,8 +14,7 @@ put create new
 
 
 
-
-
+POST only for array type variables or entities with autoincrement ids
 
 meta entity
 - property "*": {type='string|json=mixed'}  dynamic number of properties

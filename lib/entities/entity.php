@@ -12,7 +12,7 @@ class Entity
     {
         $this->entityClass = $entityClass;
         $fileName = './custom/datamodel/' . $entityClass . '.json'; // TODO or lib/datamodel
-        if(file_exists($fileName )) {
+        if (file_exists($fileName)) {
             $fileContent = file_get_contents($fileName); //TODO make safe
             //TODO check if this goes well
             $properties = json_decode($fileContent, true);
@@ -25,14 +25,13 @@ class Entity
                     $this->properties[$property] = new Property($property, $settings, $rootSettings);
                 }
             }
-        }else{
+        } else {
             //TODO error
         }
     }
 
     protected function expand(array $propertyPath, Query &$query): array
     {
-
         // TODO account for meta calls
 
         /** @var string */
@@ -65,19 +64,38 @@ class Entity
     {
         /** @var string[] */
         $entityIds = [];
-        if($entityIdList==='*'){
+        if ($entityIdList === '*') {
             $entityIds = ['*'];// TODO retrieve all ids
-        }else{
-            $entityIds = explode(',',$entityIdList);
+        } else {
+            $entityIds = explode(',', $entityIdList);
+        }
+
+        if ($method === 'PUT' && ($entityIdList === '*' || count($propertyPath) > 0)) {
+            /** @var PropertyHandle[] */
+            $propertyHandles = [new PropertyHandle(400, 'PUT method expects uri of the form /' . $this->entityClass . '/$ID', [$this->entityClass])];
+            /*        } elseif ($method === 'POST' && ($entityIdList !== '*' || count($propertyPath) > 0)) {
+                        $propertyHandles = [new PropertyHandle(400, 'POST method expects uri of the form /'.$this->entityClass.'', [$this->entityClass])];*/
+        } else {
+            /** @var PropertyHandle[] */
+            $propertyHandles = $this->expand($propertyPath, $query);
         }
         /** @var PropertyRequest[] */
         $propertyRequests = [];
-        /** @var PropertyHandle[] */
-        $propertyHandles = $this->expand($propertyPath, $query);
-
         foreach ($entityIds as $entityId) {
+            if (is_array($content)) {
+                if (array_key_exists($entityId, $content)) {
+                    $entityIdContent = array_get($content, $entityId);
+                } else if (array_key_exists('*', $content)) {
+                    $entityIdContent = array_get($content, '*');
+                } else {
+                    $entityIdContent = null;
+
+                }
+            } else {
+                $entityIdContent = null;
+            }
             foreach ($propertyHandles as $propertyHandle) {
-                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $content, $query);
+                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $entityIdContent, $query);
             }
         }
         return $propertyRequests;
@@ -93,7 +111,7 @@ class Entity
         if ($method === 'PUT') {
             foreach ($this->properties as $propertyName => $property) {
                 if ($property->isRequired()) {
-                    //TODO check if this property is properly defien in one of the property requests
+                    //TODO check if this property is properly defined in one of the property requests
                 }
             }
         }

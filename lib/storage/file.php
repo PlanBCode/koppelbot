@@ -96,7 +96,7 @@ class Storage_file extends BasicStorage
         return $storageResponse;
     }
 
-    protected function put(PropertyRequest $propertyRequest): StorageResponse
+    protected function patch(PropertyRequest $propertyRequest): StorageResponse
     {
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();

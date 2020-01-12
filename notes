@@ -26,16 +26,8 @@ display
 
 
 
-
-POST api/account/13,23,34/A.B,C.D,E
-   {
-    "identifier" : {method:"PUT", class:"account", id:"*", property:"A.B", content:"D", filter:"", parameters:""}
-   }
-
-
 GET /api/account/12/name,email
 200:{account: {12: {name:'Henk',email:'henk@mail.com'}}
-
 
 GET /api/account/12,23/name,email
 207: {account : {

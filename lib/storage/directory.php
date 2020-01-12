@@ -1,6 +1,5 @@
 <?php
 
-
 /*
     storage settings
       path
@@ -63,7 +62,7 @@ class Storage_directory extends BasicStorage
         foreach ($filePaths as $filePath) {
             $entityId = $this->extension === '*' ? $filePath : basename($filePath, '.' . $this->extension);
             //TODO lock file
-            if(!file_exists($filePath)){// TODO pass an error message?
+            if (!file_exists($filePath)) {// TODO pass an error message?
                 return new StorageResponse(404);
             }
             $fileContent = file_get_contents($filePath);
@@ -104,7 +103,6 @@ class Storage_directory extends BasicStorage
 
     protected function get(PropertyRequest $propertyRequest): StorageResponse
     {
-
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
@@ -135,10 +133,8 @@ class Storage_directory extends BasicStorage
         return $storageResponse;
     }
 
-    protected function put(PropertyRequest $propertyRequest): StorageResponse
+    protected function patch(PropertyRequest $propertyRequest): StorageResponse
     {
-
-
         $storageResponse = new StorageResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
@@ -151,7 +147,7 @@ class Storage_directory extends BasicStorage
             $property = $propertyRequest->getProperty();
             $propertyName = $property->getName();
             if ($propertyRequest->getProperty()->getStorageSetting('key')) {
-                echo $propertyName.':key ';
+                echo $propertyName . ':key ';
                 $content = $propertyRequest->getContent();
                 $content = $this->extension === '*' ? $content : basename($content, '.' . $this->extension);
                 $this->data[$content] = $this->data[$entityId];
@@ -159,11 +155,11 @@ class Storage_directory extends BasicStorage
                 unset($this->data[$entityId]);
                 $storageResponse->add(200, $propertyRequest, $content, $content);
             } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
-                echo $propertyName.':content ';
+                echo $propertyName . ':content ';
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId] = $content;
                 $storageResponse->add(200, $propertyRequest, $entityId, $content);
-            } else{
+            } else {
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId][$propertyName] = $content;
                 $storageResponse->add(200, $propertyRequest, $entityId, $content);

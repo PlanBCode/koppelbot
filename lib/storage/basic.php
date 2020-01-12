@@ -23,8 +23,13 @@ abstract class BasicStorage extends Storage
         switch ($propertyRequest->getMethod()) {
             case 'GET':
                 return $this->get($propertyRequest);
+            case 'PATCH':
+                return $this->patch($propertyRequest);//TODO use $this->put
+            /*TODOcase 'POST':
+                return $this->post($propertyRequest);
+            */
             case 'PUT':
-                return $this->put($propertyRequest);
+                return $this->patch($propertyRequest);
             case 'HEAD':
                 return $this->head($propertyRequest);
             case 'DELETE':
@@ -39,7 +44,12 @@ abstract class BasicStorage extends Storage
 
     abstract protected function get(PropertyRequest $propertyRequest): StorageResponse;
 
-    abstract protected function put(PropertyRequest $propertyRequest): StorageResponse;
+    abstract protected function patch(PropertyRequest $propertyRequest): StorageResponse;
+
+    /* TODO
+       abstract protected function put(PropertyRequest $propertyRequest): StorageResponse;
+        abstract protected function post(PropertyRequest $propertyRequest): StorageResponse;
+    */
 
     abstract protected function head(PropertyRequest $propertyRequest): StorageResponse;
 

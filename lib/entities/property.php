@@ -51,7 +51,7 @@ class  PropertyRequest
     /** @var string */
     protected $storageString;
 
-    public function __construct(int $status, $requestId, string $method, string $entityClass, string $entityId, $propertyOrError, array $propertyPath, $content, Query $query)
+    public function __construct(int $status, $requestId, string $method, string $entityClass, string $entityId, $propertyOrError, array $propertyPath, $propertyContent, Query $query)
     {
         $this->requestId = $requestId;
         $this->method = $method;
@@ -69,8 +69,8 @@ class  PropertyRequest
             $this->content = $propertyOrError;
         } else {
             $this->property = $propertyOrError;
-            $this->content = $content;
-            if ($method === 'PUT' && !$this->property->validate($content)) {
+            $this->content = $propertyContent;
+            if (($method === 'PUT' || $method === 'PATCH' || $method === 'POST') && is_null($propertyContent) || !$this->property->validate($propertyContent)) {
                 $this->status = 400;
                 $this->storageString = Storage::STORAGE_STRING_ERROR;
                 $this->content = 'Invalid content for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
@@ -89,7 +89,7 @@ class  PropertyRequest
 
     public function readOnly(): bool
     {
-        return $this->method !== 'PUT' && $this->method !== 'DELETE';
+        return $this->method === 'GET' || $this->method === 'HEAD';
     }
 
     public function getPropertyPath(): array
@@ -188,10 +188,14 @@ class PropertyHandle
         }
     }
 
-    public function createPropertyRequest($requestId, string $method, string $entityClass, string $entityId, $content, Query $query): PropertyRequest
+    public function createPropertyRequest($requestId, string $method, string $entityClass, string $entityId, $entityIdContent, Query $query): PropertyRequest
     {
+        $propertyContent =& $entityIdContent;
+        foreach($this->propertyPath as $subPropertyName){
+            $propertyContent = array_null_get($propertyContent,$subPropertyName);
+        }
         $propertyOrError = $this->status === 200 ? $this->property : $this->error;
-        return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $propertyOrError, $this->propertyPath, $content, $query);
+        return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $propertyOrError, $this->propertyPath, $propertyContent, $query);
     }
 }
 
