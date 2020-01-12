@@ -8,5 +8,11 @@ function array_null_get(?array $array, $key) {
     if(is_null($array)){
         return null;
     }
-    return array_key_exists($key, $array) ? $array[$key]: null;
+    if(array_key_exists($key, $array) ){
+        return $array[$key];
+    }elseif(array_key_exists('*', $array) ) {
+        return $array['*'];
+    }else{
+        return null;
+    }
 }

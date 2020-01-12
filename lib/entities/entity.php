@@ -60,7 +60,7 @@ class Entity
         return $propertyHandles;
     }
 
-    protected function createPropertyRequests($requestId, string $method, string $entityIdList, array $propertyPath, $content, Query &$query): array
+    protected function createPropertyRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query): array
     {
         /** @var string[] */
         $entityIds = [];
@@ -81,40 +81,53 @@ class Entity
         }
         /** @var PropertyRequest[] */
         $propertyRequests = [];
-        foreach ($entityIds as $entityId) {
-            if (is_array($content)) {
-                if (array_key_exists($entityId, $content)) {
-                    $entityIdContent = array_get($content, $entityId);
-                } else if (array_key_exists('*', $content)) {
-                    $entityIdContent = array_get($content, '*');
-                } else {
-                    $entityIdContent = null;
+        /** @var PropertyRequest[] */
+        $errorPropertyRequests = [];
 
-                }
+        foreach ($entityIds as $entityId) {
+            if (is_array($entityClassContent)) {
+                $entityIdContent = array_null_get($entityClassContent, $entityId);
             } else {
                 $entityIdContent = null;
             }
+
+            if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
+                foreach ($this->properties as $propertyName => $property) {
+                    $propertyContent = array_null_get($entityIdContent, $propertyName);
+                    if (!is_null($propertyContent)) {
+                        if (!$property->validate($propertyContent)) {
+                            $error = 'Invalid content for /' . $this->entityClass . '/' . $entityId . '/' . $propertyName;
+                            $path = [$this->entityClass, $entityId, $propertyName];
+                            $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClass, $entityId, $error, $path, $propertyContent, $query);
+                            $errorPropertyRequests[] = $errorPropertyRequest;
+                        }
+                    } elseif (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
+                        $error = 'Missing content for required /' . $this->entityClass . '/' . $entityId . '/' . $propertyName;
+                        $path = [$this->entityClass, $entityId, $propertyName];
+                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClass, $entityId, $error, $path, $propertyContent, $query);
+                        $errorPropertyRequests[] = $errorPropertyRequest;
+                    }
+                }
+            }
+
             foreach ($propertyHandles as $propertyHandle) {
                 $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $entityIdContent, $query);
             }
         }
+        if (!empty($errorPropertyRequests)) {
+            return $errorPropertyRequests;
+        }
         return $propertyRequests;
     }
 
-    public function createStorageRequests($requestId, string $method, string $entityIdList, array $propertyPath, $content, Query &$query)
+    public function createStorageRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
     {
         /** @var PropertyRequest[] */
-        $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $content, $query);
+        $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
 
         //TODO only when adding new : check if entity exists
         //TODO check if required properties are handled
-        if ($method === 'PUT') {
-            foreach ($this->properties as $propertyName => $property) {
-                if ($property->isRequired()) {
-                    //TODO check if this property is properly defined in one of the property requests
-                }
-            }
-        }
+
 
         /** @var StorageRequest[] */
         $storageRequests = [];

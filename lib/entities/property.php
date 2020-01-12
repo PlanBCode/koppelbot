@@ -70,20 +70,16 @@ class  PropertyRequest
         } else {
             $this->property = $propertyOrError;
             $this->content = $propertyContent;
-            if (($method === 'PUT' || $method === 'PATCH' || $method === 'POST') && is_null($propertyContent) || !$this->property->validate($propertyContent)) {
-                $this->status = 400;
-                $this->storageString = Storage::STORAGE_STRING_ERROR;
-                $this->content = 'Invalid content for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
-            } else {
-                $this->status = 200;
-                $storageSettings = $this->property->getStorageSettings();
-                $storageType = array_get($storageSettings, 'type');
-                $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
-                if ($this->storageString === Storage::STORAGE_STRING_ERROR) {
-                    $this->status = 500;
-                    $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
-                }
+
+            $this->status = 200;
+            $storageSettings = $this->property->getStorageSettings();
+            $storageType = array_get($storageSettings, 'type');
+            $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
+            if ($this->storageString === Storage::STORAGE_STRING_ERROR) {
+                $this->status = 500;
+                $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
             }
+
         }
     }
 
@@ -191,8 +187,8 @@ class PropertyHandle
     public function createPropertyRequest($requestId, string $method, string $entityClass, string $entityId, $entityIdContent, Query $query): PropertyRequest
     {
         $propertyContent =& $entityIdContent;
-        foreach($this->propertyPath as $subPropertyName){
-            $propertyContent = array_null_get($propertyContent,$subPropertyName);
+        foreach ($this->propertyPath as $subPropertyName) {
+            $propertyContent = array_null_get($propertyContent, $subPropertyName);
         }
         $propertyOrError = $this->status === 200 ? $this->property : $this->error;
         return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $propertyOrError, $this->propertyPath, $propertyContent, $query);
@@ -246,7 +242,7 @@ class Property
         $this->type = new $typeClass();
         $this->storage = getMergedSetting(self::PROPERTY_STORAGE, $settings, $rootSettings);
         $this->access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
-        $this->required = getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings);
+        $this->required = !is_null(getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings));
         $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
         $this->storage = array_merge($rootSettingStorage, $settingStorage);
@@ -327,9 +323,9 @@ class Property
         return $this->propertyName;
     }
 
-    public function isRequired(): string
+    public function isRequired(): bool
     {
-        return $this->propertyName;
+        return $this->required;
     }
 
     public function getStorageSettings(): array

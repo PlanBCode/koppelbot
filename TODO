@@ -1,20 +1,14 @@
 TODO
 
-PUT  /$ENTITY/$ID   {entity: {...}}
-POST /$ENTITY       {entity: {...}}  requires autoincrement or something?
-PATCH /$ENTITY/$ID/$PROP  {entity: {id: {prop: {...}}}
+js code splitten mbv webpack
+- package.json
+- - dev webpack
+- - dev gulp
+- gulpfile.js
 
-put create new
-- check if existing (using head)
-- check required values
-- use default values
-- werkend maken: xyz.create('/$type', {});
+Property:  default values
 
-
-
-
-
-POST only for array type variables or entities with autoincrement ids
+werkend maken: xyz.create('/$type', {});
 
 meta entity
 - property "*": {type='string|json=mixed'}  dynamic number of properties
@@ -29,6 +23,8 @@ werkt niet:  http://localhost:8888/site/api/*?meta
 - - iig goede foutmelding
 
 
+
+
 add dot notation: /source/*/file.content,id
 
 create /doc endpoint for documentation
@@ -38,6 +34,7 @@ create /doc endpoint for documentation
 - /doc/ui
 - /doc/ui/display/$display
 
+POST: only for array type variables or entities with autoincrement ids
 
 Pass more stuff by reference
 
@@ -49,11 +46,11 @@ client side parsing json|none
 
 readOnly for property
 
-ui: pass submit button  {submit:id, action:edit|delete}
-
 file type: viewer   https://viewerjs.org/
 
 ui: dynamic updating / state syncing
+
+ui: non dynamic updateing : pass submit button  {submit:id, action:edit|delete}
 
 proper file locks
 

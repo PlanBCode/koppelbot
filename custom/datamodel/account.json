@@ -1,8 +1,24 @@
 {
-  "_" : {
-    "storage" : {"type":"file", "parse":"json","path":"data/accounts.json"}
+  "_": {
+    "storage": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/accounts.json"
+    }
   },
-  "email" : {"type" : "string", "regex":"^TODO$"},
-  "title" : {"type" : "string", "regex":"^TODO$"},
-  "id" : {"type" : "string", "storage":{"key":true}}
+  "email": {
+    "type": "string",
+    "regex": "^TODO$"
+  },
+  "title": {
+    "type": "string",
+    "regex": "^TODO$"
+  },
+  "id": {
+    "type": "string",
+    "required": true,
+    "storage": {
+      "key": true
+    }
+  }
 }

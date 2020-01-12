@@ -23,6 +23,11 @@ display
 - create
 - list
 - view
+- tree
+
+PUT  /$ENTITY/$ID   {entity: {...}}
+POST /$ENTITY       {entity: {...}}  requires autoincrement or something?
+PATCH /$ENTITY/$ID/$PROP  {entity: {id: {prop: {...}}}
 
 
 

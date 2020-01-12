@@ -36,7 +36,7 @@ class ApiRequest extends HttpRequest2
         $entityClassNames = explode(',', $entityClassNameList);
         foreach ($entityClassNames as $entityClassName) {
             $entity = new Entity($entityClassName); //TODO static
-            $entityClassContent = array_null_get($content,$entityClassName);
+            $entityClassContent = array_null_get($content, $entityClassName);
             $storageRequests = $entity->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
             foreach ($storageRequests as $storageString => $storageRequest) {
                 if (!array_key_exists($storageString, $this->storageRequests)) {
@@ -61,7 +61,7 @@ class ApiRequest extends HttpRequest2
         } elseif ($this->method === 'PATCH' || $this->method === 'PUT') {
             $jsonContent = json_decode($this->content, true); //TODO catch errors
             $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, $jsonContent, $query);
-        }else if (  $this->method === 'POST'){
+        } elseif ($this->method === 'POST') {
             // TODO to append arrays
         } else {
             //TODO error
