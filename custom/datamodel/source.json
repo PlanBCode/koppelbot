@@ -26,15 +26,15 @@
     },
     "type": "file"
   },
-  "meta": {
-    "type": "string",
+  "account" : {
+    "type": "reference",
+    "class" : "account",
     "storage": {
       "type": "directory",
       "parse": "none",
       "path": "data/sources/",
       "extension": "meta",
       "content": true
-    },
-    "accept": "TODO"
+    }
   }
 }

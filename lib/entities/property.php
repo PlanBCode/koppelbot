@@ -229,10 +229,9 @@ class Property
         require_once './lib/types/' . $typeName . '.php';
 
         if (!class_exists($typeClass)) {
-            echo 'Type does not exist!';
+            echo 'ERROR Type ' . $typeName . 'does not exist!';
             //return null; //TODO ERROR
         }
-
         $this->type = new $typeClass();
 
         $access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
@@ -247,7 +246,7 @@ class Property
         $this->settings['storage'] = $storage;
 
         $signatureProperties = array_get($this->settings, 'signature');
-        if ($signatureProperties) {
+        if (is_array($signatureProperties)) {
             $signature = $typeClass::signature();
             if ($this->type !== $signature) {
                 // TODO this signature is an alias, do a lookup

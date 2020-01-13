@@ -1,32 +1,46 @@
 <?php
 require './lib/entities/property.php';
 
-class Entity
+class EntityClass
 {
+    /** @var EntityClass[] */
+    static $entityClasses = [];
+
+    static public function get(string $entityClassName): ?EntityClass
+    {
+        if (array_key_exists($entityClassName, self::$entityClasses)) {
+            return self::$entityClasses[$entityClassName];
+        } else {
+
+            $fileName = './custom/datamodel/' . $entityClassName . '.json'; // TODO or lib/datamodel
+            if (!file_exists($fileName)) {
+                return null;
+            }
+            $fileContent = file_get_contents($fileName); //TODO make safe
+            //TODO check if this goes well
+            $meta = json_decode($fileContent, true);
+            //TODO maybe resolve inheritance
+
+            $entityClass = new EntityClass($entityClassName,$meta);
+            self::$entityClasses[$entityClassName] = $entityClass;
+            return $entityClass;
+        }
+    }
+
     /** @var Property[] */
     protected $properties = []; // decoded json properties object
     /** @var string */
-    protected $entityClass;
+    protected $entityClassName;
 
-    public function __construct(string $entityClass)
+    protected function __construct(string $entityClassName, array &$meta)
     {
-        $this->entityClass = $entityClass;
-        $fileName = './custom/datamodel/' . $entityClass . '.json'; // TODO or lib/datamodel
-        if (file_exists($fileName)) {
-            $fileContent = file_get_contents($fileName); //TODO make safe
-            //TODO check if this goes well
-            $properties = json_decode($fileContent, true);
+        $this->entityClassName = $entityClassName;
+        $rootSettings = array_key_exists('_', $meta) ? $meta['_'] : [];
 
-            //TODO maybe resolve inheritance
-            $rootSettings = array_key_exists('_', $properties) ? $properties['_'] : [];
-
-            foreach ($properties as $property => $settings) {
-                if ($property != '_') {
-                    $this->properties[$property] = new Property($property, $settings, $rootSettings);
-                }
+        foreach ($meta as $propertyName => $settings) {
+            if ($propertyName !== '_') {
+                $this->properties[$propertyName] = new Property($propertyName, $settings, $rootSettings);
             }
-        } else {
-            //TODO error
         }
     }
 
@@ -72,7 +86,7 @@ class Entity
 
         if ($method === 'PUT' && ($entityIdList === '*' || count($propertyPath) > 0)) {
             /** @var PropertyHandle[] */
-            $propertyHandles = [new PropertyHandle(400, 'PUT method expects uri of the form /' . $this->entityClass . '/$ID', [$this->entityClass])];
+            $propertyHandles = [new PropertyHandle(400, 'PUT method expects uri of the form /' . $this->entityClassName . '/$ID', [$this->entityClassName])];
             /*        } elseif ($method === 'POST' && ($entityIdList !== '*' || count($propertyPath) > 0)) {
                         $propertyHandles = [new PropertyHandle(400, 'POST method expects uri of the form /'.$this->entityClass.'', [$this->entityClass])];*/
         } else {
@@ -94,23 +108,23 @@ class Entity
             if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
                 foreach ($this->properties as $propertyName => $property) {
                     $propertyContent = array_null_get($entityIdContent, $propertyName);
-                    $path = [$this->entityClass, $entityId, $propertyName];
+                    $path = [$this->entityClassName, $entityId, $propertyName];
                     if (!is_null($propertyContent)) {
                         if (!$property->validate($propertyContent)) {
-                            $error = 'Invalid content for /' . $this->entityClass . '/' . $entityId . '/' . $propertyName;
-                            $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClass, $entityId, $error, $path, $propertyContent, $query);
+                            $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
+                            $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
                             $errorPropertyRequests[] = $errorPropertyRequest;
                         }
                     } elseif (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
-                        $error = 'Missing content for required /' . $this->entityClass . '/' . $entityId . '/' . $propertyName;
-                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClass, $entityId, $error, $path, $propertyContent, $query);
+                        $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
+                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     }
                 }
             }
 
             foreach ($propertyHandles as $propertyHandle) {
-                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClass, $entityId, $entityIdContent, $query);
+                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClassName, $entityId, $entityIdContent, $query);
             }
         }
         if (!empty($errorPropertyRequests)) {

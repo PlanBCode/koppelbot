@@ -35,9 +35,9 @@ class ApiRequest extends HttpRequest2
     {
         $entityClassNames = explode(',', $entityClassNameList);
         foreach ($entityClassNames as $entityClassName) {
-            $entity = new Entity($entityClassName); //TODO static
+            $entityClass = EntityClass::get($entityClassName);
             $entityClassContent = array_null_get($content, $entityClassName);
-            $storageRequests = $entity->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
+            $storageRequests = $entityClass->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
             foreach ($storageRequests as $storageString => $storageRequest) {
                 if (!array_key_exists($storageString, $this->storageRequests)) {
                     $this->storageRequests[$storageString] = $storageRequests[$storageString];
