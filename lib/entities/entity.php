@@ -94,16 +94,15 @@ class Entity
             if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
                 foreach ($this->properties as $propertyName => $property) {
                     $propertyContent = array_null_get($entityIdContent, $propertyName);
+                    $path = [$this->entityClass, $entityId, $propertyName];
                     if (!is_null($propertyContent)) {
                         if (!$property->validate($propertyContent)) {
                             $error = 'Invalid content for /' . $this->entityClass . '/' . $entityId . '/' . $propertyName;
-                            $path = [$this->entityClass, $entityId, $propertyName];
                             $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClass, $entityId, $error, $path, $propertyContent, $query);
                             $errorPropertyRequests[] = $errorPropertyRequest;
                         }
                     } elseif (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
                         $error = 'Missing content for required /' . $this->entityClass . '/' . $entityId . '/' . $propertyName;
-                        $path = [$this->entityClass, $entityId, $propertyName];
                         $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClass, $entityId, $error, $path, $propertyContent, $query);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     }
@@ -120,7 +119,8 @@ class Entity
         return $propertyRequests;
     }
 
-    public function createStorageRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
+    public
+    function createStorageRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
     {
         /** @var PropertyRequest[] */
         $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);

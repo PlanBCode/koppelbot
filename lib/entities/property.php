@@ -236,10 +236,10 @@ class Property
         $this->type = new $typeClass();
 
         $access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
-        $this->settings['access']= $access;
+        $this->settings['access'] = $access;
 
         $required = !is_null(getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings));
-        $this->settings['required']= $required;
+        $this->settings['required'] = $required;
 
         $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
@@ -275,6 +275,16 @@ class Property
                 }
             }
         }
+    }
+
+    protected function isId(): bool
+    {
+        return (array_get($this->settings['storage'], 'key', false));
+    }
+
+    protected function isPrimitive(): bool
+    {
+        return empty($this->subProperties);
     }
 
     public function expand(array $propertyPath, int $depth, Query &$query): array
@@ -328,7 +338,18 @@ class Property
 
     public function isRequired(): bool
     {
-        return $this->settings['required'];
+        if ($this->settings['required']) {
+            return true;
+        } elseif ($this->isPrimitive()) {
+            return $this->isId();
+        } else {
+            foreach ($this->subProperties as $subProperty) {
+                if ($subProperty->isRequired()) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public function getStorageSettings(): array
