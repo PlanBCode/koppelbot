@@ -15,7 +15,6 @@
         "storage": {
           "content": true
         },
-        "key": "id",
         "accept": "TODO"
       },
       "id": {
@@ -27,7 +26,6 @@
     },
     "type": "file"
   },
-
   "meta": {
     "type": "string",
     "storage": {
@@ -37,7 +35,6 @@
       "extension": "meta",
       "content": true
     },
-    "key": "id",
     "accept": "TODO"
   }
 }

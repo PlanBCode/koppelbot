@@ -1,12 +1,15 @@
 TODO
 
+PUT /$EntityClasse/new   directory&file put
+- - find (sub) property with key:true : check in backend if it matches
+
 js code splitten mbv webpack
 - package.json
 - - dev webpack
 - - dev gulp
 - gulpfile.js
 
-Property:  default values
+Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 werkend maken: xyz.create('/$type', {});
 
@@ -22,8 +25,11 @@ werkt niet:  http://localhost:8888/site/api/*?meta
 - - zou het moeten werken?
 - - iig goede foutmelding
 
+file type: viewer   https://viewerjs.org/
 
 
+
+hide private storage settings or better only expose specified ones
 
 add dot notation: /source/*/file.content,id
 
@@ -46,7 +52,6 @@ client side parsing json|none
 
 readOnly for property
 
-file type: viewer   https://viewerjs.org/
 
 ui: dynamic updating / state syncing
 

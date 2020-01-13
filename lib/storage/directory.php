@@ -23,11 +23,13 @@ class Storage_directory extends BasicStorage
     protected $path;
     protected $extension;
     protected $data;
+    protected $settings;
 
-    public function __construct(array $settings)
+    public function __construct(array &$settings)
     {
         $this->path = array_get($settings, 'path');
         $this->extension = array_get($settings, 'extension', '*');
+        $this->settings = $settings;
     }
 
     protected function createFilePath(string $entityId)
@@ -39,14 +41,12 @@ class Storage_directory extends BasicStorage
     {
         $path = array_get($settings, 'path');
         $extension = array_get($settings, 'extension', '*');
-        return $path . $entityId . '.' . $extension;
+        return $path . '.' . $extension;
     }
 
     protected function open(StorageRequest $storageRequest): StorageResponse
     {
-
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
-
         $propertyRequest = $storageRequest->getFirstPropertyRequest();
         if (!$propertyRequest) {
             return new StorageResponse(500);
@@ -79,10 +79,12 @@ class Storage_directory extends BasicStorage
     protected function close(StorageRequest $storageRequest): StorageResponse
     {
         $propertyRequest = $storageRequest->getFirstPropertyRequest();
+
         if (!$propertyRequest) {
             return new StorageResponse(500);
         }
         $parse = $propertyRequest->getProperty()->getStorageSetting('parse');
+
         foreach ($this->data as $entityId => $data) {
 
             if (!$storageRequest->readOnly($entityId)) { //TODO dit gaat mis als de key gewijzigd wordt
@@ -91,7 +93,6 @@ class Storage_directory extends BasicStorage
                 } else {//TODO xml,yaml,csv,tsv
                     $fileContent = $data;
                 }
-                echo $entityId . ' ' . $fileContent . PHP_EOL;
                 if ($fileContent) {
                     file_put_contents($this->createFilePath($entityId), $fileContent);
                 }
@@ -147,15 +148,16 @@ class Storage_directory extends BasicStorage
             $property = $propertyRequest->getProperty();
             $propertyName = $property->getName();
             if ($propertyRequest->getProperty()->getStorageSetting('key')) {
-                echo $propertyName . ':key ';
                 $content = $propertyRequest->getContent();
+                //TODO or extension is mixed extensions for example "json|xml"
                 $content = $this->extension === '*' ? $content : basename($content, '.' . $this->extension);
-                $this->data[$content] = $this->data[$entityId];
-                $this->data[$entityId] = null;
-                unset($this->data[$entityId]);
+                if ($content !== $entityId) {
+                    $this->data[$content] = $this->data[$entityId];
+                    $this->data[$entityId] = null;
+                    unset($this->data[$entityId]);
+                }
                 $storageResponse->add(200, $propertyRequest, $content, $content);
             } elseif ($propertyRequest->getProperty()->getStorageSetting('content')) {
-                echo $propertyName . ':content ';
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId] = $content;
                 $storageResponse->add(200, $propertyRequest, $entityId, $content);

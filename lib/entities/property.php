@@ -70,7 +70,6 @@ class  PropertyRequest
         } else {
             $this->property = $propertyOrError;
             $this->content = $propertyContent;
-
             $this->status = 200;
             $storageSettings = $this->property->getStorageSettings();
             $storageType = array_get($storageSettings, 'type');
@@ -209,15 +208,8 @@ class Property
     /** @var array */
     protected $settings;
 
-    /** @var array */
-    protected $storage;
-    /** @var array */
-    protected $access;
     /** @var Property[] */
     protected $subProperties = [];
-
-    /** @var bool */
-    protected $required = false;
 
     /* TODO
       audit
@@ -229,8 +221,10 @@ class Property
         $this->settings = $settings;
 
         $typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
+        $this->settings['type'] = $typeName;
 
         $typeClass = 'Type_' . $typeName;
+        //TODO handle type aliases
         //TODO error if file does not exist
         require_once './lib/types/' . $typeName . '.php';
 
@@ -240,12 +234,17 @@ class Property
         }
 
         $this->type = new $typeClass();
-        $this->storage = getMergedSetting(self::PROPERTY_STORAGE, $settings, $rootSettings);
-        $this->access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
-        $this->required = !is_null(getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings));
+
+        $access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
+        $this->settings['access']= $access;
+
+        $required = !is_null(getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings));
+        $this->settings['required']= $required;
+
         $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
-        $this->storage = array_merge($rootSettingStorage, $settingStorage);
+        $storage = array_merge($rootSettingStorage, $settingStorage);
+        $this->settings['storage'] = $storage;
 
         $signatureProperties = array_get($this->settings, 'signature');
         if ($signatureProperties) {
@@ -254,20 +253,24 @@ class Property
                 // TODO this signature is an alias, do a lookup
             }
             if (!is_array($signature)) {
-                echo 'Incorrect signature!';
+                echo 'ERROR Incorrect signature!';
                 //TODO error
             } else {
                 foreach ($signatureProperties as $subPropertyName => $subSettings) {
                     if (!array_key_exists($subPropertyName, $signature)) {
-                        echo 'Incorrect signature!';
+                        echo 'ERROR Incorrect signature!';
                         //TODO error
                     } else {
                         //TODO check if type signature  {"content":"string"} supports these subProperties
+
+                        //TODO use $this->settings instead or $rootSettings
+                        //var_dump($this->settings);
                         $subProperty = new Property($subPropertyName, $subSettings, $rootSettings);
                         if ($subProperty->isRequired()) {
                             $this->required = true;
                         }
                         $this->subProperties[$subPropertyName] = $subProperty;
+                        $this->settings['signature'][$subPropertyName] = $subProperty->getMeta();
                     }
                 }
             }
@@ -325,12 +328,12 @@ class Property
 
     public function isRequired(): bool
     {
-        return $this->required;
+        return $this->settings['required'];
     }
 
     public function getStorageSettings(): array
     {
-        return $this->storage;
+        return $this->settings['storage'];
     }
 
     public function getMeta(): array
@@ -345,6 +348,6 @@ class Property
 
     public function getStorageSetting($settingName)
     {
-        return array_get($this->storage, $settingName);
+        return array_get($this->settings['storage'], $settingName);
     }
 }
