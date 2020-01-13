@@ -156,13 +156,8 @@ class ContentResponse extends HttpResponse2
         } elseif ($uri == '/xyz-style.css') {
             $fileContent = file_get_contents('lib/ui/style.css');
             parent::__construct(200, $fileContent);
-        } elseif ($uri == '/xyz-script.js') {
-            $fileContent = file_get_contents('lib/ui/script.js');
-            $typeFilePaths = glob('lib/types/*.js');
-            foreach ($typeFilePaths as $typeFilePath) {
-                $type = basename($typeFilePath, '.js');
-                $fileContent .= "\n" . file_get_contents($typeFilePath);
-            }
+        } elseif ($uri == '/xyz-ui.js') {
+            $fileContent = file_get_contents('lib/ui/xyz-ui.webpacked.js');
             parent::__construct(200, $fileContent);
         } elseif (file_exists('custom/content' . $uri)) {
             $fileContent = file_get_contents('custom/content' . $uri);//TODO make safe!

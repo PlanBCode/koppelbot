@@ -1,8 +1,5 @@
 TODO
 
-PUT /$EntityClasse/new   directory&file put
-- - find (sub) property with key:true : check in backend if it matches
-
 js code splitten mbv webpack
 - package.json
 - - dev webpack
