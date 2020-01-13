@@ -1,14 +1,8 @@
 TODO
 
-js code splitten mbv webpack
-- package.json
-- - dev webpack
-- - dev gulp
-- gulpfile.js
+reference to entities as values
+- "type" : "ref:account" 
 
-Put @ Backend default values properties gebruiken voor niet toegevoegde props
-
-werkend maken: xyz.create('/$type', {});
 
 meta entity
 - property "*": {type='string|json=mixed'}  dynamic number of properties
@@ -18,13 +12,18 @@ meta entity
 - - Storage_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
-werkt niet:  http://localhost:8888/site/api/*?meta
+werkt niet:  http://localhost:8888/site/api/*
 - - zou het moeten werken?
 - - iig goede foutmelding
 
 file type: viewer   https://viewerjs.org/
 
+Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
+drag&drop
+- als er een reference input veld is dan worden die entities sleepbaar
+
+werkend maken: xyz.create('/$type', {});
 
 hide private storage settings or better only expose specified ones
 
@@ -68,3 +67,5 @@ types:
 create http status code LUT
 
 maybe entity inheritance
+
+

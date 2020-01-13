@@ -41,26 +41,40 @@ class Storage_directory extends BasicStorage
     {
         $path = array_get($settings, 'path');
         $extension = array_get($settings, 'extension', '*');
-        return $path . '.' . $extension;
+        return $path . '*.' . $extension;
+    }
+
+    protected function getAllEntityIds(): array
+    {
+        $entityIds = [];
+        foreach (glob($this->createFilePath('*')) as $filePath) {
+            $entityIds[] = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
+        }
+        return $entityIds;
     }
 
     protected function open(StorageRequest $storageRequest): StorageResponse
     {
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
         $propertyRequest = $storageRequest->getFirstPropertyRequest();
-        if (!$propertyRequest) {
-            return new StorageResponse(500);
+
+        $entityIds = [];
+        foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
+            $entityIdList = $propertyRequest->getEntityId();
+            if ($entityIdList === '*') {
+                $entityIds = $this->getAllEntityIds();
+                break;
+            } else {
+                array_push($entityIds, ...explode(',', $entityIdList));
+                $entityIds = array_unique($entityIds);
+            }
         }
-        $entityId = $propertyRequest->getEntityId();
-        if ($entityId === '*') {
-            $filePaths = glob($this->createFilePath('*'));
-        } else {
-            $filePaths = [$this->createFilePath($entityId)];
-        }
+
         $this->data = [];
         $parse = $propertyRequest->getProperty()->getStorageSetting('parse');
-        foreach ($filePaths as $filePath) {
-            $entityId = $this->extension === '*' ? $filePath : basename($filePath, '.' . $this->extension);
+        foreach ($entityIds as $entityId) {
+            $filePath = $this->createFilePath($entityId);
+
             //TODO lock file
             if (!file_exists($filePath)) {// TODO pass an error message?
                 return new StorageResponse(404);
