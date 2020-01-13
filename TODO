@@ -1,9 +1,5 @@
 TODO
 
-reference to entities as values
-- "type" : "ref:account"
-
-
 meta entity
 - property "*": {type='string|json=mixed'}  dynamic number of properties
 - /meta/source
