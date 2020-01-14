@@ -1,0 +1,22 @@
+{
+  "_": {
+    "storage": {
+      "type": "directory",
+      "parse": "json",
+      "path": "data/facts/",
+      "extension": "json"
+    }
+  },
+  "id": {
+    "type": "id",
+    "storage": {
+      "key": "basename"
+    }
+  },
+  "title" : {
+    "type": "string",
+    "storage": {
+      "key": ".title"
+    }
+  }
+}

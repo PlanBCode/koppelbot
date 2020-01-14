@@ -25,9 +25,8 @@ abstract class BasicStorage extends Storage
                 return $this->get($propertyRequest);
             case 'PATCH':
                 return $this->patch($propertyRequest);//TODO use $this->put
-            /*TODOcase 'POST':
-                return $this->post($propertyRequest);
-            */
+            case 'POST':
+                return $this->patch($propertyRequest);
             case 'PUT':
                 return $this->patch($propertyRequest);
             case 'HEAD':

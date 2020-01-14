@@ -81,7 +81,7 @@ class EntityClass
                 $propertyContent = array_null_get($entityIdContent, $propertyName);
                 $path = [$this->entityClassName, $entityId, $propertyName];
                 if (!is_null($propertyContent)) {
-                    if ($property->getTypeName() === 'id') { //TODO only for method post
+                    if ($property->getTypeName() === 'id' && $method === 'POST') {
                         $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not bu supplied.';
                         $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
                         $errorPropertyRequests[] = $errorPropertyRequest;
@@ -106,7 +106,15 @@ class EntityClass
         /** @var string[] */
         $entityIds = [];
         if ($entityIdList === '*') {
-            $entityIds = ['*'];// TODO retrieve all ids
+            if ($method === 'POST') {
+                $entityIds = array_keys($entityClassContent);
+            } elseif ($method === 'HEAD') {
+                //TODO this is tautology requesting the existance of all existing entities
+            } elseif ($method === 'PUT') {
+                //TODO error or overwrite everything?
+            } else {
+                $entityIds = ['*']; // TODO retrieve all ids
+            }
         } else {
             $entityIds = explode(',', $entityIdList);
         }

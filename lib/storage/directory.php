@@ -26,6 +26,9 @@ class Storage_directory extends BasicStorage
     protected $data;
     protected $settings;
 
+    protected $maxAutoIncrementedId;
+    protected $autoIncrementLookup = [];
+
     public function __construct(array &$settings)
     {
         $this->path = array_get($settings, 'path');
@@ -52,6 +55,28 @@ class Storage_directory extends BasicStorage
             $entityIds[] = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
         }
         return $entityIds;
+    }
+
+    protected function getAutoIncrementedId(string $entityId): string
+    {
+        if (array_key_exists($entityId, $this->autoIncrementLookup)) {
+            return $this->autoIncrementLookup[$entityId];
+        }
+        if (empty($this->autoIncrementLookup)) {
+            //TODO error if extension === '*'  no way to decide then
+            $allExistingEntityIds = $this->getAllEntityIds();
+            if (empty($allExistingEntityIds)) {
+                $this->maxAutoIncrementedId = 0;
+            } else {
+                $integerEntityIds = array_map('intval', $allExistingEntityIds);
+                $this->maxAutoIncrementedId = max($integerEntityIds) + 1;
+            }
+        } else {
+            $this->maxAutoIncrementedId++;
+        }
+        $max = strval($this->maxAutoIncrementedId);
+        $this->autoIncrementLookup[$entityId] = $max;
+        return $max;
     }
 
     protected function open(StorageRequest $storageRequest): StorageResponse
@@ -102,14 +127,13 @@ class Storage_directory extends BasicStorage
         $parse = $propertyRequest->getProperty()->getStorageSetting('parse', 'none');
 
         foreach ($this->data as $entityId => $data) {
-            if (!$storageRequest->readOnly($entityId)) { //TODO dit gaat mis als de key gewijzigd wordt
+            if (!$storageRequest->readOnly($entityId) || !is_null($this->maxAutoIncrementedId)) {
                 if ($parse === 'json') {
                     $fileContent = json_encode($data);
                 } else {//TODO xml,yaml,csv,tsv
                     $fileContent = $data;
                 }
                 if ($fileContent) {
-                    echo($this->createFilePath($entityId).':'.$fileContent);
                     file_put_contents($this->createFilePath($entityId), $fileContent);
                 }
             }
@@ -168,20 +192,17 @@ class Storage_directory extends BasicStorage
 
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
+
+            if ($propertyRequest->getMethod() === 'POST') {
+                $entityId = $this->getAutoIncrementedId($entityId);
+            }
+
             if (!array_key_exists($entityId, $this->data)) {
                 $this->data[$entityId] = [];
             }
-            if ($key === "basename") {
-                $autoincrement = $propertyRequest->getProperty()->getTypeName() === 'id';
-                if ($propertyRequest->getMethod() === 'PUT' && $autoincrement) {// TODO or POST?
-                    //TODO error if extension === '*'  no way to decide that
-                    $entityIds = $this->getAllEntityIds();
-                    if (empty($entityIds)) {
-                        $content = '0';
-                    } else {
-                        $integerEntityIds = array_map('intval', $entityIds);
-                        $content = strval(max($integerEntityIds) + 1);
-                    }
+            if ($key === "basename") { //TODO or filename?
+                if ($propertyRequest->getMethod() === 'POST') {
+                    $content = $entityId;
                 } else {
                     $content = $propertyRequest->getContent();
                 }
@@ -197,7 +218,7 @@ class Storage_directory extends BasicStorage
                 $content = $propertyRequest->getContent();
                 $this->data[$entityId] = $content;
                 $storageResponse->add(200, $propertyRequest, $entityId, $content);
-            } else if (is_string($key) && substr($key, 0,1) === '.') {
+            } else if (is_string($key) && substr($key, 0, 1) === '.') {
                 $keyPath = explode('.', substr($key, 1));
                 $content = $propertyRequest->getContent();
                 //TODO handle multi key path

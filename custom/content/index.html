@@ -9,7 +9,7 @@
 <table id="main">
     <tr><td colspan="2" id="header">Koppelbot</td></tr>
     <tr>
-        <td rowspan="3" id="nav" width="20%" valign="top">
+        <td rowspan="4" id="nav" width="20%" valign="top">
             <script>
                 xyz.ui('/source/*/file/id', {display: 'list', select: 'source', multiSelect:'multiSource'});
             </script>
@@ -27,7 +27,13 @@
     </tr>
     <tr>
         <td>
-            Toevoegen:
+            Create fact:
+            <script>xyz.create('/fact', {});</script>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Create source:
             <script>xyz.create('/source', {});</script>
         </td>
     </tr>
