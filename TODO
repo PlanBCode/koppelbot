@@ -1,5 +1,15 @@
 TODO
 
+file type: viewer   https://viewerjs.org/
+
+add references from a dropdown generated list
+
+
+
+werkt niet:  http://localhost:8888/site/api/*
+- - zou het moeten werken?
+- - iig goede foutmelding
+
 meta entity
 - property "*": {type='string|json=mixed'}  dynamic number of properties
 - /meta/source
@@ -8,17 +18,10 @@ meta entity
 - - Storage_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
-werkt niet:  http://localhost:8888/site/api/*
-- - zou het moeten werken?
-- - iig goede foutmelding
-
-file type: viewer   https://viewerjs.org/
-
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 drag&drop
 - als er een reference input veld is dan worden die entities sleepbaar
-
 werkend maken: xyz.create('/$type', {});
 
 hide private storage settings or better only expose specified ones

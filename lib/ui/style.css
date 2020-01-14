@@ -11,6 +11,10 @@
     background-color: yellow;
 }
 
-.xyz-waiting{
-    color:grey;
+.xyz-waiting {
+    color: grey;
+}
+
+.xyz-status-400, .xyz-status-403, .xyz-status-404, .xyz-status-500 {
+    color: red;
 }
