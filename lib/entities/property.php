@@ -366,8 +366,8 @@ class Property
         return $this->type->validate($content, $this->settings);
     }
 
-    public function getStorageSetting($settingName)
+    public function getStorageSetting($settingName, $default = null)
     {
-        return array_get($this->settings['storage'], $settingName);
+        return array_get($this->settings['storage'], $settingName, $default );
     }
 }

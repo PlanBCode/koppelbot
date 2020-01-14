@@ -10,14 +10,14 @@
   "id": {
     "type": "string",
     "storage": {
-      "key": true
+      "key": "key"
     },
     "accept": "TODO"
   },
   "content": {
     "type": "string",
     "storage": {
-      "content": true
+      "key": "content"
     },
     "accept": "TODO"
   }

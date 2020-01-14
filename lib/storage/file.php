@@ -1,13 +1,14 @@
 <?php
 
 /*
-    storage settings
-      path
-      parse json (todo xml, yaml)
+    general storage settings
+      path   "/path/to/basename.extension"
+      parse "json" (todo xml, yaml)
 
-    special properties
-      key
-
+    property storage settings:
+      key: "content"
+      key: "key"
+      key: "content.a.b"
  */
 
 class Storage_file extends BasicStorage
@@ -31,7 +32,7 @@ class Storage_file extends BasicStorage
     protected function open(StorageRequest $storageRequest): StorageResponse
     {
         //TODO lock file
-        if(!file_exists($this->path)){// TODO pass an error message?
+        if (!file_exists($this->path)) {// TODO pass an error message?
             return new StorageResponse(404);
         }
 
@@ -73,21 +74,31 @@ class Storage_file extends BasicStorage
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
+        $property = $propertyRequest->getProperty();
+        $propertyName = $property->getName();
+        $key = $propertyRequest->getProperty()->getStorageSetting('key','.'.$propertyName);
+
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (array_key_exists($entityId, $this->data)) {
                 $entity = $this->data[$entityId];
-                $property = $propertyRequest->getProperty();
-                $propertyName = $property->getName();
-                if ($propertyRequest->getProperty()->getStorageSetting('key')) {
+                if ($key === 'key') {
                     $content = $entityId;
                     $storageResponse->add(200, $propertyRequest, $entityId, $content);
-                } elseif (array_key_exists($propertyName, $entity)) {
-                    $content = $entity[$propertyName];
+                } else if ($key === 'content') {
+                    $content = $entity;
                     $storageResponse->add(200, $propertyRequest, $entityId, $content);
+                } elseif (is_string($key) && substr($key, 0, 1) === '.') {
+                    $keyPath = explode('.', substr($key,1));
+                    if (array_key_exists($keyPath[0], $entity)) {//TODO multi keypath
+                        $content = $entity[$keyPath[0]];
+                        $storageResponse->add(200, $propertyRequest, $entityId, $content);
+                    } else {
+                        $error = '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/' . implode('/', $propertyRequest->getPropertyPath()) . ' not found.';
+                        $storageResponse->add(404, $propertyRequest, $entityId, $error);
+                    }
                 } else {
-                    $error = '/' . $propertyRequest->getEntityClass() . '/' . $entityId .'/'.implode('/',$propertyRequest->getPropertyPath()). ' not found.';
-                    $storageResponse->add(404, $propertyRequest, $entityId, $error);
+                    $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
                 }
             } else {
                 $storageResponse->add(404, $propertyRequest, $entityId, '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/* not found.');
@@ -102,21 +113,26 @@ class Storage_file extends BasicStorage
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
+        $property = $propertyRequest->getProperty();
+        $propertyName = $property->getName();
+        $key = $propertyRequest->getProperty()->getStorageSetting('key','.'.$propertyName);
+
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (!array_key_exists($entityId, $this->data)) {
                 $this->data[$entityId] = [];
             }
-            $property = $propertyRequest->getProperty();
-            $propertyName = $property->getName();
-            if ($propertyRequest->getProperty()->getStorageSetting('key')) {
-                $content = $propertyRequest->getContent();
+            $content = $propertyRequest->getContent();
+            if ($key === 'key') {
                 $this->data[$content] = $this->data[$entityId];
                 unset($this->data[$entityId]);
+            } elseif ($key === 'content') {
+                $this->data[$entityId] = $content;
+            } elseif (is_string($key) && substr($key, 1) === '.') {
+                $keyPath = explode('.', substr($key,0,-1));
+                $this->data[$keyPath[0]] = $content;//TODO multi key path
             } else {
-                $content = $propertyRequest->getContent();
-                $this->data[$entityId][$propertyName] = $content;
-                $storageResponse->add(200, $propertyRequest, $entityId, $content);
+                $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
             }
         }
 
