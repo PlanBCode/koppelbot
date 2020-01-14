@@ -100,7 +100,6 @@ class EntityClass
         }
     }
 
-
     protected function createPropertyRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query): array
     {
         /** @var string[] */
