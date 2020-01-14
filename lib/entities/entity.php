@@ -21,7 +21,7 @@ class EntityClass
             $meta = json_decode($fileContent, true);
             //TODO maybe resolve inheritance
 
-            $entityClass = new EntityClass($entityClassName,$meta);
+            $entityClass = new EntityClass($entityClassName, $meta);
             self::$entityClasses[$entityClassName] = $entityClass;
             return $entityClass;
         }
@@ -74,6 +74,33 @@ class EntityClass
         return $propertyHandles;
     }
 
+    protected function validateAndCheckRequired(string $method, $requestId, string $entityId, $entityIdContent, array &$errorPropertyRequests, Query &$query)
+    {
+        if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
+            foreach ($this->properties as $propertyName => $property) {
+                $propertyContent = array_null_get($entityIdContent, $propertyName);
+                $path = [$this->entityClassName, $entityId, $propertyName];
+                if (!is_null($propertyContent)) {
+                    if ($property->getTypeName() === 'id') { //TODO only for method post
+                        $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not bu supplied.';
+                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
+                        $errorPropertyRequests[] = $errorPropertyRequest;
+                    } else if (!$property->validate($propertyContent)) {
+                        $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
+                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
+                        $errorPropertyRequests[] = $errorPropertyRequest;
+                    }
+                } elseif
+                (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
+                    $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
+                    $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
+                    $errorPropertyRequests[] = $errorPropertyRequest;
+                }
+            }
+        }
+    }
+
+
     protected function createPropertyRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query): array
     {
         /** @var string[] */
@@ -83,12 +110,12 @@ class EntityClass
         } else {
             $entityIds = explode(',', $entityIdList);
         }
-
         if ($method === 'PUT' && ($entityIdList === '*' || count($propertyPath) > 0)) {
             /** @var PropertyHandle[] */
             $propertyHandles = [new PropertyHandle(400, 'PUT method expects uri of the form /' . $this->entityClassName . '/$ID', [$this->entityClassName])];
-            /*        } elseif ($method === 'POST' && ($entityIdList !== '*' || count($propertyPath) > 0)) {
-                        $propertyHandles = [new PropertyHandle(400, 'POST method expects uri of the form /'.$this->entityClass.'', [$this->entityClass])];*/
+        } elseif ($method === 'POST' && ($entityIdList !== '*' || count($propertyPath) > 0)) {
+            /** @var PropertyHandle[] */
+            $propertyHandles = [new PropertyHandle(400, 'POST method expects uri of the form /' . $this->entityClassName . '', [$this->entityClassName])];
         } else {
             /** @var PropertyHandle[] */
             $propertyHandles = $this->expand($propertyPath, $query);
@@ -105,23 +132,7 @@ class EntityClass
                 $entityIdContent = null;
             }
 
-            if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
-                foreach ($this->properties as $propertyName => $property) {
-                    $propertyContent = array_null_get($entityIdContent, $propertyName);
-                    $path = [$this->entityClassName, $entityId, $propertyName];
-                    if (!is_null($propertyContent)) {
-                        if (!$property->validate($propertyContent)) {
-                            $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                            $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
-                            $errorPropertyRequests[] = $errorPropertyRequest;
-                        }
-                    } elseif (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
-                        $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
-                        $errorPropertyRequests[] = $errorPropertyRequest;
-                    }
-                }
-            }
+            $this->validateAndCheckRequired($method, $requestId, $entityId, $entityIdContent, $errorPropertyRequests, $query);
 
             foreach ($propertyHandles as $propertyHandle) {
                 $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClassName, $entityId, $entityIdContent, $query);

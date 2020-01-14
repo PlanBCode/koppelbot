@@ -203,6 +203,8 @@ class Property
 
     /** @var string */
     protected $propertyName;
+    /** @var string */
+    protected $typeName;
     /** @var Type */
     protected $type;
     /** @var array */
@@ -220,16 +222,16 @@ class Property
         $this->propertyName = $propertyName;
         $this->settings = $settings;
 
-        $typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
-        $this->settings['type'] = $typeName;
+        $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
+        $this->settings['type'] = $this->typeName;
 
-        $typeClass = 'Type_' . $typeName;
+        $typeClass = 'Type_' . $this->typeName;
         //TODO handle type aliases
         //TODO error if file does not exist
-        require_once './lib/types/' . $typeName . '.php';
+        require_once './lib/types/' . $this->typeName . '.php';
 
         if (!class_exists($typeClass)) {
-            echo 'ERROR Type ' . $typeName . 'does not exist!';
+            echo 'ERROR Type ' . $this->typeName . 'does not exist!';
             //return null; //TODO ERROR
         }
         $this->type = new $typeClass();
@@ -335,12 +337,17 @@ class Property
         return $this->propertyName;
     }
 
+    public function getTypeName(): string
+    {
+        return $this->typeName;
+    }
+
     public function isRequired(): bool
     {
         if ($this->settings['required']) {
             return true;
         } elseif ($this->isPrimitive()) {
-            return $this->isId();
+            return $this->isId() && $this->typeName !== 'id';
         } else {
             foreach ($this->subProperties as $subProperty) {
                 if ($subProperty->isRequired()) {

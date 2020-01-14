@@ -58,13 +58,11 @@ class ApiRequest extends HttpRequest2
         $query = new Query($this->queryString);
         if ($this->method === 'GET' || $this->method === 'DELETE' || $this->method === 'HEAD') {
             $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, null, $query);
-        } elseif ($this->method === 'PATCH' || $this->method === 'PUT') {
+        } elseif ($this->method === 'PATCH' || $this->method === 'PUT' || $this->method === 'POST') {
             $jsonContent = json_decode($this->content, true); //TODO catch errors
             $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, $jsonContent, $query);
-        } elseif ($this->method === 'POST') {
-            // TODO to append arrays
         } else {
-            //TODO error
+            //TODO error unknown method
         }
         /*
             foreach ($jsonContent as $requestId => $subRequest) {
@@ -87,7 +85,6 @@ class ApiRequest extends HttpRequest2
         $requestResponses = [];
 
         foreach ($this->storageRequests as $storageRequest) {
-
             $storageResponse = Storage::getStorageResponse($storageRequest);
 
             foreach ($storageResponse->getRequestResponses() as $requestId => $requestResponse) {

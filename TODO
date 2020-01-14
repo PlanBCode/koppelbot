@@ -1,5 +1,14 @@
 TODO
 
+add source using put
+- missing account : gaat nog iets mis
+
+add fact using post
+- POST: only for array type variables or entities with autoincrement ids
+- prevent setting of autoincremented id with patch, post or put
+
+
+
 file type: viewer   https://viewerjs.org/
 
 
@@ -33,7 +42,6 @@ create /doc endpoint for documentation
 - /doc/ui
 - /doc/ui/display/$display
 
-POST: only for array type variables or entities with autoincrement ids
 
 Pass more stuff by reference
 

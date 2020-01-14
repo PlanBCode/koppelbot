@@ -31,22 +31,23 @@ class Storage_file extends BasicStorage
 
     protected function open(StorageRequest $storageRequest): StorageResponse
     {
-        //TODO lock file
         if (!file_exists($this->path)) {// TODO pass an error message?
-            return new StorageResponse(404);
+            if ($storageRequest->readOnly()) {
+                return new StorageResponse(404);
+            } else { // create the file
+                $this->data = [];
+            }
+        } else {
+            $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+            //TODO lock file
+            $fileContent = file_get_contents($this->path);
+            if ($parse === 'json') {
+                //TODO error if parsing fails
+                $this->data = json_decode($fileContent, true);
+            } else { //TODO xml, yaml,csv,tsv
+                return new StorageResponse(500);
+            }
         }
-
-        $fileContent = file_get_contents($this->path);
-
-        $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
-
-        //TODO error if fails
-        if ($parse === 'json') {
-            $this->data = json_decode($fileContent, true);
-        } else { //TODO xml, yaml,csv,tsv
-            return new StorageResponse(500);
-        }
-
         return new StorageResponse(200);
     }
 
@@ -76,7 +77,7 @@ class Storage_file extends BasicStorage
 
         $property = $propertyRequest->getProperty();
         $propertyName = $property->getName();
-        $key = $propertyRequest->getProperty()->getStorageSetting('key','.'.$propertyName);
+        $key = $propertyRequest->getProperty()->getStorageSetting('key', '.' . $propertyName);
 
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
@@ -89,7 +90,7 @@ class Storage_file extends BasicStorage
                     $content = $entity;
                     $storageResponse->add(200, $propertyRequest, $entityId, $content);
                 } elseif (is_string($key) && substr($key, 0, 1) === '.') {
-                    $keyPath = explode('.', substr($key,1));
+                    $keyPath = explode('.', substr($key, 1));
                     if (array_key_exists($keyPath[0], $entity)) {//TODO multi keypath
                         $content = $entity[$keyPath[0]];
                         $storageResponse->add(200, $propertyRequest, $entityId, $content);
@@ -115,7 +116,7 @@ class Storage_file extends BasicStorage
 
         $property = $propertyRequest->getProperty();
         $propertyName = $property->getName();
-        $key = $propertyRequest->getProperty()->getStorageSetting('key','.'.$propertyName);
+        $key = $propertyRequest->getProperty()->getStorageSetting('key', '.' . $propertyName);
 
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
@@ -128,8 +129,8 @@ class Storage_file extends BasicStorage
                 unset($this->data[$entityId]);
             } elseif ($key === 'content') {
                 $this->data[$entityId] = $content;
-            } elseif (is_string($key) && substr($key, 1) === '.') {
-                $keyPath = explode('.', substr($key,0,-1));
+            } elseif (is_string($key) && substr($key, 0,1) === '.') {
+                $keyPath = explode('.', substr($key, 1));
                 $this->data[$keyPath[0]] = $content;//TODO multi key path
             } else {
                 $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
