@@ -7,9 +7,9 @@
 </head>
 <body>
 <table id="main">
-    <tr><td colspan="2" id="header">Koppelbot</td></tr>
+    <tr><td colspan="3" id="header">Koppelbot</td></tr>
     <tr>
-        <td rowspan="4" id="nav" width="20%" valign="top">
+        <td rowspan="4" id="sources" width="20%" valign="top">
             <script>
                 xyz.ui('/source/*/file/id', {display: 'list', select: 'source', multiSelect:'multiSource'});
             </script>
@@ -17,6 +17,11 @@
         <td valign="top">
             <script>xyz.ui('/source/$source', {showLabel:false});</script>
             <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel:false});</script>
+        </td>
+        <td rowspan="4" id="facts" width="20%" valign="top">
+            <script>
+                xyz.ui('/fact/*', {display: 'list', select: 'fact'});
+            </script>
         </td>
     </tr>
     <tr>
@@ -29,6 +34,8 @@
         <td>
             Create fact:
             <script>xyz.create('/fact', {});</script>
+            Edit fact:
+            <script>xyz.ui('/fact/$fact', {action: 'edit'});</script>
         </td>
     </tr>
     <tr>

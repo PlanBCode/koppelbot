@@ -2,7 +2,7 @@
 
 class Type_string extends Type
 {
-    public function validate($value, array $settings): bool
+    public static function validate($value, array $settings): bool
     {
         return true; //TODO
     }

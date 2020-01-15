@@ -2,8 +2,11 @@ html,body{
     padding:0;
     margin:0;
 }
-#nav {
+#sources {
     background-color: lightpink;
+}
+#facts {
+    background-color: lightgreen;
 }
 #main{
     padding:0;

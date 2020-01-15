@@ -18,5 +18,14 @@
     "storage": {
       "key": ".title"
     }
+  },
+  "words" : {
+    "type": "array",
+    "subType": {
+      "type": "string"
+    },
+    "storage": {
+      "key": ".words"
+    }
   }
 }

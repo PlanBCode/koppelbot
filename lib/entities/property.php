@@ -205,8 +205,7 @@ class Property
     protected $propertyName;
     /** @var string */
     protected $typeName;
-    /** @var Type */
-    protected $type;
+    protected $typeClass;
     /** @var array */
     protected $settings;
 
@@ -225,16 +224,10 @@ class Property
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
         $this->settings['type'] = $this->typeName;
 
-        $typeClass = 'Type_' . $this->typeName;
-        //TODO handle type aliases
-        //TODO error if file does not exist
-        require_once './lib/types/' . $this->typeName . '.php';
-
-        if (!class_exists($typeClass)) {
-            echo 'ERROR Type ' . $this->typeName . 'does not exist!';
-            //return null; //TODO ERROR
+        $this->typeClass = Type::get($this->typeName);
+        if ($this->typeClass === null) {
+            //TODO error
         }
-        $this->type = new $typeClass();
 
         $access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
         $this->settings['access'] = $access;
@@ -249,8 +242,8 @@ class Property
 
         $signatureProperties = array_get($this->settings, 'signature');
         if (is_array($signatureProperties)) {
-            $signature = $typeClass::signature();
-            if ($this->type !== $signature) {
+            $signature = $this->typeClass::signature();
+            if ($this->typeName !== $signature) {
                 // TODO this signature is an alias, do a lookup
             }
             if (!is_array($signature)) {
@@ -370,11 +363,11 @@ class Property
 
     public function validate($content): bool
     {
-        return $this->type->validate($content, $this->settings);
+        return $this->typeClass->validate($content, $this->settings);
     }
 
     public function getStorageSetting($settingName, $default = null)
     {
-        return array_get($this->settings['storage'], $settingName, $default );
+        return array_get($this->settings['storage'], $settingName, $default);
     }
 }

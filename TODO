@@ -1,6 +1,15 @@
 TODO
 
 add multiple sources to facts
+- array/set type
+{
+"type":"array",
+ "element": {  <- betere naam
+   "type":"string"
+ }
+
+}
+
 
 
 file type: viewer   https://viewerjs.org/
