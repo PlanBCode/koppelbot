@@ -8,21 +8,27 @@ entityClassName
 Property
 propertyName
 
+typeName
 signature
+settings
+- storage
+- access
+- required
 
 uri
 - /$entityClassName/$entityId/$propertyName...
 path
-- ['$entityClassName','$entityId'.'$propertyName']
+- ['$entityClassName','$entityId','$propertyName',...]
 
 action
 - edit
 - view
+- validate
 
 display
 - create
 - list
-- view
+- item
 - tree
 
 PUT  /$ENTITY/$ID   {entity: {...}}
