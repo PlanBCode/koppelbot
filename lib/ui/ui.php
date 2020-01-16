@@ -11,7 +11,7 @@ class UiResponse extends HttpResponse2
             <head>
                 <title></title>
                 <link rel="stylesheet" type="text/css" href="' . $rootUri . 'xyz-style.css"/>
-                <script type="text/javascript" src="' . $rootUri . 'xyz-script.js"></script>        
+                <script type="text/javascript" src="' . $rootUri . 'xyz-ui.js"></script>        
             </head>
             <body>
                 <script>xyz.ui("' . $uri . '",{display:"' . $display . '"});</script>

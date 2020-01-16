@@ -1,6 +1,4 @@
 TODO
-- add creation interface at list display
-
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
 array
@@ -14,10 +12,11 @@ edit/create
 POST /fact/x/words "vier"              array
 PUT/PATCH /fact/x/words/4 "vier"        replace current value / insert
 DELETE /fact/word/3  null
+
 file type: viewer   https://viewerjs.org/
 
-EntityClass|Property.addListener(type, entityId="*", callback ) = Listener = {entity: entityClass|property, stop: ()=>{remove me}}
-- listertypes = delete/remove, modify/change, new/create, 200,404,403,500,... error
+Listeners
+- listener types = delete/remove, modify/change, new/create, 200,404,403,500,... error
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -27,7 +26,6 @@ EntityClass
 - - HTTP status code xxx : object has been removed
 
 diplays
-- option to add create button + interface
 - option to add delete buttons
 
 provide display settings schema in json form
@@ -58,7 +56,7 @@ werkend maken: xyz.create('/$type', {});
 
 hide private storage settings or better only expose specified ones
 
-add dot notation: /source/*/file.content,id
+MAYBE add dot notation: /source/*/file.content,id
 
 
 create /doc endpoint for documentation
