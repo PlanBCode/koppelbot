@@ -19,6 +19,13 @@
       "key": ".title"
     }
   },
+  "color" : {
+    "type": "enum",
+    "choices" : ["red","blue","green"]
+  },
+  "ready" : {
+    "type": "bool"
+  },
   "words" : {
     "type": "array",
     "subType": {

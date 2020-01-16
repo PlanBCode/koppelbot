@@ -29,7 +29,7 @@ display
 - create
 - list
 - item
-- tree
+- TODO tree, json
 
 PUT  /$ENTITY/$ID   {entity: {...}}
 POST /$ENTITY       {entity: {...}}  requires autoincrement or something?

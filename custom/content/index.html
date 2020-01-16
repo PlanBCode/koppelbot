@@ -7,33 +7,40 @@
 </head>
 <body>
 <table id="main">
-    <tr><td colspan="3" id="header">Koppelbot</td></tr>
+    <tr>
+        <td colspan="3" id="header">Koppelbot</td>
+    </tr>
     <tr>
         <td rowspan="4" id="sources" width="20%" valign="top">
             <script>
-                xyz.ui('/source/*/file/id', {display: 'list', select: 'source', multiSelect:'multiSource'});
+                xyz.ui('/source/*/file/id', {
+                    display: 'list',
+                    select: 'source',
+                    multiSelect: 'multiSource',
+                    addCreateButton: true
+                });
             </script>
         </td>
         <td valign="top">
-            <script>xyz.ui('/source/$source', {showLabel:false});</script>
-            <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel:false});</script>
+            <script>xyz.ui('/source/$source', {showLabel: false});</script>
+            <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel: false});</script>
         </td>
         <td rowspan="4" id="facts" width="20%" valign="top">
             <script>
-                xyz.ui('/fact/*', {display: 'list', select: 'fact'});
+                xyz.ui('/fact/*', {display: 'list', select: 'fact', addCreateButton: true});
             </script>
         </td>
     </tr>
     <tr>
         <td>
             Geselecteerd:
-            <script>xyz.ui('/source/$multiSource/file/id', {dynamic: true, showLabel:false});</script>
+            <script>xyz.ui('/source/$multiSource/file/id', {dynamic: true, showLabel: false});</script>
         </td>
     </tr>
     <tr>
         <td>
             Create fact:
-            <script>xyz.ui('/fact', {display:'create'});</script>
+            <script>xyz.ui('/fact', {display: 'create'});</script>
             Edit fact:
             <script>xyz.ui('/fact/$fact', {action: 'edit'});</script>
         </td>
@@ -41,7 +48,7 @@
     <tr>
         <td>
             Create source:
-            <script>xyz.ui('/source', {display:'create'});</script>
+            <script>xyz.ui('/source', {display: 'create'});</script>
         </td>
     </tr>
 </table>

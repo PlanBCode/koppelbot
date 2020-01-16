@@ -1,4 +1,7 @@
 TODO
+- add creation interface at list display
+
+xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
 array
 array,set,dictionary
@@ -8,11 +11,32 @@ edit/create
 - remove values DELETE
 - edit values  PATCH
 
+POST /fact/x/words "vier"              array
+PUT/PATCH /fact/x/words/4 "vier"        replace current value / insert
+DELETE /fact/word/3  null
 file type: viewer   https://viewerjs.org/
 
+EntityClass|Property.addListener(type, entityId="*", callback ) = Listener = {entity: entityClass|property, stop: ()=>{remove me}}
+- listertypes = delete/remove, modify/change, new/create, 200,404,403,500,... error
 
+EntityClass
+- "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
+- - polling made easy :)
+- - ?modified_after=$timestamp
+- - only additions,modications and removals
+- - HTTP status code xxx : object has been removed
 
+diplays
+- option to add create button + interface
+- option to add delete buttons
 
+provide display settings schema in json form
+- - generate auto documenation for displays
+- - create a ui interface to generate a ui interface
+
+- provide type settings schema in json form to
+- - generate auto documentation for types
+- - build ui interfaces for creating entity definitions
 
 werkt niet:  http://localhost:8888/site/api/*
 - - zou het moeten werken?
@@ -35,6 +59,7 @@ werkend maken: xyz.create('/$type', {});
 hide private storage settings or better only expose specified ones
 
 add dot notation: /source/*/file.content,id
+
 
 create /doc endpoint for documentation
 - /doc/api
@@ -65,7 +90,6 @@ $variable usage in /ui endpoints (generate inputs to update)
 navigation in /ui endpoints
 
 types:
- - file  (accept, max-size)
  - number (min,max,step)
  - time
  - datetime
