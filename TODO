@@ -1,22 +1,25 @@
 TODO
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
+Listeners
+- use in properties/entities
+- - implement at response.parse
+- listener types = delete/remove, modify/change, new/create, 200,404,403,500,... error
+- wat geeft listener mee aan callback?
+- - status, type, property|entity, content?
+
+
+MAYBE response.map to entity/property
+
 array
-array,set,dictionary
-
-edit/create
-- add values  POST
-- remove values DELETE
-- edit values  PATCH
-
-POST /fact/x/words "vier"              array
-PUT/PATCH /fact/x/words/4 "vier"        replace current value / insert
-DELETE /fact/word/3  null
+- array,set,dictionary
+- - edit/create
+- - add values  POST /fact/x/words "vier"
+- - remove values DELETE /fact/word/3
+- - edit values  PUT/PATCH /fact/x/words/4 "vier"
 
 file type: viewer   https://viewerjs.org/
 
-Listeners
-- listener types = delete/remove, modify/change, new/create, 200,404,403,500,... error
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
