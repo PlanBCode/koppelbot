@@ -1,15 +1,12 @@
 TODO
 
-list
-- use type rendering
-- response.render();
+finish property.render
+entity.render
 
-item
-- ...
+list:dropdown flavor
 
-response.on('/abs')
-response.on('./relative')
-response.on('eventName')
+
+
 
 
 php request.php : error if entity class not found
@@ -20,8 +17,6 @@ EntityClass
 - - ?modified_after=$timestamp
 - - only additions,modications and removals
 - - HTTP status code xxx : object has been removed
-
-MAYBE response.map to entity/property
 
 array
 - array,set,dictionary
