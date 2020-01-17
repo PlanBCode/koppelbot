@@ -1,7 +1,6 @@
 TODO
-xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
-
+php request.php : error if entity class not found
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -27,6 +26,7 @@ file type: viewer   https://viewerjs.org/
 
 
 
+xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
 diplays
 - option to add delete buttons

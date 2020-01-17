@@ -36,13 +36,18 @@ class ApiRequest extends HttpRequest2
         $entityClassNames = explode(',', $entityClassNameList);
         foreach ($entityClassNames as $entityClassName) {
             $entityClass = EntityClass::get($entityClassName);
-            $entityClassContent = array_null_get($content, $entityClassName);
-            $storageRequests = $entityClass->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
-            foreach ($storageRequests as $storageString => $storageRequest) {
-                if (!array_key_exists($storageString, $this->storageRequests)) {
-                    $this->storageRequests[$storageString] = $storageRequests[$storageString];
-                } else {
-                    $this->storageRequests[$storageString]->merge($storageRequests[$storageString]);
+            if (is_null($entityClass)) {
+                //TODO
+                echo 'ERROR'.$entityClassName.' not found';
+            } else {
+                $entityClassContent = array_null_get($content, $entityClassName);
+                $storageRequests = $entityClass->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
+                foreach ($storageRequests as $storageString => $storageRequest) {
+                    if (!array_key_exists($storageString, $this->storageRequests)) {
+                        $this->storageRequests[$storageString] = $storageRequests[$storageString];
+                    } else {
+                        $this->storageRequests[$storageString]->merge($storageRequests[$storageString]);
+                    }
                 }
             }
         }
