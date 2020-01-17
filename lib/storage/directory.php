@@ -145,6 +145,29 @@ class Storage_directory extends BasicStorage
     protected function get(PropertyRequest $propertyRequest): StorageResponse
     {
         $storageResponse = new StorageResponse();
+
+        /*$modified_after = $propertyRequest->getQuery()->get('modified_after');
+        $modified_after = is_string($modified_after)?intval($modified_after):null;
+        if ($modified_after) {
+            $filePath = $this->createFilePath($entityId);
+            $create_time = filectime($filePath); // Note: this is not the actual create time on linux but the change time (change group, owner, file permissions)
+            if ($create_time > $modified_after) {
+                $returnStatus = 201; // Created
+            } else {
+                $modify_time = filemtime($filePath);
+                if ($modify_time > $modified_after) {
+                    $returnStatus =  200; // OK -> Modified
+            } else {
+                    // Not Modified, nothing to return
+                    $returnStatus = 304;
+                    $storageResponse->add($returnStatus, $propertyRequest, $entityId, null);
+                    return $storageResponse;
+                }
+            }
+        }else{
+            $returnStatus = 200;
+        }*/
+
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 

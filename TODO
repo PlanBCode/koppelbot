@@ -1,15 +1,14 @@
 TODO
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
-Listeners
-- use in properties/entities
-- - implement at response.parse
-- listener types =
-- - removed, changed, created, unchanged
-- - error, 2xx, 4xx, 5xx
-- - 200,207 ,404,403,500,... 40x removed: no longer available
-- wat geeft listener mee aan callback?
-- - status, type, property|entity, content?
+
+
+EntityClass
+- "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
+- - polling made easy :)
+- - ?modified_after=$timestamp
+- - only additions,modications and removals
+- - HTTP status code xxx : object has been removed
 
 MAYBE response.map to entity/property
 
@@ -23,18 +22,17 @@ array
 file type: viewer   https://viewerjs.org/
 
 
-EntityClass
-- "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
-- - polling made easy :)
-- - ?modified_after=$timestamp
-- - only additions,modications and removals
-- - HTTP status code xxx : object has been removed
+
+
+
+
+
 
 diplays
 - option to add delete buttons
 
 provide display settings schema in json form
-- - generate auto documenation for displays
+- - generate auto documentation for displays
 - - create a ui interface to generate a ui interface
 
 - provide type settings schema in json form to

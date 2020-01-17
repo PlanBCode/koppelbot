@@ -54,10 +54,23 @@ class Query
         return $query;
     }
 
-    public function checkToggle(string $variable): bool
+    public function get(string $variableName): ?string
     {
         foreach ($this->queryStatements as $queryStatement) {
-            if ($queryStatement->getLhs() === $variable) {
+            if ($queryStatement->getLhs() === $variableName) {
+                $operator = $queryStatement->getOperator();
+                if ($operator === '=') {
+                    return  $queryStatement->getRhs();
+                }
+            }
+        }
+        return null;
+    }
+
+    public function checkToggle(string $variableName): bool
+    {
+        foreach ($this->queryStatements as $queryStatement) {
+            if ($queryStatement->getLhs() === $variableName) {
                 $rhs = $queryStatement->getRhs();
                 $operator = $queryStatement->getOperator();
                 if ($operator === '' || ($operator === '=' && ($rhs === 'true' || $rhs === '1')) || ($operator === '!=' && ($rhs === 'false' || $rhs === '0'))) {
