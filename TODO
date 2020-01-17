@@ -1,5 +1,17 @@
 TODO
 
+list
+- use type rendering
+- response.render();
+
+item
+- ...
+
+response.on('/abs')
+response.on('./relative')
+response.on('eventName')
+
+
 php request.php : error if entity class not found
 
 EntityClass

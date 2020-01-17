@@ -21,12 +21,12 @@
             </script>
         </td>
         <td valign="top">
-            <script>xyz.ui('/source/$source', {showLabel: false});</script>
+            <script>xyz.ui2('/source/$source', {showLabel: false});</script>
             <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel: false});</script>
         </td>
         <td rowspan="4" id="facts" width="20%" valign="top">
             <script>
-                xyz.ui('/fact/*', {display: 'list', select: 'fact'});
+                xyz.ui2('/fact/*', {display: 'list', select: 'fact'});
             </script>
         </td>
     </tr>
@@ -38,16 +38,8 @@
     </tr>
     <tr>
         <td>
-            Create fact:
-            <script>xyz.ui('/fact', {display: 'create'});</script>
             Edit fact:
             <script>xyz.ui('/fact/$fact', {action: 'edit'});</script>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            Create source:
-            <script>xyz.ui('/source', {display: 'create'});</script>
         </td>
     </tr>
 </table>
