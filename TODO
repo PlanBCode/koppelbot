@@ -1,6 +1,10 @@
 TODO
 
 fix rare undefined
+- handle change events
+
+Waiting for items... ->  Waiting for input...
+Waiting for xxxx... ->  Waiting for data...
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x

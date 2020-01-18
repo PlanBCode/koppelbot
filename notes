@@ -1,9 +1,16 @@
 
+status
+content
 
 EntityClass
 Entity
+
 entityId
 entityClassName
+
+entityIdList "$entityId,..."
+entityClassNameList = "$entityClassName,..."
+
 
 Property
 propertyName
@@ -30,6 +37,11 @@ display
 - list
 - item
 - TODO tree, json
+
+state
+listener
+ eventName
+
 
 PUT  /$ENTITY/$ID   {entity: {...}}
 POST /$ENTITY       {entity: {...}}  requires autoincrement or something?
