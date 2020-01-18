@@ -1,8 +1,5 @@
 TODO
 
-Waiting for items... ->  Waiting for input...
-Waiting for xxxx... ->  Waiting for data...
-
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 EntityClass
@@ -12,8 +9,7 @@ EntityClass
 - - only additions,modications and removals
 - - HTTP status code xxx : object has been removed
 
-array
-- array,set,dictionary
+array/object
 - - edit/create
 - - add values  POST /fact/x/words "vier"
 - - remove values DELETE /fact/word/3
@@ -80,10 +76,9 @@ client side parsing json|none
 
 readOnly for property
 
+ui: state syncing
 
-ui: dynamic updating / state syncing
-
-ui: non dynamic updateing : pass submit button  {submit:id, action:edit|delete}
+ui: non dynamic editing : pass submit button  {submit:id, action:edit|delete}
 
 proper file locks
 
@@ -91,7 +86,6 @@ $variable usage in /ui endpoints (generate inputs to update)
 navigation in /ui endpoints
 
 types:
- - number (min,max,step)
  - time
  - datetime
 

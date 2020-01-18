@@ -1,15 +1,1 @@
-{
-  "string": "asdfs",
-  "enum": "red",
-  "bool": true,
-  "array": [
-    "een",
-    "twee",
-    "drie"
-  ],
-  "object": {
-    "a": "x",
-    "b": "y",
-    "c": "z"
-  }
-}
+{"string":"abc","enum":"red","bool":true,"array":["een","twee","drie"],"object":{"a":"x","b":"y","c":"z"},"number":"1"}

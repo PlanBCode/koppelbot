@@ -2,8 +2,8 @@
 
 class Type_string extends Type
 {
-    public static function validate($value, array $settings): bool
+    public static function validate($content, array $settings): bool
     {
-        return true; //TODO
+        return is_string($content); //TODO  min, max length, regex
     }
 }
