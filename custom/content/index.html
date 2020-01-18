@@ -13,11 +13,7 @@
     <tr>
         <td rowspan="4" id="sources" width="20%" valign="top">
             <script>
-                xyz.ui('/source/*/file/id', {
-                    display: 'list',
-                    select: 'source',
-                    multiSelect: 'multiSource'
-                });
+                xyz.ui('/source/*/file/id', {display: 'list',select: 'source',multiSelect: 'multiSource'});
             </script>
         </td>
         <td valign="top">
@@ -25,9 +21,7 @@
             <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel: false});</script>
         </td>
         <td rowspan="4" id="facts" width="20%" valign="top">
-            <script>
-                xyz.ui('/fact/*', {display: 'list', select: 'fact'});
-            </script>
+            <script>xyz.ui('/fact/*', {display: 'list', select: 'fact'});</script>
         </td>
     </tr>
     <tr>

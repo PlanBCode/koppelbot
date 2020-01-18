@@ -1,10 +1,9 @@
 TODO
 
-fix rare undefined
-- handle change events
-
 Waiting for items... ->  Waiting for input...
 Waiting for xxxx... ->  Waiting for data...
+
+Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -53,8 +52,6 @@ meta entity
 - move to non custom data model
 - - Storage_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
-
-Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 drag&drop
 - als er een reference input veld is dan worden die entities sleepbaar
