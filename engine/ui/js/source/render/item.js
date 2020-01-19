@@ -14,6 +14,15 @@ function Item(xyz, uri, status, content, settings, options, onChange) {
     this.renderElement = xyz.renderElement;
     this.validate = xyz.validate;
     this.ui = xyz.ui;
+
+    // callback = (status,content)=>{...}
+    this.onChange = callback => {
+        xyz.on(uri, 'change', (entityId, node, eventName)=>{
+            //TODO get Node from node wrapper YOYO1
+        });
+        // TODO unregister these listeners somehow
+    }
+
 }
 
 exports.constructor = Item;

@@ -20,16 +20,19 @@ function renderElement(xyz, action, uri, status, content, settings, options) {
         const item = new Item(xyz, uri, status, content, settings, options, onChange);
         let TAG = types[type][action](item);
 
+        //TODO remove this in favor of item.onChange YOYO2
+
         // Redraw the type on content change
         const listeners = xyz.on(uri, 'changed', (entityId, node) => {
             const newContent = node.getContent();
             const newStatus = node.getStatus();
             const PARENT = TAG.parentNode;
             if(PARENT) {
-                PARENT.removeChild(TAG);
                 const item = new Item(xyz, uri, newStatus, newContent, settings, options, onChange);
-                TAG = types[type][action](item);
-                PARENT.appendChild(TAG);
+                const TAG_new = types[type][action](item);
+                PARENT.insertBefore(TAG_new, TAG);
+                PARENT.removeChild(TAG);
+                TAG = TAG_new;
             }else{
                 // TODO ERROR?? listeners should have been removed, remove them now?
             }

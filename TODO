@@ -1,17 +1,6 @@
 TODO
 
-plugin structure
-
-/custom/$PLUGINNAME/
-- types/
-- displays/
-- content/
-- entities/   (datamodel)
-- connectors/  (storage)
-- package.json
-(use same structure for /engine/core/.)
-
-
+vervang onChange YOYO2 method door YOYO1
 
 array/object
 - - edit/create
@@ -19,14 +8,21 @@ array/object
 - - remove values DELETE /fact/word/3
 - - edit values  PUT/PATCH /fact/x/words/4 "vier"
 
-Put @ Backend default values properties gebruiken voor niet toegevoegde props
+
+
 
 file type: viewer   https://viewerjs.org/
 
 
 
 
-add samples to types for testing
+Put @ Backend default values properties gebruiken voor niet toegevoegde props
+
+move types into separate folders
+
+rename storage to connector
+
+load storage connectors when needed based on their file
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -44,7 +40,7 @@ provide display settings schema in json form
 - - generate auto documentation for displays
 - - create a ui interface to generate a ui interface
 
-- provide type settings schema in json form to
+- provide type settings
 - - generate auto documentation for types
 - - build ui interfaces for creating entity definitions
 
@@ -53,16 +49,16 @@ php request.php : error if entity class not found
 - werkt ook niet:  http://localhost:8888/site/api/*
 - - zou het moeten werken? iig goede foutmelding
 
-plugins: mapjes met custom types, displays, workflows en content
-- - package.json for dependencies etc.
-
 meta entity
 - property "*": {type='type'}  dynamic number of properties
 - type = type : validation en signature baseren op $type.json = settings voor settings
 - /meta/source
 - - property "*" : { "signature":{type:type:"","*":"*"}
-- move to non custom data model
-- - Storage_directory: split directory on spaces,comma's or (semi)colons
+- move to ./core/entities
+
+add samples to types for testing
+
+Storage_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
 drag&drop
@@ -72,7 +68,7 @@ werkend maken: xyz.create('/$type', {});
 
 hide private storage settings or better only expose specified ones
 
-MAYBE add dot notation: /source/*/file.content,id
+add dot notation: /source/*/file.content,id
 
 create /doc endpoint for documentation
 - /doc/api
@@ -81,6 +77,15 @@ create /doc endpoint for documentation
 - /doc/ui
 - /doc/ui/display/$display
 
+use the plugin structure
+/custom/$PLUGINNAME/
+- types/
+- displays/
+- content/
+- entities/   (datamodel)
+- connectors/  (storage)
+- flows/
+- package.json
 
 Pass more stuff by reference
 
@@ -88,11 +93,7 @@ custom view html definition:
 "label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
 
-client side parsing json|none
-
 readOnly for property
-
-ui: state syncing
 
 ui: non dynamic editing : pass submit button  {submit:id, action:edit|delete}
 
@@ -106,7 +107,5 @@ types:
  - type type : meta :)
  - datetime
  - json : infinite subProperty paths
-
-create http status code LUT
 
 maybe entity inheritance

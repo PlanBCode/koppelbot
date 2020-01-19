@@ -224,10 +224,16 @@ function EntityClass(xyz, entityClassName, settings) {
 
 
 const handleInput = (uri, status, content, entityClasses) => {
-    //TODO check status
-    content = JSON.parse(content);//TODO check
-
     const state = new State();
+    //TODO check status
+    try {
+        content = JSON.parse(content);//TODO check
+    }catch(e){
+        console.error(content);
+        content = {};
+        state.setError(500,'Could not parse JSON');
+    }
+
     const path = uriTools.pathFromUri(uri);
     const entityClassNameList = path[0]; // TODO error if no entityClass
     const entityIdList = path[1] || '*';

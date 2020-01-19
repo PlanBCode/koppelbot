@@ -120,6 +120,7 @@ abstract class Storage
             return self::STORAGE_STRING_META;
         }
 
+        //TODO find the file and load it from there
         $storageClass = 'Storage_' . $type;
         if (!class_exists($storageClass)) {
             return self::STORAGE_STRING_ERROR;

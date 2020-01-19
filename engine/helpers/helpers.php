@@ -42,6 +42,9 @@ function json_get(&$object, array $keyPath): JsonActionResponse
     if (empty($keyPath)) {
         return new JsonActionResponse(true, $object);
     }
+    if(!is_array($object)){
+        return new JsonActionResponse(false, $object); //TODO add error message
+    }
     if (array_key_exists($keyPath[0], $object)) {
         return json_get($object[$keyPath[0]], array_slice($keyPath, 1));
     } else {

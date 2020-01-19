@@ -39,7 +39,7 @@ class EntityClass
 
         foreach ($meta as $propertyName => $settings) {
             if ($propertyName !== '_') {
-                $this->properties[$propertyName] = new Property($this, $propertyName, $settings, $rootSettings);
+                $this->properties[$propertyName] = new Property($this, 0, $propertyName, $settings, $rootSettings);
             }
         }
     }

@@ -203,6 +203,8 @@ class Property
 
     /** @var Property|EntityClass */
     protected $parent;
+    /** @var int */
+    protected $depth;
     /** @var string */
     protected $propertyName;
     /** @var string */
@@ -218,11 +220,12 @@ class Property
       audit
       default*/
 
-    public function __construct($parent, string $propertyName, $settings, $rootSettings)
+    public function __construct($parent, int $depth, string $propertyName, $settings, $rootSettings)
     {
         $this->propertyName = $propertyName;
         $this->settings = $settings;
         $this->parent = $parent;
+        $this->depth = $depth;
 
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
         $this->settings['type'] = $this->typeName;
@@ -261,7 +264,7 @@ class Property
                         //TODO check if type signature  {"content":"string"} supports these subProperties
 
                         //TODO use $this->settings instead or $rootSettings
-                        $subProperty = new Property($this, $subPropertyName, $subSettings, $rootSettings);
+                        $subProperty = new Property($this, $this->depth + 1, $subPropertyName, $subSettings, $rootSettings);
                         if ($subProperty->isRequired()) {
                             $this->required = true;
                         }
@@ -276,6 +279,11 @@ class Property
     public function getUri(?string $entityId = null): string
     {
         return $this->parent->getUri() . '/' . $this->propertyName;
+    }
+
+    public function getDepth(): int
+    {
+        return $this->depth;
     }
 
     protected function isId(): bool
