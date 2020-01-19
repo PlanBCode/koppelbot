@@ -3,7 +3,7 @@
     "storage": {
       "type": "directory",
       "parse": "json",
-      "path": "custom/main/entities/",
+      "path": "engine/core/types/",
       "extension": "json"
     }
   },
@@ -14,7 +14,11 @@
     }
   },
   "content": {
-    "type": "json",
+    "TODO": "TODO",
+    "type": "object",
+    "subType" : {
+      "type": "json"
+    },
     "storage": {
       "key": "content"
     }

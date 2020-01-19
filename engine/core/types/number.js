@@ -13,8 +13,8 @@ exports.actions = {
         INPUT.max = item.getSetting('max');
 
         if (item.patch) {
-            INPUT.oninput = event => {
-                item.patch(event.target.value)
+            INPUT.oninput = () => {
+                item.patch(INPUT.value)
             };
         }
 

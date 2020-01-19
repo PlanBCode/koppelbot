@@ -26,14 +26,18 @@ class UiResponse extends HttpResponse2
             $body .= '</ul> ';
         } else {
             $breadcrumbs = ['ui' => 'ui', ('ui/' . $display) => $display, '' => $entityClassName];
-            $uri = '/' . $entityClassName . '/' . $entityId . '/' . implode('/', $propertyPath); //TODO proper merge
+            if ($display === 'create') {
+                $uri = '/' . $entityClassName;
+            } else {
+                $uri = '/' . $entityClassName . '/' . $entityId . '/' . implode('/', $propertyPath); //TODO proper merge
+            }
             $body = '<script>xyz.ui("' . $uri . '",{display:"' . $display . '"});</script>';
         }
         $navigation = '';
         foreach ($breadcrumbs as $uri => $breadcrumb) {
-            if($uri === ''){
+            if ($uri === '') {
                 $navigation .= '<b>' . $breadcrumb . '</b> ';
-            }else {
+            } else {
                 $navigation .= '<a href="' . $rootUri . $uri . '">' . $breadcrumb . '</a> ';
             }
         }

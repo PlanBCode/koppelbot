@@ -6,8 +6,8 @@ exports.actions = {
             INPUT.value = content;
         }
         if (item.patch) {
-            INPUT.oninput = event => {
-                item.patch(event.target.value)
+            INPUT.oninput = () => {
+                item.patch(INPUT.value)
             };
         }
 

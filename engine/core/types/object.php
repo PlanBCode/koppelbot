@@ -1,4 +1,5 @@
 <?php
+require_once 'array.php';
 
 class Type_object extends Type_array
 {

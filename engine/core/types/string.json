@@ -1,0 +1,23 @@
+{
+  "default": {
+    "type": "string",
+    "default" : ""
+  },
+  "regex": {
+    "type": "string"
+  },
+  "minLength": {
+    "type": "number",
+    "min": 0
+  },
+  "maxLength": {
+    "type": "number",
+    "min": 0
+  },
+  "allowedChars": {
+    "type": "string"
+  },
+  "password": {
+    "type": "string"
+  }
+}

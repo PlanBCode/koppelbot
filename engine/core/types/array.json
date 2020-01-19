@@ -1,0 +1,9 @@
+{
+  "default": {
+    "type": "array",
+    "default": []
+  },
+  "subType": {
+    "type": "type"
+  }
+}

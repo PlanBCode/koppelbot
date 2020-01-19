@@ -248,7 +248,7 @@ class Property
 
         $signatureProperties = array_get($this->settings, 'signature');
         if (is_array($signatureProperties)) {
-            $signature = $this->typeClass::signature();
+            $signature = $this->typeClass::signature($this->settings);
             if ($this->typeName !== $signature) {
                 // TODO this signature is an alias, do a lookup
             }

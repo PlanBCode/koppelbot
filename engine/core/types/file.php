@@ -2,7 +2,7 @@
 
 class Type_file extends Type
 {
-    public static function signature()
+    public static function signature(array &$settings)
     {
         return ['id' => 'string', 'content' => 'string'];
     }
