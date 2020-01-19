@@ -1,16 +1,14 @@
 
-status
-content
 
-EntityClass
-Entity
+EntityClass  The abstract definition of entity properties. An instantiation of an entity class is an Entity
+
+Entity   An instance of a EntityClass with actual properties.
 
 entityId
 entityClassName
 
 entityIdList "$entityId,..."
 entityClassNameList = "$entityClassName,..."
-
 
 Property
 propertyName
@@ -27,6 +25,15 @@ uri
 path
 - ['$entityClassName','$entityId','$propertyName',...]
 
+
+response
+Node
+Item
+
+status
+content
+
+
 action
 - edit
 - view
@@ -37,10 +44,12 @@ display
 - list
 - item
 - TODO tree, json
+options
 
-state
-listener
- eventName
+State
+
+Listener
+eventName
 
 
 PUT  /$ENTITY/$ID   {entity: {...}}

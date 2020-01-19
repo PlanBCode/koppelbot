@@ -3,6 +3,10 @@
     color: white;
 }
 
+.xyz-list-item {
+    cursor: pointer;
+}
+
 .xyz-list-item:hover {
     background-color: lightblue;
 }
