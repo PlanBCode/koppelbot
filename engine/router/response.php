@@ -154,10 +154,10 @@ class ContentResponse extends HttpResponse2
                 parent::__construct(200, 'Hello World');
             }
         } elseif ($uri == '/xyz-style.css') {
-            $fileContent = file_get_contents('lib/ui/style.css');
+            $fileContent = file_get_contents('engine/ui/style.css');
             parent::__construct(200, $fileContent);
         } elseif ($uri == '/xyz-ui.js') {
-            $fileContent = file_get_contents('lib/ui/xyz-ui.webpacked.js');
+            $fileContent = file_get_contents('engine/ui/xyz-ui.webpacked.js');
             parent::__construct(200, $fileContent);
         } elseif (file_exists('custom/content' . $uri)) {
             $fileContent = file_get_contents('custom/content' . $uri);//TODO make safe!

@@ -1,5 +1,5 @@
 <?php
-require './lib/entities/property.php';
+require './engine/entities/property.php';
 
 class EntityClass
 {

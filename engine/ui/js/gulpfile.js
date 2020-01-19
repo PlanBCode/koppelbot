@@ -40,7 +40,7 @@ const write = (path, content) => cb => {
 };
 
 function addTypes(cb) {
-    let js = '// This file is created by gulpfile.js using the type definitions of lib/types/*.js. \n\n';
+    let js = '// This file is created by gulpfile.js using the type definitions of engine/types/*.js. \n\n';
     forEachFile('../../types/*.js',
         file => cb => {
             js += `exports.${baseName(file.path)} = require('../../../types/${baseName(file.path)}.js').actions;\n`;

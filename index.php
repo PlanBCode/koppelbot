@@ -1,11 +1,11 @@
 <?php
 
-require './lib/helpers/helpers.php';
-require './lib/router/response.php';
-require './lib/storage/storage.php';
-require './lib/entities/entity.php';
-require './lib/ui/ui.php';
-require './lib/router/request.php';
+require './engine/helpers/helpers.php';
+require './engine/router/response.php';
+require './engine/storage/storage.php';
+require './engine/entities/entity.php';
+require './engine/ui/ui.php';
+require './engine/router/request.php';
 
 $uri = substr(strtok($_SERVER["REQUEST_URI"],'?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
 

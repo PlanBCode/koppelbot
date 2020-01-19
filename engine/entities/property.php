@@ -1,5 +1,5 @@
 <?php
-require './lib/types/type.php';
+require './engine/types/type.php';
 
 function getMergedSetting($name, $settings, $rootSettings)
 {

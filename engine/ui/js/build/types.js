@@ -1,4 +1,4 @@
-// This file is created by gulpfile.js using the type definitions of lib/types/*.js. 
+// This file is created by gulpfile.js using the type definitions of engine/types/*.js.
 
 exports.array = require('../../../types/array.js').actions;
 exports.bool = require('../../../types/bool.js').actions;

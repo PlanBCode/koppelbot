@@ -1,7 +1,17 @@
 TODO
 
+plugin structure
 
-store changed variable in the querystring for the url
+/custom/$PLUGINNAME/
+- types/
+- displays/
+- content/
+- entities/   (datamodel)
+- connectors/  (storage)
+- package.json
+(use same structure for /engine/core/.)
+
+
 
 array/object
 - - edit/create
@@ -16,6 +26,7 @@ file type: viewer   https://viewerjs.org/
 
 
 
+add samples to types for testing
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
