@@ -142,6 +142,7 @@ class Storage_directory extends BasicStorage
         return new StorageResponse(200);
     }
 
+    //TODO refactor with file.php into basic.php
     protected function get(PropertyRequest $propertyRequest): StorageResponse
     {
         $storageResponse = new StorageResponse();
@@ -209,6 +210,7 @@ class Storage_directory extends BasicStorage
         return $storageResponse;
     }
 
+    //TODO refactor with file.php into basic.php
     protected function patch(PropertyRequest $propertyRequest): StorageResponse
     {
         $storageResponse = new StorageResponse();
