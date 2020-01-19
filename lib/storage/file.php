@@ -86,20 +86,26 @@ class Storage_file extends BasicStorage
                 if ($key === 'key') {
                     $content = $entityId;
                     $storageResponse->add(200, $propertyRequest, $entityId, $content);
-                } else if ($key === 'content') {
-                    $content = $entity;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $content);
-                } elseif (is_string($key) && substr($key, 0, 1) === '.') {
-                    $keyPath = explode('.', substr($key, 1));
-                    if (array_key_exists($keyPath[0], $entity)) {//TODO multi keypath
-                        $content = $entity[$keyPath[0]];
-                        $storageResponse->add(200, $propertyRequest, $entityId, $content);
+                } else {
+                    if ($key === 'content') {
+                        $keyPath = [];
+                    } elseif (is_string($key) && substr($key, 0, 1) === '.') {
+                        $keyPath = explode('.', substr($key, 1));
                     } else {
+                        $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                        continue;
+                    }
+
+                    $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1);
+                    $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
+                    if ($jsonActionResponse->succeeded()) {
+                        $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                    } else {
+                        //TODO use $jsonActionResponse->getErrorMessage()
+                        //TODO might result in 404 or 500
                         $error = '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/' . implode('/', $propertyRequest->getPropertyPath()) . ' not found.';
                         $storageResponse->add(404, $propertyRequest, $entityId, $error);
                     }
-                } else {
-                    $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
                 }
             } else {
                 $storageResponse->add(404, $propertyRequest, $entityId, '/' . $propertyRequest->getEntityClass() . '/' . $entityId . '/* not found.');
@@ -127,13 +133,26 @@ class Storage_file extends BasicStorage
             if ($key === 'key') {
                 $this->data[$content] = $this->data[$entityId];
                 unset($this->data[$entityId]);
-            } elseif ($key === 'content') {
-                $this->data[$entityId] = $content;
-            } elseif (is_string($key) && substr($key, 0,1) === '.') {
-                $keyPath = explode('.', substr($key, 1));
-                $this->data[$keyPath[0]] = $content;//TODO multi key path
             } else {
-                $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                if ($key === 'content') {
+                    $keyPath = [];
+                } elseif (is_string($key) && substr($key, 0, 1) === '.') {
+                    $keyPath = explode('.', substr($key, 1));
+                } else {
+                    $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                    continue;
+                }
+
+                $content = $propertyRequest->getContent();
+                $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1);
+                $jsonActionResponse = json_set($this->data[$entityId], array_merge($keyPath, $subPropertyPath), $content);
+                if ($jsonActionResponse->succeeded()) {
+                    $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                } else {
+                    //TODO use $jsonActionResponse->getErrorMessage()
+                    //TODO might result in 404 or 500
+                    $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                }
             }
         }
 
