@@ -7,7 +7,7 @@ class Type_file extends Type
         return ['id' => 'string', 'content' => 'string'];
     }
 
-    public static function validate($value, array $settings): bool
+    public static function validateContent($value, array $settings): bool
     {
         //todo mime/accept
         //todo max size

@@ -1,19 +1,15 @@
 TODO
 
-Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
-EntityClass
-- "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
-- - polling made easy :)
-- - ?modified_after=$timestamp
-- - only additions,modications and removals
-- - HTTP status code xxx : object has been removed
+store changed variable in the querystring for the url
 
 array/object
 - - edit/create
-- - add values  POST /fact/x/words "vier"
+- - add values  POST /fact/0/words "vier"
 - - remove values DELETE /fact/word/3
 - - edit values  PUT/PATCH /fact/x/words/4 "vier"
+
+Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 file type: viewer   https://viewerjs.org/
 
@@ -21,7 +17,12 @@ file type: viewer   https://viewerjs.org/
 
 
 
-
+EntityClass
+- "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
+- - polling made easy :)
+- - ?modified_after=$timestamp
+- - only additions,modications and removals
+- - HTTP status code xxx : object has been removed
 
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
@@ -41,8 +42,12 @@ php request.php : error if entity class not found
 - werkt ook niet:  http://localhost:8888/site/api/*
 - - zou het moeten werken? iig goede foutmelding
 
+plugins: mapjes met custom types, displays, workflows en content
+- - package.json for dependencies etc.
+
 meta entity
-- property "*": {type='string|json=mixed'}  dynamic number of properties
+- property "*": {type='type'}  dynamic number of properties
+- type = type : validation en signature baseren op $type.json = settings voor settings
 - /meta/source
 - - property "*" : { "signature":{type:type:"","*":"*"}
 - move to non custom data model
@@ -87,7 +92,9 @@ navigation in /ui endpoints
 
 types:
  - time
+ - type type : meta :)
  - datetime
+ - json : infinite subProperty paths
 
 create http status code LUT
 

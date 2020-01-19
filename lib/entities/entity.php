@@ -39,9 +39,14 @@ class EntityClass
 
         foreach ($meta as $propertyName => $settings) {
             if ($propertyName !== '_') {
-                $this->properties[$propertyName] = new Property($propertyName, $settings, $rootSettings);
+                $this->properties[$propertyName] = new Property($this, $propertyName, $settings, $rootSettings);
             }
         }
+    }
+
+    public function getUri(?string $entityId = null): string
+    {
+        return '/' . $this->entityClassName . '/' . (is_null($entityId) ? '*' : $entityId);
     }
 
     protected function expand(array $propertyPath, Query &$query): array

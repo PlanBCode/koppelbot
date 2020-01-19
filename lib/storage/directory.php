@@ -182,19 +182,25 @@ class Storage_directory extends BasicStorage
                 if ($key === 'basename') {
                     $content = $entityId;
                     $storageResponse->add(200, $propertyRequest, $entityId, $content);
-                } elseif ($key === 'content') {
-                    $content = $entity;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $content);
-                } elseif (is_string($key) && substr($key, 0, 1) === '.') {
-                    $keyPath = explode('.', substr($key, 1));
-                    if (array_key_exists($keyPath[0], $entity)) {//TODO handle keypath
-                        $content = $entity[$keyPath[0]];
-                        $storageResponse->add(200, $propertyRequest, $entityId, $content);
-                    } else {
-                        $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO pass something
-                    }
                 } else {
-                    $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                    if ($key === 'content') {
+                        $keyPath = [];
+                    } elseif (is_string($key) && substr($key, 0, 1) === '.') {
+                        $keyPath = explode('.', substr($key, 1));
+                    } else {
+                        $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                        continue;
+                    }
+                    $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1);
+                    $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
+                    if ($jsonActionResponse->succeeded()) {
+                        $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                    } else {
+                        //TODO use $jsonActionResponse->getErrorMessage()
+                        //TODO might result in 404 or 500
+                        $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                    }
+
                 }
             } else {
                 $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
@@ -237,18 +243,25 @@ class Storage_directory extends BasicStorage
                     unset($this->data[$entityId]);
                 }
                 $storageResponse->add(200, $propertyRequest, $content, $content);
-            } elseif ($key === "content") {
-                $content = $propertyRequest->getContent();
-                $this->data[$entityId] = $content;
-                $storageResponse->add(200, $propertyRequest, $entityId, $content);
-            } else if (is_string($key) && substr($key, 0, 1) === '.') {
-                $keyPath = explode('.', substr($key, 1));
-                $content = $propertyRequest->getContent();
-                //TODO handle multi key path
-                $this->data[$entityId][$keyPath[0]] = $content;
-                $storageResponse->add(200, $propertyRequest, $entityId, $content);
             } else {
-                $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                if ($key === "content") {
+                    $keyPath = [];
+                } else if (is_string($key) && substr($key, 0, 1) === '.') {
+                    $keyPath = explode('.', substr($key, 1));
+                } else {
+                    $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                    continue;
+                }
+                $content = $propertyRequest->getContent();
+                $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1);
+                $jsonActionResponse = json_set($this->data[$entityId] , array_merge($keyPath, $subPropertyPath), $content);
+                if ($jsonActionResponse->succeeded()) {
+                    $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                } else {
+                    //TODO use $jsonActionResponse->getErrorMessage()
+                    //TODO might result in 404 or 500
+                    $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                }
             }
         }
         return $storageResponse;

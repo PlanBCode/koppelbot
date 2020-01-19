@@ -31,7 +31,12 @@ abstract class Type
         }
     }
 
-    abstract static public function validate($value, array $settings): bool;
+    abstract static public function validateContent($content, array $settings): bool;
+
+    static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
+    {
+        return false;
+    }
 
     static function signature()
     {

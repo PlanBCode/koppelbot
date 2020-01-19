@@ -201,6 +201,8 @@ class Property
     const PROPERTY_ACCESS = 'access';
     const PROPERTY_REQUIRED = 'required';
 
+    /** @var Property|EntityClass */
+    protected $parent;
     /** @var string */
     protected $propertyName;
     /** @var string */
@@ -216,10 +218,11 @@ class Property
       audit
       default*/
 
-    public function __construct(string $propertyName, $settings, $rootSettings)
+    public function __construct($parent, string $propertyName, $settings, $rootSettings)
     {
         $this->propertyName = $propertyName;
         $this->settings = $settings;
+        $this->parent = $parent;
 
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
         $this->settings['type'] = $this->typeName;
@@ -258,8 +261,7 @@ class Property
                         //TODO check if type signature  {"content":"string"} supports these subProperties
 
                         //TODO use $this->settings instead or $rootSettings
-                        //var_dump($this->settings);
-                        $subProperty = new Property($subPropertyName, $subSettings, $rootSettings);
+                        $subProperty = new Property($this, $subPropertyName, $subSettings, $rootSettings);
                         if ($subProperty->isRequired()) {
                             $this->required = true;
                         }
@@ -269,6 +271,11 @@ class Property
                 }
             }
         }
+    }
+
+    public function getUri(?string $entityId = null): string
+    {
+        return $this->parent->getUri() . '/' . $this->propertyName;
     }
 
     protected function isId(): bool
@@ -288,17 +295,19 @@ class Property
         }
 
         if (count($propertyPath) === $depth) {
-            if (count($this->subProperties) === 0 || $query->checkToggle('meta')) {
+            if ($this->isPrimitive() || $query->checkToggle('meta')) {
                 return [new PropertyHandle(200, $this, $propertyPath)];
             }
         }
 
-        if (count($this->subProperties) === 0) {
-            $last = count($propertyPath) - 1;
-            $partialPropertyPath = array_slice($propertyPath, 0, $last);
-            $subPropertyName = $propertyPath[$last];
-            //TODO expand error with entiy class and id
-            return [new PropertyHandle(400, 'No subproperties available for /' . implode('/', $partialPropertyPath), $propertyPath)];
+
+        if ($this->isPrimitive()) {
+            $subPropertyPath = array_slice($propertyPath, 1);
+            if ($this->typeClass->validateSubPropertyPath($subPropertyPath, $this->settings)) { // array and object type allow subproperty paths
+                return [new PropertyHandle(200, $this, $propertyPath)];
+            } else {
+                return [new PropertyHandle(400, 'No subproperties available for ' . $this->getUri(), $propertyPath)];
+            }
         }
 
         $subPropertyList = array_get($propertyPath, $depth, '*');
@@ -313,6 +322,7 @@ class Property
             $propertyPathSingular = $propertyPath;
             $propertyPathSingular[$depth] = $subPropertyName;
             if (!array_key_exists($subPropertyName, $this->subProperties)) {
+
                 //TODO expand error with entiy class and id
                 $propertyHandle = new PropertyHandle(400, '/' . implode('/', $propertyPathSingular) . ' does not exist.', $propertyPathSingular);
                 array_push($propertyHandles, $propertyHandle);
@@ -363,7 +373,7 @@ class Property
 
     public function validate($content): bool
     {
-        return $this->typeClass->validate($content, $this->settings);
+        return $this->typeClass->validateContent($content, $this->settings);
     }
 
     public function getStorageSetting($settingName, $default = null)
