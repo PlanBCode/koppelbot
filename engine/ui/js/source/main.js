@@ -283,7 +283,7 @@ function XYZ() {
 
                 WRAPPER.classList.add('xyz-empty');
                 if (display && display.hasOwnProperty('empty')) {
-                    display.empty(this, action, options, WRAPPER);
+                    display.empty(this, action, options, WRAPPER, uri);
                 } else {
                     WRAPPER.innerHTML = 'Empty';
                 }

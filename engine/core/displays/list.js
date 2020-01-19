@@ -70,13 +70,12 @@ exports.display = {
     waitingForData: (xyz, action, options, WRAPPER) => {
         WRAPPER.innerHTML = 'Waiting for data...';
     },
-    empty: (xyz, action, options, WRAPPER, entityClassNameList) => {
+    empty: (xyz, action, options, WRAPPER, uri) => {
         WRAPPER.innerHTML = '';
         const TABLE = document.createElement('TABLE');
         TABLE.className = 'xyz-list';
-        const fullUri = '/'+  entityClassNameList; //TODO this could be multiple classes
         WRAPPER.appendChild(TABLE);
-        addCreateButton(xyz, fullUri, WRAPPER, options);
+        addCreateButton(xyz, uri, WRAPPER, options);
     },
     first: (xyz, action, options, WRAPPER, entityId, content) => {
         const columns = flatten(content);

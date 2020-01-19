@@ -78,7 +78,7 @@ abstract class BasicStorage extends Storage
         foreach ($entityIds as $entityId) {
             if (array_key_exists($entityId, $this->data)) {
                 $entity = $this->data[$entityId];
-                if ($key === 'basename') {
+                if ($key === 'basename' || $key === 'key') {
                     $content = $entityId;
                     $storageResponse->add(200, $propertyRequest, $entityId, $content);
                 } else {
@@ -128,7 +128,7 @@ abstract class BasicStorage extends Storage
             if (!array_key_exists($entityId, $this->data)) {
                 $this->data[$entityId] = [];
             }
-            if ($key === "basename") { //TODO or filename?
+            if ($key === "basename" || $key === "key") { //TODO or filename?
                 if ($propertyRequest->getMethod() === 'POST') {
                     $content = $entityId;
                 } else {

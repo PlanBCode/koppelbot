@@ -9,7 +9,7 @@ require './engine/router/request.php';
 
 $uri = substr(strtok($_SERVER["REQUEST_URI"],'?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
 
-if (strpos($uri, '/api/') === 0) {
+if (strpos($uri, '/api/') === 0 || $uri === '/api') {
     $request = new ApiRequest(
         $_SERVER['REQUEST_METHOD'],
         substr($uri, 4),
@@ -17,7 +17,7 @@ if (strpos($uri, '/api/') === 0) {
         getallheaders(),
         @file_get_contents('php://input')
     );
-} elseif (strpos($uri, '/ui/') === 0) {
+} elseif (strpos($uri, '/ui/') === 0 || $uri === '/ui') {
     $request = new UiRequest(
         $_SERVER['REQUEST_METHOD'],
         substr($uri, 4),
