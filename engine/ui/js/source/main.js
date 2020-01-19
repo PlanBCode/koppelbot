@@ -3,12 +3,8 @@ const response = require('./entity/response.js');
 const uriTools = require('./uri/uri.js');
 const render = require('./render/render.js');
 const web = require('./web/web.js');
+const displays = require('../build/displays');
 
-const displays = {
-    list: require('./display/list.js').display, //todo rename to table
-    item: require('./display/item.js').display,
-    select: require('./display/select.js').display
-};
 
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';

@@ -12,7 +12,7 @@ class EntityClass
             return self::$entityClasses[$entityClassName];
         } else {
 
-            $fileName = './custom/datamodel/' . $entityClassName . '.json'; // TODO or lib/datamodel
+            $fileName = './custom/main/entities/' . $entityClassName . '.json'; // TODO or lib/datamodel
             if (!file_exists($fileName)) {
                 return null;
             }

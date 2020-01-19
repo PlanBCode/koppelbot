@@ -147,8 +147,8 @@ class ContentResponse extends HttpResponse2
     public function __construct($uri)
     {
         if ($uri === '') {
-            if (file_exists('custom/content/index.html')) {
-                $fileContent = file_get_contents('custom/content/index.html');
+            if (file_exists('custom/main/content/index.html')) {
+                $fileContent = file_get_contents('custom/main/content/index.html');
                 parent::__construct(200, $fileContent);
             } else {
                 parent::__construct(200, 'Hello World');
@@ -159,11 +159,11 @@ class ContentResponse extends HttpResponse2
         } elseif ($uri == '/xyz-ui.js') {
             $fileContent = file_get_contents('engine/ui/xyz-ui.webpacked.js');
             parent::__construct(200, $fileContent);
-        } elseif (file_exists('custom/content' . $uri)) {
-            $fileContent = file_get_contents('custom/content' . $uri);//TODO make safe!
+        } elseif (file_exists('custom/main/content' . $uri)) {
+            $fileContent = file_get_contents('custom/main/content' . $uri);//TODO make safe!
             parent::__construct(200, $fileContent);
-        } elseif (file_exists('custom/errors/404.html')) {
-            $fileContent = file_get_contents('custom/errors/404.html');
+        } elseif (file_exists('custom/main/content/404.html')) {
+            $fileContent = file_get_contents('custom/main/content/404.html');
             parent::__construct(404, $fileContent);
         } else {
             parent::__construct(404, 'Page Not Found');//TODO use (default) error page

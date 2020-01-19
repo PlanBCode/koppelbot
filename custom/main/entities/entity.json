@@ -3,7 +3,7 @@
     "storage": {
       "type": "directory",
       "parse": "json",
-      "path": "custom/datamodel/",
+      "path": "custom/main/entities/",
       "extension": "json"
     }
   },

@@ -1,8 +1,8 @@
 <?php
 
-require './engine/storage/basic.php';
-require './engine/storage/file.php';
-require './engine/storage/directory.php';
+require './engine/core/connectors/basic.php';
+require './engine/core/connectors/file.php';
+require './engine/core/connectors/directory.php';
 
 /*
 
