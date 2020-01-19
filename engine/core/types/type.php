@@ -26,6 +26,12 @@ abstract class Type
             }
 
             $type = new $typeClass();
+
+            if (!is_subclass_of($type, 'Type')) {
+                echo 'ERROR Type ' . $typeName . ' : class does not extent Type!';
+                return null;
+            }
+
             self::$types[$typeName] = $type;
             return $type;
         }

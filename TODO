@@ -100,7 +100,7 @@ ui: non dynamic editing : pass submit button  {submit:id, action:edit|delete}
 proper file locks
 
 $variable usage in /ui endpoints (generate inputs to update)
-navigation in /ui endpoints
+navigation in /ui endpoints for (sub) property names
 
 types:
  - time
