@@ -4,7 +4,7 @@ const Item = require('./item.js').constructor;
 
 const DEFAULT_TYPE = 'string';
 
-function renderElement(xyz, action, uri, status, content, settings, options) {
+function element(xyz, action, uri, status, content, settings, options) {
     const type = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(type)) {
         console.error('problem1');
@@ -17,6 +17,7 @@ function renderElement(xyz, action, uri, status, content, settings, options) {
                 xyz.patch(uri, uriTools.wrapContent(uri, content));
             }
         }
+
         const item = new Item(xyz, uri, status, content, settings, options, onChange);
         let TAG = types[type][action](item);
 
@@ -50,7 +51,7 @@ function renderElement(xyz, action, uri, status, content, settings, options) {
             const subContent = content[subPropertyName];
             const subType = subSettings.type;
             const subUri = uri + '/' + subPropertyName;
-            const TAG = renderElement(xyz, subType, action, subUri, status, subContent, subSettings, options);
+            const TAG = element(xyz, subType, action, subUri, status, subContent, subSettings, options);
             TAG.className = `xyz-status-${status}`;
             DIV.appendChild(TAG);
         }
@@ -61,4 +62,4 @@ function renderElement(xyz, action, uri, status, content, settings, options) {
     }
 }
 
-exports.element = renderElement;
+exports.element = element;

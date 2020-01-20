@@ -1,3 +1,5 @@
+const render = require('./render');
+
 function Item(xyz, uri, status, content, settings, options, onChange) {
 
     this.getUri = () => uri;
@@ -11,13 +13,15 @@ function Item(xyz, uri, status, content, settings, options, onChange) {
     this.hasSetting = settingName => settings.hasOwnProperty(settingName);
 
     this.patch = onChange;
-    this.renderElement = xyz.renderElement;
+
+    this.renderElement = (action, uri, status, content, settings, options) => render.element(xyz, action, uri, status, content, settings, options);
+
     this.validate = xyz.validate;
     this.ui = xyz.ui;
-
     // callback = (status,content)=>{...}
     this.onChange = callback => {
-        xyz.on(uri, 'change', (entityId, node, eventName)=>{
+        xyz.on(uri, 'change', (entityId, node, eventName) => {
+
             //TODO get Node from node wrapper YOYO1
         });
         // TODO unregister these listeners somehow

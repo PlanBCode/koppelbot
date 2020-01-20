@@ -5,7 +5,6 @@ const render = require('./render/render.js');
 const web = require('./web/web.js');
 const displays = require('../build/displays');
 
-
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';
 const DEFAULT_TAG = 'DIV';
@@ -255,10 +254,6 @@ function XYZ() {
         } else {
             //TODO a default way of handeling stuff
         }
-    };
-
-    this.renderElement = (action, uri, status, content, settings, options) => {
-        return render.element(this, action, uri, status, content, settings, options);
     };
 
     const displayListenersPerWrapper = new Map();

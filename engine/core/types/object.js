@@ -7,27 +7,30 @@ exports.actions = {
         const subSettings = item.getSetting('subType');
         const subOptions = item.getOptions(); //TODO
         const TABLE = document.createElement('TABLE');
-        for (let key in content) {
-            const TR = document.createElement('TR');
-            const TD_key = document.createElement('TD');
-            const TD_value = document.createElement('TD');
 
-            const INPUT_remove = document.createElement('INPUT');
-            INPUT_remove.type = 'submit';
-            //TODO add class
-            INPUT_remove.value = 'x';
-            TD_key.appendChild(INPUT_remove);
-            const TEXT_key = document.createTextNode(key)
-            TD_key.appendChild(TEXT_key);
+        if (typeof content === 'object' && content !== null) {
+            for (let key in content) {
+                const TR = document.createElement('TR');
+                const TD_key = document.createElement('TD');
+                const TD_value = document.createElement('TD');
 
-            const subUri = item.getUri() + '/' + key;
-            const subContent = content[key];
-            const TAG = item.renderElement('edit', subUri,  item.getStatus(), subContent, subSettings, subOptions);
-            TD_value.appendChild(TAG);
+                const INPUT_remove = document.createElement('INPUT');
+                INPUT_remove.type = 'submit';
+                //TODO add class
+                INPUT_remove.value = 'x';
+                TD_key.appendChild(INPUT_remove);
+                const TEXT_key = document.createTextNode(key)
+                TD_key.appendChild(TEXT_key);
 
-            TR.appendChild(TD_key);
-            TR.appendChild(TD_value);
-            TABLE.appendChild(TR);
+                const subUri = item.getUri() + '/' + key;
+                const subContent = content[key];
+                const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
+                TD_value.appendChild(TAG);
+
+                TR.appendChild(TD_key);
+                TR.appendChild(TD_value);
+                TABLE.appendChild(TR);
+            }
         }
         const TR_add = document.createElement('TR');
         const TD_key = document.createElement('TD');
