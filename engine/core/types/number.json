@@ -1,0 +1,14 @@
+{
+  "default": {
+    "type": "number"
+  },
+  "min" : {
+    "type": "number"
+  },
+  "max" : {
+    "type": "number"
+  },
+  "step" : {
+    "type": "number"
+  }
+}

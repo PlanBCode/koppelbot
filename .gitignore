@@ -1,4 +1,4 @@
 
 .idea/*
 **/.tern-port
-lib/ui/js/node_modules/*
+engine/ui/js/node_modules/*

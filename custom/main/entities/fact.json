@@ -1,0 +1,44 @@
+{
+  "_": {
+    "storage": {
+      "type": "directory",
+      "parse": "json",
+      "path": "data/facts/",
+      "extension": "json"
+    }
+  },
+  "id": {
+    "type": "id",
+    "storage": {
+      "key": "basename"
+    }
+  },
+  "string" : {
+    "type": "string"
+  },
+  "enum" : {
+    "type": "enum",
+    "choices" : ["red","blue","green"]
+  },
+  "bool" : {
+    "type": "bool"
+  },
+  "number" : {
+    "type": "number",
+    "step": 1,
+    "max": 10,
+    "min": 1
+  },
+  "array" : {
+    "type": "array",
+    "subType": {
+      "type": "string"
+    }
+  },
+  "object" : {
+    "type": "object",
+    "subType": {
+      "type": "string"
+    }
+  }
+}

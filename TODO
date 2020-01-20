@@ -1,6 +1,28 @@
 TODO
 
-php request.php : error if entity class not found
+vervang onChange YOYO2 method door YOYO1
+
+array/object
+- - edit/create
+- - add values  POST /fact/0/words "vier"
+- - remove values DELETE /fact/word/3
+- - edit values  PUT/PATCH /fact/x/words/4 "vier"
+
+
+
+
+file type: viewer   https://viewerjs.org/
+
+
+
+
+Put @ Backend default values properties gebruiken voor niet toegevoegde props
+
+move types into separate folders
+
+rename storage to connector
+
+load storage connectors when needed based on their file
 
 EntityClass
 - "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -8,23 +30,6 @@ EntityClass
 - - ?modified_after=$timestamp
 - - only additions,modications and removals
 - - HTTP status code xxx : object has been removed
-
-MAYBE response.map to entity/property
-
-array
-- array,set,dictionary
-- - edit/create
-- - add values  POST /fact/x/words "vier"
-- - remove values DELETE /fact/word/3
-- - edit values  PUT/PATCH /fact/x/words/4 "vier"
-
-file type: viewer   https://viewerjs.org/
-
-
-
-
-
-
 
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
 
@@ -35,32 +40,35 @@ provide display settings schema in json form
 - - generate auto documentation for displays
 - - create a ui interface to generate a ui interface
 
-- provide type settings schema in json form to
+- provide type settings
 - - generate auto documentation for types
 - - build ui interfaces for creating entity definitions
 
-werkt niet:  http://localhost:8888/site/api/*
-- - zou het moeten werken?
-- - iig goede foutmelding
+php request.php : error if entity class not found
+- http://localhost:8888/site/api/bestaatniet
+- werkt ook niet:  http://localhost:8888/site/api/*
+- - zou het moeten werken? iig goede foutmelding
 
 meta entity
-- property "*": {type='string|json=mixed'}  dynamic number of properties
+- property "*": {type='type'}  dynamic number of properties
+- type = type : validation en signature baseren op $type.json = settings voor settings
 - /meta/source
 - - property "*" : { "signature":{type:type:"","*":"*"}
-- move to non custom data model
-- - Storage_directory: split directory on spaces,comma's or (semi)colons
-- - - to browse multiple directories
+- move to ./core/entities
 
-Put @ Backend default values properties gebruiken voor niet toegevoegde props
+add samples to types for testing
+
+Storage_directory: split directory on spaces,comma's or (semi)colons
+- - - to browse multiple directories
 
 drag&drop
 - als er een reference input veld is dan worden die entities sleepbaar
+
 werkend maken: xyz.create('/$type', {});
 
 hide private storage settings or better only expose specified ones
 
-MAYBE add dot notation: /source/*/file.content,id
-
+add dot notation: /source/*/file.content,id
 
 create /doc endpoint for documentation
 - /doc/api
@@ -69,6 +77,15 @@ create /doc endpoint for documentation
 - /doc/ui
 - /doc/ui/display/$display
 
+use the plugin structure
+/custom/$PLUGINNAME/
+- types/
+- displays/
+- content/
+- entities/   (datamodel)
+- connectors/  (storage)
+- flows/
+- package.json
 
 Pass more stuff by reference
 
@@ -76,27 +93,19 @@ custom view html definition:
 "label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
 
-client side parsing json|none
-
 readOnly for property
 
-
-ui: dynamic updating / state syncing
-
-ui: non dynamic updateing : pass submit button  {submit:id, action:edit|delete}
+ui: non dynamic editing : pass submit button  {submit:id, action:edit|delete}
 
 proper file locks
 
 $variable usage in /ui endpoints (generate inputs to update)
-navigation in /ui endpoints
+navigation in /ui endpoints for (sub) property names
 
 types:
- - number (min,max,step)
  - time
+ - type type : meta :)
  - datetime
-
-create http status code LUT
+ - json : infinite subProperty paths
 
 maybe entity inheritance
-
-

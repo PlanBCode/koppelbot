@@ -1,0 +1,26 @@
+{
+  "_": {
+    "storage": {
+      "type": "directory",
+      "parse": "json",
+      "path": "engine/core/types/",
+      "extension": "json"
+    }
+  },
+  "id": {
+    "type": "string",
+    "storage": {
+      "key": "key"
+    }
+  },
+  "content": {
+    "TODO": "TODO",
+    "type": "object",
+    "subType" : {
+      "type": "json"
+    },
+    "storage": {
+      "key": "content"
+    }
+  }
+}

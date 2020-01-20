@@ -1,0 +1,22 @@
+{
+  "_": {
+    "storage": {
+      "type": "directory",
+      "parse": "json",
+      "path": "custom/main/entities/",
+      "extension": "json"
+    }
+  },
+  "id": {
+    "type": "string",
+    "storage": {
+      "key": "key"
+    }
+  },
+  "content": {
+    "type": "json",
+    "storage": {
+      "key": "content"
+    }
+  }
+}
