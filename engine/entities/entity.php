@@ -90,7 +90,7 @@ class EntityClass
                         $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not bu supplied.';
                         $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
                         $errorPropertyRequests[] = $errorPropertyRequest;
-                    } else if (!$property->validate($propertyContent)) {
+                    } else if (!$property->validateContent($propertyContent)) {
                         $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
                         $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
                         $errorPropertyRequests[] = $errorPropertyRequest;

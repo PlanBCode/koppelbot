@@ -15,6 +15,7 @@ file type: viewer   https://viewerjs.org/
 
 
 
+ui: use validateContent before patch & put?
 
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 

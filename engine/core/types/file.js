@@ -48,9 +48,10 @@ exports.actions = {
     },
     /*view: function (item) {
         //TODO use a file viewer:   https://viewerjs.org/
+        //TODO onChange
         return content;
     },*/
-    validate: function (item) {
+    validateContent: function (item) {
         //TODO implement client side validation
         //todo mime/accept
         //todo max size

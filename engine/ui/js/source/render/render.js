@@ -19,25 +19,11 @@ function element(xyz, action, uri, status, content, settings, options) {
         }
 
         const item = new Item(xyz, uri, status, content, settings, options, onChange);
-        let TAG = types[type][action](item);
+        const TAG = types[type][action](item); // TODO
+        //  item.forceChange();
 
-        //TODO remove this in favor of item.onChange YOYO2
-
-        // Redraw the type on content change
-        const listeners = xyz.on(uri, 'changed', (entityId, node) => {
-            const newContent = node.getContent();
-            const newStatus = node.getStatus();
-            const PARENT = TAG.parentNode;
-            if (PARENT) {
-                const item = new Item(xyz, uri, newStatus, newContent, settings, options, onChange);
-                const TAG_new = types[type][action](item);
-                PARENT.insertBefore(TAG_new, TAG);
-                PARENT.removeChild(TAG);
-                TAG = TAG_new;
-            } else {
-                // TODO ERROR?? listeners should have been removed, remove them now?
-            }
-        });
+        // TODO add id from options (also for label for)
+        // TODO add class from options
 
         TAG.className = `xyz-status-${status}`;
         return TAG;
@@ -63,23 +49,35 @@ function element(xyz, action, uri, status, content, settings, options) {
 }
 
 function creator(options, type, uri, settings, propertyName, data) {
+    if (!types.hasOwnProperty(type)) {
+        console.error('problem1'); //TODO return a TR containing the error
+        return [];
+    }
     if (type === 'id') {
         return [];
+    }
+    if (!types[type].hasOwnProperty('edit')) {
+        console.error('problem1');
+        return []; //TODO return a TR containing the error
     }
     const TRs = [];
     const content = settings.hasOwnProperty('default') ? settings.default : null;
     // TODO html label for gebruiken
     const TR = document.createElement('TR');
     const TD_label = document.createElement('TD');
+
+
     TD_label.innerText = propertyName;
     TR.appendChild(TD_label);
     const onChange = content => {
         data[propertyName] = content;
     };
     const item = new Item(xyz, uri, 200, content, settings, options, onChange);
-    const element = types[type].edit(item);
+    const ELEMENT = types[type].edit(item);
+    // TODO add id from options (also for label for)
+    // TODO add class from options
     const TD_content = document.createElement('TD');
-    TD_content.appendChild(element);
+    TD_content.appendChild(ELEMENT);
     TR.appendChild(TD_content);
     TRs.push(TR);
     return TRs;

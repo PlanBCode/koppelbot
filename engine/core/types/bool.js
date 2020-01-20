@@ -7,6 +7,10 @@ exports.actions = {
         INPUT.onchange = () => {
             item.patch(INPUT.checked);
         };
+        item.onChange(node => {
+            //TODO use status
+            INPUT.checked =  !!node.getContent();
+        });
         return INPUT;
     },
     view: function (item) {
@@ -14,9 +18,13 @@ exports.actions = {
         //TODO 404 etc status outputs (refactor from string)
         //TODO use settings to get yes|no label
         SPAN.innerText = item.getContent() ? 'yes':'no';
+        item.onChange(node => {
+            //TODO use status
+            SPAN.innerText = node.getContent() ? 'yes':'no';
+        });
         return SPAN;
     },
-    validate: function (item) {
+    validateContent: function (item) {
         return typeof item.getContent() === 'boolean';
     }
 };

@@ -58,8 +58,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     let isPrimitive = true;
     if (settings.hasOwnProperty('signature')) {
         isPrimitive = false;
-        for (let propertyName in settings.signature) {
-            subProperties[propertyName] = new Property(xyz, this, propertyName, settings.signature[propertyName]);
+        for (let subPropertyName in settings.signature) {
+            subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, settings.signature[subPropertyName]);
         }
     }
 
@@ -194,7 +194,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     this.createCreator = (options, data) => {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
-            const uri = this.getUri('*'); //TODO double check, perhaps 'NEW' or '$NEW'?
+            const uri = this.getUri('$new');
             return render.creator(options, type, uri, settings, propertyName, data);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {

@@ -17,7 +17,12 @@ exports.actions = {
                 item.patch(INPUT.value)
             };
         }
-
+        item.onChange(node => {
+            //TODO use status
+            if(INPUT !== document.activeElement) { // we don't want to interupt typing
+                INPUT.value = node.getContent();
+            }
+        });
         // TODO add id from options (for label for)
 
         return INPUT;
@@ -41,9 +46,13 @@ exports.actions = {
                 SPAN.innerText = item.getContent();
                 break;
         }
+        item.onChange(node => {
+            //TODO use status stuff from above
+            SPAN.innerText= node.getContent();
+        });
         return SPAN;
     },
-    validate: function (item) {
+    validateContent: function (item) {
         const content = item.getContent();
         if (typeof content !== 'number') {
             return false;

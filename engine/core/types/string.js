@@ -5,14 +5,20 @@ exports.actions = {
         if (content) {
             INPUT.value = content;
         }
+
+        //TODO add validation regex
+
         if (item.patch) {
             INPUT.oninput = () => {
                 item.patch(INPUT.value)
             };
         }
-
-        // TODO add id from options (for label for)
-        //TODO add validation regex
+        item.onChange(node => {
+            //TODO use status
+            if(INPUT !== document.activeElement) { // we don't want to interupt typing
+                INPUT.value = node.getContent();
+            }
+        });
 
         return INPUT;
     },
@@ -35,9 +41,13 @@ exports.actions = {
                 SPAN.innerText = item.getContent();
                 break;
         }
+        item.onChange(node => {
+            //TODO use status stuff from above
+            SPAN.innerText= node.getContent();
+        });
         return SPAN;
     },
-    validate: function (item) {
+    validateContent: function (item) {
         //TODO implement client side validation
         return typeof item.getContent() === 'string';//TODO min max length, regex
     }

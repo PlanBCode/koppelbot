@@ -51,6 +51,7 @@ exports.actions = {
         TR_add.appendChild(TD_key);
         TR_add.appendChild(TD_value);
         TABLE.appendChild(TR_add);
+        //TODO onchange
         return TABLE;
     },
     view: function (item) {
@@ -73,9 +74,10 @@ exports.actions = {
             TR.appendChild(TD_value);
             TABLE.appendChild(TR);
         }
+        //TODO onchange
         return TABLE;
     },
-    validate: function (item) {
+    validateContent: function (item) {
         const content = item.getContent();
         if (content === null || typeof content !== 'object') {
             return false;
@@ -85,7 +87,7 @@ exports.actions = {
         for (let key in content) {
             const subUri = item.getUri() + '/' + key;
             const subContent = content[key];
-            if (!item.validate(subUri, item.getStatus(), subContent, subSettings, subOptions)) {
+            if (!item.validateContent(subUri, item.getStatus(), subContent, subSettings, subOptions)) {
                 return false;
             }
         }

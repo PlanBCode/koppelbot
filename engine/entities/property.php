@@ -379,7 +379,7 @@ class Property
         return $this->settings;
     }
 
-    public function validate($content): bool
+    public function validateContent($content): bool
     {
         return $this->typeClass->validateContent($content, $this->settings);
     }

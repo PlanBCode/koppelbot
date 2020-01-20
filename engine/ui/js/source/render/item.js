@@ -20,10 +20,8 @@ function Item(xyz, uri, status, content, settings, options, onChange) {
     this.ui = xyz.ui;
     // callback = (status,content)=>{...}
     this.onChange = callback => {
-        xyz.on(uri, 'change', (entityId, node, eventName) => {
-
-            //TODO get Node from node wrapper YOYO1
-        });
+        if (typeof callback !== 'function') throw new TypeError("callback is not a function.");
+        xyz.on(uri, 'changed', (entityId, node, eventName) => callback(node));
         // TODO unregister these listeners somehow
     }
 

@@ -30,8 +30,14 @@ const getEntityClassNames = (uri, entityClasses) => {
 };
 
 const getBaseUri = uri => {
-    const path0 = pathFromUri(uri)[0];
-    return '/' + (typeof path0 === 'string' ? path0 : '*');
+    const path = pathFromUri(uri);
+    if (path.length === 1) {
+        return '/' + path[0] + '/*';
+    } else if (path.length === 0) {
+        console.error('PROBLEM ERROR'); // TODO
+    } else {
+        return '/' + path[0] + '/' + path[1];
+    }
 };
 
 exports.getBaseUri = getBaseUri;

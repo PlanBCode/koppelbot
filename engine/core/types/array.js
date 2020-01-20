@@ -31,6 +31,7 @@ exports.actions = {
         DIV_CREATE.appendChild(TAG_create);
         DIV_CREATE.appendChild(INPUT_create);
         SPAN.appendChild(DIV_CREATE);
+        //TODO onchange
         return SPAN;
     },
     view: function (item) {
@@ -45,9 +46,10 @@ exports.actions = {
             const TAG = item.renderElement('view', subUri, item.getStatus(), subContent, subSettings, subOptions);
             SPAN.appendChild(TAG);
         }
+        //TODO onchange item.onChange( item => {});
         return SPAN;
     },
-    validate: function (item) {
+    validateContent: function (item) {
         const content = item.getContent();
         if (content === null || typeof content !== 'object') {
             return false;
@@ -57,7 +59,7 @@ exports.actions = {
         for (let key in content) {
             const subUri = item.getUri() + '/' + key;
             const subContent = content[key];
-            if (!item.validate(subUri, item.getStatus(), subContent, subSettings, subOptions)) {
+            if (!item.validateContent(subUri, item.getStatus(), subContent, subSettings, subOptions)) {
                 return false;
             }
         }
