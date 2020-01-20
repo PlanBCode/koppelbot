@@ -1,17 +1,22 @@
-const setupOnChange = (item, rows, addRow, deleteRow) => item.onChange(item => {
+const setupOnChange = (item, TAGs_row, addRow) => item.onChange(item => {
     const content = item.getContent();
-    for (let key in content) {
-        if ((rows instanceof Array && rows.indexOf(key) === -1) || (!(rows instanceof Array) && !rows.hasOwnProperty(key))) {
-            const subContent = content[key];
-            addRow(key, subContent);
+    //TODO use   const status = item.getStatus();
+   /* if (item.getMethod() === 'DELETE') {
+        for (let key in content) {
+            if ((TAGs_row instanceof Array && TAGs_row.indexOf(key) !== -1) || (!(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key))) {
+                const TAG_row = TAGs_row[key];
+                TAG_row.parentNode.removeChild(TAG_row);
+            }
         }
-    }
-    for (let key in rows) {
-        if ((rows instanceof Array && content.indexOf(key) === -1) || (!(rows instanceof Array) && !content.hasOwnProperty(key))) {
-            const subContent = content[key];
-            //TODO deleteRow(key);
+    } else {*/
+        for (let key in content) {
+            if ((TAGs_row instanceof Array && TAGs_row.indexOf(key) === -1) || (!(TAGs_row instanceof Array) && !TAGs_row.hasOwnProperty(key))) {
+                const subContent = content[key];
+                addRow(key, subContent);
+            }
         }
-    }
+   // }
+
 });
 
 exports.setupOnChange = setupOnChange;

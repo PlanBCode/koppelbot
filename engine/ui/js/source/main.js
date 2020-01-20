@@ -143,20 +143,21 @@ function XYZ() {
         content = typeof content === 'string' ? content : JSON.stringify(content);
         request('PUT', uri, content, (status, response) => {
             //TODO check for errors
-            console.log('put response:', uri, response);
-            entity.handleInput(uri, status, content, entityClasses);
+            console.log('put response: ' + uri + ' ' + response);
+            entity.handleInput(uri, status, response, entityClasses);
         });
     };
 
     this.delete = uri => {
         request('DELETE', uri, null, (status, response) => {
-            console.log('delete response:', uri, response);
+            console.log('delete response: ' + uri + ' ' + response);
+            entity.handleInput(uri, status, response, entityClasses);
         });
     };
 
     this.head = uri => {
         request('HEAD', uri, null, (status, response) => {
-            console.log('head response:', uri, response);
+            console.log('head response: ' + uri + ' ' + response);
         });
     };
     this.post = (uri, content) => {
@@ -165,7 +166,7 @@ function XYZ() {
         request('POST', uri, content, (status, response) => {
             //TODO check for errors
             console.log('post response:' + response, uri);
-            entity.handleInput(uri, status, content, entityClasses);
+            entity.handleInput(uri, status, response, entityClasses);
         });
     };
 

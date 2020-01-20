@@ -155,12 +155,57 @@ abstract class BasicStorage extends Storage
                 $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
                 $jsonActionResponse = json_set($this->data[$entityId], array_merge($keyPath, $subPropertyPath), $content);
                 if ($jsonActionResponse->succeeded()) {
+                    //TODO update to 204
                     $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
                 } else {
                     //TODO use $jsonActionResponse->getErrorMessage()
                     //TODO might result in 404 or 500
                     $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
                 }
+            }
+        }
+        return $storageResponse;
+    }
+    protected function delete(PropertyRequest $propertyRequest): StorageResponse
+    {
+        $storageResponse = new StorageResponse();
+        $entityIdList = $propertyRequest->getEntityId();
+        $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
+
+        $property = $propertyRequest->getProperty();
+        $propertyName = $property->getName();
+        $key = $propertyRequest->getProperty()->getStorageSetting('key', '.' . $propertyName);
+
+        //Loop through entityIds and add properties
+        foreach ($entityIds as $entityId) {
+            if (array_key_exists($entityId, $this->data)) {
+                $entity =& $this->data[$entityId];
+                if ($key === 'basename' || $key === 'key') {
+                    $storageResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
+                } else {
+                    if ($key === 'content') {
+                        $storageResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
+                        continue;
+                    } elseif (is_string($key) && substr($key, 0, 1) === '.') {
+                        $keyPath = explode('.', substr($key, 1));
+                    } else {
+                        $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                        continue;
+                    }
+                    $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
+                    $jsonActionResponse = json_unset($entity, array_merge($keyPath, $subPropertyPath));
+                    if ($jsonActionResponse->succeeded()) {
+                        //TODO update to 204
+                        $storageResponse->add(200, $propertyRequest, $entityId, null);
+                    } else {
+                        //TODO use $jsonActionResponse->getErrorMessage()
+                        //TODO might result in 404 or 500
+                        $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                    }
+
+                }
+            } else {
+                $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
             }
         }
         return $storageResponse;
@@ -173,5 +218,4 @@ abstract class BasicStorage extends Storage
 
     abstract protected function head(PropertyRequest $propertyRequest): StorageResponse;
 
-    abstract protected function delete(PropertyRequest $propertyRequest): StorageResponse;
 }

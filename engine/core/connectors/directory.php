@@ -127,7 +127,7 @@ class Storage_directory extends BasicStorage
         $parse = $propertyRequest->getProperty()->getStorageSetting('parse', 'none');
 
         foreach ($this->data as $entityId => $data) {
-            if (!$storageRequest->readOnly($entityId) || !is_null($this->maxAutoIncrementedId)) {
+            if (!$storageRequest->isReadOnly($entityId) || !is_null($this->maxAutoIncrementedId)) {
                 if ($parse === 'json') {
                     $fileContent = json_encode($data);
                 } else {//TODO xml,yaml,csv,tsv
@@ -143,12 +143,6 @@ class Storage_directory extends BasicStorage
     }
 
     protected function head(PropertyRequest $propertyRequest): StorageResponse
-    {
-        //TODO
-        return new StorageResponse();
-    }
-
-    protected function delete(PropertyRequest $propertyRequest): StorageResponse
     {
         //TODO
         return new StorageResponse();

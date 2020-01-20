@@ -73,3 +73,27 @@ function json_set(&$object, array $keyPath, &$content): JsonActionResponse
         return new JsonActionResponse(false); //TODO add error message
     }
 }
+
+function json_unset(&$object, array $keyPath): JsonActionResponse
+{
+    if (empty($keyPath)) {
+        return new JsonActionResponse(false); // TODO error message cannot delete prime
+    }
+    if (array_key_exists($keyPath[0], $object)) {
+        if(count($keyPath) === 1){
+            unset($object[$keyPath[0]]);
+            return new JsonActionResponse(true);
+        }else {
+            return json_unset($object[$keyPath[0]], array_slice($keyPath, 1));
+        }
+    } elseif (is_array($object)) {
+        if (count($keyPath) === 1) {
+            unset($object[$keyPath[0]]);
+            return new JsonActionResponse(true);
+        } else {
+            return new JsonActionResponse(false); //TODO add error message
+        }
+    } else {
+        return new JsonActionResponse(false); //TODO add error message
+    }
+}

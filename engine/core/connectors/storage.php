@@ -35,14 +35,24 @@ class StorageRequest
         return reset($this->propertyRequests);
     }
 
-    public function readOnly(string $entityId = ''): bool
+    public function isReadOnly(string $entityId = ''): bool
     {
         foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->readOnly()) {
+            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->isReadOnly()) {
                 return false;
             }
         }
         return true;
+    }
+
+    public function isDeletion(string $entityId = ''): bool
+    {
+        foreach ($this->propertyRequests as $propertyRequest) {
+            if (($entityId === '' || $entityId === $propertyRequest->getEntityId())  && $propertyRequest->isDeletion()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

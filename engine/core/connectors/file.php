@@ -32,7 +32,7 @@ class Storage_file extends BasicStorage
     protected function open(StorageRequest $storageRequest): StorageResponse
     {
         if (!file_exists($this->path)) {// TODO pass an error message?
-            if ($storageRequest->readOnly()) {
+            if ($storageRequest->isReadOnly()) {
                 return new StorageResponse(404);
             } else { // create the file
                 $this->data = [];
@@ -53,7 +53,7 @@ class Storage_file extends BasicStorage
 
     protected function close(StorageRequest $storageRequest): StorageResponse
     {
-        if (!$storageRequest->readOnly()) {
+        if (!$storageRequest->isReadOnly()) {
             $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
             if ($parse === 'json') {
                 $fileContent = json_encode($this->data);
@@ -70,11 +70,6 @@ class Storage_file extends BasicStorage
     }
 
     protected function head(PropertyRequest $propertyRequest): StorageResponse
-    {
-        return new StorageResponse();
-    }
-
-    protected function delete(PropertyRequest $propertyRequest): StorageResponse
     {
         return new StorageResponse();
     }

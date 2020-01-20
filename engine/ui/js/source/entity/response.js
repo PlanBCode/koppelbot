@@ -31,10 +31,11 @@ function getSubNodeFromNode(subPath, object, entityId, status, content, errors) 
 }
 
 function Node(object, entityId, status_, content_, errors_) {
-    this.content = content_;
     const status = status_;
+    //TODO const method = method_;
     const content = content_;
     const errors = errors_;
+    //TODO this.getMethod= () => method;
     this.getStatus = () => status;
     this.getContent = () => content;
     this.getErrors = () => errors;

@@ -82,9 +82,14 @@ class  PropertyRequest
         }
     }
 
-    public function readOnly(): bool
+    public function isReadOnly(): bool
     {
         return $this->method === 'GET' || $this->method === 'HEAD';
+    }
+
+    public function isDeletion(): bool
+    {
+        return $this->method === 'DELETE';
     }
 
     public function getPropertyPath(): array
