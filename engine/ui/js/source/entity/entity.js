@@ -98,10 +98,10 @@ function EntityClass(xyz, entityClassName, settings) {
         return content;
     };
 
-    this.createCreator = (options, data, xyz) => {
+    this.createCreator = (options, data) => {
         const TABLE = document.createElement('TABLE');
         for (let propertyName in properties) {
-            for (let TR of properties[propertyName].createCreator(options, data, xyz)) {
+            for (let TR of properties[propertyName].createCreator(options, data)) {
                 TABLE.appendChild(TR);
             }
         }

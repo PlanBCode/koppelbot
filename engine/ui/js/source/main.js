@@ -196,7 +196,7 @@ function XYZ() {
             const entityClassName = uriTools.pathFromUri(uri)[0];
             const entityClass = entityClasses[entityClassName];
             const data = {};
-            const TABLE = entityClass.createCreator(options, data, this);
+            const TABLE = entityClass.createCreator(options, data);
             TAG.appendChild(TABLE);
             const INPUT = document.createElement('INPUT');
             INPUT.type = 'submit';

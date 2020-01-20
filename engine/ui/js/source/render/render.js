@@ -28,13 +28,13 @@ function element(xyz, action, uri, status, content, settings, options) {
             const newContent = node.getContent();
             const newStatus = node.getStatus();
             const PARENT = TAG.parentNode;
-            if(PARENT) {
+            if (PARENT) {
                 const item = new Item(xyz, uri, newStatus, newContent, settings, options, onChange);
                 const TAG_new = types[type][action](item);
                 PARENT.insertBefore(TAG_new, TAG);
                 PARENT.removeChild(TAG);
                 TAG = TAG_new;
-            }else{
+            } else {
                 // TODO ERROR?? listeners should have been removed, remove them now?
             }
         });
@@ -62,4 +62,28 @@ function element(xyz, action, uri, status, content, settings, options) {
     }
 }
 
+function creator(options, type, uri, settings, propertyName, data) {
+    if (type === 'id') {
+        return [];
+    }
+    const TRs = [];
+    const content = settings.hasOwnProperty('default') ? settings.default : null;
+    // TODO html label for gebruiken
+    const TR = document.createElement('TR');
+    const TD_label = document.createElement('TD');
+    TD_label.innerText = propertyName;
+    TR.appendChild(TD_label);
+    const onChange = content => {
+        data[propertyName] = content;
+    };
+    const item = new Item(xyz, uri, 200, content, settings, options, onChange);
+    const element = types[type].edit(item);
+    const TD_content = document.createElement('TD');
+    TD_content.appendChild(element);
+    TR.appendChild(TD_content);
+    TRs.push(TR);
+    return TRs;
+}
+
 exports.element = element;
+exports.creator = creator;

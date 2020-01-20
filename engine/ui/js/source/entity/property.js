@@ -24,7 +24,7 @@ function changed(a, b) {
                 for (let key in a) {
                     if (b.hasOwnProperty(key)) {
                         if (changed(a[key], b[key])) return true
-                    }else{
+                    } else {
                         return true;
                     }
                 }
@@ -170,7 +170,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             listeners.push(listener);
         } else if (isPrimitive) {
             //TODO error
-            console.error('No subproperties, property is primitive')
+            // TODO handle subPropertyPaths
+            console.error('No subproperties, property /' + path.join('/') + ' is primitive.');
         } else {
             const subPropertNameList = path[0];
             const subPropertyNames = subPropertNameList === '*'
@@ -190,33 +191,18 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return listeners;
     };
 
-    this.createCreator = (options, data, xyz) => {
+    this.createCreator = (options, data) => {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
-            if (type === 'id') {
-                return TRs;
-            }
-            const uri = this.getUri('*'); //TODO double check this
-            const content = settings.hasOwnProperty('default') ? settings.default : null;
-            // TODO html label for gebruiken
-            const TR = document.createElement('TR');
-            const TD_label = document.createElement('TD');
-            TD_label.innerText = propertyName;
-            TR.appendChild(TD_label);
-            const onChange = content => {
-                data[propertyName] = content;
-            };
-            const item = new Item(xyz, uri, 200, content, settings, options, onChange);
-            const element = types[type].edit(item);
-            const TD_content = document.createElement('TD');
-            TD_content.appendChild(element);
-            TR.appendChild(TD_content);
-            TRs.push(TR);
+            const uri = this.getUri('*'); //TODO double check, perhaps 'NEW' or '$NEW'?
+            return render.creator(options, type, uri, settings, propertyName, data);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {
                 data[propertyName] = {};
-                TRs.push(...subProperties[propertyName].createCreator(options, data[propertyName], xyz));
+                TRs.push(...subProperties[propertyName].createCreator(options, data[propertyName]));
             }
+        } else {
+            console.error('No available rendering method for edit ' + type);
         }
         return TRs;
     };
