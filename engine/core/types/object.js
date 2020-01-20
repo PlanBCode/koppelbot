@@ -1,3 +1,21 @@
+const setupOnChange = (item, rows, addRow, deleteRow) => item.onChange(item => {
+    const content = item.getContent();
+    for (let key in content) {
+        if ((rows instanceof Array && rows.indexOf(key) === -1) || (!(rows instanceof Array) && !rows.hasOwnProperty(key))) {
+            const subContent = content[key];
+            addRow(key, subContent);
+        }
+    }
+    for (let key in rows) {
+        if ((rows instanceof Array && content.indexOf(key) === -1) || (!(rows instanceof Array) && !content.hasOwnProperty(key))) {
+            const subContent = content[key];
+            //TODO deleteRow(key);
+        }
+    }
+});
+
+exports.setupOnChange = setupOnChange;
+
 exports.actions = {
     edit: function (item) {
         // TODO create ui for adding/removing elements
@@ -5,37 +23,8 @@ exports.actions = {
         //TODO check if content is array
         const content = item.getContent();
         const subSettings = item.getSetting('subType');
-        const subOptions = item.getOptions(); //TODO
+        const subOptions = {showLabels: false};
         const TABLE = document.createElement('TABLE');
-
-        if (typeof content === 'object' && content !== null) {
-            for (let key in content) {
-                const subUri = item.getUri() + '/' + key;
-
-                const TR = document.createElement('TR');
-                const TD_key = document.createElement('TD');
-                const TD_value = document.createElement('TD');
-
-                const INPUT_remove = document.createElement('INPUT');
-                INPUT_remove.type = 'submit';
-                //TODO add class
-                INPUT_remove.value = 'x';
-                INPUT_remove.onclick = ()=>{
-                    //TODO item.delete(subUri);
-                };
-                TD_key.appendChild(INPUT_remove);
-                const TEXT_key = document.createTextNode(key)
-                TD_key.appendChild(TEXT_key);
-
-                const subContent = content[key];
-                const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
-                TD_value.appendChild(TAG);
-
-                TR.appendChild(TD_key);
-                TR.appendChild(TD_value);
-                TABLE.appendChild(TR);
-            }
-        }
         const TR_add = document.createElement('TR');
         const TD_key = document.createElement('TD');
         const TD_value = document.createElement('TD');
@@ -65,7 +54,42 @@ exports.actions = {
         TR_add.appendChild(TD_key);
         TR_add.appendChild(TD_value);
         TABLE.appendChild(TR_add);
-        //TODO onchange
+
+        const rows = {};
+        const addTR = (key, subContent) => {
+
+            const subUri = item.getUri() + '/' + key;
+
+            const TR = document.createElement('TR');
+            const TD_key = document.createElement('TD');
+            const TD_value = document.createElement('TD');
+
+            const INPUT_remove = document.createElement('INPUT');
+            INPUT_remove.type = 'submit';
+            //TODO add class
+            INPUT_remove.value = 'x';
+            INPUT_remove.onclick = () => {
+                item.delete(key);
+            };
+            TD_key.appendChild(INPUT_remove);
+            const TEXT_key = document.createTextNode(key);
+            TD_key.appendChild(TEXT_key);
+
+            const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
+            TD_value.appendChild(TAG);
+
+            TR.appendChild(TD_key);
+            TR.appendChild(TD_value);
+            rows[key] = TR;
+            TABLE.insertBefore(TR, TR_add);
+        };
+        if (typeof content === 'object' && content !== null) {
+            for (let key in content) {
+                const subContent = content[key];
+                addTR(key, subContent);
+            }
+        }
+        setupOnChange(item, rows, addTR);
         return TABLE;
     },
     view: function (item) {
@@ -74,7 +98,8 @@ exports.actions = {
         const subSettings = item.getSetting('subType');
         const subOptions = item.getOptions(); //TODO
         const TABLE = document.createElement('TABLE');
-        for (let key in content) {
+        const rows = {};
+        const addTR = (key, subContent) => {
             const TR = document.createElement('TR');
             const TD_key = document.createElement('TD');
             const TD_value = document.createElement('TD');
@@ -82,13 +107,17 @@ exports.actions = {
             TR.appendChild(TD_key);
 
             const subUri = item.getUri() + '/' + key;
-            const subContent = content[key];
             const TAG = item.renderElement('view', subUri, item.getStatus(), subContent, subSettings, subOptions);
             TD_value.appendChild(TAG);
             TR.appendChild(TD_value);
+            rows[key] = TR;
             TABLE.appendChild(TR);
+        };
+        for (let key in content) {
+            const subContent = content[key];
+            addTR(key, subContent);
         }
-        //TODO onchange
+        setupOnChange(item, rows, addTR);
         return TABLE;
     },
     validateContent: function (item) {

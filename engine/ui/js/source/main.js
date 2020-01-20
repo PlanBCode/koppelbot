@@ -1,7 +1,6 @@
 const entity = require('./entity/entity.js');
 const response = require('./entity/response.js');
 const uriTools = require('./uri/uri.js');
-const render = require('./render/render.js');
 const web = require('./web/web.js');
 const displays = require('../build/displays');
 
@@ -129,39 +128,44 @@ function XYZ() {
         }
     };
 
-    this.patch = (uri, content, callback) => {
-        console.log('patch request', uri, content)
+    this.patch = (uri, content) => {
+        console.log('patch request', uri, content);
         content = typeof content === 'string' ? content : JSON.stringify(content);
         request('PATCH', uri, content, (status, response) => {
             //TODO check for errors
             console.log('patch response:' + response, uri);
             const state = entity.handleInput(uri, status, content, entityClasses);
-            //TODO callback?
         });
     };
 
-    this.put = (uri, content, callback) => {
-        console.log('put request', uri, content)
+    this.put = (uri, content) => {
+        console.log('put request', uri, content);
         content = typeof content === 'string' ? content : JSON.stringify(content);
         request('PUT', uri, content, (status, response) => {
             //TODO check for errors
-            console.log('put response', uri, response)
-            const state = entity.handleInput(uri, status, content, entityClasses);
-            //TODO callback
+            console.log('put response:', uri, response);
+            entity.handleInput(uri, status, content, entityClasses);
         });
     };
 
-    this.head = (uri, content, callback) => {
-        //TODO
+    this.delete = uri => {
+        request('DELETE', uri, null, (status, response) => {
+            console.log('delete response:', uri, response);
+        });
     };
-    this.post = (uri, content, callback) => {
+
+    this.head = uri => {
+        request('HEAD', uri, null, (status, response) => {
+            console.log('head response:', uri, response);
+        });
+    };
+    this.post = (uri, content) => {
         console.log('post request', uri, content);
         content = typeof content === 'string' ? content : JSON.stringify(content);
         request('POST', uri, content, (status, response) => {
             //TODO check for errors
-            console.log('post response:' + response, uri)
-            const state = entity.handleInput(uri, status, content, entityClasses);
-            //TODO callback
+            console.log('post response:' + response, uri);
+            entity.handleInput(uri, status, content, entityClasses);
         });
     };
 
@@ -185,11 +189,6 @@ function XYZ() {
             });
         });
     };
-
-    //============================================================
-    // RENDERING should be refactored with better naming
-    //============================================================
-
 
     const renderUiCreate = (uri, options, TAG) => {
         retrieveMeta(uri, () => {
@@ -237,7 +236,6 @@ function XYZ() {
         const display = displays[displayName];
         const action = options.action || DEFAULT_ACTION;
         const path = uriTools.pathFromUri(uri);
-        const entityClassNameList = path[0] || '*';
         response.filter(node, path.slice(2)); // filter the content that was not requested
 
         if (WRAPPER.classList.contains('xyz-empty')) {

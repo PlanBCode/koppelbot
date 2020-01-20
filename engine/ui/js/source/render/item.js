@@ -1,6 +1,6 @@
 const render = require('./render');
 
-function Item(xyz, uri, status, content, settings, options, onChange) {
+function Item(xyz, uri, status, content, settings, options, onChange, onDelete) {
 
     this.getUri = () => uri;
     this.getStatus = () => status;
@@ -13,6 +13,7 @@ function Item(xyz, uri, status, content, settings, options, onChange) {
     this.hasSetting = settingName => settings.hasOwnProperty(settingName);
 
     this.patch = onChange; // (newContent,subUri) => {...}
+    this.delete = onDelete; // subUri => {...}
 
     this.renderElement = (action, uri, status, content, settings, options) => render.element(xyz, action, uri, status, content, settings, options);
 

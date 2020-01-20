@@ -11,16 +11,19 @@ function element(xyz, action, uri, status, content, settings, options) {
         return;
     }
     if (types[type].hasOwnProperty(action)) {
-        let onChange;
+        let onChange, onDelete;
         if (action === 'edit') {
             onChange = (content, subUri) => { //TODO use subUri
                 subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
                 xyz.patch(uri + subUri, uriTools.wrapContent(uri, content));
-                //console.log('PATCH',uri + subUri, uriTools.wrapContent(uri, content));
-            }
+            };
+            onDelete = subUri => {
+                subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
+                xyz.delete(uri + subUri);
+            };
         }
 
-        const item = new Item(xyz, uri, status, content, settings, options, onChange);
+        const item = new Item(xyz, uri, status, content, settings, options, onChange, onDelete);
         const TAG = types[type][action](item); // TODO
         //  item.forceChange();
 
@@ -67,15 +70,18 @@ function creator(options, uri, settings, propertyName, data) {
     const content = settings.hasOwnProperty('default') ? settings.default : null;
     // TODO html label for gebruiken
     const TR = document.createElement('TR');
-    const TD_label = document.createElement('TD');
-
-
-    TD_label.innerText = propertyName;
-    TR.appendChild(TD_label);
-    const onChange = (content, subUri) => { //TODO use subUri
+    if (options.showLabels !== false) {
+        const TD_label = document.createElement('TD');
+        TD_label.innerText = propertyName;
+        TR.appendChild(TD_label);
+    }
+    const onChange = (content, subUri) => { //TODO use subUri path
         data[propertyName] = content;
     };
-    const item = new Item(xyz, uri, 200, content, settings, options, onChange);
+    const onDelete = subUri => {
+        delete data[propertyName][subUri]; //TODO make work for nested objects
+    };
+    const item = new Item(xyz, uri, 200, content, settings, options, onChange, onDelete);
     const ELEMENT = types[type].edit(item);
     // TODO add id from options (also for label for)
     // TODO add class from options
