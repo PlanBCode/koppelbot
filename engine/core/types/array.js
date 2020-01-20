@@ -20,7 +20,7 @@ exports.actions = {
             DIV_sub.appendChild(TAG);
             SPAN.appendChild(DIV_sub);
         }
-        const subUri = item.getUri(); //TODO add something
+        const subUri = item.getUri()+'/$NEW'; //TODO add something
         const newContent = null;//TODO default value
         const DIV_CREATE = document.createElement('DIV');
         const INPUT_create = document.createElement('INPUT');

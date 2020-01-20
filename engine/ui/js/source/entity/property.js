@@ -163,28 +163,29 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return state;
     };
 
-    this.addPropertyListener = (entityId, path, eventName, callback) => {
+    this.addPropertyListener = (entityId, subpropertyPath, eventName, callback) => {
         const listeners = [];
-        if (path.length === 0) {
+        if (subpropertyPath.length === 0) {
             const listener = this.addAtomicListener(entityId, eventName, callback);
             listeners.push(listener);
         } else if (isPrimitive) {
             if (types.hasOwnProperty(type) && types[type].hasOwnProperty('validateSubPropertyPath')) {
-                if (types[type].validateSubPropertyPath(path)) {
-                    //TODO handle
-                    console.log('SUBPROPERTY PATH', path);
+                if (types[type].validateSubPropertyPath(subpropertyPath)) {
+                    const subUri = subpropertyPath.join('/');
+                    const listener = this.addAtomicListener(entityId, eventName, callback, subUri);
+                    listeners.push(listener);
                 } else {
-                    console.error('Invalid sub property path: ' + this.getUri(entityId) + '/' + path.join('/') + '.');
+                    console.error('Invalid sub property path: ' + this.getUri(entityId) + '/' + subpropertyPath.join('/') + '.');
                 }
             } else {
-                console.error('Invalid sub property path: ' + this.getUri(entityId) + path.join('/') + '.');
+                console.error('Invalid sub property path: ' + this.getUri(entityId) + subpropertyPath.join('/') + '.');
             }
         } else {
-            const subPropertNameList = path[0];
+            const subPropertNameList = subpropertyPath[0];
             const subPropertyNames = subPropertNameList === '*'
                 ? Object.keys(properties)
                 : subPropertNameList.split(',');
-            const subPath = path.slice(1);
+            const subPath = subpropertyPath.slice(1);
             for (let subPropertyName of subPropertyNames) {
                 if (subProperties.hasOwnProperty(subPropertyName)) {
                     const subPropertyListeners = subProperties[subPropertyName].addPropertyListener(entityId, subPath, eventName, callback)
