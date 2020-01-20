@@ -20,22 +20,24 @@ function filter(content, path) {
     }
 }
 
-function getSubNodeFromNode(subPath, object, entityId, status, content, errors) {
+function getSubNodeFromNode(subPath, object, entityId, status, content, errors, method) {
     if (subPath.length === 0) { //TODO or has errors?
-        return new Node(object, entityId, status, content, errors)
+        return new Node(object, entityId, status, content, errors, method)
     } else if (content !== null && typeof content === 'object' && content.hasOwnProperty(subPath[0])) {
-        return getSubNodeFromNode(subPath.slice(1), object, entityId, status, content[subPath[0]], errors);
+        return getSubNodeFromNode(subPath.slice(1), object, entityId, status, content[subPath[0]], errors, method);
     } else {
         return null; // unmodified
     }
 }
 
-function Node(object, entityId, status_, content_, errors_) {
+function Node(object, entityId, status_, content_, errors_, method_) {
+
     const status = status_;
-    //TODO const method = method_;
     const content = content_;
     const errors = errors_;
-    //TODO this.getMethod= () => method;
+    const method = method_;
+
+    this.getMethod = () => method;
     this.getStatus = () => status;
     this.getContent = () => content;
     this.getErrors = () => errors;

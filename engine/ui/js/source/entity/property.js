@@ -67,9 +67,9 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getUri = entityId => parent.getUri(entityId) + '/' + propertyName;
 
-    this.getResponse = (path, entityId) => {
+    this.getResponse = (path, entityId, method) => {
         if (isPrimitive) {
-            return new response.Node(this, entityId, statusses[entityId], contents[entityId], errors[entityId]);
+            return new response.Node(this, entityId, statusses[entityId], contents[entityId], errors[entityId], method);
         } else {
             const subPropertyNames = (path.length === 0 || path[0] === '*')
                 ? Object.keys(subProperties)
@@ -78,9 +78,9 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             const subPath = path.slice(1);
             for (let subPropertyName of subPropertyNames) {
                 if (subProperties.hasOwnProperty(subPropertyName)) {
-                    content[subPropertyName] = subProperties[subPropertyName].getResponse(subPath, entityId);
+                    content[subPropertyName] = subProperties[subPropertyName].getResponse(subPath, entityId, method);
                 } else {
-                    content[subPropertyName] = new response.Node(this, entityId, 400, null, [`${subPropertyName} does not exist.`]); //TODO
+                    content[subPropertyName] = new response.Node(this, entityId, 400, null, [`${subPropertyName} does not exist.`], method); //TODO
                 }
             }
             return content;
@@ -88,12 +88,12 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     };
 
     this.callListeners = (state, entityId) => {
-        this.callAtomicListeners(state, entityId, this.getResponse([], entityId));
+        this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()));
         parent.callListeners(state.getParentState(), entityId);
     };
 
-    this.handleInput = (entityId, propertyStatus, propertyContent) => {
-        const state = new State();
+    this.handleInput = (method, entityId, propertyStatus, propertyContent) => {
+        const state = new State(method);
         if (isPrimitive) {
             if (contents.hasOwnProperty(entityId)) {
                 const prevPropertyContent = contents[entityId];
@@ -144,7 +144,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
                     const subProperty = subProperties[subPropertyName];
                     const subStatus = subProperty207Wrapper.status;
                     const subContent = subProperty207Wrapper.content;
-                    const subState = subProperty.handleInput(entityId, subStatus, subContent);
+                    const subState = subProperty.handleInput(method, entityId, subStatus, subContent);
                     state.addSubState(subState);
                 }
             }
@@ -154,7 +154,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
                 const subPropertyContent = (propertyContent === null || typeof propertyContent !== 'object')
                     ? null
                     : propertyContent[subPropertyName];
-                const subState = subProperty.handleInput(entityId, propertyStatus, subPropertyContent);
+                const subState = subProperty.handleInput(method, entityId, propertyStatus, subPropertyContent);
                 state.addSubState(subState);
             }
         }

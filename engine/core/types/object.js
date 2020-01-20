@@ -1,22 +1,21 @@
 const setupOnChange = (item, TAGs_row, addRow) => item.onChange(item => {
     const content = item.getContent();
     //TODO use   const status = item.getStatus();
-   /* if (item.getMethod() === 'DELETE') {
+    if (item.getMethod() === 'DELETE') {
         for (let key in content) {
             if ((TAGs_row instanceof Array && TAGs_row.indexOf(key) !== -1) || (!(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key))) {
                 const TAG_row = TAGs_row[key];
                 TAG_row.parentNode.removeChild(TAG_row);
             }
         }
-    } else {*/
+    } else {
         for (let key in content) {
             if ((TAGs_row instanceof Array && TAGs_row.indexOf(key) === -1) || (!(TAGs_row instanceof Array) && !TAGs_row.hasOwnProperty(key))) {
                 const subContent = content[key];
                 addRow(key, subContent);
             }
         }
-   // }
-
+    }
 });
 
 exports.setupOnChange = setupOnChange;

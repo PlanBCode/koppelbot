@@ -14,7 +14,6 @@ exports.actions = {
         const subSettings = item.getSetting('subType');
         const subOptions = {showLabels: false};
 
-
         const subUri = item.getUri() + '/' + content.length;
         const newContent = null;//TODO default value
         const DIV_CREATE = document.createElement('TABLE');

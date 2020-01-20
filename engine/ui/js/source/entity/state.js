@@ -1,5 +1,6 @@
-function State() {
+function State(method_) {
     // let status;
+    let method = method_;
     let created = false;
     let changed = false;
     let removed = false;
@@ -7,9 +8,10 @@ function State() {
     const errors = [];
 
     let subStatus;
+    this.getMethod = () => method;
 
     this.getParentState = () => {
-        const parentState = new State();
+        const parentState = new State(method);
         if (changed || created || removed) parentState.setChanged();
         for (let error of errors) {
             parentState.setError(error.status, error.message);
@@ -52,7 +54,12 @@ function State() {
         } else if (newSubStatus !== subStatus) {
             subStatus = 207;
         }
-
+        const subMethod = subState.getMethod();
+        if (typeof method === 'undefined') {
+            method = subMethod;
+        } else if (method !== subMethod) {
+            throw new Error('A state cannot have multiple methods');
+        }
         if (subState.isChanged() || subState.isRemoved() || subState.isCreated()) {
             changed = true;
         }

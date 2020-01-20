@@ -134,7 +134,7 @@ function XYZ() {
         request('PATCH', uri, content, (status, response) => {
             //TODO check for errors
             console.log('patch response:' + response, uri);
-            const state = entity.handleInput(uri, status, content, entityClasses);
+            const state = entity.handleInput('PATCH',uri, status, content, entityClasses);
         });
     };
 
@@ -144,14 +144,14 @@ function XYZ() {
         request('PUT', uri, content, (status, response) => {
             //TODO check for errors
             console.log('put response: ' + uri + ' ' + response);
-            entity.handleInput(uri, status, response, entityClasses);
+            entity.handleInput('PUT', uri, status, response, entityClasses);
         });
     };
 
     this.delete = uri => {
         request('DELETE', uri, null, (status, response) => {
             console.log('delete response: ' + uri + ' ' + response);
-            entity.handleInput(uri, status, response, entityClasses);
+            entity.handleInput('DELETE', uri, status, response, entityClasses);
         });
     };
 
@@ -160,13 +160,14 @@ function XYZ() {
             console.log('head response: ' + uri + ' ' + response);
         });
     };
+
     this.post = (uri, content) => {
         console.log('post request', uri, content);
         content = typeof content === 'string' ? content : JSON.stringify(content);
         request('POST', uri, content, (status, response) => {
             //TODO check for errors
             console.log('post response:' + response, uri);
-            entity.handleInput(uri, status, response, entityClasses);
+            entity.handleInput('POST',uri, status, response, entityClasses);
         });
     };
 
@@ -183,7 +184,7 @@ function XYZ() {
             //TODO meta should be good or we have a problem
             //TODO get the data from cache if already in cache
             request('GET', uri, undefined, (status, content) => {//TODO add querystring better
-                const state = entity.handleInput(uri, status, content, entityClasses);
+                const state = entity.handleInput('GET', uri, status, content, entityClasses);
                 if (typeof dataCallback === 'function') {
                     dataCallback(state);//TODO hier wordt nog niets mee gedaan...
                 }
@@ -285,7 +286,7 @@ function XYZ() {
                 this.get(uri, () => {
                     WRAPPER.classList.remove('xyz-waiting-for-data');
                 }, () => {
-                    const node = entity.getResponse(uri, entityClasses);
+                    const node = entity.getResponse(uri, entityClasses, 'GET');
                     for (let entityClassName in node) {
                         for (let entityId in node[entityClassName]) {
                             renderDisplay(uri, options, WRAPPER)(entityId, node[entityClassName][entityId]);

@@ -65,7 +65,7 @@ function EntityClass(xyz, entityClassName, settings) {
         return listeners;
     };
 
-    this.getResponse = (path, entityId) => {
+    this.getResponse = (path, entityId, method) => {
         const propertyNames = (path.length === 0 || path[0] === '*')
             ? Object.keys(properties)
             : path[0].split(',');
@@ -73,16 +73,16 @@ function EntityClass(xyz, entityClassName, settings) {
         const subPath = path.slice(1);
         for (let propertyName of propertyNames) {
             if (properties.hasOwnProperty(propertyName)) {
-                content[propertyName] = properties[propertyName].getResponse(subPath, entityId);
+                content[propertyName] = properties[propertyName].getResponse(subPath, entityId, method);
             } else {
-                content[propertyName] = new response.Node(this, entityId, 400, null, [`${propertyName} does not exist.`]); //TODO
+                content[propertyName] = new response.Node(this, entityId, 400, null, [`${propertyName} does not exist.`], method); //TODO
             }
         }
         return content;
     };
 
     //TODO MAYBE make private /remove
-    this.getEntityClassResponse = path => {
+    this.getEntityClassResponse = (path, method) => {
         const entityIds = (path.length === 0 || path[0] === '*')
             ? Object.keys(entities)
             : path[0].split(',');
@@ -90,9 +90,9 @@ function EntityClass(xyz, entityClassName, settings) {
         const subPath = path.slice(1);
         for (let entityId of entityIds) {
             if (entities.hasOwnProperty(entityId)) {
-                content[entityId] = this.getResponse(subPath, entityId);
+                content[entityId] = this.getResponse(subPath, entityId, method);
             } else {
-                content[entityId] = new response.Node(this, entityId, 404, null, [`/${entityClassName}/${entityId} not found.`]); //TODO
+                content[entityId] = new response.Node(this, entityId, 404, null, [`/${entityClassName}/${entityId} not found.`], method); //TODO
             }
         }
         return content;
@@ -133,10 +133,10 @@ function EntityClass(xyz, entityClassName, settings) {
     };
 
     this.callListeners = (state, entityId) => {
-        this.callAtomicListeners(state, entityId, this.getResponse([], entityId))
+        this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()))
     };
 
-    const handleEntityIdInput = (entityId, entityStatus, entityContent) => {
+    const handleEntityIdInput = (method, entityId, entityStatus, entityContent) => {
 
         if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
         if (typeof entityStatus !== 'number') throw new TypeError('entityStatus not a number.');
@@ -160,7 +160,7 @@ function EntityClass(xyz, entityClassName, settings) {
                     const property = properties[propertyName];
                     const propertyStatus = property207Wrapper.status;
                     const propertyContent = property207Wrapper.content;
-                    const propertyState = property.handleInput(entityId, propertyStatus, propertyContent);
+                    const propertyState = property.handleInput(method, entityId, propertyStatus, propertyContent);
                     state.addSubState(propertyState);
                 }
             }
@@ -170,7 +170,7 @@ function EntityClass(xyz, entityClassName, settings) {
                 const propertyContent = (entityContent === null || typeof entityContent !== 'object')
                     ? null
                     : entityContent[propertyName];
-                const propertyState = property.handleInput(entityId, entityStatus, propertyContent);
+                const propertyState = property.handleInput(method, entityId, entityStatus, propertyContent);
                 state.addSubState(propertyState);
             }
         }
@@ -179,7 +179,7 @@ function EntityClass(xyz, entityClassName, settings) {
         return state;
     };
 
-    this.handleInput = (entityClassStatus, entityClassContent, entityIds) => {
+    this.handleInput = (method, entityClassStatus, entityClassContent, entityIds) => {
         const state = new State();
         if (entityClassStatus === 207) {
             for (let entityId of entityIds) {
@@ -193,7 +193,7 @@ function EntityClass(xyz, entityClassName, settings) {
                 } else {
                     const entityStatus = entity207Wrapper.status;
                     const entityContent = entity207Wrapper.content;
-                    const entityState = handleEntityIdInput(entityId, entityStatus, entityContent);
+                    const entityState = handleEntityIdInput(method, entityId, entityStatus, entityContent);
                     state.addSubState(entityState);
                 }
             }
@@ -204,7 +204,7 @@ function EntityClass(xyz, entityClassName, settings) {
                 const entityContent = (entityClassContent === null || typeof entityClassContent !== 'object')
                     ? null
                     : entityClassContent[entityId];
-                const entityState = handleEntityIdInput(entityId, entityClassStatus, entityContent);
+                const entityState = handleEntityIdInput(method, entityId, entityClassStatus, entityContent);
                 state.addSubState(entityState);
             }
         }
@@ -223,15 +223,15 @@ function EntityClass(xyz, entityClassName, settings) {
 }
 
 
-const handleInput = (uri, status, content, entityClasses) => {
+const handleInput = (method, uri, status, content, entityClasses) => {
     const state = new State();
     //TODO check status
     try {
         content = JSON.parse(content);//TODO check
-    }catch(e){
+    } catch (e) {
         console.error(content);
         content = {};
-        state.setError(500,'Could not parse JSON');
+        state.setError(500, 'Could not parse JSON');
     }
 
     const path = uriTools.pathFromUri(uri);
@@ -256,7 +256,7 @@ const handleInput = (uri, status, content, entityClasses) => {
                 } else {
                     entityIds = entityIdList.split(',');
                 }
-                const entityClassState = entityClass.handleInput(entityClassStatus, entityClassContent, entityIds);
+                const entityClassState = entityClass.handleInput(method, entityClassStatus, entityClassContent, entityIds);
                 state.addSubState(entityClassState);
             }
         }
@@ -271,14 +271,14 @@ const handleInput = (uri, status, content, entityClasses) => {
             } else {
                 entityIds = entityIdList.split(',');
             }
-            const entityClassState = entityClass.handleInput(status, entityClassContent, entityIds);
+            const entityClassState = entityClass.handleInput(method, status, entityClassContent, entityIds);
             state.addSubState(entityClassState);
         }
     }
     return state;
 };
 
-function getResponse(uri, entityClasses) {
+function getResponse(uri, entityClasses, method) {
     const path = uriTools.pathFromUri(uri);
     const entityClassNames = (path.length === 0 || path[0] === '*')
         ? Object.keys(entityClasses)
@@ -287,10 +287,10 @@ function getResponse(uri, entityClasses) {
     const subPath = path.slice(1);
     for (let entityClassName of entityClassNames) {
         if (entityClasses.hasOwnProperty(entityClassName)) {
-            content[entityClassName] = entityClasses[entityClassName].getEntityClassResponse(subPath);
+            content[entityClassName] = entityClasses[entityClassName].getEntityClassResponse(subPath, method);
         } else {
             //TODO replace null with something that has the endpoints required by Node
-            content[entityClassName] = new response.Node(null, entityId, 404, null, [`/${entityClassName} not found.`]); //TODO
+            content[entityClassName] = new response.Node(null, entityId, 404, null, [`/${entityClassName} not found.`], method); //TODO
         }
     }
     return content;
