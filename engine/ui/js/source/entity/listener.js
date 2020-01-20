@@ -19,25 +19,20 @@ function ListenerHandler() {
             const listenersPerEventNamePerSubUri = listenersPerEntityIdPerEventNamePerSubUri[listenerEntityId];
             if (listenersPerEventNamePerSubUri.hasOwnProperty(eventName)) {
                 const listenersPerSubUri = listenersPerEventNamePerSubUri[eventName];
-
                 if (typeof subUri === 'undefined') { // if no subUri is specified, call all subUri's
                     for (let subUri in listenersPerSubUri) {
-
                         const subPath = subUri === '' ? [] : subUri.split('/');
-                        console.log('1>>>',subPath)
                         const subNode = response.getSubNode(this, entityId, node, subPath);
-                        console.log('2 callListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, subNode);
+                        console.log('callListener', this.getUri(entityId) + '/' + subUri + ':' + eventName);
                         if(subNode) {
                             const listeners = listenersPerSubUri[subUri];
-                            //TODO create a node to match the subUri
                             listeners.forEach(callback => callback(entityId, subNode, eventName));
                         }
                     }
                 } else if (listenersPerSubUri.hasOwnProperty(subUri)) {
                     const subPath = subUri === '' ? [] : subUri.split('/');
                     const subNode = response.getSubNode(this, entityId, node, subPath);
-                    console.log('2>>>',subPath)
-                    console.log('1 callListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, subNode);
+                    console.log('callListener', this.getUri(entityId) + '/' + subUri + ':' + eventName);
                     if(subNode) {
                         const listeners = listenersPerSubUri[subUri];
                         listeners.forEach(callback => callback(entityId, subNode, eventName));

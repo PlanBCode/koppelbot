@@ -26,7 +26,6 @@ function getSubNodeFromNode(subPath, object, entityId, status, content, errors) 
     } else if (content !== null && typeof content === 'object' && content.hasOwnProperty(subPath[0])) {
         return getSubNodeFromNode(subPath.slice(1), object, entityId, status, content[subPath[0]], errors);
     } else {
-        console.log('aaaa', subPath)
         return null; // unmodified
     }
 }
@@ -44,16 +43,13 @@ function Node(object, entityId, status_, content_, errors_) {
 }
 
 function getSubNode(object, entityId, node, subPath) {
-
     if (subPath.length === 0) { //TODO or has errors?
         return node;
     } else if (node instanceof Node) {
         return node.getSubNode(subPath);
     } else if (node !== null && typeof node === 'object' && node.hasOwnProperty(subPath[0])) {
-        console.log('cccc', subPath.slice(1))
         return getSubNode(object, entityId, node[subPath[0]], subPath.slice(1));
     } else {
-        console.log('bbbb', subPath)
         return null; // unmodified
     }
 }
