@@ -92,5 +92,10 @@ exports.actions = {
             }
         }
         return true;
+    },
+    validateSubPropertyPath: function (subPropertyPath, settings) {
+        return subPropertyPath instanceof Array &&
+            subPropertyPath.length === 1 &&
+            typeof subPropertyPath[0] === 'string'
     }
 };

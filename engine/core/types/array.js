@@ -64,5 +64,11 @@ exports.actions = {
             }
         }
         return true;
+    },
+    validateSubPropertyPath: function (subPropertyPath, settings) {
+        return subPropertyPath instanceof Array &&
+            subPropertyPath.length === 1 &&
+            !isNaN(subPropertyPath[0]) &&
+            Number(subPropertyPath) === Math.floor(subPropertyPath);
     }
 };

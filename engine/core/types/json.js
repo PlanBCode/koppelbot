@@ -34,5 +34,8 @@ exports.actions = {
         } catch (e) {
             return false;
         }
+    },
+    validateSubPropertyPath: function (subPropertyPath, settings) {
+        return subPropertyPath instanceof Array;
     }
 };

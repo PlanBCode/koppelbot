@@ -169,9 +169,16 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             const listener = this.addAtomicListener(entityId, eventName, callback);
             listeners.push(listener);
         } else if (isPrimitive) {
-            //TODO error
-            // TODO handle subPropertyPaths
-            console.error('No subproperties, property /' + path.join('/') + ' is primitive.');
+            if (types.hasOwnProperty(type) && types[type].hasOwnProperty('validateSubPropertyPath')) {
+                if (types[type].validateSubPropertyPath(path)) {
+                    //TODO handle
+                    console.log('SUBPROPERTY PATH', path);
+                } else {
+                    console.error('Invalid sub property path: ' + this.getUri(entityId) + '/' + path.join('/') + '.');
+                }
+            } else {
+                console.error('Invalid sub property path: ' + this.getUri(entityId) + path.join('/') + '.');
+            }
         } else {
             const subPropertNameList = path[0];
             const subPropertyNames = subPropertNameList === '*'
