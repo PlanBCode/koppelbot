@@ -13,8 +13,10 @@ function element(xyz, action, uri, status, content, settings, options) {
     if (types[type].hasOwnProperty(action)) {
         let onChange;
         if (action === 'edit') {
-            onChange = content => {
-                xyz.patch(uri, uriTools.wrapContent(uri, content));
+            onChange = (content, subUri) => { //TODO use subUri
+                subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
+                xyz.patch(uri + subUri, uriTools.wrapContent(uri, content));
+                //console.log('PATCH',uri + subUri, uriTools.wrapContent(uri, content));
             }
         }
 
@@ -48,7 +50,8 @@ function element(xyz, action, uri, status, content, settings, options) {
     }
 }
 
-function creator(options, type, uri, settings, propertyName, data) {
+function creator(options, uri, settings, propertyName, data) {
+    const type = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(type)) {
         console.error('problem1'); //TODO return a TR containing the error
         return [];
@@ -69,7 +72,7 @@ function creator(options, type, uri, settings, propertyName, data) {
 
     TD_label.innerText = propertyName;
     TR.appendChild(TD_label);
-    const onChange = content => {
+    const onChange = (content, subUri) => { //TODO use subUri
         data[propertyName] = content;
     };
     const item = new Item(xyz, uri, 200, content, settings, options, onChange);

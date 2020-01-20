@@ -10,6 +10,8 @@ exports.actions = {
 
         if (typeof content === 'object' && content !== null) {
             for (let key in content) {
+                const subUri = item.getUri() + '/' + key;
+
                 const TR = document.createElement('TR');
                 const TD_key = document.createElement('TD');
                 const TD_value = document.createElement('TD');
@@ -18,11 +20,13 @@ exports.actions = {
                 INPUT_remove.type = 'submit';
                 //TODO add class
                 INPUT_remove.value = 'x';
+                INPUT_remove.onclick = ()=>{
+                    //TODO item.delete(subUri);
+                };
                 TD_key.appendChild(INPUT_remove);
                 const TEXT_key = document.createTextNode(key)
                 TD_key.appendChild(TEXT_key);
 
-                const subUri = item.getUri() + '/' + key;
                 const subContent = content[key];
                 const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
                 TD_value.appendChild(TAG);
@@ -37,15 +41,25 @@ exports.actions = {
         const TD_value = document.createElement('TD');
         const INPUT_key = document.createElement('INPUT');
 
-        const subUri = item.getUri(); //TODO add something
+        const subUri = item.getUri() + '/$new';
         const newContent = null;//TODO default value
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
         //TODO add class
         INPUT_create.value = "Add";
-        const TAG_create = item.renderElement('edit', subUri, item.getStatus(), newContent, subSettings, subOptions);
+        const data = {};
+        const TRs = item.creator(subOptions, subUri, subSettings, '$new', data);
+        const TABLE_create = document.createElement('TABLE');
+        TRs.forEach(TR => TABLE_create.appendChild(TR));
+        INPUT_create.onclick = () => {
+            const key = INPUT_key.value;
+            data[key] = data['$new'];
+            delete data['$new'];
+            item.patch(data, key);
+        };
+
         TD_key.appendChild(INPUT_key);
-        TD_value.appendChild(TAG_create);
+        TD_value.appendChild(TABLE_create);
         TD_value.appendChild(INPUT_create);
 
         TR_add.appendChild(TD_key);

@@ -203,7 +203,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
             const uri = this.getUri('$new');
-            return render.creator(options, type, uri, settings, propertyName, data);
+            return render.creator(options, uri, settings, propertyName, data);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {
                 data[propertyName] = {};

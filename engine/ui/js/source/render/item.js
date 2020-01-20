@@ -12,9 +12,11 @@ function Item(xyz, uri, status, content, settings, options, onChange) {
     this.getSetting = settingName => settings[settingName];
     this.hasSetting = settingName => settings.hasOwnProperty(settingName);
 
-    this.patch = onChange;
+    this.patch = onChange; // (newContent,subUri) => {...}
 
     this.renderElement = (action, uri, status, content, settings, options) => render.element(xyz, action, uri, status, content, settings, options);
+
+    this.creator = (options, uri, settings, propertyName, data) => render.creator(options, uri, settings, propertyName, data);
 
     this.validate = xyz.validate;
     this.ui = xyz.ui;

@@ -31,7 +31,7 @@ Class JsonActionResponse
         $this->content =& $content;
     }
 
-    public function succeeded():bool
+    public function succeeded(): bool
     {
         return $this->success;
     }
@@ -42,7 +42,7 @@ function json_get(&$object, array $keyPath): JsonActionResponse
     if (empty($keyPath)) {
         return new JsonActionResponse(true, $object);
     }
-    if(!is_array($object)){
+    if (!is_array($object)) {
         return new JsonActionResponse(false, $object); //TODO add error message
     }
     if (array_key_exists($keyPath[0], $object)) {
@@ -60,7 +60,15 @@ function json_set(&$object, array $keyPath, &$content): JsonActionResponse
         return new JsonActionResponse(true);
     }
     if (array_key_exists($keyPath[0], $object)) {
-        return json_set($object[$keyPath[0]], array_slice($keyPath, 1),$content);
+        return json_set($object[$keyPath[0]], array_slice($keyPath, 1), $content);
+    } elseif (is_array($object)) {
+        if (count($keyPath) === 1) {
+            $object[$keyPath[0]] = $content;
+            return new JsonActionResponse(true);
+        } else {
+            $object[$keyPath[0]] = [];
+            return json_set($object[$keyPath[0]], array_slice($keyPath, 1), $content);
+        }
     } else {
         return new JsonActionResponse(false); //TODO add error message
     }

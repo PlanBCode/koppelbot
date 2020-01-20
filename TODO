@@ -1,19 +1,13 @@
 TODO
 
-vervang onChange YOYO2 method door YOYO1
-
 array/object
-- - edit/create
-- - add values  POST /fact/0/words "vier"
 - - remove values DELETE /fact/word/3
-- - edit values  PUT/PATCH /fact/x/words/4 "vier"
-
 
 
 
 file type: viewer   https://viewerjs.org/
 
-
+delete entities
 
 ui: use validateContent before patch & put?
 
@@ -26,10 +20,10 @@ rename storage to connector
 load storage connectors when needed based on their file
 
 EntityClass
-- "collapse" all entityclasses,ids and properties that have active listeners into a multi GET request ?modified_after=x
+- "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
 - - polling made easy :)
 - - ?modified_after=$timestamp
-- - only additions,modications and removals
+- - only additions, modifications and removals
 - - HTTP status code xxx : object has been removed
 
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
