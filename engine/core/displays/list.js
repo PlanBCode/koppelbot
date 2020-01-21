@@ -10,16 +10,21 @@ options
 - TODO add multiselect tools
  */
 
-function select(xyz, options, entityId) {
-    if (typeof options.select === 'string') {
-        xyz.setVariable(options.select, entityId);
-    } else if (typeof options.select === 'function') {
-        options.select(entityId);
+function select(xyz, variableNameOrCallback, entityClassName, entityId) {
+    if (typeof variableNameOrCallback === 'string') {
+        if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
+            xyz.clearVariable(variableNameOrCallback);
+        } else {
+
+            xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId);
+        }
+    } else if (typeof variableNameOrCallback === 'function') {
+        variableNameOrCallback(entityClassName, entityId);
     }
 }
 
 function flatten2(source, target, prefix) {
-    if(source.constructor !== Object){
+    if (source.constructor !== Object) {
         return;
     }
     for (let key in source) {
@@ -77,7 +82,7 @@ exports.display = {
         WRAPPER.appendChild(TABLE);
         addCreateButton(xyz, uri, WRAPPER, options);
     },
-    first: (xyz, action, options, WRAPPER, entityId, content) => {
+    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const columns = flatten(content);
         const TR_header = document.createElement('TR');
         TR_header.className = 'xyz-list-header';
@@ -94,7 +99,7 @@ exports.display = {
         TABLE.appendChild(TR_header);
     },
     //TODO uri
-    entity: (xyz, action, options, WRAPPER, entityId, content) => {
+    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const columns = flatten(content);
         const TR_entity = document.createElement('TR');
         TR_entity.className = 'xyz-list-item';
@@ -105,23 +110,28 @@ exports.display = {
             const INPUT_checkbox = document.createElement('INPUT');
             INPUT_checkbox.type = "checkbox";
             INPUT_checkbox.onclick = event => {
-                const entityIds = xyz.hasVariable(variableName)
+                const selectedUris = xyz.hasVariable(variableName)
                     ? xyz.getVariable(variableName).split(',')
                     : [];
+                const uri = '/'+entityClassName+'/'+entityId;
                 if (INPUT_checkbox.checked) {
-                    if (!entityIds.includes(entityId)) {
-                        entityIds.push(entityId);
+                    if (!selectedUris.includes(uri)) {
+                        selectedUris.push(uri);
                     }
                 } else {
-                    const index = entityIds.indexOf(entityId);
+                    const index = entityIds.indexOf(uri);
                     if (index !== -1) {
-                        entityIds.splice(index, 1);
+                        selectedUris.splice(index, 1);
                     }
                 }
-                if (entityIds.length === 0) {
-                    xyz.clearVariable(variableName);
+                if (selectedUris.length === 0) { //TODO use select
+                    select(xyz, variableName, undefined, undefined)
                 } else {
-                    xyz.setVariable(variableName, entityIds.join(','));
+                    const entityIds = selectedUris
+                        .map(uri => uri.substr(1).split('/'))
+                        .filter(path => path[0] === entityClassName)
+                        .map(path => path[1]);
+                    select(xyz, variableName, entityClassName, entityIds.join(','))
                 }
                 event.stopPropagation();
             };
@@ -143,7 +153,7 @@ exports.display = {
                 TR_entity.classList.add('xyz-list-selected');
             }
             TR_entity.onclick = () => {
-                select(xyz, options, entityId);
+                select(xyz, options.select, entityClassName, entityId);
                 for (let row of TABLE.childNodes) {
                     if (row === TR_entity) {
                         row.classList.add('xyz-list-selected');
@@ -159,3 +169,4 @@ exports.display = {
 
 exports.addCreateButton = addCreateButton;
 exports.flatten = flatten;
+exports.select = select;

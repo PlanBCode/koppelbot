@@ -20,6 +20,8 @@ function EntityClass(xyz, entityClassName, settings) {
 
     this.getSettings = () => settings;
 
+    this.getEntityClassName = () => entityClassName;
+
     this.getUri = entityId => {
         if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
 

@@ -10,10 +10,10 @@ exports.display = {
     empty: (xyz, action, options, WRAPPER) => {
         WRAPPER.innerHTML = 'No items to display.';
     },
-    first: (xyz, action, options, WRAPPER, entityId, content) => {
+    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         WRAPPER.innerHTML = '';
     },
-    entity: (xyz, action, options, WRAPPER, entityId, content) => {
+    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const columns = list.flatten(content);
         const TABLE_entity = document.createElement('TR');
         TABLE_entity.className = 'xyz-item';

@@ -2,7 +2,7 @@ exports.actions = {
     edit: function (item) {
         const TAG = item.ui('/' + item.getSetting('class') + '/*/id', {
             display: 'select',
-            select: item.patch,
+            select: (entityClass, entityId) => item.patch(entityId),
             initialValue: item.getContent()
         }); // TODO how to determine id or title?
         //TODO onchange : how to?

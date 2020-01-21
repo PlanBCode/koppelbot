@@ -134,7 +134,7 @@ function XYZ() {
         request('PATCH', uri, content, (status, response) => {
             //TODO check for errors
             console.log('patch response:' + response, uri);
-            const state = entity.handleInput('PATCH',uri, status, content, entityClasses);
+            const state = entity.handleInput('PATCH', uri, status, content, entityClasses);
         });
     };
 
@@ -167,7 +167,7 @@ function XYZ() {
         request('POST', uri, content, (status, response) => {
             //TODO check for errors
             console.log('post response:' + response, uri);
-            entity.handleInput('POST',uri, status, response, entityClasses);
+            entity.handleInput('POST', uri, status, response, entityClasses);
         });
     };
 
@@ -233,7 +233,7 @@ function XYZ() {
     };
 
 
-    const renderDisplay = (uri, options, WRAPPER) => (entityId, node) => {
+    const renderDisplay = (uri, options, WRAPPER) => (entityClassName, entityId, node) => {
         const displayName = options.display || DEFAULT_DISPLAYNAME;
         const display = displays[displayName];
         const action = options.action || DEFAULT_ACTION;
@@ -243,14 +243,14 @@ function XYZ() {
         if (WRAPPER.classList.contains('xyz-empty')) {
             WRAPPER.classList.remove('xyz-empty');
             if (display && display.hasOwnProperty('first')) {
-                display.first(this, action, options, WRAPPER, entityId, node);
+                display.first(this, action, options, WRAPPER, entityClassName, entityId, node);
             } else {
                 WRAPPER.innerHTML = '';
             }
         }
 
         if (display && display.hasOwnProperty('entity')) {
-            display.entity(this, action, options, WRAPPER, entityId, node);
+            display.entity(this, action, options, WRAPPER, entityClassName, entityId, node);
         } else {
             //TODO a default way of handeling stuff
         }
@@ -289,7 +289,7 @@ function XYZ() {
                     const node = entity.getResponse(uri, entityClasses, 'GET');
                     for (let entityClassName in node) {
                         for (let entityId in node[entityClassName]) {
-                            renderDisplay(uri, options, WRAPPER)(entityId, node[entityClassName][entityId]);
+                            renderDisplay(uri, options, WRAPPER)(entityClassName, entityId, node[entityClassName][entityId]);
                         }
                     }
 

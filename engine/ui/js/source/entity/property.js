@@ -67,6 +67,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getUri = entityId => parent.getUri(entityId) + '/' + propertyName;
 
+    this.getEntityClassName = () => parent.getEntityClassName();
+
     this.getResponse = (path, entityId, method) => {
         if (isPrimitive) {
             return new response.Node(this, entityId, statusses[entityId], contents[entityId], errors[entityId], method);

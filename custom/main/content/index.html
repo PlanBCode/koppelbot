@@ -13,12 +13,19 @@
     <tr>
         <td rowspan="4" id="sources" width="20%" valign="top">
             <script>
-                xyz.ui('/source/*/file/id', {display: 'list',select: 'source',multiSelect: 'multiSource'});
+                xyz.ui('/source/*/file/id', {display: 'list', select: 'source', multiSelect: 'multiSource'});
             </script>
         </td>
         <td valign="top">
-            <script>xyz.ui('/source/$source', {showLabel: false});</script>
-            <script>xyz.ui('/source/$source/file/content', {action: 'edit', dynamic: true, showLabel: false});</script>
+            View source:
+            <p>
+                <script>xyz.ui('$source', {showLabel: false});</script>
+            </p>
+
+            Edit source content:
+            <p>
+                <script>xyz.ui('$source/file/content', {action: 'edit', dynamic: true, showLabel: false});</script>
+            </p>
         </td>
         <td rowspan="4" id="facts" width="20%" valign="top">
             <script>xyz.ui('/fact/*', {display: 'list', select: 'fact'});</script>
@@ -26,14 +33,14 @@
     </tr>
     <tr>
         <td>
-            Selected sources:
-            <script>xyz.ui('/source/$multiSource/file/id', {dynamic: true, showLabel: false});</script>
+            Multi selected sources:
+            <script>xyz.ui('$multiSource/file/id', {dynamic: true, showLabel: false});</script>
         </td>
     </tr>
     <tr>
         <td>
             Edit fact:
-            <script>xyz.ui('/fact/$fact', {action: 'edit'});</script>
+            <script>xyz.ui('$fact', {action: 'edit'});</script>
         </td>
     </tr>
 </table>

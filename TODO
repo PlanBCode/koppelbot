@@ -1,13 +1,6 @@
 TODO
 
 references can use multi assets: us an uri (only use the /class/id to render though)
-select and multi select use /class/id form
-
-filtering & searching:
-- query->getStorageRequests
-- if they match the actual requests get them together with the rest
-- otherwise get them first, analyze and use to get the ids
-
 
 file type: viewer   https://viewerjs.org/
 
@@ -22,6 +15,11 @@ move types into separate folders
 rename storage to connector
 
 load storage connectors when needed based on their file
+
+filtering & searching:
+- query->getStorageRequests
+- if they match the actual requests get them together with the rest
+- otherwise get them first, analyze and use to get the ids
 
 EntityClass
 - "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x

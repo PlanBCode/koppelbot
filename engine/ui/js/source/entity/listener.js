@@ -14,28 +14,29 @@ function Listener(listenerHandler, eventName, entityId, subUri) {
 function ListenerHandler() {
     const listenersPerEntityIdPerEventNamePerSubUri = {};
 
-    const callListners = (eventName, entityId, listenerEntityId, node, subUri) => {
+    const callListeners = (eventName, entityId, listenerEntityId, node, subUri) => {
         if (listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(listenerEntityId)) {
             const listenersPerEventNamePerSubUri = listenersPerEntityIdPerEventNamePerSubUri[listenerEntityId];
             if (listenersPerEventNamePerSubUri.hasOwnProperty(eventName)) {
                 const listenersPerSubUri = listenersPerEventNamePerSubUri[eventName];
+                const entityClassName = this.getEntityClassName();
                 if (typeof subUri === 'undefined') { // if no subUri is specified, call all subUri's
                     for (let subUri in listenersPerSubUri) {
                         const subPath = subUri === '' ? [] : subUri.split('/');
                         const subNode = response.getSubNode(this, entityId, node, subPath);
-                        console.log('callListener', this.getUri(entityId) + '/' + subUri + ':' + eventName);
-                        if(subNode) {
+                        console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
+                        if (subNode) {
                             const listeners = listenersPerSubUri[subUri];
-                            listeners.forEach(callback => callback(entityId, subNode, eventName));
+                            listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName));
                         }
                     }
                 } else if (listenersPerSubUri.hasOwnProperty(subUri)) {
                     const subPath = subUri === '' ? [] : subUri.split('/');
                     const subNode = response.getSubNode(this, entityId, node, subPath);
-                    console.log('callListener', this.getUri(entityId) + '/' + subUri + ':' + eventName);
-                    if(subNode) {
+                    console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
+                    if (subNode) {
                         const listeners = listenersPerSubUri[subUri];
-                        listeners.forEach(callback => callback(entityId, subNode, eventName));
+                        listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName));
                     }
                 }
             }
@@ -44,8 +45,8 @@ function ListenerHandler() {
 
     const callAllListeners = (eventName, entityId, node, subUri) => {
         if (eventNames.indexOf(eventName) === -1) throw new Error('Listener eventName "' + eventName + '"  is not in allowed event names: ' + eventNames.join(', ') + '.');
-        callListners(eventName, entityId, '*', node, subUri);
-        callListners(eventName, entityId, entityId, node, subUri)
+        callListeners(eventName, entityId, '*', node, subUri);
+        callListeners(eventName, entityId, entityId, node, subUri)
     };
 
     this.callAtomicListeners = (state, entityId, node, subUri) => {
