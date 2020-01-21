@@ -316,7 +316,7 @@ class Property
 
         if ($this->isPrimitive()) {
             $subPropertyPath = array_slice($propertyPath, 1);
-            if ($this->typeClass->validateSubPropertyPath($subPropertyPath, $this->settings)) { // array and object type allow subproperty paths
+            if ($this->typeClass::validateSubPropertyPath($subPropertyPath, $this->settings)) { // array and object type allow subproperty paths
                 return [new PropertyHandle(200, $this, $propertyPath)];
             } else {
                 return [new PropertyHandle(400, 'No subproperties available for ' . $this->getUri(), $propertyPath)];
@@ -386,7 +386,7 @@ class Property
 
     public function validateContent($content): bool
     {
-        return $this->typeClass->validateContent($content, $this->settings);
+        return $this->typeClass::validateContent($content, $this->settings);
     }
 
     public function getStorageSetting($settingName, $default = null)

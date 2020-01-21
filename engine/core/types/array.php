@@ -27,7 +27,7 @@ class Type_array extends Type
         $subTypeClass = Type::get($subTypeName);
         return ctype_digit($subPropertyPath[0]) && (
             count($subPropertyPath) <= 1  ||
-            $subTypeClass->validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings)
+            $subTypeClass::validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings)
             );
     }
 

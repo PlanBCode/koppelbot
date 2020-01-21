@@ -8,7 +8,6 @@ class Type_object extends Type_array
         $subSettings = array_get($settings, 'subType', []);
         $subTypeName = array_get($subSettings, 'type', self::$DEFAULT_TYPE);
         $subTypeClass = Type::get($subTypeName);
-        return count($subPropertyPath) <= 1 || $subTypeClass->validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings);
-
+        return count($subPropertyPath) <= 1 || $subTypeClass::validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings);
     }
 }
