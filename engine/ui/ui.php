@@ -1,14 +1,20 @@
 <?php
 
-class UiResponse extends HttpResponse2
+class UiRequest extends HttpRequest2
 {
-    public function __construct(string $display, string $entityClassName, string $entityId, array $propertyPath, Query &$query)
+
+    public function createResponse()
     {
+        $query = new Query($this->queryString);
+        $path = explode('/', $this->uri);
+        $display = count($path) > 0 ? $path[0] : '*';
+        $entityClassName = count($path) > 1 ? $path[1] : '';
+        $entityId = count($path) > 2 ? $path[2] : '*';
+        $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
+
         $rootUri = 'http://localhost:8888/site/';//TODO proper location
 
         if ($display === '') {
-            $breadcrumbs = ['' => 'ui'];
-
             $body = '<h3>Choose an interaction method:</h3><ul>';
             foreach (glob('./engine/core/displays/*.js') as $file) {
                 $displayName = basename($file, '.js');
@@ -17,7 +23,6 @@ class UiResponse extends HttpResponse2
             $body .= '<li><a href="' . $rootUri . 'ui/create">create</a></li>';
             $body .= '</ul> ';
         } elseif ($entityClassName === '') {
-            $breadcrumbs = ['ui' => 'ui', '' => $display];
             $body = '<h3>Choose an entity class:</h3><ul>';
             foreach (glob('./custom/main/entities/*.json') as $file) {
                 $entityClassName = basename($file, '.json');
@@ -25,7 +30,6 @@ class UiResponse extends HttpResponse2
             }
             $body .= '</ul> ';
         } else {
-            $breadcrumbs = ['ui' => 'ui', ('ui/' . $display) => $display, '' => $entityClassName];
             if ($display === 'create') {
                 $uri = '/' . $entityClassName;
             } else {
@@ -33,25 +37,11 @@ class UiResponse extends HttpResponse2
             }
             $body = '<script>xyz.ui("' . $uri . '",{display:"' . $display . '"});</script>';
         }
-        $navigation = '';
-        foreach ($breadcrumbs as $uri => $breadcrumb) {
-            if ($uri === '') {
-                $navigation .= '<b>' . $breadcrumb . '</b> ';
-            } else {
-                $navigation .= '<a href="' . $rootUri . $uri . '">' . $breadcrumb . '</a> ';
-            }
-        }
 
-        $content =
-            '<html>
-            <head>
-                <title>xyz: ' . implode(' - ', $breadcrumbs) . '</title >
-                <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
-                <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
-            </head >
-            <body > ' . $navigation . $body . '</body >
-        </html > ';
-        parent::__construct(200, $content);
+
+        return new DocResponse('ui' . $this->uri, $body);
     }
 }
+
+
 

@@ -4,8 +4,11 @@ require './engine/helpers/helpers.php';
 require './engine/router/response.php';
 require './engine/core/connectors/storage.php';
 require './engine/entities/entity.php';
-require './engine/ui/ui.php';
 require './engine/router/request.php';
+require './engine/api/api.php';
+require './engine/content/content.php';
+require './engine/doc/doc.php';
+require './engine/ui/ui.php';
 
 $uri = substr(strtok($_SERVER["REQUEST_URI"],'?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
 
@@ -21,6 +24,14 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
     $request = new UiRequest(
         $_SERVER['REQUEST_METHOD'],
         substr($uri, 4),
+        array_get($_SERVER, 'QUERY_STRING', ''),
+        getallheaders(),
+        @file_get_contents('php://input')
+    );
+} elseif (strpos($uri, '/doc/') === 0 || $uri === '/doc') {
+    $request = new DocRequest(
+        $_SERVER['REQUEST_METHOD'],
+        substr($uri, 1),
         array_get($_SERVER, 'QUERY_STRING', ''),
         getallheaders(),
         @file_get_contents('php://input')

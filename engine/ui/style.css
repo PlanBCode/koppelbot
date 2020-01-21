@@ -1,3 +1,9 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+}
+
 .xyz-list-header, .xyz-item-header {
     background-color: blue;
     color: white;
@@ -21,4 +27,55 @@
 
 .xyz-status-400, .xyz-status-403, .xyz-status-404, .xyz-status-500 {
     color: red;
+}
+
+
+.xyz-page-header {
+    padding: 35px;
+    width: 100vw;
+    height: 30px;
+    background-color: white;
+    color: black;
+    border-bottom: 1px solid rgb(230, 230, 230) ;
+    font-size: xx-large;
+}
+
+.xyz-page-navigation {
+    padding-top:20px;
+    height: calc(100vh - 100px);
+    width: 200px;
+    background-color: rgb(247, 247, 247);
+    display: inline-block;
+    float: left;
+}
+
+.xyz-page-navigation ul, .xyz-page-content ul {
+    list-style-type: none;
+}
+
+.xyz-page-navigation li {
+    padding-bottom: 40px;
+    color:rgb(100,100,100);
+}
+
+.xyz-page-navigation a {
+    text-decoration: none;
+    color: inherit;
+}
+
+a.xyz-page-navigation-current {
+    color:  darkgoldenrod;
+}
+
+li.xyz-page-navigation-depth-0{
+    font-weight: bold;
+    color:black;
+}
+
+.xyz-page-content {
+    padding:50px;
+    width: calc(100vw - 300px);
+    height: calc(100vh - 200px);
+    display: inline-block;
+    float: left;
 }

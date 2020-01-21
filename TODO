@@ -1,8 +1,12 @@
 TODO
 
-array/object
-- - remove values DELETE /fact/word/3
+references can use multi assets: us an uri (only use the /class/id to render though)
+select and multi select use /class/id form
 
+filtering & searching:
+- query->getStorageRequests
+- if they match the actual requests get them together with the rest
+- otherwise get them first, analyze and use to get the ids
 
 
 file type: viewer   https://viewerjs.org/
@@ -71,6 +75,8 @@ create /doc endpoint for documentation
 - /doc/api/type/$typeName
 - /doc/ui
 - /doc/ui/display/$display
+- /doc/ui/type/$display
+- /doc/code/
 
 use the plugin structure
 /custom/$PLUGINNAME/
