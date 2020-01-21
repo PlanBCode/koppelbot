@@ -2,5 +2,8 @@
   "default": {
     "type": "reference"
   },
-  "TODO": {}
+  "uri": {
+    "type": "string",
+    "regex": "TODOuriregex"
+  }
 }

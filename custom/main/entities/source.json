@@ -27,7 +27,7 @@
   },
   "account": {
     "type": "reference",
-    "class": "account",
+    "uri": "/account/*",
     "storage": {
       "type": "directory",
       "parse": "none",
