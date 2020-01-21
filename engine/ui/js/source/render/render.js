@@ -53,7 +53,7 @@ function element(xyz, action, uri, status, content, settings, options) {
     }
 }
 
-function creator(options, uri, settings, propertyName, data) {
+function creator(xyz, options, uri, settings, propertyName, data) {
     const type = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(type)) {
         console.error('problem1'); //TODO return a TR containing the error

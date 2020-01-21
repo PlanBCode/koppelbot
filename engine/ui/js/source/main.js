@@ -185,8 +185,10 @@ function XYZ() {
             //TODO get the data from cache if already in cache
             request('GET', uri, undefined, (status, content) => {//TODO add querystring better
                 const state = entity.handleInput('GET', uri, status, content, entityClasses);
+                //TODO  word er nog iets met state gedaan...?
                 if (typeof dataCallback === 'function') {
-                    dataCallback(state);//TODO hier wordt nog niets mee gedaan...
+                    const node = entity.getResponse(uri, entityClasses, 'GET');
+                    dataCallback(node);
                 }
             });
         });
@@ -283,10 +285,9 @@ function XYZ() {
                     WRAPPER.innerHTML = 'Empty';
                 }
 
-                this.get(uri, () => {
+                this.get(uri, node => {
                     WRAPPER.classList.remove('xyz-waiting-for-data');
-                }, () => {
-                    const node = entity.getResponse(uri, entityClasses, 'GET');
+
                     for (let entityClassName in node) {
                         for (let entityId in node[entityClassName]) {
                             renderDisplay(uri, options, WRAPPER)(entityClassName, entityId, node[entityClassName][entityId]);
@@ -314,6 +315,9 @@ function XYZ() {
                     const baseUri = uriTools.getBaseUri(uri);
                     const listeners = this.on(baseUri, 'created', renderDisplay(uri, options, WRAPPER));
                     displayListenersPerWrapper.set(WRAPPER, listeners);
+
+                }, () => {
+                    //TODO is deze nog nodig?
                 });
             },
             () => {

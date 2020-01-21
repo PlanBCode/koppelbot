@@ -13,7 +13,7 @@ abstract class Type
             // TODO an instance of Type_xxx should not be needed, we only use static functions
 
             if ($typeName === 'type') {
-                $type = new Type_type();
+                $typeClass = Type_type::class;
             } else {
                 $fileName = './engine/core/types/' . $typeName . '.php'; // TODO or custom/types
                 if (!file_exists($fileName)) {
@@ -30,15 +30,15 @@ abstract class Type
                 }
 
 
-                $type = new $typeClass();
             }
-            if (!is_subclass_of($type, 'Type')) {
-                echo 'ERROR Type ' . $typeName . ' : class does not extent Type!';
+           /* TODO this does not work without instantiating:
+               if (!is_subclass_of($typeClass, 'Type')) {
+                echo 'ERROR Type ' . $typeName . ' : class does not extend Type!';
                 return null;
-            }
+            }*/
 
-            self::$types[$typeName] = $type;
-            return $type;
+            self::$types[$typeName] = $typeClass;
+            return $typeClass;
         }
     }
 
@@ -68,8 +68,8 @@ class Type_type extends Type
         return true;
     }
 
-    static function signature(array &$settings)
+    /*static function signature(array &$settings)
     {
         //TODO
-    }
+    }*/
 }

@@ -10,3 +10,4 @@ exports.number = require('../../../core/types/number.js').actions;
 exports.object = require('../../../core/types/object.js').actions;
 exports.reference = require('../../../core/types/reference.js').actions;
 exports.string = require('../../../core/types/string.js').actions;
+exports.type = require('../../../core/types/type.js').actions;

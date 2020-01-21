@@ -15,8 +15,18 @@ exports.display = {
     },
     entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const columns = list.flatten(content);
-        const TABLE_entity = document.createElement('TR');
+        const TABLE_entity = document.createElement('TABLE');
         TABLE_entity.className = 'xyz-item';
+
+        if (options.showHeader !== false ) {
+            const TR_header = document.createElement('TR');
+            TR_header.className = 'xyz-item-header';
+            const TD_header = document.createElement('TD');
+            TD_header.innerHTML = '/' + entityClassName + '/' + entityId;
+            TD_header.setAttribute('colspan', options.showLabel !== false ? 2 : 1);
+            TR_header.appendChild(TD_header);
+            TABLE_entity.appendChild(TR_header);
+        }
 
         for (let flatPropertyName in columns) {
             const TR_flatProperty = document.createElement('TR');

@@ -2,6 +2,8 @@
 
 class Type_array extends Type
 {
+    static protected $DEFAULT_TYPE = 'string';
+
     public static function validateContent($content, array $settings): bool
     {
         if (!is_array($content)) {
@@ -9,9 +11,9 @@ class Type_array extends Type
         }
         $subSettings = array_get($settings, 'subSettings', []);
         $subTypeName = array_get($subSettings, 'type', 'string');
-        $subType = Type::get($subTypeName);
+        $subTypeClass = Type::get($subTypeName);
         foreach ($content as $subContent) {
-            if (!$subType::validateContent($subContent, $subSettings)) {
+            if (!$subTypeClass::validateContent($subContent, $subSettings)) {
                 return false;
             }
         }
@@ -20,7 +22,13 @@ class Type_array extends Type
 
     static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
     {
-        return count($subPropertyPath) === 1 && ctype_digit($subPropertyPath[0]);
+        $subSettings = array_get($settings, 'subType', []);
+        $subTypeName = array_get($subSettings, 'type', self::$DEFAULT_TYPE);
+        $subTypeClass = Type::get($subTypeName);
+        return ctype_digit($subPropertyPath[0]) && (
+            count($subPropertyPath) <= 1  ||
+            $subTypeClass->validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings)
+            );
     }
 
 }

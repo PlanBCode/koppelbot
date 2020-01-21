@@ -140,9 +140,10 @@ exports.actions = {
         }
         return true;
     },
-    validateSubPropertyPath: function (subPropertyPath, settings) {
+    validateSubPropertyPath: function (subPropertyPath, settings, validateSubPropertyPath) {
+        const subType = settings.subType.type || 'string';
         return subPropertyPath instanceof Array &&
-            subPropertyPath.length === 1 &&
-            typeof subPropertyPath[0] === 'string'
+            typeof subPropertyPath[0] === 'string' &&
+            validateSubPropertyPath(subType, subPropertyPath.slice(1));
     }
 };

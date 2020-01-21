@@ -7,17 +7,16 @@
       "extension": "json"
     }
   },
-  "id": {
+  "name": {
     "type": "string",
     "storage": {
       "key": "key"
     }
   },
-  "content": {
-    "TODO": "TODO",
+  "parameters": {
     "type": "object",
-    "subType" : {
-      "type": "json"
+    "subType": {
+      "type": "type"
     },
     "storage": {
       "key": "content"

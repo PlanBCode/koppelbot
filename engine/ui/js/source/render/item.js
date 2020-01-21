@@ -17,7 +17,10 @@ function Item(xyz, uri, status, content, settings, options, onChange, onDelete) 
 
     this.renderElement = (action, uri, status, content, settings, options) => render.element(xyz, action, uri, status, content, settings, options);
 
-    this.creator = (options, uri, settings, propertyName, data) => render.creator(options, uri, settings, propertyName, data);
+    this.creator = (options, uri, settings, propertyName, data) => render.creator(xyz, options, uri, settings, propertyName, data);
+
+    //TODO this is not congruent with this.patch and this.delete
+    this.get = (uri, dataCallback) => xyz.get(uri, dataCallback);
 
     this.validate = xyz.validate;
     this.ui = xyz.ui;

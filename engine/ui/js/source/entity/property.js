@@ -38,6 +38,12 @@ function changed(a, b) {
     }
 }
 
+const validateSubPropertyPath = (types) => (type, subPropertyPath) => {
+    if (!types.hasOwnProperty(type)) return false;
+    if (typeof types[type].validateSubPropertyPath !== 'function') return false;
+    return types[type].validateSubPropertyPath(subPropertyPath);
+}
+
 exports.constructor = function Property(xyz, parent, propertyName, meta) {
     listener.Handler.call(this);
 
@@ -165,29 +171,30 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return state;
     };
 
-    this.addPropertyListener = (entityId, subpropertyPath, eventName, callback) => {
+    this.addPropertyListener = (entityId, subPropertyPath, eventName, callback) => {
         const listeners = [];
-        if (subpropertyPath.length === 0) {
+        if (subPropertyPath.length === 0) {
             const listener = this.addAtomicListener(entityId, eventName, callback);
             listeners.push(listener);
         } else if (isPrimitive) {
             if (types.hasOwnProperty(type) && types[type].hasOwnProperty('validateSubPropertyPath')) {
-                if (types[type].validateSubPropertyPath(subpropertyPath)) {
-                    const subUri = subpropertyPath.join('/');
+
+                if (types[type].validateSubPropertyPath(subPropertyPath, settings, validateSubPropertyPath)) {
+                    const subUri = subPropertyPath.join('/');
                     const listener = this.addAtomicListener(entityId, eventName, callback, subUri);
                     listeners.push(listener);
                 } else {
-                    console.error('Invalid sub property path: ' + this.getUri(entityId) + '/' + subpropertyPath.join('/') + '.');
+                    console.error('Invalid sub property path: ' + this.getUri(entityId) + '/' + subPropertyPath.join('/') + ' for type ' + type + '.');
                 }
             } else {
-                console.error('Invalid sub property path: ' + this.getUri(entityId) + subpropertyPath.join('/') + '.');
+                console.error('Invalid sub property path: ' + this.getUri(entityId) + subPropertyPath.join('/') + ' for type ' + type + '.');
             }
         } else {
-            const subPropertNameList = subpropertyPath[0];
+            const subPropertNameList = subPropertyPath[0];
             const subPropertyNames = subPropertNameList === '*'
                 ? Object.keys(properties)
                 : subPropertNameList.split(',');
-            const subPath = subpropertyPath.slice(1);
+            const subPath = subPropertyPath.slice(1);
             for (let subPropertyName of subPropertyNames) {
                 if (subProperties.hasOwnProperty(subPropertyName)) {
                     const subPropertyListeners = subProperties[subPropertyName].addPropertyListener(entityId, subPath, eventName, callback)
@@ -205,7 +212,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
             const uri = this.getUri('$new');
-            return render.creator(options, uri, settings, propertyName, data);
+            return render.creator(xyz, options, uri, settings, propertyName, data);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {
                 data[propertyName] = {};

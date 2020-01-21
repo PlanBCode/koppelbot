@@ -14,7 +14,10 @@
     }
   },
   "content": {
-    "type": "json",
+    "type": "object",
+    "subType": {
+      "type": "type"
+    },
     "storage": {
       "key": "content"
     }
