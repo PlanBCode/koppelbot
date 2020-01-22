@@ -16,16 +16,17 @@ exports.display = {
     waitingForData: (xyz, action, options, WRAPPER) => {
         WRAPPER.innerHTML = 'Waiting for data...';
     },
-    empty: (xyz, action, options, WRAPPER, entityClassNameList) => {
+    empty: (xyz, action, options, WRAPPER, uri) => {
+        const entityClassNameList= uri.substr(1).split('/')[0] || '*';
         WRAPPER.innerHTML = '';
         const SELECT = document.createElement('SELECT');
         SELECT.className = 'xyz-select';
         SELECT.onchange = () => {
             const entityId = SELECT.options[SELECT.selectedIndex].value;
-            list.select(xyz, options, entityClassName, entityId);
+            list.select(xyz, options.select, entityClassNameList, entityId);
         };
         WRAPPER.appendChild(SELECT);
-        const fullUri = '/' + entityClassNameList; //TODO this could be multiple classes
+        const fullUri = '/' + entityClassNameList;
         list.addCreateButton(xyz, fullUri, WRAPPER, options);
     },
     first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
@@ -42,6 +43,10 @@ exports.display = {
         }
 
         const OPTION = document.createElement('OPTION');
+
+        if (typeof options.select === 'string' && xyz.getVariable() === options.select) {
+            OPTION.selected = true;
+        }
         if (options.initialValue === entityId) {
             list.select(xyz, options, entityClassName, entityId);
             OPTION.selected = true;

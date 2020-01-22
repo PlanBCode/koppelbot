@@ -66,7 +66,7 @@ function XYZ() {
             this.setVariable(variableName, variableObject[variableName]);
         }
     };
-    
+
     this.setVariables(web.getQueryParameters());
 
     function handleUri(uri, callbacks) {
