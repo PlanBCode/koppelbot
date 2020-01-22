@@ -4,6 +4,8 @@ file type: viewer   https://viewerjs.org/
 
 delete entities
 
+select display : sync with query string var on load
+
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 move types into separate folders

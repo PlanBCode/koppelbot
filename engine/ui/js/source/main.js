@@ -28,11 +28,17 @@ function XYZ() {
     const entityClasses = {};
     const variables = {};
 
+    const uriCallbacks = {};
+
     this.hasVariable = variableName => variables.hasOwnProperty(variableName);
     this.getVariable = (variableName, fallback) => variables.hasOwnProperty(variableName) ? variables[variableName] : fallback;
 
     const handleVariableChange = variableName => {
-        web.setQueryParameter(variableName, variables[variableName]);
+        if(variables.hasOwnProperty(variableName)) {
+            web.setQueryParameter(variableName, variables[variableName]);
+        }else{
+
+        }
 
         for (let uri in uriCallbacks) {
             if (uri.indexOf('$' + variableName) !== -1) { // TODO find ${variableName} and ignore $variableNameWithPostfix
@@ -60,13 +66,8 @@ function XYZ() {
             this.setVariable(variableName, variableObject[variableName]);
         }
     };
-
-    const loadWindowListener = window.addEventListener('load', () => {
-        this.setVariables(web.getQueryParameters());
-        window.removeEventListener('load', loadWindowListener);
-    });
-
-    const uriCallbacks = {};
+    
+    this.setVariables(web.getQueryParameters());
 
     function handleUri(uri, callbacks) {
         let complete = true;

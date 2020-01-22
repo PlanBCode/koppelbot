@@ -21,12 +21,11 @@ table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xy
 .xyz-list-item {
     cursor: pointer;
 }
-
-.xyz-list-item:hover {
+table.xyz-list tr.xyz-list-item:hover {
     background-color: lightblue;
 }
 
-.xyz-list-selected {
+table.xyz-list tr.xyz-list-selected {
     background-color: yellow;
 }
 

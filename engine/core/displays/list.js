@@ -15,12 +15,20 @@ function select(xyz, variableNameOrCallback, entityClassName, entityId) {
         if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
             xyz.clearVariable(variableNameOrCallback);
         } else {
-
             xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId);
         }
     } else if (typeof variableNameOrCallback === 'function') {
         variableNameOrCallback(entityClassName, entityId);
     }
+}
+
+function getUrisFromVariable(xyz, variableName, entityClassName) {
+    if (!xyz.hasVariable(variableName)) {
+        return [];
+    }
+    return xyz.getVariable(variableName).split(',')  // "/fruit/apple,pear" => ["/fruit/apple","/fruit/pear"]
+        .map(uri => uri.split('/'))
+        .map(path => ('/' + entityClassName + '/' + path[path.length - 1]));
 }
 
 function flatten2(source, target, prefix) {
@@ -103,34 +111,38 @@ exports.display = {
         const columns = flatten(content);
         const TR_entity = document.createElement('TR');
         TR_entity.className = 'xyz-list-item';
+        const uri = '/' + entityClassName + '/' + entityId;
 
         if (options.multiSelect) {
             const variableName = options.multiSelect;
             const TD_checkbox = document.createElement('TD');
             const INPUT_checkbox = document.createElement('INPUT');
             INPUT_checkbox.type = "checkbox";
+            const selectedUris = getUrisFromVariable(xyz, variableName, entityClassName);
+
+            if (selectedUris.includes(uri)) {
+                INPUT_checkbox.checked = true;
+            }
+
             INPUT_checkbox.onclick = event => {
-                const selectedUris = xyz.hasVariable(variableName)
-                    ? xyz.getVariable(variableName).split(',')
-                    : [];
-                const uri = '/'+entityClassName+'/'+entityId;
+                const selectedUris = getUrisFromVariable(xyz, variableName, entityClassName);
                 if (INPUT_checkbox.checked) {
                     if (!selectedUris.includes(uri)) {
                         selectedUris.push(uri);
                     }
                 } else {
-                    const index = entityIds.indexOf(uri);
+                    const index = selectedUris.indexOf(uri);
                     if (index !== -1) {
                         selectedUris.splice(index, 1);
                     }
                 }
-                if (selectedUris.length === 0) { //TODO use select
+                const entityIds = selectedUris
+                    .map(uri => uri.substr(1).split('/'))
+                    .filter(path => path[0] === entityClassName)
+                    .map(path => path[1]);
+                if (entityIds.length === 0) {
                     select(xyz, variableName, undefined, undefined)
                 } else {
-                    const entityIds = selectedUris
-                        .map(uri => uri.substr(1).split('/'))
-                        .filter(path => path[0] === entityClassName)
-                        .map(path => path[1]);
                     select(xyz, variableName, entityClassName, entityIds.join(','))
                 }
                 event.stopPropagation();
@@ -149,7 +161,8 @@ exports.display = {
 
         const TABLE = WRAPPER.firstChild;
         if (options.select) {
-            if (xyz.getVariable(options.select) === entityId || options.default === entityId) {
+
+            if (xyz.getVariable(options.select) === uri || options.default === entityId) {
                 TR_entity.classList.add('xyz-list-selected');
             }
             TR_entity.onclick = () => {

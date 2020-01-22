@@ -48,13 +48,17 @@ function updateQueryParameter(queryParameterName, value) {
         const keyValuePair = keyValuePairs[i];
         const otherKey = keyValuePair.split('=')[0];  //  'a=1' -> 'a'
         if (otherKey === encodeURIComponent(queryParameterName)) {
-            keyValuePairs[i] = [encodeURIComponent(queryParameterName), encodeURIComponent(value)].join('='); // 'a=value'
+            if (typeof value === 'undefined') {
+                keyValuePairs.splice(i,1);
+            }else {
+                keyValuePairs[i] = [encodeURIComponent(queryParameterName), encodeURIComponent(value)].join('='); // 'a=value'
+            }
             found = true;
             break;
         }
     }
 
-    if (!found) {
+    if (!found && typeof value !== 'undefined') {
         keyValuePairs[keyValuePairs.length] = [encodeURIComponent(queryParameterName), encodeURIComponent(value)].join('=');
     }
     if (keyValuePairs.length) {
