@@ -4,11 +4,15 @@ file type: viewer   https://viewerjs.org/
 
 delete entities
 
-ui: use validateContent before patch & put?
-
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 move types into separate folders
+
+ui: use validateContent before patch & put?
+
+werkend maken:
+- xyz.create('/source?content=default');
+- xyz.create('/$type', {});
 
 rename storage to connector
 
@@ -59,20 +63,13 @@ Storage_directory: split directory on spaces,comma's or (semi)colons
 drag&drop
 - als er een reference input veld is dan worden die entities sleepbaar
 
-werkend maken: xyz.create('/$type', {});
 
 hide private storage settings or better only expose specified ones
 
 add dot notation: /source/*/file.content,id
 
-create /doc endpoint for documentation
-- /doc/api
-- /doc/api/entity/$entityClass[/$property/...]
-- /doc/api/type/$typeName
-- /doc/ui
-- /doc/ui/display/$display
-- /doc/ui/type/$display
-- /doc/code/
+"_" -> root is labeled as string (because no type)	: string(storage:{....},...)
+        would be nice to give this a root type :)
 
 use the plugin structure
 /custom/$PLUGINNAME/

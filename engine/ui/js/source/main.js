@@ -332,6 +332,10 @@ function XYZ() {
 
     this.ui = (uri, options, WRAPPER) => {//TODO rename
         options = options || {};
+        if (options.display === 'edit') {
+            options.action = 'edit';
+            options.display = 'item';
+        }
         let SCRIPT;
         if (typeof WRAPPER === 'undefined') {
             const tag = options.tag || DEFAULT_TAG;

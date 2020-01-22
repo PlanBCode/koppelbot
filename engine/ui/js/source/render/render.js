@@ -1,6 +1,7 @@
 const types = require('../../build/types.js');
 const uriTools = require('../uri/uri.js');
 const Item = require('./item.js').constructor;
+const json = require('../web/json.js');
 
 const DEFAULT_TYPE = 'string';
 
@@ -76,10 +77,16 @@ function creator(xyz, options, uri, settings, propertyName, data) {
         TR.appendChild(TD_label);
     }
     const onChange = (content, subUri) => { //TODO use subUri path
-        data[propertyName] = content;
+        const keyPath = typeof subUri === 'undefined' ?
+            [propertyName] :
+            [propertyName, ...subUri.split('/')];
+        json.set(data, keyPath, content);
     };
     const onDelete = subUri => {
-        delete data[propertyName][subUri]; //TODO make work for nested objects
+        const keyPath = typeof subUri === 'undefined' ?
+            [propertyName] :
+            [propertyName, ...subUri.split('/')];
+        json.unset(data, keyPath);
     };
     const item = new Item(xyz, uri, 200, content, settings, options, onChange, onDelete);
     const ELEMENT = types[type].edit(item);

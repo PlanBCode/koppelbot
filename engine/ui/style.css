@@ -4,16 +4,16 @@ html, body {
     font-family: sans-serif;
 }
 
-table.xyz-item, table.xyz-list {
+table.xyz-create, table.xyz-item, table.xyz-list {
     border: 1px solid lightgrey;
     margin-bottom: 5px;
 }
 
-table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
+table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
     background: rgba(155, 155, 155, 0.2);
 }
 
-.xyz-list-header, .xyz-item-header {
+.xyz-create-header, .xyz-list-header, .xyz-item-header {
     background-color: darkslateblue;
     color: white;
 }
@@ -63,7 +63,7 @@ table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
 }
 
 .xyz-page-navigation li {
-    padding-bottom: 40px;
+    margin-bottom: 25px;
     color: rgb(100, 100, 100);
 }
 
@@ -77,6 +77,7 @@ a.xyz-page-navigation-current {
 }
 
 li.xyz-page-navigation-depth-0 {
+    margin-top: 40px;
     font-weight: bold;
     color: black;
 }

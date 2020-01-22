@@ -102,6 +102,14 @@ function EntityClass(xyz, entityClassName, settings) {
 
     this.createCreator = (options, data) => {
         const TABLE = document.createElement('TABLE');
+        TABLE.classList.add('xyz-create')
+        const TR_header = document.createElement('TR');
+        TR_header.classList.add('xyz-create-header')
+        const TD_header = document.createElement('TD');
+        TD_header.setAttribute('colspan', 2);
+        TR_header.appendChild(TD_header);
+        TABLE.appendChild(TR_header);
+        TD_header.innerText = 'New ' + entityClassName;
         for (let propertyName in properties) {
             for (let TR of properties[propertyName].createCreator(options, data)) {
                 TABLE.appendChild(TR);

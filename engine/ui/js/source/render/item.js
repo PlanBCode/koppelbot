@@ -12,8 +12,8 @@ function Item(xyz, uri, status, content, settings, options, onChange, onDelete) 
     this.getSetting = settingName => settings[settingName];
     this.hasSetting = settingName => settings.hasOwnProperty(settingName);
 
-    this.patch = onChange; // (newContent,subUri) => {...}
-    this.delete = onDelete; // subUri => {...}
+    this.patch = (newContent, subUri) => (options.onChange || onChange)(newContent, subUri);
+    this.delete = subUri => (options.onDelete || onDelete)(subUri);
 
     this.renderElement = (action, uri, status, content, settings, options) => render.element(xyz, action, uri, status, content, settings, options);
 

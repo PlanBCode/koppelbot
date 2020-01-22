@@ -13,20 +13,45 @@ class DocResponse extends HttpResponse2
     static protected $menuItems = [
         'doc' => "Documentation",
         'doc/api' => "API Reference",
+        'doc/api/entities' => "Entities",
+        'doc/api/types' => "Types",
         'doc/ui' => "UI Reference",
+        'doc/ui/displays' => "Displays",
+        'doc/ui/templates' => "HTML templates",
+        'doc/ui/types' => "Types",
         'api' => "Rest API",
-        'ui' => "User Interface",
+        'ui' => "User Interface"
     ];
 
-    public function __construct(string $currentUri, $content)
+    protected function spliceInExtraMenuItems($extraMenuItems){
+        if (!empty($extraMenuItems)) {
+            $firstExtraMenuItemUri = array_keys($extraMenuItems)[0];
+            $index = 1;
+            foreach (self::$menuItems as $uri => $menuItem) {
+                if (strpos($firstExtraMenuItemUri, $uri . '/') === 0) {
+                    //var_dump(array_splice(self::$menuItems, $index , 0, $extraMenuItems));
+                    return  array_slice(self::$menuItems, 0, $index, true) +
+                        $extraMenuItems +
+                        array_slice(self::$menuItems, $index, true);
+                }
+                ++$index;
+            }
+        }else{
+            return self::$menuItems;
+        }
+    }
+
+    public function __construct(string $currentUri, $content, $extraMenuItems = [])
     {
         $rootUri = 'http://localhost:8888/site/';//TODO proper location
 
 
-        $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri,'');
+        $menuItems = $this->spliceInExtraMenuItems($extraMenuItems);
+
+        $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
 
         $navigation = '<ul>';
-        foreach (self::$menuItems as $uri => $menuItem) {
+        foreach ($menuItems as $uri => $menuItem) {
             $depth = substr_count($uri, '/');
             $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current"' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
 

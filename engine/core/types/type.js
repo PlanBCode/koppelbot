@@ -30,9 +30,11 @@ exports.actions = {
                 const subUri = originalItem.getUri() + '/' + key;
                 const subSettings = settings[key];
                 const subContent = content[key];
-  //              const data = {};
-//                const TAG = originalItem.creator({}, subUri, subSettings, key, data);
-                const TAG = originalItem.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, {});
+
+                const subOnChange = (newContent, subUri2) => {
+                    originalItem.patch(newContent, key);
+                };
+                const TAG = originalItem.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, {onChange:subOnChange});
                 TD_value.appendChild(TAG);
                 TR.appendChild(TD_label);
                 TR.appendChild(TD_value);
