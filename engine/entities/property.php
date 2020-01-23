@@ -49,7 +49,7 @@ class  PropertyRequest
     protected $status;
 
     /** @var string */
-    protected $storageString;
+    protected $connectorString;
 
     public function __construct(int $status, $requestId, string $method, string $entityClass, string $entityId, $propertyOrError, array $propertyPath, $propertyContent, Query $query)
     {
@@ -61,20 +61,20 @@ class  PropertyRequest
         $this->query = $query;
         if ($status !== 200) {
             $this->status = $status;
-            $this->storageString = Storage::STORAGE_STRING_ERROR;
+            $this->connectorString = Connector::STORAGE_STRING_ERROR;
             $this->content = $propertyOrError;
         } elseif (is_string($propertyOrError)) {
             $this->status = 500;
-            $this->storageString = Storage::STORAGE_STRING_ERROR;
+            $this->connectorString = Connector::STORAGE_STRING_ERROR;
             $this->content = $propertyOrError;
         } else {
             $this->property = $propertyOrError;
             $this->content = $propertyContent;
             $this->status = 200;
-            $storageSettings = $this->property->getStorageSettings();
-            $storageType = array_get($storageSettings, 'type');
-            $this->storageString = Storage::addStorage($storageType, $storageSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
-            if ($this->storageString === Storage::STORAGE_STRING_ERROR) {
+            $connectorSettings = $this->property->getStorageSettings();
+            $connectorType = array_get($connectorSettings, 'type');
+            $this->connectorString = Connector::addStorage($connectorType, $connectorSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
+            if ($this->connectorString === Connector::STORAGE_STRING_ERROR) {
                 $this->status = 500;
                 $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
             }
@@ -139,7 +139,7 @@ class  PropertyRequest
 
     public function getStorageString(): string
     {
-        return $this->storageString;
+        return $this->connectorString;
     }
 }
 
@@ -202,7 +202,7 @@ class PropertyHandle
 class Property
 {
     const PROPERTY_TYPE = 'type';
-    const PROPERTY_STORAGE = 'storage';
+    const PROPERTY_STORAGE = 'connector';
     const PROPERTY_ACCESS = 'access';
     const PROPERTY_REQUIRED = 'required';
 
@@ -248,8 +248,8 @@ class Property
 
         $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
         $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
-        $storage = array_merge($rootSettingStorage, $settingStorage);
-        $this->settings['storage'] = $storage;
+        $connector = array_merge($rootSettingStorage, $settingStorage);
+        $this->settings['connector'] = $connector;
 
         $signatureProperties = array_get($this->settings, 'signature');
         if (is_array($signatureProperties)) {
@@ -293,7 +293,7 @@ class Property
 
     protected function isId(): bool
     {
-        return (array_get($this->settings['storage'], 'key', false));
+        return (array_get($this->settings['connector'], 'key', false));
     }
 
     protected function isPrimitive(): bool
@@ -376,7 +376,7 @@ class Property
 
     public function getStorageSettings(): array
     {
-        return $this->settings['storage'];
+        return $this->settings['connector'];
     }
 
     public function getMeta(): array
@@ -391,6 +391,6 @@ class Property
 
     public function getStorageSetting($settingName, $default = null)
     {
-        return array_get($this->settings['storage'], $settingName, $default);
+        return array_get($this->settings['connector'], $settingName, $default);
     }
 }

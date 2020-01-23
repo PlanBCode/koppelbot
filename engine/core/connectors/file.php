@@ -1,17 +1,17 @@
 <?php
-
+require_once './engine/core/connectors/basic.php';
 /*
-    general storage settings
+    general connector settings
       path   "/path/to/basename.extension"
       parse "json" (todo xml, yaml)
 
-    property storage settings:
+    property connector settings:
       key: "content"
       key: "key"
       key: "content.a.b"
  */
 
-class Storage_file extends BasicStorage
+class Storage_file extends BasicConnector
 {
     //TODO create directories if required
 
@@ -29,36 +29,36 @@ class Storage_file extends BasicStorage
         return array_get($settings, 'path');
     }
 
-    protected function open(StorageRequest $storageRequest): StorageResponse
+    protected function open(connectorRequest $connectorRequest): connectorResponse
     {
         if (!file_exists($this->path)) {// TODO pass an error message?
-            if ($storageRequest->isReadOnly()) {
-                return new StorageResponse(404);
+            if ($connectorRequest->isReadOnly()) {
+                return new connectorResponse(404);
             } else { // create the file
                 $this->data = [];
             }
         } else {
-            $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+            $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
             //TODO lock file
             $fileContent = file_get_contents($this->path);
             if ($parse === 'json') {
                 //TODO error if parsing fails
                 $this->data = json_decode($fileContent, true);
             } else { //TODO xml, yaml,csv,tsv
-                return new StorageResponse(500);
+                return new connectorResponse(500);
             }
         }
-        return new StorageResponse(200);
+        return new connectorResponse(200);
     }
 
-    protected function close(StorageRequest $storageRequest): StorageResponse
+    protected function close(connectorRequest $connectorRequest): connectorResponse
     {
-        if (!$storageRequest->isReadOnly()) {
-            $parse = $storageRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+        if (!$connectorRequest->isReadOnly()) {
+            $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
             if ($parse === 'json') {
                 $fileContent = json_encode($this->data);
             } else { //TODO xml, yaml,csv,tsv
-                return new StorageResponse(500);
+                return new connectorResponse(500);
             }
 
             if ($fileContent) {
@@ -66,11 +66,11 @@ class Storage_file extends BasicStorage
             }
         }
         //TODO unlock file
-        return new StorageResponse(200);
+        return new connectorResponse(200);
     }
 
-    protected function head(PropertyRequest $propertyRequest): StorageResponse
+    protected function head(PropertyRequest $propertyRequest): connectorResponse
     {
-        return new StorageResponse();
+        return new connectorResponse();
     }
 }

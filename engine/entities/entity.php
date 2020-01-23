@@ -157,7 +157,7 @@ class EntityClass
     }
 
     public
-    function createStorageRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
+    function createconnectorRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
     {
         /** @var PropertyRequest[] */
         $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
@@ -166,16 +166,16 @@ class EntityClass
         //TODO check if required properties are handled
 
 
-        /** @var StorageRequest[] */
-        $storageRequests = [];
+        /** @var connectorRequest[] */
+        $connectorRequests = [];
         foreach ($propertyRequests as $propertyRequest) {
-            $storageString = $propertyRequest->getStorageString();
-            if (!array_key_exists($storageString, $storageRequests)) {
-                $storageRequests[$storageString] = new StorageRequest();
+            $connectorString = $propertyRequest->getStorageString();
+            if (!array_key_exists($connectorString, $connectorRequests)) {
+                $connectorRequests[$connectorString] = new connectorRequest();
             }
-            $storageRequests[$storageString]->add($propertyRequest);
+            $connectorRequests[$connectorString]->add($propertyRequest);
         }
-        return $storageRequests;
+        return $connectorRequests;
     }
 }
 

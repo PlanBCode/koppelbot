@@ -1,6 +1,6 @@
 {
   "_": {
-    "storage": {
+    "connector": {
       "type": "directory",
       "parse": "none",
       "path": "data/sources/",
@@ -11,14 +11,14 @@
     "signature": {
       "content": {
         "type": "string",
-        "storage": {
+        "connector": {
           "key": "content"
         },
         "accept": "TODO"
       },
       "id": {
         "type": "string",
-        "storage": {
+        "connector": {
           "key": "basename"
         }
       }
@@ -28,7 +28,7 @@
   "account": {
     "type": "reference",
     "uri": "/account/*",
-    "storage": {
+    "connector": {
       "type": "directory",
       "parse": "none",
       "path": "data/sources/",

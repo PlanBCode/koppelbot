@@ -1,6 +1,6 @@
 {
   "_": {
-    "storage": {
+    "connector": {
       "type": "directory",
       "parse": "json",
       "path": "data/facts/",
@@ -10,7 +10,7 @@
   "id": {
     "type": "id",
     "autoIncrement": true,
-    "storage": {
+    "connector": {
       "key": "basename"
     }
   },

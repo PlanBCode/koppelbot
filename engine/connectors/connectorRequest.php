@@ -1,6 +1,6 @@
 <?php
 
-class StorageRequest
+class connectorRequest
 {
     /** @var PropertyRequest[] */
     protected $propertyRequests = [];
@@ -10,9 +10,9 @@ class StorageRequest
         $this->propertyRequests[] = $propertyRequest;
     }
 
-    public function merge($storageRequest): void
+    public function merge($connectorRequest): void
     {
-        array_push($this->propertyRequests, ...$storageRequest->propertyRequests);
+        array_push($this->propertyRequests, ...$connectorRequest->propertyRequests);
     }
 
     public function getPropertyRequests(): array

@@ -6,10 +6,6 @@ password type? on create: confirm password
 on put /account/password -> hash it
 - type : post process? pre process? -> flows
 
-rename storage to connector
-
-load storage connectors when needed based on their file
-
 file type: viewer   https://viewerjs.org/
 
 
@@ -27,7 +23,7 @@ werkend maken:
 
 
 filtering & searching:
-- query->getStorageRequests
+- query->getconnectorRequests
 - if they match the actual requests get them together with the rest
 - otherwise get them first, analyze and use to get the ids
 
@@ -65,11 +61,11 @@ Storage_directory: split directory on spaces,comma's or (semi)colons
 
 drag&drop: als er een reference input veld is dan worden die entities sleepbaar
 
-hide private storage settings or better only expose specified ones
+hide private connector settings or better only expose specified ones
 
 add dot notation: /source/*/file.content,id
 
-"_" -> root is labeled as string (because no type)	: string(storage:{....},...)
+"_" -> root is labeled as string (because no type)	: string(connector:{....},...)
         would be nice to give this a root type :)
 
 use the plugin structure

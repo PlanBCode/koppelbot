@@ -56,8 +56,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     //TODO handle type alliasses?
     const settings = meta; //TODO check if object
     let isId = false;
-    if (settings.hasOwnProperty('storage')) {
-        if (settings.storage.key === 'key' || settings.storage.key === 'basename' || settings.type === 'id') {
+    if (settings.hasOwnProperty('connector')) {
+        if (settings.connector.key === 'key' || settings.connector.key === 'basename' || settings.type === 'id') {
             isId = true;
         }
     }

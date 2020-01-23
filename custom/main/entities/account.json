@@ -1,6 +1,6 @@
 {
   "_": {
-    "storage": {
+    "connector": {
       "type": "file",
       "parse": "json",
       "path": "data/accounts.json"
@@ -21,7 +21,7 @@
   "id": {
     "type": "string",
     "required": true,
-    "storage": {
+    "connector": {
       "key": "key"
     }
   }

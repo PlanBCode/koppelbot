@@ -2,7 +2,7 @@
 
 class ApiRequest extends HttpRequest2
 {
-    protected $storageRequests = [];
+    protected $connectorRequests = [];
 
     private function add($requestId, string $method, string $entityClassNameList, string $entityIdList, array $propertyPath, $content, Query $query): void
     {
@@ -14,12 +14,12 @@ class ApiRequest extends HttpRequest2
                 echo 'ERROR' . $entityClassName . ' not found';
             } else {
                 $entityClassContent = array_null_get($content, $entityClassName);
-                $storageRequests = $entityClass->createStorageRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
-                foreach ($storageRequests as $storageString => $storageRequest) {
-                    if (!array_key_exists($storageString, $this->storageRequests)) {
-                        $this->storageRequests[$storageString] = $storageRequests[$storageString];
+                $connectorRequests = $entityClass->createconnectorRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
+                foreach ($connectorRequests as $connectorString => $connectorRequest) {
+                    if (!array_key_exists($connectorString, $this->connectorRequests)) {
+                        $this->connectorRequests[$connectorString] = $connectorRequests[$connectorString];
                     } else {
-                        $this->storageRequests[$storageString]->merge($storageRequests[$storageString]);
+                        $this->connectorRequests[$connectorString]->merge($connectorRequests[$connectorString]);
                     }
                 }
             }
@@ -66,10 +66,10 @@ class ApiRequest extends HttpRequest2
         $this->parseContent();
         $requestResponses = [];
 
-        foreach ($this->storageRequests as $storageRequest) {
-            $storageResponse = Storage::getStorageResponse($storageRequest);
+        foreach ($this->connectorRequests as $connectorRequest) {
+            $connectorResponse = Connector::getStorageResponse($connectorRequest);
 
-            foreach ($storageResponse->getRequestResponses() as $requestId => $requestResponse) {
+            foreach ($connectorResponse->getRequestResponses() as $requestId => $requestResponse) {
                 if (!array_key_exists($requestId, $requestResponses)) {
                     $requestResponses[$requestId] = $requestResponse;
                 } else {

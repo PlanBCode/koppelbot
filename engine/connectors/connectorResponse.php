@@ -1,7 +1,7 @@
 <?php
 
 
-class StorageResponse extends Response
+class connectorResponse extends Response
 {
     /** @var RequestResponse[] */
     protected $requestResponses = [];
@@ -11,7 +11,7 @@ class StorageResponse extends Response
         $this->addStatus($status);
     }
 
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): StorageResponse
+    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): connectorResponse
     {
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
@@ -22,10 +22,10 @@ class StorageResponse extends Response
         return $this;
     }
 
-    public function merge(StorageResponse $storageResponse): StorageResponse
+    public function merge(connectorResponse $connectorResponse): connectorResponse
     {
-        $this->addStatus($storageResponse->getStatus());
-        foreach ($storageResponse->requestResponses as $requestId => $requestResponse) {
+        $this->addStatus($connectorResponse->getStatus());
+        foreach ($connectorResponse->requestResponses as $requestId => $requestResponse) {
             if (!array_key_exists($requestId, $this->requestResponses)) {
                 $this->requestResponses[$requestId] = $requestResponse;
             } else {

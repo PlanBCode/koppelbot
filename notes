@@ -16,7 +16,7 @@ propertyName
 typeName
 signature
 settings
-- storage
+- connector
 - access
 - required
 
@@ -70,7 +70,7 @@ GET /api/account/12,23/name,email
          }
 }
 
-HttpRequest2::ApiRequest -> StorageRequests[] -> PropertyRequests[]
+HttpRequest2::ApiRequest -> connectorRequests[] -> PropertyRequests[]
 -> PropertyResponses[] -> StorageResponses[] -> EntityResponses[] -> RequestResponses[] -> HttpResponse2::ApiResponse
 
 

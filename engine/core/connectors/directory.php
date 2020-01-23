@@ -1,12 +1,13 @@
 <?php
+require_once './engine/core/connectors/basic.php';
 
 /*
-    general storage settings
+    general connector settings
       path        "/path/to/directory/"
       extension    "json"|"*"
       parse "json" (todo xml, yaml)
 
-    property storage settings:
+    property connector settings:
       key: "content"
       key: "basename"
       key: "filename"
@@ -15,7 +16,7 @@
    TODO modified/created = timestamps
  */
 
-class Storage_directory extends BasicStorage
+class Storage_directory extends BasicConnector
 {
     /*
     create directories if required
@@ -79,13 +80,13 @@ class Storage_directory extends BasicStorage
         return $max;
     }
 
-    protected function open(StorageRequest $storageRequest): StorageResponse
+    protected function open(connectorRequest $connectorRequest): connectorResponse
     {
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
-        $propertyRequest = $storageRequest->getFirstPropertyRequest();
+        $propertyRequest = $connectorRequest->getFirstPropertyRequest();
 
         $entityIds = [];
-        foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
+        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
             $entityIdList = $propertyRequest->getEntityId();
             if ($entityIdList === '*') {
                 $entityIds = $this->getAllEntityIds();
@@ -103,7 +104,7 @@ class Storage_directory extends BasicStorage
 
             //TODO lock file
             if (!file_exists($filePath)) {// TODO pass an error message?
-                return new StorageResponse(404);
+                return new connectorResponse(404);
             }
             $fileContent = file_get_contents($filePath);
             //TODO error if fails
@@ -113,21 +114,21 @@ class Storage_directory extends BasicStorage
                 $this->data[$entityId] = $fileContent;
             }
         }
-        return new StorageResponse(200);
+        return new connectorResponse(200);
     }
 
-    protected function close(StorageRequest $storageRequest): StorageResponse
+    protected function close(connectorRequest $connectorRequest): connectorResponse
     {
 
-        $propertyRequest = $storageRequest->getFirstPropertyRequest();
+        $propertyRequest = $connectorRequest->getFirstPropertyRequest();
 
         if (!$propertyRequest) {
-            return new StorageResponse(500);
+            return new connectorResponse(500);
         }
         $parse = $propertyRequest->getProperty()->getStorageSetting('parse', 'none');
 
         foreach ($this->data as $entityId => $data) {
-            if (!$storageRequest->isReadOnly($entityId) || !is_null($this->maxAutoIncrementedId)) {
+            if (!$connectorRequest->isReadOnly($entityId) || !is_null($this->maxAutoIncrementedId)) {
                 if ($parse === 'json') {
                     $fileContent = json_encode($data);
                 } else {//TODO xml,yaml,csv,tsv
@@ -139,12 +140,12 @@ class Storage_directory extends BasicStorage
             }
             //TODO unlock file
         }
-        return new StorageResponse(200);
+        return new connectorResponse(200);
     }
 
-    protected function head(PropertyRequest $propertyRequest): StorageResponse
+    protected function head(PropertyRequest $propertyRequest): connectorResponse
     {
         //TODO
-        return new StorageResponse();
+        return new connectorResponse();
     }
 }

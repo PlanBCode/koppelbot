@@ -1,6 +1,6 @@
 {
   "_": {
-    "storage": {
+    "connector": {
       "type": "directory",
       "parse": "json",
       "path": "engine/core/types/",
@@ -9,7 +9,7 @@
   },
   "name": {
     "type": "string",
-    "storage": {
+    "connector": {
       "key": "key"
     }
   },
@@ -18,7 +18,7 @@
     "subType": {
       "type": "type"
     },
-    "storage": {
+    "connector": {
       "key": "content"
     }
   }

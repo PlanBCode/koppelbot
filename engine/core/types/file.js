@@ -11,7 +11,7 @@ exports.actions = {
                 const reader = new FileReader();
                 reader.onload = evt => {
                     data['content'] = evt.target.result;
-                    const extension = item.getSetting('signature').id.storage.extension;
+                    const extension = item.getSetting('signature').id.connector.extension;
                     let key;
                     //TODO or extension is mixed extensions for example "json|xml"
                     if (extension && extension !== '*') {

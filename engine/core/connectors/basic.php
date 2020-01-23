@@ -1,20 +1,20 @@
 <?php
 
-abstract class BasicStorage extends Storage
+abstract class BasicConnector extends Connector
 {
-    public function createResponse(StorageRequest $storageRequest): StorageResponse
+    public function createResponse(connectorRequest $connectorRequest): connectorResponse
     {
-        $storageResponse = $this->open($storageRequest);
-        foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
-            $storageResponse->merge($this->createPropertyResponse($propertyRequest));
+        $connectorResponse = $this->open($connectorRequest);
+        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+            $connectorResponse->merge($this->createPropertyResponse($propertyRequest));
         }
-        return $storageResponse->merge($this->close($storageRequest));
+        return $connectorResponse->merge($this->close($connectorRequest));
     }
 
     /**
      * @param PropertyRequest $propertyRequest
      *
-     * @return StorageResponse|void
+     * @return connectorResponse|void
      */
     protected function createPropertyResponse(PropertyRequest $propertyRequest)
     {
@@ -35,13 +35,13 @@ abstract class BasicStorage extends Storage
         }
     }
 
-    abstract protected function open(StorageRequest $storageRequest): StorageResponse;
+    abstract protected function open(connectorRequest $connectorRequest): connectorResponse;
 
-    abstract protected function close(StorageRequest $storageRequest): StorageResponse;
+    abstract protected function close(connectorRequest $connectorRequest): connectorResponse;
 
-    protected function get(PropertyRequest $propertyRequest): StorageResponse
+    protected function get(PropertyRequest $propertyRequest): connectorResponse
     {
-        $storageResponse = new StorageResponse();
+        $connectorResponse = new connectorResponse();
 
         /*$modified_after = $propertyRequest->getQuery()->get('modified_after');
         $modified_after = is_string($modified_after)?intval($modified_after):null;
@@ -57,8 +57,8 @@ abstract class BasicStorage extends Storage
             } else {
                     // Not Modified, nothing to return
                     $returnStatus = 304;
-                    $storageResponse->add($returnStatus, $propertyRequest, $entityId, null);
-                    return $storageResponse;
+                    $connectorResponse->add($returnStatus, $propertyRequest, $entityId, null);
+                    return $connectorResponse;
                 }
             }
         }else{
@@ -78,37 +78,37 @@ abstract class BasicStorage extends Storage
                 $entity = $this->data[$entityId];
                 if ($key === 'basename' || $key === 'key') {
                     $content = $entityId;
-                    $storageResponse->add(200, $propertyRequest, $entityId, $content);
+                    $connectorResponse->add(200, $propertyRequest, $entityId, $content);
                 } else {
                     if ($key === 'content') {
                         $keyPath = [];
                     } elseif (is_string($key) && substr($key, 0, 1) === '.') {
                         $keyPath = explode('.', substr($key, 1));
                     } else {
-                        $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                        $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
                     $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
                     if ($jsonActionResponse->succeeded()) {
-                        $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                        $connectorResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
                     } else {
                         //TODO use $jsonActionResponse->getErrorMessage()
                         //TODO might result in 404 or 500
-                        $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                        $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
                     }
 
                 }
             } else {
-                $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
+                $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
             }
         }
-        return $storageResponse;
+        return $connectorResponse;
     }
 
-    protected function patch(PropertyRequest $propertyRequest): StorageResponse
+    protected function patch(PropertyRequest $propertyRequest): connectorResponse
     {
-        $storageResponse = new StorageResponse();
+        $connectorResponse = new connectorResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
@@ -139,14 +139,14 @@ abstract class BasicStorage extends Storage
                     $this->data[$entityId] = null;
                     unset($this->data[$entityId]);
                 }
-                $storageResponse->add(200, $propertyRequest, $content, $content);
+                $connectorResponse->add(200, $propertyRequest, $content, $content);
             } else {
                 if ($key === "content") {
                     $keyPath = [];
                 } else if (is_string($key) && substr($key, 0, 1) === '.') {
                     $keyPath = explode('.', substr($key, 1));
                 } else {
-                    $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                    $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
                     continue;
                 }
                 $content = $propertyRequest->getContent();
@@ -154,19 +154,19 @@ abstract class BasicStorage extends Storage
                 $jsonActionResponse = json_set($this->data[$entityId], array_merge($keyPath, $subPropertyPath), $content);
                 if ($jsonActionResponse->succeeded()) {
                     //TODO update to 204
-                    $storageResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                    $connectorResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
                 } else {
                     //TODO use $jsonActionResponse->getErrorMessage()
                     //TODO might result in 404 or 500
-                    $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                    $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
                 }
             }
         }
-        return $storageResponse;
+        return $connectorResponse;
     }
-    protected function delete(PropertyRequest $propertyRequest): StorageResponse
+    protected function delete(PropertyRequest $propertyRequest): connectorResponse
     {
-        $storageResponse = new StorageResponse();
+        $connectorResponse = new connectorResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
@@ -179,34 +179,34 @@ abstract class BasicStorage extends Storage
             if (array_key_exists($entityId, $this->data)) {
                 $entity =& $this->data[$entityId];
                 if ($key === 'basename' || $key === 'key') {
-                    $storageResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
+                    $connectorResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
                 } else {
                     if ($key === 'content') {
-                        $storageResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
+                        $connectorResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
                         continue;
                     } elseif (is_string($key) && substr($key, 0, 1) === '.') {
                         $keyPath = explode('.', substr($key, 1));
                     } else {
-                        $storageResponse->add(500, $propertyRequest, $entityId, 'Incorrect storage setting key="' . $key . '".');//TODO
+                        $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
                     $jsonActionResponse = json_unset($entity, array_merge($keyPath, $subPropertyPath));
                     if ($jsonActionResponse->succeeded()) {
                         //TODO update to 204
-                        $storageResponse->add(200, $propertyRequest, $entityId, null);
+                        $connectorResponse->add(200, $propertyRequest, $entityId, null);
                     } else {
                         //TODO use $jsonActionResponse->getErrorMessage()
                         //TODO might result in 404 or 500
-                        $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                        $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
                     }
 
                 }
             } else {
-                $storageResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
+                $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
             }
         }
-        return $storageResponse;
+        return $connectorResponse;
     }
 
     /* TODO
@@ -214,6 +214,6 @@ abstract class BasicStorage extends Storage
         abstract protected function post(PropertyRequest $propertyRequest): StorageResponse;
     */
 
-    abstract protected function head(PropertyRequest $propertyRequest): StorageResponse;
+    abstract protected function head(PropertyRequest $propertyRequest): connectorResponse;
 
 }
