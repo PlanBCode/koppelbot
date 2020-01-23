@@ -4,7 +4,7 @@ class Type_reference extends Type
 {
     public static function validateContent($content, array $settings): bool
     {
-        // content should be "/$entityClassName/$entityId" 
+        // content should be "/$entityClassName/$entityId"
         if (!is_string($content)) return false;
         $uri = array_get($settings, 'uri');
         if ($uri === null) return false;

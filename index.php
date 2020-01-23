@@ -12,38 +12,71 @@ require './engine/ui/ui.php';
 
 session_start();
 
-$uri = substr(strtok($_SERVER["REQUEST_URI"],'?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
+if (PHP_SAPI === 'cli') {
+
+    /*TODO
+    short, long   args
+                   2    requestUri , content
+
+    -m  --method   set methode
+    -h  --headers  set headers
+    -f  --file     set file input
+    -i  --interactive interactive modo
+    -v  --verbose  set verbose debuggin
+
+    $opts = [];
+    if(isset($argc)){
+        for ($i = 0; $i < $argc; $i++) {
+            $arg = $argv[$i];
+            if()
+        }
+    }*/
+
+    $headers = [];
+    $requestUri = $argc > 1
+        ? $argv[1]
+        : '';
+    $uriQueryString = explode('?', $requestUri);
+    $uri = array_get($uriQueryString, 0, '');
+    $queryString = array_get($uriQueryString, 1, '');
+    $method = 'GET';
+} else {
+    $headers = getallheaders();
+    $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
+    $method = $_SERVER['REQUEST_METHOD'];
+    $queryString = array_get($_SERVER, 'QUERY_STRING', '');
+}
 
 if (strpos($uri, '/api/') === 0 || $uri === '/api') {
     $request = new ApiRequest(
-        $_SERVER['REQUEST_METHOD'],
+        $method,
         substr($uri, 4),
-        array_get($_SERVER, 'QUERY_STRING', ''),
-        getallheaders(),
+        $queryString,
+        $headers,
         @file_get_contents('php://input')
     );
 } elseif (strpos($uri, '/ui/') === 0 || $uri === '/ui') {
     $request = new UiRequest(
-        $_SERVER['REQUEST_METHOD'],
+        $method,
         substr($uri, 4),
-        array_get($_SERVER, 'QUERY_STRING', ''),
-        getallheaders(),
+        $queryString,
+        $headers,
         @file_get_contents('php://input')
     );
 } elseif (strpos($uri, '/doc/') === 0 || $uri === '/doc') {
     $request = new DocRequest(
-        $_SERVER['REQUEST_METHOD'],
+        $method,
         substr($uri, 1),
-        array_get($_SERVER, 'QUERY_STRING', ''),
-        getallheaders(),
+        $queryString,
+        $headers,
         @file_get_contents('php://input')
     );
 } else {
     $request = new ContentRequest(
-        $_SERVER['REQUEST_METHOD'],
+        $method,
         $uri,
-        array_get($_SERVER, 'QUERY_STRING', ''),
-        getallheaders(),
+        $queryString,
+        $headers,
         @file_get_contents('php://input')
     );
 }

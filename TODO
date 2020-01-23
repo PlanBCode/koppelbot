@@ -2,9 +2,6 @@ TODO
 
 array object editing is broken
 
-
-validate reference better
-
 add samples to types&*entities for testing
 - API: create|delete|get|edit
 - UI: headless browser testing
