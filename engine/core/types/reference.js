@@ -2,7 +2,11 @@ exports.actions = {
     edit: function (item) {
         const TAG = item.ui(item.getSetting('uri'), {
             display: 'select',
-            select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId),
+            select: (entityClass, entityId) =>
+            {
+                console.log('>>>', entityClass, entityId);
+                item.patch('/' + entityClass + '/' + entityId)
+            },
             initialValue: item.getContent()
         });
         //TODO onchange : how to?
@@ -17,7 +21,12 @@ exports.actions = {
         return DIV;
     },
     validateContent: function (item) {
-        //TODO implement client side validation specific for referenced entity type
-        return true;//TODO
+        // content should be "/$entityClassName/$entityId"
+        const referenceUri = item.getContent();
+        if (typeof referenceUri !== 'string') return false;
+        const uri = item.getSetting('uri');
+        const entityClassName = uri.substr(1).split('/')[0];
+        const referencePath = referenceUri.substr(1).split('/');
+        return referencePath[0] === entityClassName && referencePath.length === 2;
     }
 };

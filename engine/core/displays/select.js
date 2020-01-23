@@ -17,15 +17,17 @@ exports.display = {
         WRAPPER.innerHTML = 'Waiting for data...';
     },
     empty: (xyz, action, options, WRAPPER, uri) => {
-        const entityClassNameList= uri.substr(1).split('/')[0] || '*';
         WRAPPER.innerHTML = '';
         const SELECT = document.createElement('SELECT');
         SELECT.className = 'xyz-select';
         SELECT.onchange = () => {
-            const entityId = SELECT.options[SELECT.selectedIndex].value;
-            list.select(xyz, options.select, entityClassNameList, entityId);
+            const selectedUri = SELECT.options[SELECT.selectedIndex].value;
+            const path = selectedUri.substr(1).split('/');
+            const [entityClassName, entityId] = path;
+            list.select(xyz, options.select, entityClassName, entityId);
         };
         WRAPPER.appendChild(SELECT);
+        const entityClassNameList = uri.substr(1).split('/')[0] || '*';
         const fullUri = '/' + entityClassNameList;
         list.addCreateButton(xyz, fullUri, WRAPPER, options);
     },
@@ -43,7 +45,7 @@ exports.display = {
         }
 
         const OPTION = document.createElement('OPTION');
-
+        OPTION.value = '/' + entityClassName + '/' + entityId;
         if (typeof options.select === 'string' && xyz.getVariable() === options.select) {
             OPTION.selected = true;
         }
