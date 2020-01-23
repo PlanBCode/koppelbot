@@ -57,7 +57,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     const settings = meta; //TODO check if object
     let isId = false;
     if (settings.hasOwnProperty('storage')) {
-        if (settings.storage.key === 'key' || settings.storage.key === 'basename') {
+        if (settings.storage.key === 'key' || settings.storage.key === 'basename' || settings.type === 'id') {
             isId = true;
         }
     }
@@ -128,6 +128,11 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
                             state.setChanged(); // TODO if new array value then Created
                             contents[entityId] = propertyContent;
                         }
+                        break;
+                    case 403:
+                        //TODO use message frop source if available
+                        // TODO check if error is new eg compare with current error in errors
+                        state.setError(403, 'Forbidden');
                         break;
                     case 404:
                         //TODO use message frop source if available
@@ -226,7 +231,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.isAutoIncremented = () => {
         if (isPrimitive) {
-            return type === 'id';
+            return type === 'id' && settings.autoIncrement === true;
         } else {
             for (let subPropertyName in subProperties) {
                 if (subProperties[subPropertyName].isAutoIncremented()) {
@@ -239,6 +244,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getIdFromContent = data => {
         if (isPrimitive) {
+            console.log('a', isId)
+
             return isId ? data : null;
         } else {
 

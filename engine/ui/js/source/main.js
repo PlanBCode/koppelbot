@@ -34,11 +34,7 @@ function XYZ() {
     this.getVariable = (variableName, fallback) => variables.hasOwnProperty(variableName) ? variables[variableName] : fallback;
 
     const handleVariableChange = variableName => {
-        if(variables.hasOwnProperty(variableName)) {
-            web.setQueryParameter(variableName, variables[variableName]);
-        }else{
-
-        }
+        web.setQueryParameter(variableName, variables[variableName]);
 
         for (let uri in uriCallbacks) {
             if (uri.indexOf('$' + variableName) !== -1) { // TODO find ${variableName} and ignore $variableNameWithPostfix
@@ -116,7 +112,7 @@ function XYZ() {
         } else {
             request('GET', '/' + entityClassNames.join(',') + '?meta', undefined, (status, content) => {//TODO add querystring better
                 //TODO check status
-                console.log(uri, content);
+                console.log(uri + ' ' + content);
                 const data = JSON.parse(content); //TODO check
                 // TODO validate data
                 for (let entityClassName of entityClassNames) {
@@ -193,6 +189,12 @@ function XYZ() {
                 }
             });
         });
+    };
+
+    this.isAutoIncremented = entityClassName => {
+        return entityClassName === '*' || !entityClasses.hasOwnProperty(entityClassName)
+            ? false
+            : entityClasses[entityClassName].isAutoIncremented();
     };
 
     const renderUiCreate = (uri, options, TAG) => {
@@ -337,6 +339,11 @@ function XYZ() {
             options.action = 'edit';
             options.display = 'item';
         }
+        if (options.display === 'delete') {
+            options.action = 'view';
+            options.display = 'item';
+            options.showDeleteButton = true;
+        }
         let SCRIPT;
         if (typeof WRAPPER === 'undefined') {
             const tag = options.tag || DEFAULT_TAG;
@@ -347,7 +354,7 @@ function XYZ() {
             WRAPPER.id = options.id;
         }
         if (options.class) {
-            WRAPPER.class = options.class || '';
+            WRAPPER.classList.add(options.class)
         }
         if (SCRIPT) {
             SCRIPT.parentNode.insertBefore(WRAPPER, SCRIPT);

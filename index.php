@@ -10,6 +10,8 @@ require './engine/content/content.php';
 require './engine/doc/doc.php';
 require './engine/ui/ui.php';
 
+session_start();
+
 $uri = substr(strtok($_SERVER["REQUEST_URI"],'?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
 
 if (strpos($uri, '/api/') === 0 || $uri === '/api') {

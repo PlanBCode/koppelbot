@@ -3,6 +3,7 @@
 require './engine/core/connectors/basic.php';
 require './engine/core/connectors/file.php';
 require './engine/core/connectors/directory.php';
+require './engine/core/connectors/session.php';
 
 /*
 
@@ -48,7 +49,7 @@ class StorageRequest
     public function isDeletion(string $entityId = ''): bool
     {
         foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId())  && $propertyRequest->isDeletion()) {
+            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && $propertyRequest->isDeletion()) {
                 return true;
             }
         }
@@ -66,7 +67,7 @@ class StorageResponse extends Response
         $this->addStatus($status);
     }
 
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): void
+    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): StorageResponse
     {
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
@@ -74,9 +75,10 @@ class StorageResponse extends Response
             $this->requestResponses[$requestId] = new RequestResponse($requestId);
         }
         $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
+        return $this;
     }
 
-    public function merge(StorageResponse $storageResponse): void
+    public function merge(StorageResponse $storageResponse): StorageResponse
     {
         $this->addStatus($storageResponse->getStatus());
         foreach ($storageResponse->requestResponses as $requestId => $requestResponse) {
@@ -86,6 +88,7 @@ class StorageResponse extends Response
                 $this->requestResponses[$requestId]->merge($requestResponse);
             }
         }
+        return $this;
     }
 
     public function getRequestResponses(): array

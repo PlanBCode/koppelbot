@@ -2,5 +2,7 @@
   "default": {
     "type": "id"
   },
-  "TODO": {}
+  "autoIncrement": {
+    "type": "bool"
+  }
 }

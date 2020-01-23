@@ -60,9 +60,11 @@ function creator(xyz, options, uri, settings, propertyName, data) {
         console.error('problem1'); //TODO return a TR containing the error
         return [];
     }
-    if (type === 'id') {
+    const entityClassName= uriTools.pathFromUri(uri)[0];
+    if (type === 'id' && xyz.isAutoIncremented(entityClassName)) {
         return [];
     }
+
     if (!types[type].hasOwnProperty('edit')) {
         console.error('problem1');
         return []; //TODO return a TR containing the error

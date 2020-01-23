@@ -9,6 +9,7 @@
   },
   "id": {
     "type": "id",
+    "autoIncrement": true,
     "storage": {
       "key": "basename"
     }

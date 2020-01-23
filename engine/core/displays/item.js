@@ -17,12 +17,12 @@ exports.display = {
         const columns = list.flatten(content);
         const TABLE_entity = document.createElement('TABLE');
         TABLE_entity.className = 'xyz-item';
-
-        if (options.showHeader !== false ) {
+        const uri = '/' + entityClassName + '/' + entityId;
+        if (options.showHeader !== false) {
             const TR_header = document.createElement('TR');
             TR_header.className = 'xyz-item-header';
             const TD_header = document.createElement('TD');
-            TD_header.innerHTML = '/' + entityClassName + '/' + entityId;
+            TD_header.innerHTML = uri;
             TD_header.setAttribute('colspan', options.showLabel !== false ? 2 : 1);
             TR_header.appendChild(TD_header);
             TABLE_entity.appendChild(TR_header);
@@ -42,6 +42,21 @@ exports.display = {
             TD_flatPropertyContent.appendChild(TAG);
             TR_flatProperty.appendChild(TD_flatPropertyContent);
             TABLE_entity.appendChild(TR_flatProperty);
+        }
+
+        if (options.showDeleteButton === true) {
+            const TR_deleteButton = document.createElement('TR');
+            const TD_deleteButton = document.createElement('TD');
+            TD_deleteButton.setAttribute('colspan', 2);
+            const INPUT_deleteButton = document.createElement('INPUT');
+            INPUT_deleteButton.type = 'submit';
+            INPUT_deleteButton.value = 'Delete';
+            INPUT_deleteButton.onclick = () => {
+                xyz.delete(uri)
+            };
+            TD_deleteButton.appendChild(INPUT_deleteButton);
+            TR_deleteButton.appendChild(TD_deleteButton);
+            TABLE_entity.appendChild(TR_deleteButton);
         }
         WRAPPER.appendChild(TABLE_entity);
     }

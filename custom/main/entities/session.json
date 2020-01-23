@@ -1,0 +1,13 @@
+{
+  "_": {
+    "storage": {
+      "type": "session"
+    }
+  },
+  "username": {
+    "type": "id"
+  },
+  "password": {
+    "type": "string"
+  }
+}

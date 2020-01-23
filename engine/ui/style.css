@@ -4,6 +4,9 @@ html, body {
     font-family: sans-serif;
 }
 
+/* ====================================================================================================
+DISPLAYS
+==================================================================================================== */
 table.xyz-create, table.xyz-item, table.xyz-list {
     border: 1px solid lightgrey;
     margin-bottom: 5px;
@@ -21,6 +24,7 @@ table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xy
 .xyz-list-item {
     cursor: pointer;
 }
+
 table.xyz-list tr.xyz-list-item:hover {
     background-color: lightblue;
 }
@@ -28,6 +32,10 @@ table.xyz-list tr.xyz-list-item:hover {
 table.xyz-list tr.xyz-list-selected {
     background-color: yellow;
 }
+
+/* ====================================================================================================
+STATUS
+==================================================================================================== */
 
 .xyz-waiting {
     color: grey;
@@ -37,6 +45,9 @@ table.xyz-list tr.xyz-list-selected {
     color: red;
 }
 
+/* ====================================================================================================
+PAGE
+==================================================================================================== */
 
 .xyz-page-header {
     padding: 35px;

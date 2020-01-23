@@ -8,9 +8,7 @@ abstract class BasicStorage extends Storage
         foreach ($storageRequest->getPropertyRequests() as $propertyRequest) {
             $storageResponse->merge($this->createPropertyResponse($propertyRequest));
         }
-        $storageResponse->merge($this->close($storageRequest));
-
-        return $storageResponse;
+        return $storageResponse->merge($this->close($storageRequest));
     }
 
     /**

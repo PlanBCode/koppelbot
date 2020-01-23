@@ -1,8 +1,15 @@
 TODO
 
+add a reference to account in session?
+
+logout ~ delete entities
+
+Request was empty => response was empty
+
 file type: viewer   https://viewerjs.org/
 
-delete entities
+
+
 
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
