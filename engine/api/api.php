@@ -67,7 +67,7 @@ class ApiRequest extends HttpRequest2
         $requestResponses = [];
 
         foreach ($this->connectorRequests as $connectorRequest) {
-            $connectorResponse = Connector::getStorageResponse($connectorRequest);
+            $connectorResponse = Connector::getConnectorResponse($connectorRequest);
 
             foreach ($connectorResponse->getRequestResponses() as $requestId => $requestResponse) {
                 if (!array_key_exists($requestId, $requestResponses)) {

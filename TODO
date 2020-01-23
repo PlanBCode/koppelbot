@@ -1,10 +1,13 @@
 TODO
 
-add a reference to account in session?
+array object editing is broken
 
-password type? on create: confirm password
-on put /account/password -> hash it
-- type : post process? pre process? -> flows
+
+validate reference better
+
+add samples to types&*entities for testing
+- API: create|delete|get|edit
+- UI: headless browser testing
 
 file type: viewer   https://viewerjs.org/
 
@@ -23,7 +26,7 @@ werkend maken:
 
 
 filtering & searching:
-- query->getconnectorRequests
+- query->getConnectorRequests
 - if they match the actual requests get them together with the rest
 - otherwise get them first, analyze and use to get the ids
 
@@ -35,9 +38,6 @@ EntityClass
 - - HTTP status code xxx : object has been removed
 
 xyz.globals({options)  die worden aan alle ui.displays meegegeve
-
-diplays
-- option to add delete buttons
 
 provide display settings schema in json form
 - - generate auto documentation for displays
@@ -54,9 +54,8 @@ php request.php : error if entity class not found
 
 replace /source?meta with /entity/source
 
-add samples to types for testing
 
-Storage_directory: split directory on spaces,comma's or (semi)colons
+Connector_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
 drag&drop: als er een reference input veld is dan worden die entities sleepbaar
@@ -91,6 +90,5 @@ types:
  - time
  - type type : meta :)
  - datetime
- - json : infinite subProperty paths
 
 maybe entity inheritance

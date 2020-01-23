@@ -71,6 +71,6 @@ GET /api/account/12,23/name,email
 }
 
 HttpRequest2::ApiRequest -> connectorRequests[] -> PropertyRequests[]
--> PropertyResponses[] -> StorageResponses[] -> EntityResponses[] -> RequestResponses[] -> HttpResponse2::ApiResponse
+-> PropertyResponses[] -> ConnectorResponses[] -> EntityResponses[] -> RequestResponses[] -> HttpResponse2::ApiResponse
 
 

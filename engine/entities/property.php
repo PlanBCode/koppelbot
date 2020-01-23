@@ -61,22 +61,22 @@ class  PropertyRequest
         $this->query = $query;
         if ($status !== 200) {
             $this->status = $status;
-            $this->connectorString = Connector::STORAGE_STRING_ERROR;
+            $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
             $this->content = $propertyOrError;
         } elseif (is_string($propertyOrError)) {
             $this->status = 500;
-            $this->connectorString = Connector::STORAGE_STRING_ERROR;
+            $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
             $this->content = $propertyOrError;
         } else {
             $this->property = $propertyOrError;
             $this->content = $propertyContent;
             $this->status = 200;
-            $connectorSettings = $this->property->getStorageSettings();
+            $connectorSettings = $this->property->getConnectorSettings();
             $connectorType = array_get($connectorSettings, 'type');
-            $this->connectorString = Connector::addStorage($connectorType, $connectorSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
-            if ($this->connectorString === Connector::STORAGE_STRING_ERROR) {
+            $this->connectorString = Connector::addConnector($connectorType, $connectorSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
+            if ($this->connectorString === Connector::CONNECTOR_STRING_ERROR) {
                 $this->status = 500;
-                $this->content = 'Storage failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
+                $this->content = 'Connector failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
             }
 
         }
@@ -137,9 +137,14 @@ class  PropertyRequest
         return $this->query;
     }
 
-    public function getStorageString(): string
+    public function getConnectorString(): string
     {
         return $this->connectorString;
+    }
+
+    public function processBeforeConnector(&$newContent, &$currentContent)
+    {
+        return $this->property->processBeforeConnector($this->method, $newContent, $currentContent);
     }
 }
 
@@ -202,7 +207,7 @@ class PropertyHandle
 class Property
 {
     const PROPERTY_TYPE = 'type';
-    const PROPERTY_STORAGE = 'connector';
+    const PROPERTY_CONNECTOR = 'connector';
     const PROPERTY_ACCESS = 'access';
     const PROPERTY_REQUIRED = 'required';
 
@@ -246,9 +251,9 @@ class Property
         $required = !is_null(getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings));
         $this->settings['required'] = $required;
 
-        $settingStorage = array_get($settings, self::PROPERTY_STORAGE, []);
-        $rootSettingStorage = array_get($rootSettings, self::PROPERTY_STORAGE, []);
-        $connector = array_merge($rootSettingStorage, $settingStorage);
+        $settingConnector = array_get($settings, self::PROPERTY_CONNECTOR, []);
+        $rootSettingConnector = array_get($rootSettings, self::PROPERTY_CONNECTOR, []);
+        $connector = array_merge($rootSettingConnector, $settingConnector);
         $this->settings['connector'] = $connector;
 
         $signatureProperties = array_get($this->settings, 'signature');
@@ -374,7 +379,7 @@ class Property
         }
     }
 
-    public function getStorageSettings(): array
+    public function getConnectorSettings(): array
     {
         return $this->settings['connector'];
     }
@@ -389,8 +394,13 @@ class Property
         return $this->typeClass::validateContent($content, $this->settings);
     }
 
-    public function getStorageSetting($settingName, $default = null)
+    public function getConnectorSetting($settingName, $default = null)
     {
         return array_get($this->settings['connector'], $settingName, $default);
+    }
+
+    public function processBeforeConnector(string $method, &$newContent, &$currentContent)
+    {
+        return $this->typeClass::processBeforeConnector($method, $newContent, $currentContent);
     }
 }

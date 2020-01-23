@@ -60,7 +60,7 @@ function creator(xyz, options, uri, settings, propertyName, data) {
         console.error('problem1'); //TODO return a TR containing the error
         return [];
     }
-    const entityClassName= uriTools.pathFromUri(uri)[0];
+    const entityClassName = uriTools.pathFromUri(uri)[0];
     if (type === 'id' && xyz.isAutoIncremented(entityClassName)) {
         return [];
     }
@@ -79,6 +79,7 @@ function creator(xyz, options, uri, settings, propertyName, data) {
         TR.appendChild(TD_label);
     }
     const onChange = (content, subUri) => { //TODO use subUri path
+        subUri = typeof subUri === 'number' ? subUri.toString() : subUri;
         const keyPath = typeof subUri === 'undefined' ?
             [propertyName] :
             [propertyName, ...subUri.split('/')];

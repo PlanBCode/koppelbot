@@ -4,11 +4,11 @@ require './engine/connectors/connectorResponse.php';
 
 abstract class Connector
 {
-    const STORAGE_STRING_META = 'META';
-    const STORAGE_STRING_ERROR = 'ERROR';
+    const CONNECTOR_STRING_META = 'META';
+    const CONNECTOR_STRING_ERROR = 'ERROR';
 
     /** @var Connector[] */
-    private static $connectors = []; // string $connectorString -> Storage
+    private static $connectors = []; // string $connectorString -> Connector
     private static $connectorClasses = [];
 
     static public function getConnectorClass(string $typeName)
@@ -25,14 +25,14 @@ abstract class Connector
 
             require_once $fileName;
 
-            $connectorClass = 'Storage_' . $typeName;
+            $connectorClass = 'Connector_' . $typeName;
             if (!class_exists($connectorClass)) {
-                echo 'ERROR Storage ' . $typeName . ' : class is not defined!';
+                echo 'ERROR Connector ' . $typeName . ' : class is not defined!';
                 return null;
             }
         }
         /* TODO this does not work without instantiating:
-            if (!is_subclass_of($typeClass, 'Storage')) {
+            if (!is_subclass_of($typeClass, 'Connector')) {
              echo 'ERROR Type ' . $typeName . ' : class does not extend Type!';
              return null;
          }*/
@@ -45,11 +45,11 @@ abstract class Connector
     require_once './engine/core/connectors/' . $type . '.php';
 
     //TODO find the file and load it from there
-    $connectorClass = 'Storage_' . $type;
+    $connectorClass = 'Connector_' . $type;
     if (!class_exists($connectorClass)) {
-        return self::STORAGE_STRING_ERROR;
+        return self::CONNECTOR_STRING_ERROR;
     }
-    //TODO check if $connectorClass extends Storage class
+    //TODO check if $connectorClass extends Connector class
 
  */
 
@@ -78,16 +78,16 @@ static function createErrorResponse(connectorRequest $connectorRequest): connect
 }
 
 public
-static function addStorage(string $typeName, array $connectorSettings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+static function addConnector(string $typeName, array $connectorSettings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
 {
     if ($query->checkToggle('meta')) {
-        return self::STORAGE_STRING_META;
+        return self::CONNECTOR_STRING_META;
     }
 
     $connectorClass = self::getConnectorClass($typeName);
 
 
-    $connectorString = $typeName . '_' . $connectorClass::getStorageString($connectorSettings, $method, $entityClass, $entityId, $propertyPath, $query);
+    $connectorString = $typeName . '_' . $connectorClass::getConnectorString($connectorSettings, $method, $entityClass, $entityId, $propertyPath, $query);
 
     if (!array_key_exists($connectorString, self::$connectors)) {
         self::$connectors[$connectorString] = new $connectorClass($connectorSettings);
@@ -99,26 +99,26 @@ static function addStorage(string $typeName, array $connectorSettings, string $m
 }
 
 public
-static function getStorageResponse(connectorRequest $connectorRequest): connectorResponse
+static function getConnectorResponse(connectorRequest $connectorRequest): connectorResponse
 {
     /** @var PropertyRequest|null $propertyRequest */
     $propertyRequest = array_get($connectorRequest->getPropertyRequests(), 0);
     if (!$propertyRequest instanceof PropertyRequest) {
         return Connector::createErrorResponse($connectorRequest);
     }
-    $connectorString = $propertyRequest->getStorageString();
+    $connectorString = $propertyRequest->getConnectorString();
 
     switch ($connectorString) {
-        case self::STORAGE_STRING_ERROR:
+        case self::CONNECTOR_STRING_ERROR:
             return Connector::createErrorResponse($connectorRequest);
-        case self::STORAGE_STRING_META:
+        case self::CONNECTOR_STRING_META:
             return Connector::createMetaResponse($connectorRequest);
         default:
             return Connector::$connectors[$connectorString]->createResponse($connectorRequest);
     }
 }
 
-abstract static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
+abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
 
     abstract public function createResponse(connectorRequest $connectorRequest): connectorResponse;
 }

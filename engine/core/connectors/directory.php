@@ -16,7 +16,7 @@ require_once './engine/core/connectors/basic.php';
    TODO modified/created = timestamps
  */
 
-class Storage_directory extends BasicConnector
+class Connector_directory extends BasicConnector
 {
     /*
     create directories if required
@@ -42,7 +42,7 @@ class Storage_directory extends BasicConnector
         return $this->path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
     }
 
-    static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
     {
         $path = array_get($settings, 'path');
         $extension = array_get($settings, 'extension', '*');
@@ -98,7 +98,7 @@ class Storage_directory extends BasicConnector
         }
 
         $this->data = [];
-        $parse = $propertyRequest->getProperty()->getStorageSetting('parse', 'none');
+        $parse = $propertyRequest->getProperty()->getConnectorSetting('parse', 'none');
         foreach ($entityIds as $entityId) {
             $filePath = $this->createFilePath($entityId);
 
@@ -125,7 +125,7 @@ class Storage_directory extends BasicConnector
         if (!$propertyRequest) {
             return new connectorResponse(500);
         }
-        $parse = $propertyRequest->getProperty()->getStorageSetting('parse', 'none');
+        $parse = $propertyRequest->getProperty()->getConnectorSetting('parse', 'none');
 
         foreach ($this->data as $entityId => $data) {
             if (!$connectorRequest->isReadOnly($entityId) || !is_null($this->maxAutoIncrementedId)) {

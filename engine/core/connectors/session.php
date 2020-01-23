@@ -2,7 +2,7 @@
 
 class Connector_session extends Connector
 {
-    static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
     {
         return $method;
     }
@@ -48,9 +48,19 @@ class Connector_session extends Connector
             return $connectorResponse->add(200, $propertyRequest, $userName, 'Login successfull');
         } else if (array_key_exists('content', $_SESSION) && array_key_exists($userName, $_SESSION['content'])) {
             $keyPath = array_merge(['content', $userName], $propertyRequest->getPropertyPath());
-            $content = $propertyRequest->getContent();
-            $jsonActionResponse = json_set($_SESSION, $keyPath, $content);
-            if ($jsonActionResponse->succeeded()) {
+            $newContent = $propertyRequest->getContent();
+
+            $jsonActionResponseGet = json_get($_SESSION, $keyPath);
+            $currentContent = $jsonActionResponseGet->succeeded()?$jsonActionResponseGet->content:null;
+
+            $processResponse = $propertyRequest->processBeforeConnector($newContent, $currentContent);
+            if(!$processResponse->succeeded()){
+                $connectorResponse->add($processResponse->getStatus(), $propertyRequest, $userName, $processResponse->getError());
+            }
+
+            $newContent =  $processResponse->getContent();
+            $jsonActionResponseSet = json_set($_SESSION, $keyPath, $newContent);
+            if ($jsonActionResponseSet->succeeded()) {
                 return $connectorResponse->add(200, $propertyRequest, $userName, null);
             } else {
                 return $connectorResponse->add(500, $propertyRequest, $userName, 'Data could not be stored.');

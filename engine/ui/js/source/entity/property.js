@@ -244,8 +244,6 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getIdFromContent = data => {
         if (isPrimitive) {
-            console.log('a', isId)
-
             return isId ? data : null;
         } else {
 

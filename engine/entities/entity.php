@@ -169,7 +169,7 @@ class EntityClass
         /** @var connectorRequest[] */
         $connectorRequests = [];
         foreach ($propertyRequests as $propertyRequest) {
-            $connectorString = $propertyRequest->getStorageString();
+            $connectorString = $propertyRequest->getConnectorString();
             if (!array_key_exists($connectorString, $connectorRequests)) {
                 $connectorRequests[$connectorString] = new connectorRequest();
             }

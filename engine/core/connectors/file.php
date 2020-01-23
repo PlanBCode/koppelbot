@@ -1,5 +1,6 @@
 <?php
 require_once './engine/core/connectors/basic.php';
+
 /*
     general connector settings
       path   "/path/to/basename.extension"
@@ -11,20 +12,20 @@ require_once './engine/core/connectors/basic.php';
       key: "content.a.b"
  */
 
-class Storage_file extends BasicConnector
+class Connector_file extends BasicConnector
 {
     //TODO create directories if required
-
-
     protected $path;
     protected $data;
+    protected $extension;
 
     public function __construct(array $settings)
     {
         $this->path = array_get($settings, 'path');
+        $this->extension = array_get($settings, 'extension', '*');
     }
 
-    static protected function getStorageString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
     {
         return array_get($settings, 'path');
     }
@@ -38,7 +39,7 @@ class Storage_file extends BasicConnector
                 $this->data = [];
             }
         } else {
-            $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+            $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getConnectorSetting('parse');
             //TODO lock file
             $fileContent = file_get_contents($this->path);
             if ($parse === 'json') {
@@ -54,7 +55,7 @@ class Storage_file extends BasicConnector
     protected function close(connectorRequest $connectorRequest): connectorResponse
     {
         if (!$connectorRequest->isReadOnly()) {
-            $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getStorageSetting('parse');
+            $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getConnectorSetting('parse');
             if ($parse === 'json') {
                 $fileContent = json_encode($this->data);
             } else { //TODO xml, yaml,csv,tsv

@@ -1,5 +1,41 @@
 <?php
 
+Class ProcessResponse
+{
+    /** @var int */
+    protected $status;
+    protected $content;
+    /** @var string */
+    protected $error;
+
+    public function __construct(int $status, &$content = null, string $error = '')
+    {
+        $this->status = $status;
+        $this->content =& $content;
+        $this->error = $error;
+    }
+
+    public function succeeded(): bool
+    {
+        return $this->status === 200;
+    }
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function getError(): string
+    {
+        return $this->error;
+    }
+}
+
 abstract class Type
 {
     /** @var Type[] */
@@ -28,14 +64,12 @@ abstract class Type
                     echo 'ERROR Type ' . $typeName . ' : class is not defined!';
                     return null;
                 }
-
-
             }
-           /* TODO this does not work without instantiating:
-               if (!is_subclass_of($typeClass, 'Type')) {
-                echo 'ERROR Type ' . $typeName . ' : class does not extend Type!';
-                return null;
-            }*/
+            /* TODO this does not work without instantiating:
+                if (!is_subclass_of($typeClass, 'Type')) {
+                 echo 'ERROR Type ' . $typeName . ' : class does not extend Type!';
+                 return null;
+             }*/
 
             self::$types[$typeName] = $typeClass;
             return $typeClass;
@@ -59,6 +93,11 @@ abstract class Type
             return 'SIGNATURE ERROR';
         }
     }
+
+    static function processBeforeConnector(string $method, &$newContent, &$currentContent): ProcessResponse
+    {
+        return new ProcessResponse(200, $newContent);
+    }
 }
 
 class Type_type extends Type
@@ -67,9 +106,4 @@ class Type_type extends Type
     {
         return true;
     }
-
-    /*static function signature(array &$settings)
-    {
-        //TODO
-    }*/
 }
