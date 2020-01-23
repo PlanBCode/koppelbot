@@ -1,101 +1,12 @@
 <?php
+require './engine/connectors/connectorRequest.php';
+require './engine/connectors/connectorResponse.php';
 
+//TODO autoload
 require './engine/core/connectors/basic.php';
 require './engine/core/connectors/file.php';
 require './engine/core/connectors/directory.php';
 require './engine/core/connectors/session.php';
-
-/*
-
-  if for multiple properties storage json is the same except for property then offer them merged to Storage
-
- */
-
-class StorageRequest
-{
-    /** @var PropertyRequest[] */
-    protected $propertyRequests = [];
-
-    public function add($propertyRequest): void
-    {
-        $this->propertyRequests[] = $propertyRequest;
-    }
-
-    public function merge($storageRequest): void
-    {
-        array_push($this->propertyRequests, ...$storageRequest->propertyRequests);
-    }
-
-    public function getPropertyRequests(): array
-    {
-        return $this->propertyRequests;
-    }
-
-    public function getFirstPropertyRequest(): PropertyRequest
-    {
-        return reset($this->propertyRequests);
-    }
-
-    public function isReadOnly(string $entityId = ''): bool
-    {
-        foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->isReadOnly()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public function isDeletion(string $entityId = ''): bool
-    {
-        foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && $propertyRequest->isDeletion()) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-class StorageResponse extends Response
-{
-    /** @var RequestResponse[] */
-    protected $requestResponses = [];
-
-    public function __construct(int $status = 200)
-    {
-        $this->addStatus($status);
-    }
-
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): StorageResponse
-    {
-        $this->addStatus($status);
-        $requestId = $propertyRequest->getRequestId();
-        if (!array_key_exists($requestId, $this->requestResponses)) {
-            $this->requestResponses[$requestId] = new RequestResponse($requestId);
-        }
-        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
-        return $this;
-    }
-
-    public function merge(StorageResponse $storageResponse): StorageResponse
-    {
-        $this->addStatus($storageResponse->getStatus());
-        foreach ($storageResponse->requestResponses as $requestId => $requestResponse) {
-            if (!array_key_exists($requestId, $this->requestResponses)) {
-                $this->requestResponses[$requestId] = $requestResponse;
-            } else {
-                $this->requestResponses[$requestId]->merge($requestResponse);
-            }
-        }
-        return $this;
-    }
-
-    public function getRequestResponses(): array
-    {
-        return $this->requestResponses;
-    }
-}
 
 abstract class Storage
 {

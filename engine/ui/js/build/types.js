@@ -8,6 +8,7 @@ exports.id = require('../../../core/types/id.js').actions;
 exports.json = require('../../../core/types/json.js').actions;
 exports.number = require('../../../core/types/number.js').actions;
 exports.object = require('../../../core/types/object.js').actions;
+exports.password = require('../../../core/types/password.js').actions;
 exports.reference = require('../../../core/types/reference.js').actions;
 exports.string = require('../../../core/types/string.js').actions;
 exports.type = require('../../../core/types/type.js').actions;

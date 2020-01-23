@@ -11,6 +11,9 @@
     "regex": "^TODO$",
     "default": "hello@default.com"
   },
+  "password": {
+    "type": "password"
+  },
   "title": {
     "type": "string",
     "regex": "^TODO$"

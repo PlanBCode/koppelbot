@@ -42,6 +42,7 @@ class Storage_session extends Storage
         } elseif ($propertyName === 'username') {
             return $storageResponse->add(200, $propertyRequest, $userName, $userName);
         } elseif ($propertyName === 'password') {
+            //TODO verify password with /account/username/password
             if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
             $_SESSION['content'][$userName] = [];
             return $storageResponse->add(200, $propertyRequest, $userName, 'Login successfull');
@@ -61,7 +62,6 @@ class Storage_session extends Storage
 
     protected function logout(PropertyRequest &$propertyRequest): StorageResponse
     {
-        //TODO implement
         $storageResponse = new StorageResponse();
         $userName = $propertyRequest->getEntityId();
         if ($userName === '*') {

@@ -2,9 +2,13 @@ TODO
 
 add a reference to account in session?
 
-logout ~ delete entities
+password type? on create: confirm password
+on put /account/password -> hash it
+- type : post process? pre process? -> flows
 
-Request was empty => response was empty
+rename storage to connector
+
+load storage connectors when needed based on their file
 
 file type: viewer   https://viewerjs.org/
 
@@ -21,9 +25,6 @@ werkend maken:
 - xyz.create('/source?content=default');
 - xyz.create('/$type', {});
 
-rename storage to connector
-
-load storage connectors when needed based on their file
 
 filtering & searching:
 - query->getStorageRequests
@@ -55,21 +56,14 @@ php request.php : error if entity class not found
 - werkt ook niet:  http://localhost:8888/site/api/*
 - - zou het moeten werken? iig goede foutmelding
 
-meta entity
-- property "*": {type='type'}  dynamic number of properties
-- type = type : validation en signature baseren op $type.json = settings voor settings
-- /meta/source
-- - property "*" : { "signature":{type:type:"","*":"*"}
-- move to ./core/entities
+replace /source?meta with /entity/source
 
 add samples to types for testing
 
 Storage_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
-drag&drop
-- als er een reference input veld is dan worden die entities sleepbaar
-
+drag&drop: als er een reference input veld is dan worden die entities sleepbaar
 
 hide private storage settings or better only expose specified ones
 
@@ -80,12 +74,6 @@ add dot notation: /source/*/file.content,id
 
 use the plugin structure
 /custom/$PLUGINNAME/
-- types/
-- displays/
-- content/
-- entities/   (datamodel)
-- connectors/  (storage)
-- flows/
 - package.json
 
 Pass more stuff by reference

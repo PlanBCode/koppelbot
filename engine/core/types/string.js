@@ -7,7 +7,9 @@ exports.actions = {
         }
 
         //TODO add validation regex
-
+        if (item.getSetting('password') === true) {
+            INPUT.type = 'password';
+        }
         if (item.patch) {
             INPUT.oninput = () => {
                 item.patch(INPUT.value)
@@ -24,27 +26,31 @@ exports.actions = {
     },
     view: function (item) {
         const SPAN = document.createElement('SPAN');
-        switch (item.getStatus()) {
-            case 500 :
-                SPAN.innerText = 'Server error';
-                break;
-            case 400 :
-                SPAN.innerText = 'Bad request';
-                break;
-            case 403 :
-                SPAN.innerText = 'Forbidden';
-                break;
-            case 404 :
-                SPAN.innerText = 'Not found';
-                break;
-            default:
-                SPAN.innerText = item.getContent();
-                break;
-        }
-        item.onChange(node => {
-            //TODO use status stuff from above
-            SPAN.innerText = node.getContent();
-        });
+        const onChangeHandler = node => {
+            switch (item.getStatus()) {
+                case 500 :
+                    SPAN.innerText = 'Server error';
+                    break;
+                case 400 :
+                    SPAN.innerText = 'Bad request';
+                    break;
+                case 403 :
+                    SPAN.innerText = 'Forbidden';
+                    break;
+                case 404 :
+                    SPAN.innerText = 'Not found';
+                    break;
+                default:
+                    if (item.getSetting('password') === true) {
+                        SPAN.innerText = '***';
+                    } else {
+                        SPAN.innerText = item.getContent();
+                    }
+                    break;
+            }
+        };
+        onChangeHandler(item);
+        item.onChange(onChangeHandler);
         return SPAN;
     },
     validateContent: function (item) {

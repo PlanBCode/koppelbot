@@ -8,6 +8,7 @@
     "type": "id"
   },
   "password": {
-    "type": "string"
+    "type": "string",
+    "password": true
   }
 }
