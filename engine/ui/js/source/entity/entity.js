@@ -260,29 +260,31 @@ const handleInput = (method, uri, status, content, entityClasses) => {
                 const entityClassStatus = entityClass207Wrapper.status;
                 const entityClassContent = entityClass207Wrapper.content;
                 const entityClass = entityClasses[entityClassName];
-                let entityIds;
-                if (entityIdList === '*') {
-                    entityIds = Object.keys(entityClassContent);
-                } else {
-                    entityIds = entityIdList.split(',');
-                }
+                const entityIds = (entityIdList === '*')
+                    ? Object.keys(entityClassContent)
+                    : entityIdList.split(',');
                 const entityClassState = entityClass.handleInput(method, entityClassStatus, entityClassContent, entityIds);
                 state.addSubState(entityClassState);
             }
         }
     } else {
         for (let entityClassName of entityClassNames) {
-            //TODO check if content of right form otherwise null
             const entityClassContent = content[entityClassName];
-            const entityClass = entityClasses[entityClassName];
-            let entityIds;
-            if (entityIdList === '*') {
-                entityIds = Object.keys(entityClassContent);
+            if (entityClassContent === null || typeof entityClassContent !== 'object') {
+                const entityIds = entityIdList === '*'
+                    ? []
+                    : entityIdList.split(',');
+                const entityClass = entityClasses[entityClassName];
+                const entityClassState = entityClass.handleInput(method, 404, {}, entityIds);
+                state.addSubState(entityClassState);
             } else {
-                entityIds = entityIdList.split(',');
+                const entityIds = entityIdList === '*'
+                    ? Object.keys(entityClassContent)
+                    : entityIdList.split(',');
+                const entityClass = entityClasses[entityClassName];
+                const entityClassState = entityClass.handleInput(method, status, entityClassContent, entityIds);
+                state.addSubState(entityClassState);
             }
-            const entityClassState = entityClass.handleInput(method, status, entityClassContent, entityIds);
-            state.addSubState(entityClassState);
         }
     }
     return state;

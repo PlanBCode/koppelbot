@@ -88,8 +88,8 @@ class ApiResponse extends HttpResponse2
     {
         $count = count($requestResponses);
         if ($count == 0) {
-            parent::__construct(400, 'Request was empty');
-        } elseif ($method != 'POST') {
+            parent::__construct(200, '{}');
+        } elseif ($method !== 'POST') {
             $requestResponse = array_values($requestResponses)[0];
             $data = $requestResponse->getContent();
             parent::__construct($requestResponse->getStatus(), json_encode($data));
