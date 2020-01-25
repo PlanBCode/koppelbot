@@ -13,33 +13,31 @@ require './engine/ui/ui.php';
 session_start();
 
 if (PHP_SAPI === 'cli') {
+    require './engine/cli/cli.php';
 
+    $cliOptions = [
+        new CliOption('m', 'method', 1, "Set HTTP method. ", "GET"),
+    ];
     /*TODO
-    short, long   args
-                   2    requestUri , content
+        new CliOption('H', 'headers', 1, "Set HTTP headers. ", ""),
+   -f  --file     set file input
+   -i  --interactive interactive modo
+   -v  --verbose  set verbose debuggin
+   }*/
 
-    -m  --method   set methode
-    -h  --headers  set headers
-    -f  --file     set file input
-    -i  --interactive interactive modo
-    -v  --verbose  set verbose debuggin
-
-    $opts = [];
-    if(isset($argc)){
-        for ($i = 0; $i < $argc; $i++) {
-            $arg = $argv[$i];
-            if()
-        }
-    }*/
-
-    $headers = [];
+    $options = getCliOptions($cliOptions,$argc, $argv);
+    if($options['help']){
+        exit(0);
+    }
+    $headers = [];//TODO
     $requestUri = $argc > 1
         ? $argv[1]
         : '';
     $uriQueryString = explode('?', $requestUri);
     $uri = array_get($uriQueryString, 0, '');
     $queryString = array_get($uriQueryString, 1, '');
-    $method = 'GET';
+    $method = array_get($options, 'method', 'GET');
+    echo $method;
 } else {
     $headers = getallheaders();
     $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
