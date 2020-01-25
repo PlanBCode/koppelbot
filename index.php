@@ -31,8 +31,9 @@ if (PHP_SAPI === 'cli') {
     }
     $headers = [];//TODO
     $requestUri = $argc > 1
-        ? $argv[1]
+        ? '/api'.$argv[1]
         : '';
+
     $uriQueryString = explode('?', $requestUri);
     $uri = array_get($uriQueryString, 0, '');
     $queryString = array_get($uriQueryString, 1, '');
