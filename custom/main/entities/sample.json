@@ -48,7 +48,7 @@
     "connector": {
       "type": "directory",
       "parse": "none",
-      "path": "data/sources/",
+      "path": "data/samples/",
       "extension": "meta",
       "key": "content"
     }

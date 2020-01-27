@@ -47,11 +47,15 @@ exports.handlePrimitive = (element, contents, statusses) => (method, entityId, r
                 if (changed(prevPropertyContent, responseContent) && typeof responseContent !== 'undefined') {
                     state.setChanged();
                 }
-                contents[entityId] = responseContent;
+                if ((method === 'PATCH' || method === 'PUT' || method === 'POST') && responseContent === null) {
+                    contents[entityId] = requestContent;
+                } else {
+                    contents[entityId] = responseContent;
+                }
                 break;
             case 404:
                 //TODO use message frop source if available
-                // TODO check if error is new eg compare with current error in errors
+                //TODO check if error is new eg compare with current error in errors
                 state.setError(404, 'Not found');
                 break;
             default:

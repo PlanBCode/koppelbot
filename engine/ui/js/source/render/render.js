@@ -5,7 +5,9 @@ const json = require('../web/json.js');
 
 const DEFAULT_TYPE = 'string';
 
-function element(xyz, action, uri, status, content, settings, options) {
+function element(xyz, action, uri, subPropertyPath, status, content, settings, options) {
+    console.log('element', uri, subPropertyPath);
+
     const type = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(type)) {
         console.error('problem1');
@@ -14,17 +16,19 @@ function element(xyz, action, uri, status, content, settings, options) {
     if (types[type].hasOwnProperty(action)) {
         let onChange, onDelete;
         if (action === 'edit') {
-            onChange = (content, subUri) => { //TODO use subUri
-                subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
-                xyz.patch(uri + subUri, uriTools.wrapContent(uri, content));
+            onChange = (content, additionalSubPropertyPath) => {
+                additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
+                const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
+                xyz.patch(uri + subUri, uriTools.wrapContent(uri+subUri, content));
             };
             onDelete = subUri => {
+                //TODO use subPropertyPath
                 subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
                 xyz.delete(uri + subUri);
             };
         }
 
-        const item = new Item(xyz, uri, status, content, settings, options, onChange, onDelete);
+        const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
         const TAG = types[type][action](item); // TODO
         //  item.forceChange();
 
@@ -43,7 +47,7 @@ function element(xyz, action, uri, status, content, settings, options) {
             const subContent = content[subPropertyName];
             const subType = subSettings.type;
             const subUri = uri + '/' + subPropertyName;
-            const TAG = element(xyz, subType, action, subUri, status, subContent, subSettings, options);
+            const TAG = element(xyz, subType, action, subUri, subPropertyPath.concat([subPropertyName]), status, subContent, subSettings, options);
             TAG.className = `xyz-status-${status}`;
             DIV.appendChild(TAG);
         }
@@ -54,7 +58,10 @@ function element(xyz, action, uri, status, content, settings, options) {
     }
 }
 
-function creator(xyz, options, uri, settings, propertyName, data) {
+function creator(xyz, options, uri, settings, subPropertyPath, data) {
+
+    console.log('creator', uri, subPropertyPath);
+
     const typeName = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(typeName)) {
         console.error('problem1'); //TODO return a TR containing the error
@@ -77,32 +84,35 @@ function creator(xyz, options, uri, settings, propertyName, data) {
     const TR = document.createElement('TR');
     if (options.showLabels !== false) {
         const TD_label = document.createElement('TD');
-        TD_label.innerText = propertyName;
+        TD_label.innerText = subPropertyPath[0];
         TR.appendChild(TD_label);
     }
-    const onChange = (content, subUri) => {
-        subUri = typeof subUri === 'number' ? subUri.toString() : subUri;
-        const keyPath = typeof subUri === 'undefined' ?
-            [propertyName] :
-            [propertyName, ...subUri.split('/')];
+    const onChange = (content, additionalSubPropertyPath) => {
+        const keyPath = typeof additionalSubPropertyPath === 'undefined'
+            ? subPropertyPath
+            : subPropertyPath.concat(additionalSubPropertyPath);
         json.set(data, keyPath, content);
     };
     const onDelete = subUri => {
+        //TODO rewrite for subPropertyPath
         const keyPath = typeof subUri === 'undefined' ?
-            [propertyName] :
-            [propertyName, ...subUri.split('/')];
+            [subPropertyPath] :
+            [...subPropertyPath, ...subUri.split('/')];
         json.unset(data, keyPath);
     };
-    let content = null;
-    if(settings.hasOwnProperty('default')) {
-        content = settings.default;
-    }else if(type.json.hasOwnProperty('default') && type.json.default.hasOwnProperty('default')){
-        // does the default have a default
-        content = type.json.default.default;
-    }
-    data[propertyName] = content;
 
-    const item = new Item(xyz, uri, 200, content, settings, options, onChange, onDelete, data);
+    let content = json.get(data, subPropertyPath);
+    if (content === null) {
+        if (settings.hasOwnProperty('default')) {
+            content = settings.default;
+        } else if (type.json.hasOwnProperty('default') && type.json.default.hasOwnProperty('default')) {
+            // does the default have a default
+            content = type.json.default.default;
+        }
+        json.set(data, subPropertyPath, content);
+    }
+
+    const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
     const ELEMENT = type.edit(item);
     // TODO add id from options (also for label for)
     // TODO add class from options

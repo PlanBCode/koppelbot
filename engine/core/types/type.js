@@ -31,7 +31,7 @@ exports.actions = {
                 const subContent = content[key];
 
                 const subOnChange = (newContent, subUri2) => {
-                    originalItem.patch(newContent, key);
+                    originalItem.patch(newContent, [key]);
                 };
                 const TAG = originalItem.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, {onChange:subOnChange});
                 TD_value.appendChild(TAG);

@@ -26,14 +26,14 @@ exports.actions = {
 
         const subSettings = item.getSetting('subType');
         const subOptions = {showLabels: false, display: item.getOption('display')};
-        const newContent = null;//TODO default value
         const DIV_CREATE = document.createElement('TABLE');
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
         //TODO add class
         INPUT_create.value = "Add";
         const data = {};
-        const TRs = item.creator(subOptions, item.getUri(), subSettings, 'new', data);
+
+        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings,[0], data);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
 
@@ -43,6 +43,7 @@ exports.actions = {
 
         const rows = [];
         const addRow = (key, subContent) => {
+            console.log('addRow', key,subContent);
             const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
             const DIV_sub = document.createElement('DIV');
             const INPUT_remove = document.createElement('INPUT');
@@ -58,9 +59,9 @@ exports.actions = {
         };
 
         INPUT_create.onclick = () => {
-            console.log('xxx', content.length, data['new'], data); //TODO
-            addRow(content.length, data['new']);
-            item.patch(data['new'], content.length);
+            console.log('xxx', data[0]); //TODO
+            addRow(content.length, data[0]);
+            item.patch(data[0], [content.length]);
         };
 
         for (let key in content) {

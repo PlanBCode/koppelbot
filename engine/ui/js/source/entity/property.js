@@ -111,7 +111,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
             const uri = this.getUri('$new');
-            return render.creator(xyz, options, uri, settings, propertyName, data);
+            return render.creator(xyz, options, uri, settings, [propertyName], data);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {
                 data[propertyName] = {};
@@ -163,7 +163,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             const uri = this.getUri(entityId);
             const content = contents[entityId];
             const status = statusses[entityId];
-            const TAG = render.element(xyz, action, uri, status, content, settings, options);
+            const TAG = render.element(xyz, action, uri, [], status, content, settings, options);
             return TAG;
         } else {
             //TODO loop through subproperties and render all

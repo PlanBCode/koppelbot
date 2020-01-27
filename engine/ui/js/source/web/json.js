@@ -41,7 +41,23 @@ function json_unset(object, keyPath) {
     }
 }
 
+
+function json_get(object, keyPath) {
+    {
+        const length = keyPath.length;
+        if (length === 0) {
+            return object;
+        }
+        if (typeof object !== 'object' || object === null) {
+            throw new TypeError('object not an object');
+        } else if (object.hasOwnProperty(keyPath[0])) {
+            return json_get(object[keyPath[0]], keyPath.slice(1));
+        }
+        return null;
+    }
+}
 //TODO json_get
 
+exports.get = json_get;
 exports.set = json_set;
 exports.unset = json_unset;

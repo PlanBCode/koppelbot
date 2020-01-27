@@ -1,5 +1,6 @@
 const setupOnChange = (item, TAGs_row, addRow) => item.onChange(item => {
     const content = item.getContent();
+    console.log('addRow',item.getMethod(),content)
     //TODO use   const status = item.getStatus();
     if (item.getMethod() === 'DELETE') {
         for (let key in content) {
@@ -39,21 +40,18 @@ exports.actions = {
         const TD_value = document.createElement('TD');
         const INPUT_key = document.createElement('INPUT');
 
-        const subUri = item.getUri() + '/$new';
-        const newContent = null;//TODO default value
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
         //TODO add class
         INPUT_create.value = "Add";
         const data = {};
-        const TRs = item.creator(subOptions, subUri, subSettings, '$new', data);
+        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, ['new'], data);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
         INPUT_create.onclick = () => {
             const key = INPUT_key.value;
-            data[key] = data['$new'];
-            delete data['$new'];
-            item.patch(data, key);
+            addTR(key, data['new']);
+            item.patch(data['new'], [key]);
         };
 
         TD_key.appendChild(INPUT_key);

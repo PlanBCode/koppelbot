@@ -1,13 +1,8 @@
 TODO
 
-
-
-array object creating is broken:
-- item.js
-- - pass initial value to creator
-- - determine propertyName by subtracting uri from subUri
-
-array object editing is broken
+object editing
+- handle add duplicate labels
+- keep values
 
 
 

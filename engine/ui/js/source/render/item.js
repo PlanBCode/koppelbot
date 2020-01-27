@@ -1,8 +1,12 @@
+const json = require('../web/json.js');
 const render = require('./render');
 
-function Item(xyz, uri, status, content, settings, options, onChange, onDelete, creatorData) {
+// onChange = (content, [additionalSubPropertyPath]) => {...}
+// onDelete = (content, [additionalSubPropertyPath]) => {...}
 
-    this.getUri = () => uri;
+function Item(xyz, baseUri, subPropertyPath, status, content, settings, options, onChange, onDelete, creatorData) {
+
+    this.getUri = () => baseUri;
     this.getStatus = () => status;
     this.getContent = () => content;
     this.getOptions = () => options;
@@ -12,28 +16,32 @@ function Item(xyz, uri, status, content, settings, options, onChange, onDelete, 
     this.getSetting = settingName => settings[settingName];
     this.hasSetting = settingName => settings.hasOwnProperty(settingName);
 
-    this.patch = (newContent, subUri) => (options.onChange || onChange)(newContent, subUri);
+    this.patch = (newContent, additionalSubPropertyPath) => {
+        console.log('x', newContent, subPropertyPath, additionalSubPropertyPath);
+        /*additionalSubPropertyPath = typeof additionalSubPropertyPath === 'undefined'
+            ? subPropertyPath
+            : subPropertyPath.concat(additionalSubPropertyPath);*/
+        (options.onChange || onChange)(newContent, additionalSubPropertyPath);
+    };
     this.delete = subUri => (options.onDelete || onDelete)(subUri);
 
-    this.renderSubElement = (action, subPropertyPath, status, content, settings, options_) => {
+    this.renderSubElement = (action, additionalSubPropertyPath, status, content, settings, options_) => {
         if (options.display === 'create') {
             const TABLE = document.createElement('TABLE');
             TABLE.style.display = 'inline-block';
-            //TODO pass initial value to creator
-            const TRs = render.creator(xyz, options_, uri, settings, 'TODO', creatorData);
+            json.set(creatorData, subPropertyPath.concat(additionalSubPropertyPath), content);
+            const TRs = render.creator(xyz, options_, baseUri, settings, subPropertyPath.concat(additionalSubPropertyPath), creatorData);
             for (let TR of TRs) {
                 TABLE.appendChild(TR);
             }
             return TABLE;
         } else {
-            const subUri = subPropertyPath.length > 0
-                ? uri + '/' + subPropertyPath.join('/')
-                : uri;
-            return render.element(xyz, action, subUri, status, content, settings, options_);
+            return render.element(xyz, action, baseUri, subPropertyPath.concat(additionalSubPropertyPath), status, content, settings, options_);
         }
     };
 
-    this.creator = (options, uri, settings, propertyName, data) => render.creator(xyz, options, uri, settings, propertyName, data);
+    this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData);
+
 
     //TODO this is not congruent with this.patch and this.delete
     this.get = (uri, dataCallback) => xyz.get(uri, dataCallback);
@@ -42,9 +50,15 @@ function Item(xyz, uri, status, content, settings, options, onChange, onDelete, 
     this.ui = xyz.ui;
     // callback = (status,content)=>{...}
     this.onChange = callback => {
-        if (typeof callback !== 'function') throw new TypeError("callback is not a function.");
-        xyz.on(uri, 'changed', (entityClass, entityId, node, eventName) => callback(node));
-        // TODO unregister these listeners somehow
+        console.log('onChange');
+        if (options.display !== 'create') {
+            if (typeof callback !== 'function') throw new TypeError("callback is not a function.");
+            const fullUri = subPropertyPath.length > 0
+                ? baseUri + '/' + subPropertyPath.join('/')
+                : baseUri;
+            xyz.on(fullUri, 'changed', (entityClass, entityId, node, eventName) => callback(node));
+            // TODO unregister these listeners somehow
+        }
     }
 
 }
