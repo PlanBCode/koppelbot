@@ -1,10 +1,26 @@
 TODO
 
+array object creating is broken:
+- item.js
+- - pass initial value to creator
+- - determine propertyName by subtracting uri from subUri
+
 array object editing is broken
 
+
+
 add samples to types&*entities for testing
-- API: create|delete|get|edit
 - UI: headless browser testing
+
+
+ resources: "usable"
+
+ const dom = new JSDOM(`<body>
+   <script>document.body.appendChild(document.createElement("hr"));</script>
+ </body>`, { runScripts: "dangerously" });
+
+ const jsdom = require("jsdom");
+ const { JSDOM } = jsdom;
 
 file type: viewer   https://viewerjs.org/
 

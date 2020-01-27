@@ -3,14 +3,19 @@ const setupOnChange = (item, TAGs_row, addRow) => item.onChange(item => {
     //TODO use   const status = item.getStatus();
     if (item.getMethod() === 'DELETE') {
         for (let key in content) {
-            if ((TAGs_row instanceof Array && TAGs_row.indexOf(key) !== -1) || (!(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key))) {
+            if (TAGs_row instanceof Array && key >=0 && key < TAGs_row.length) {
                 const TAG_row = TAGs_row[key];
+                TAGs_row.splice(key,1);
+                TAG_row.parentNode.removeChild(TAG_row);
+            }else if( !(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key)) {
+                const TAG_row = TAGs_row[key];
+                delete TAGs_row[key];
                 TAG_row.parentNode.removeChild(TAG_row);
             }
         }
     } else {
         for (let key in content) {
-            if ((TAGs_row instanceof Array && TAGs_row.indexOf(key) === -1) || (!(TAGs_row instanceof Array) && !TAGs_row.hasOwnProperty(key))) {
+            if ((TAGs_row instanceof Array && key >= TAGs_row.length) || (!(TAGs_row instanceof Array) && !TAGs_row.hasOwnProperty(key))) {
                 const subContent = content[key];
                 addRow(key, subContent);
             }
@@ -27,7 +32,7 @@ exports.actions = {
         //TODO check if content is array
         const content = item.getContent();
         const subSettings = item.getSetting('subType');
-        const subOptions = {showLabels: false};
+        const subOptions = {showLabels: false, display: item.getOption('display')};
         const TABLE = document.createElement('TABLE');
         const TR_add = document.createElement('TR');
         const TD_key = document.createElement('TD');

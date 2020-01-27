@@ -25,9 +25,8 @@
     },
     "type": "file"
   },
-  "account": {
-    "type": "reference",
-    "uri": "/account/*",
+  "note" : {
+    "type": "string",
     "connector": {
       "type": "directory",
       "parse": "none",

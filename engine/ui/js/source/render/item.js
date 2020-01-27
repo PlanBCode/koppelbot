@@ -1,6 +1,6 @@
 const render = require('./render');
 
-function Item(xyz, uri, status, content, settings, options, onChange, onDelete) {
+function Item(xyz, uri, status, content, settings, options, onChange, onDelete, creatorData) {
 
     this.getUri = () => uri;
     this.getStatus = () => status;
@@ -15,7 +15,20 @@ function Item(xyz, uri, status, content, settings, options, onChange, onDelete) 
     this.patch = (newContent, subUri) => (options.onChange || onChange)(newContent, subUri);
     this.delete = subUri => (options.onDelete || onDelete)(subUri);
 
-    this.renderElement = (action, uri, status, content, settings, options) => render.element(xyz, action, uri, status, content, settings, options);
+    this.renderElement = (action, uri, status, content, settings, options_) => {
+        if (options.display === 'create') {
+            const TABLE = document.createElement('TABLE');
+            TABLE.style.display = 'inline-block';
+            //TODO pass initial value to creator
+            const TRs = render.creator(xyz, options_, uri, settings, 'TODO', creatorData)
+            for(let TR of TRs){
+                TABLE.appendChild(TR);
+            }
+            return TABLE;
+        } else {
+            return render.element(xyz, action, uri, status, content, settings, options_);
+        }
+    };
 
     this.creator = (options, uri, settings, propertyName, data) => render.creator(xyz, options, uri, settings, propertyName, data);
 

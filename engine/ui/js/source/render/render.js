@@ -78,7 +78,7 @@ function creator(xyz, options, uri, settings, propertyName, data) {
         TD_label.innerText = propertyName;
         TR.appendChild(TD_label);
     }
-    const onChange = (content, subUri) => { //TODO use subUri path
+    const onChange = (content, subUri) => {
         subUri = typeof subUri === 'number' ? subUri.toString() : subUri;
         const keyPath = typeof subUri === 'undefined' ?
             [propertyName] :
@@ -91,7 +91,7 @@ function creator(xyz, options, uri, settings, propertyName, data) {
             [propertyName, ...subUri.split('/')];
         json.unset(data, keyPath);
     };
-    const item = new Item(xyz, uri, 200, content, settings, options, onChange, onDelete);
+    const item = new Item(xyz, uri, 200, content, settings, options, onChange, onDelete, data);
     const ELEMENT = types[type].edit(item);
     // TODO add id from options (also for label for)
     // TODO add class from options

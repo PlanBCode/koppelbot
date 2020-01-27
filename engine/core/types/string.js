@@ -27,7 +27,7 @@ exports.actions = {
     view: function (item) {
         const SPAN = document.createElement('SPAN');
         const onChangeHandler = node => {
-            switch (item.getStatus()) {
+            switch (node.getStatus()) {
                 case 500 :
                     SPAN.innerText = 'Server error';
                     break;
@@ -44,7 +44,7 @@ exports.actions = {
                     if (item.getSetting('password') === true) {
                         SPAN.innerText = '***';
                     } else {
-                        SPAN.innerText = item.getContent();
+                        SPAN.innerText = node.getContent();
                     }
                     break;
             }

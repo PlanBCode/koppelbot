@@ -1,19 +1,31 @@
 const object = require('./object');
 
+function makeArray(content) {
+    if (content === null) {
+        return [];
+    } else if (content instanceof Array) {
+        return content;
+    } else if (typeof content === 'object') { // if data is an object, reshape to array
+        const tmp = [];
+        for (let key in content) {
+            tmp[key] = content[key];
+        }
+        return tmp;
+    } else {
+        //TODO problem
+        return [];
+    }
+}
+
 exports.actions = {
     edit: function (item) {
         // TODO create ui for adding/removing elements
         // TODO create drop ui to drag elements to
         const SPAN = document.createElement('SPAN');
-
-        //TODO check if content is array
-        const content = item.getContent() === null
-            ? []
-            : item.getContent();
+        const content = makeArray(item.getContent());
 
         const subSettings = item.getSetting('subType');
-        const subOptions = {showLabels: false};
-
+        const subOptions = {showLabels: false, display: item.getOption('display')};
         const subUri = item.getUri() + '/' + content.length;
         const newContent = null;//TODO default value
         const DIV_CREATE = document.createElement('TABLE');
@@ -25,17 +37,15 @@ exports.actions = {
         const TRs = item.creator(subOptions, subUri, subSettings, content.length, data);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
-        INPUT_create.onclick = () => {
-            item.patch(data, content.length);
-        };
+
         DIV_CREATE.appendChild(TABLE_create);
         DIV_CREATE.appendChild(INPUT_create);
         SPAN.appendChild(DIV_CREATE);
 
         const rows = [];
         const addRow = (key, subContent) => {
-
             const subUri = item.getUri() + '/' + key;
+            console.log('a')
             const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
             const DIV_sub = document.createElement('DIV');
             const INPUT_remove = document.createElement('INPUT');
@@ -50,6 +60,10 @@ exports.actions = {
             SPAN.insertBefore(DIV_sub, DIV_CREATE);
         };
 
+        INPUT_create.onclick = () => {
+            addRow(content.length, data[content.length]);
+            item.patch(data, content.length);
+        };
 
         for (let key in content) {
             const subContent = content[key];
@@ -61,10 +75,9 @@ exports.actions = {
     },
     view: function (item) {
         const SPAN = document.createElement('SPAN');
-        //TODO check if content is array
         const subSettings = item.getSetting('subType');
         const subOptions = item.getOptions(); //TODO
-        const content = item.getContent();
+        const content = makeArray(item.getContent());
         const rows = [];
         const addRow = (key, subContent) => {
             const subUri = item.getUri() + '/' + key;
