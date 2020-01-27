@@ -1,4 +1,6 @@
 const entity = require('./entity/entity.js');
+
+const request = require('./request/request.js');
 const response = require('./entity/response.js');
 const uriTools = require('./uri/uri.js');
 const web = require('./web/web.js');
@@ -7,22 +9,6 @@ const displays = require('../build/displays');
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';
 const DEFAULT_TAG = 'DIV';
-
-function request(method, uri, data, callback) {
-    //TODO allow for multiple hosts by prepending http(s)://..
-    const location = 'http://localhost:8888/site/'; //TODO determine dynamically
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, location + 'api' + uri, true);
-
-    xhr.onreadystatechange = e => {
-        if (xhr.readyState === 4) {
-            const status = xhr.status;
-            const content = xhr.responseText;
-            callback(status, content);
-        }
-    };
-    xhr.send(data);
-}
 
 function XYZ() {
     const entityClasses = {};
@@ -102,103 +88,10 @@ function XYZ() {
         handleUri(uri, callbacks);
     }
 
-    const retrieveMeta = (uri, callback) => {
-        const path = uri.substr(1).split('/');
-        const entityClassNameList = path[0]; // TODO error if no entityClass
-
-        const entityClassNames = entityClassNameList.split(',').filter(entityClass => !entityClasses.hasOwnProperty((entityClass)));
-        if (entityClassNames.length === 0) {
-            callback();
-        } else {
-            request('GET', '/' + entityClassNames.join(',') + '?meta', undefined, (status, content) => {//TODO add querystring better
-                //TODO check status
-                console.log(uri + ' ' + content);
-                const data = JSON.parse(content); //TODO check
-                // TODO validate data
-                for (let entityClassName of entityClassNames) {
-                    if (!entityClasses.hasOwnProperty(entityClassName)) {
-                        entityClasses[entityClassName] = new entity.Class(this, entityClassName, data[entityClassName]['*']);
-                    }
-                }
-                callback();
-            });
-        }
-    };
-
-    this.patch = (uri, content) => {
-        console.log('patch request', uri, content);
-        content = typeof content === 'string' ? content : JSON.stringify(content);
-        request('PATCH', uri, content, (status, response) => {
-            //TODO check for errors
-            console.log('patch response:' + response, uri);
-            const state = entity.handleInput('PATCH', uri, status, content, entityClasses);
-        });
-    };
-
-    this.put = (uri, content) => {
-        console.log('put request', uri, content);
-        content = typeof content === 'string' ? content : JSON.stringify(content);
-        request('PUT', uri, content, (status, response) => {
-            //TODO check for errors
-            console.log('put response: ' + uri + ' ' + response);
-            entity.handleInput('PUT', uri, status, response, entityClasses);
-        });
-    };
-
-    this.delete = uri => {
-        request('DELETE', uri, null, (status, response) => {
-            console.log('delete response: ' + uri + ' ' + response);
-            entity.handleInput('DELETE', uri, status, response, entityClasses);
-        });
-    };
-
-    this.head = uri => {
-        request('HEAD', uri, null, (status, response) => {
-            console.log('head response: ' + uri + ' ' + response);
-        });
-    };
-
-    this.post = (uri, content) => {
-        console.log('post request', uri, content);
-        content = typeof content === 'string' ? content : JSON.stringify(content);
-        request('POST', uri, content, (status, response) => {
-            //TODO check for errors
-            console.log('post response:' + response, uri);
-            entity.handleInput('POST', uri, status, response, entityClasses);
-        });
-    };
-
-    // callback = Response =>{}
-    // get the requested uri from cache or request it from server
-    this.get = (uri, dataCallback, metaCallBack) => {
-        // get the meta data
-
-        retrieveMeta(uri, () => {
-            if (typeof metaCallBack === 'function') {
-                metaCallBack();
-            }
-
-            //TODO meta should be good or we have a problem
-            //TODO get the data from cache if already in cache
-            request('GET', uri, undefined, (status, content) => {//TODO add querystring better
-                const state = entity.handleInput('GET', uri, status, content, entityClasses);
-                //TODO  word er nog iets met state gedaan...?
-                if (typeof dataCallback === 'function') {
-                    const node = entity.getResponse(uri, entityClasses, 'GET');
-                    dataCallback(node);
-                }
-            });
-        });
-    };
-
-    this.isAutoIncremented = entityClassName => {
-        return entityClassName === '*' || !entityClasses.hasOwnProperty(entityClassName)
-            ? false
-            : entityClasses[entityClassName].isAutoIncremented();
-    };
+    this.isAutoIncremented = entityClassName => entity.isAutoIncremented(entityClasses, entityClassName);
 
     const renderUiCreate = (uri, options, TAG) => {
-        retrieveMeta(uri, () => {
+        request.retrieveMeta(this, entityClasses, uri, () => {
             const entityClassName = uriTools.pathFromUri(uri)[0];
             const entityClass = entityClasses[entityClassName];
             const data = {};
@@ -207,6 +100,8 @@ function XYZ() {
             const INPUT = document.createElement('INPUT');
             INPUT.type = 'submit';
             INPUT.onclick = () => {
+                // console.log(data)
+                // return;
                 if (entityClass.isAutoIncremented()) {
                     this.post(uri, {[entityClassName]: {'new': data}},);
                 } else {
@@ -367,6 +262,15 @@ function XYZ() {
         }
         return WRAPPER;
     };
+
+    this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);
+    this.head = (uri) => request.head(entityClasses, uri);
+
+    this.post = (uri, content) => request.post(entityClasses, uri, content);
+    this.patch = (uri, content) => request.patch(entityClasses, uri, content);
+    this.put = (uri, content) => request.put(entityClasses, uri, content);
+
+    this.delete = (uri) => request.head(entityClasses, uri);
 }
 
 const xyz = new XYZ();
