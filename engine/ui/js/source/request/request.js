@@ -43,7 +43,7 @@ exports.delete = (entityClasses, uri) => {
     request('DELETE', uri, null, (status, response) => {
         console.log('delete response: ' + uri + ' ' + response);
         const responseContent = JSON.parse(response);
-        entity.handleInput('DELETE', uri, status, responseContent, entityClasses);
+        entity.handleInput('DELETE', uri, status, responseContent, null, entityClasses);
     });
 };
 
@@ -55,16 +55,11 @@ exports.head = uri => {
 
 const handleModifyRequest = (entityClasses, method, uri, requestObjectContent) => {
     console.log(method + ' request', uri, requestObjectContent);
-
     const requestStringContent = JSON.stringify(requestObjectContent);
     request(method, uri, requestStringContent, (status, responseStringContent) => {
         console.log(method + ' response:' + responseStringContent, uri);
         const responseObjectContent = JSON.parse(responseStringContent);
-
-        console.log(requestObjectContent);
-        console.log(responseObjectContent);
-
-        entity.handleInput(method, uri, status, responseObjectContent, entityClasses);
+        entity.handleInput(method, uri, status, responseObjectContent, requestObjectContent, entityClasses);
     });
 };
 
@@ -87,7 +82,7 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
         request('GET', uri, undefined, (status, responseStringContent) => {
             const responseObjectContent = JSON.parse(responseStringContent);
             //TODO replace null with current content?
-            const state = entity.handleInput('GET', uri, status, responseObjectContent, entityClasses);
+            const state = entity.handleInput('GET', uri, status, responseObjectContent, null, entityClasses);
             //TODO  word er nog iets met state gedaan...?
             if (typeof dataCallback === 'function') {
                 const node = entity.getResponse(uri, entityClasses, 'GET');

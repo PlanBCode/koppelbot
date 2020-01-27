@@ -1,48 +1,14 @@
 const types = require('../../build/types.js');
 const listener = require('./listener.js');
-const State = require('./state.js').State;
 const response = require('./response.js');
 const render = require('../render/render.js');
-const Item = require('../render/item.js').constructor;
-
-function changed(a, b) {
-    switch (typeof a) {
-        case 'string':
-        case 'number':
-        case 'boolean':
-            return a !== b;
-        case 'undefined':
-            return typeof b !== 'undefined';
-        case 'function':
-            return false;
-        case 'object':
-            if (a === null) {
-                return b !== null;
-            } else if (typeof b !== 'object' || b === null) {
-                return false
-            } else {
-                for (let key in a) {
-                    if (b.hasOwnProperty(key)) {
-                        if (changed(a[key], b[key])) return true
-                    } else {
-                        return true;
-                    }
-                }
-                for (let key in b) {
-                    if (!a.hasOwnProperty(key)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-    }
-}
+const input = require('../request/input.js');
 
 const validateSubPropertyPath = (types) => (type, subPropertyPath) => {
     if (!types.hasOwnProperty(type)) return false;
     if (typeof types[type].validateSubPropertyPath !== 'function') return false;
     return types[type].validateSubPropertyPath(subPropertyPath);
-}
+};
 
 exports.constructor = function Property(xyz, parent, propertyName, meta) {
     listener.Handler.call(this);
@@ -100,81 +66,9 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         parent.callListeners(state.getParentState(), entityId);
     };
 
-    this.handleInput = (method, entityId, propertyStatus, propertyContent) => {
-        const state = new State(method);
-        if (isPrimitive) {
-            if (contents.hasOwnProperty(entityId)) {
-                const prevPropertyContent = contents[entityId];
-                switch (propertyStatus) {
-                    case 200:
-                        if (changed(prevPropertyContent, propertyContent) && typeof propertyContent !== 'undefined') {
-                            state.setChanged();
-                        }
-                        contents[entityId] = propertyContent;
-                        break;
-                    case 404:
-                        //TODO use message frop source if available
-                        // TODO check if error is new eg compare with current error in errors
-                        state.setError(404, 'Not found');
-                        break;
-                    default:
-                        //state.setError(); // TODO compare with current error in errors
-                        throw new Error('Unsupported status ' + propertyStatus);
-                }
-            } else { // if 200 then changed else error
-                switch (propertyStatus) {
-                    case 200:
-                        if (typeof propertyContent !== 'undefined') {
-                            state.setChanged(); // TODO if new array value then Created
-                            contents[entityId] = propertyContent;
-                        }
-                        break;
-                    case 403:
-                        //TODO use message frop source if available
-                        // TODO check if error is new eg compare with current error in errors
-                        state.setError(403, 'Forbidden');
-                        break;
-                    case 404:
-                        //TODO use message frop source if available
-                        // TODO check if error is new eg compare with current error in errors
-                        state.setError(404, 'Not found');
-                        break;
-                    default:
-                        //state.setError(); TODO compare with current error in errors
-                        throw new Error('Unsupported status ' + propertyStatus);
-                }
-            }
-        } else if (propertyStatus === 207) {
-            for (let subPropertyName in subProperties) {
-                const subProperty207Wrapper = propertyContent[subPropertyName];
-                if (subProperty207Wrapper === null || typeof subProperty207Wrapper !== 'object'
-                    || !subProperty207Wrapper.hasOwnProperty('status')
-                    || !subProperty207Wrapper.hasOwnProperty('content')
-                ) {
-                    //TODO reponse is in error
-                    console.error('error response in wrong format');
-                } else {
-                    const subProperty = subProperties[subPropertyName];
-                    const subStatus = subProperty207Wrapper.status;
-                    const subContent = subProperty207Wrapper.content;
-                    const subState = subProperty.handleInput(method, entityId, subStatus, subContent);
-                    state.addSubState(subState);
-                }
-            }
-        } else {
-            for (let subPropertyName in subProperties) {
-                const subProperty = subProperties[subPropertyName];
-                const subPropertyContent = (propertyContent === null || typeof propertyContent !== 'object')
-                    ? null
-                    : propertyContent[subPropertyName];
-                const subState = subProperty.handleInput(method, entityId, propertyStatus, subPropertyContent);
-                state.addSubState(subState);
-            }
-        }
-        statusses[entityId] = state.getStatus();
-        this.callListeners(state, entityId);
-        return state;
-    };
+    this.handleInput = isPrimitive
+        ? input.handlePrimitive(this, contents, statusses, subProperties)
+        : input.handle(this, statusses, subProperties);
 
     this.addPropertyListener = (entityId, subPropertyPath, eventName, callback) => {
         const listeners = [];
