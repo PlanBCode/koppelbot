@@ -89,11 +89,12 @@ class ApiResponse extends HttpResponse2
         $count = count($requestResponses);
         if ($count == 0) {
             parent::__construct(200, '{}');
-        } elseif ($method !== 'POST') {
+        } else {
             $requestResponse = array_values($requestResponses)[0];
             $data = $requestResponse->getContent();
             parent::__construct($requestResponse->getStatus(), json_encode($data));
-        } else {
+        }
+       /* } else { //TODO multi request
             $data = [];
             foreach ($requestResponses as $requestId => $requestResponse) {
                 $this->addStatus($requestResponse->getStatus());
@@ -103,6 +104,6 @@ class ApiResponse extends HttpResponse2
                 ];
             }
             parent::__construct($this->status, json_encode($data));
-        }
+        }*/
     }
 }

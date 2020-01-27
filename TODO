@@ -1,5 +1,10 @@
 TODO
 
+ui:  validateContent
+- on editing
+- before patch & put?
+
+
 array object creating is broken:
 - item.js
 - - pass initial value to creator
@@ -9,15 +14,15 @@ array object editing is broken
 
 
 
-add samples to types&*entities for testing
+add samples to types for testing
 - UI: headless browser testing
 
 
- resources: "usable"
+
 
  const dom = new JSDOM(`<body>
    <script>document.body.appendChild(document.createElement("hr"));</script>
- </body>`, { runScripts: "dangerously" });
+ </body>`, { runScripts: "dangerously", resources: "usable" });
 
  const jsdom = require("jsdom");
  const { JSDOM } = jsdom;
@@ -31,7 +36,6 @@ Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 move types into separate folders
 
-ui: use validateContent before patch & put?
 
 werkend maken:
 - xyz.create('/source?content=default');

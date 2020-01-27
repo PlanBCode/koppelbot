@@ -17,33 +17,41 @@ if (PHP_SAPI === 'cli') {
 
     $cliOptions = [
         new CliOption('m', 'method', 1, "Set HTTP method. ", "GET"),
+        new CliOption('v', 'verbose', 0, "Set verbose output. ", false),
     ];
     /*TODO
         new CliOption('H', 'headers', 1, "Set HTTP headers. ", ""),
    -f  --file     set file input
-   -i  --interactive interactive modo
-   -v  --verbose  set verbose debuggin
+   -i  --interactive interactive mode
+   -v  --verbose  set verbose debugging
    }*/
 
-    $options = getCliOptions($cliOptions,$argc, $argv);
-    if($options['help']){
+    $options = getCliOptions($cliOptions, $argc, $argv);
+    if ($options['help']) {
         exit(0);
     }
-    $headers = [];//TODO
-    $requestUri = $argc > 1
-        ? '/api'.$argv[1]
-        : '';
+    $headers = [];//TODO from cliOptions
+    $requestUri = count($options['args']) > 1
+        ? '/api' . $options['args'][1]
+        : ''; //TODO fallback
 
+    $content = array_get($options['args'],2,'');
     $uriQueryString = explode('?', $requestUri);
     $uri = array_get($uriQueryString, 0, '');
     $queryString = array_get($uriQueryString, 1, '');
     $method = array_get($options, 'method', 'GET');
-    echo $method;
+    if(array_get($options,'verbose',false)) {
+        echo ' - method      : ' . $method . PHP_EOL;
+        echo ' - uri         : ' . $uri . PHP_EOL;
+        echo ' - queryString : ' . $queryString . PHP_EOL;
+        echo ' - content     : ' . json_encode($content) . PHP_EOL;
+    }
 } else {
     $headers = getallheaders();
     $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
     $method = $_SERVER['REQUEST_METHOD'];
     $queryString = array_get($_SERVER, 'QUERY_STRING', '');
+    $content = @file_get_contents('php://input');
 }
 
 if (strpos($uri, '/api/') === 0 || $uri === '/api') {
@@ -52,7 +60,7 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
         substr($uri, 4),
         $queryString,
         $headers,
-        @file_get_contents('php://input')
+        $content
     );
 } elseif (strpos($uri, '/ui/') === 0 || $uri === '/ui') {
     $request = new UiRequest(
@@ -60,7 +68,7 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
         substr($uri, 4),
         $queryString,
         $headers,
-        @file_get_contents('php://input')
+        $content
     );
 } elseif (strpos($uri, '/doc/') === 0 || $uri === '/doc') {
     $request = new DocRequest(
@@ -68,7 +76,7 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
         substr($uri, 1),
         $queryString,
         $headers,
-        @file_get_contents('php://input')
+        $content
     );
 } else {
     $request = new ContentRequest(
@@ -76,7 +84,7 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
         $uri,
         $queryString,
         $headers,
-        @file_get_contents('php://input')
+        $content
     );
 }
 

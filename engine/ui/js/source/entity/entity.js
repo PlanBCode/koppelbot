@@ -102,9 +102,9 @@ function EntityClass(xyz, entityClassName, settings) {
 
     this.createCreator = (options, data) => {
         const TABLE = document.createElement('TABLE');
-        TABLE.classList.add('xyz-create')
+        TABLE.classList.add('xyz-create');
         const TR_header = document.createElement('TR');
-        TR_header.classList.add('xyz-create-header')
+        TR_header.classList.add('xyz-create-header');
         const TD_header = document.createElement('TD');
         TD_header.setAttribute('colspan', 2);
         TR_header.appendChild(TD_header);
@@ -236,13 +236,6 @@ function EntityClass(xyz, entityClassName, settings) {
 const handleInput = (method, uri, status, content, entityClasses) => {
     const state = new State();
     //TODO check status
-    try {
-        content = JSON.parse(content);//TODO check
-    } catch (e) {
-        console.error(content);
-        content = {};
-        state.setError(500, 'Could not parse JSON');
-    }
 
     const path = uriTools.pathFromUri(uri);
     const entityClassNameList = path[0]; // TODO error if no entityClass
@@ -308,6 +301,13 @@ function getResponse(uri, entityClasses, method) {
     return content;
 }
 
+const isAutoIncremented = (entityClasses, entityClassName) => {
+    return entityClassName === '*' || !entityClasses.hasOwnProperty(entityClassName)
+        ? false
+        : entityClasses[entityClassName].isAutoIncremented();
+};
+
+exports.isAutoIncremented = isAutoIncremented;
 exports.getResponse = getResponse;
 exports.Class = EntityClass;
 exports.handleInput = handleInput;

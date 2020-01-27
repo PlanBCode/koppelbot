@@ -16,7 +16,7 @@ exports.actions = {
             OPTION.selected = true;
             SELECT.appendChild(OPTION);
         }
-        
+
         const subSettings = item.getSetting('subType')|| {};
         const content = item.getContent();
         for (let choice of choices) {
