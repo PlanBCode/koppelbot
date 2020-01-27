@@ -1,6 +1,6 @@
 {
   "default": {
     "type": "bool",
-    "default": "false"
+    "default": false
   }
 }

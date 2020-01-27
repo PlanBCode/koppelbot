@@ -1,6 +1,7 @@
 {
   "default": {
-    "type": "type"
+    "type": "type",
+    "default": "string"
   },
   "TODO": {}
 }

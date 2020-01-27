@@ -1,14 +1,22 @@
 exports.actions = {
     edit: function (item) {
         const SELECT = document.createElement('SELECT');
+
         SELECT.onchange = () => {
             const content = SELECT.options[SELECT.selectedIndex].value;
             item.patch(content);
         };
 
         const choices = item.getSetting('choices') instanceof Array ? item.getSetting('choices') : [];
-        // TODO select default by default
 
+        if(!item.getSetting('default')){
+            const OPTION = document.createElement('OPTION');
+            OPTION.innerText = 'Select...';
+            OPTION.disabled = true;
+            OPTION.selected = true;
+            SELECT.appendChild(OPTION);
+        }
+        
         const subSettings = item.getSetting('subType')|| {};
         const content = item.getContent();
         for (let choice of choices) {

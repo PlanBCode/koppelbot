@@ -1,6 +1,7 @@
 {
   "default": {
-    "type": "object"
+    "type": "object",
+    "default" : {}
   },
   "TODO": {}
 }

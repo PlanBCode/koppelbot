@@ -19,6 +19,6 @@
   },
   "password": {
     "type": "bool",
-    "default" : false;
+    "default" : false
   }
 }

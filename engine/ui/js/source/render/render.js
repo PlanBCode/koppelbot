@@ -55,22 +55,24 @@ function element(xyz, action, uri, status, content, settings, options) {
 }
 
 function creator(xyz, options, uri, settings, propertyName, data) {
-    const type = settings.type || DEFAULT_TYPE;
-    if (!types.hasOwnProperty(type)) {
+    const typeName = settings.type || DEFAULT_TYPE;
+    if (!types.hasOwnProperty(typeName)) {
         console.error('problem1'); //TODO return a TR containing the error
         return [];
     }
+
     const entityClassName = uriTools.pathFromUri(uri)[0];
-    if (type === 'id' && xyz.isAutoIncremented(entityClassName)) {
+    if (typeName === 'id' && xyz.isAutoIncremented(entityClassName)) {
         return [];
     }
 
-    if (!types[type].hasOwnProperty('edit')) {
+    const type = types[typeName];
+
+    if (!type.hasOwnProperty('edit')) {
         console.error('problem1');
         return []; //TODO return a TR containing the error
     }
     const TRs = [];
-    const content = settings.hasOwnProperty('default') ? settings.default : null;
     // TODO html label for gebruiken
     const TR = document.createElement('TR');
     if (options.showLabels !== false) {
@@ -91,8 +93,17 @@ function creator(xyz, options, uri, settings, propertyName, data) {
             [propertyName, ...subUri.split('/')];
         json.unset(data, keyPath);
     };
+    let content = null;
+    if(settings.hasOwnProperty('default')) {
+        content = settings.default;
+    }else if(type.json.hasOwnProperty('default') && type.json.default.hasOwnProperty('default')){
+        // does the default have a default
+        content = type.json.default.default;
+    }
+    data[propertyName] = content;
+
     const item = new Item(xyz, uri, 200, content, settings, options, onChange, onDelete, data);
-    const ELEMENT = types[type].edit(item);
+    const ELEMENT = type.edit(item);
     // TODO add id from options (also for label for)
     // TODO add class from options
     const TD_content = document.createElement('TD');

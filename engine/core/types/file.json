@@ -1,7 +1,4 @@
 {
-  "default": {
-    "type": "enum"
-  },
   "accepts": {
     "type": "array",
     "TODO": "TODO"

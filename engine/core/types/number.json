@@ -1,6 +1,7 @@
 {
   "default": {
-    "type": "number"
+    "type": "number",
+    "default": 0
   },
   "min" : {
     "type": "number"

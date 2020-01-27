@@ -4,7 +4,7 @@ exports.actions = {
         INPUT.type = 'number';
 
         const content = item.getContent();
-        if (content) {
+        if (content !== null) {
             INPUT.value = content;
         }
 
@@ -19,7 +19,7 @@ exports.actions = {
         }
         item.onChange(node => {
             //TODO use status
-            if(INPUT !== document.activeElement) { // we don't want to interupt typing
+            if (INPUT !== document.activeElement) { // we don't want to interupt typing
                 INPUT.value = node.getContent();
             }
         });
@@ -48,7 +48,7 @@ exports.actions = {
         }
         item.onChange(node => {
             //TODO use status stuff from above
-            SPAN.innerText= node.getContent();
+            SPAN.innerText = node.getContent();
         });
         return SPAN;
     },

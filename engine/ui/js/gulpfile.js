@@ -44,6 +44,9 @@ const generateRequiresFile = (name, component) => cb => {
     forEachFile(`../../core/${name}/*.js`,
         file => cb => {
             js += `exports.${baseName(file.path)} = require('../../../core/${name}/${baseName(file.path)}.js').${component};\n`;
+            if(name === 'types') {
+                js += `exports.${baseName(file.path)}.json = require('../../../core/${name}/${baseName(file.path)}.json');\n\n`;
+            }
             cb();
         }
     )(() => {
