@@ -27,14 +27,13 @@ exports.actions = {
                 const TD_label = document.createElement('TD');
                 const TD_value = document.createElement('TD');
                 TD_label.innerText = key;
-                const subUri = originalItem.getUri() + '/' + key;
                 const subSettings = settings[key];
                 const subContent = content[key];
 
                 const subOnChange = (newContent, subUri2) => {
                     originalItem.patch(newContent, key);
                 };
-                const TAG = originalItem.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, {onChange:subOnChange});
+                const TAG = originalItem.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, {onChange:subOnChange});
                 TD_value.appendChild(TAG);
                 TR.appendChild(TD_label);
                 TR.appendChild(TD_value);

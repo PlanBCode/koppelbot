@@ -26,7 +26,6 @@ exports.actions = {
 
         const subSettings = item.getSetting('subType');
         const subOptions = {showLabels: false, display: item.getOption('display')};
-        const subUri = item.getUri() + '/' + content.length;
         const newContent = null;//TODO default value
         const DIV_CREATE = document.createElement('TABLE');
         const INPUT_create = document.createElement('INPUT');
@@ -34,7 +33,7 @@ exports.actions = {
         //TODO add class
         INPUT_create.value = "Add";
         const data = {};
-        const TRs = item.creator(subOptions, subUri, subSettings, content.length, data);
+        const TRs = item.creator(subOptions, item.getUri(), subSettings, 'new', data);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
 
@@ -44,9 +43,7 @@ exports.actions = {
 
         const rows = [];
         const addRow = (key, subContent) => {
-            const subUri = item.getUri() + '/' + key;
-            console.log('a')
-            const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
+            const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
             const DIV_sub = document.createElement('DIV');
             const INPUT_remove = document.createElement('INPUT');
             INPUT_remove.type = 'submit';
@@ -61,8 +58,9 @@ exports.actions = {
         };
 
         INPUT_create.onclick = () => {
-            addRow(content.length, data[content.length]);
-            item.patch(data, content.length);
+            console.log('xxx', content.length, data['new'], data); //TODO
+            addRow(content.length, data['new']);
+            item.patch(data['new'], content.length);
         };
 
         for (let key in content) {
@@ -80,8 +78,7 @@ exports.actions = {
         const content = makeArray(item.getContent());
         const rows = [];
         const addRow = (key, subContent) => {
-            const subUri = item.getUri() + '/' + key;
-            const TAG = item.renderElement('view', subUri, item.getStatus(), subContent, subSettings, subOptions);
+            const TAG = item.renderSubElement('view', [key], item.getStatus(), subContent, subSettings, subOptions);
             rows[key] = TAG;
             SPAN.appendChild(TAG);
         };

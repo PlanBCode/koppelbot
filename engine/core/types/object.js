@@ -13,7 +13,7 @@ const setupOnChange = (item, TAGs_row, addRow) => item.onChange(item => {
                 TAG_row.parentNode.removeChild(TAG_row);
             }
         }
-    } else {
+    } else if(item.getMethod() === 'PUT' || item.getMethod() === 'POST'){
         for (let key in content) {
             if ((TAGs_row instanceof Array && key >= TAGs_row.length) || (!(TAGs_row instanceof Array) && !TAGs_row.hasOwnProperty(key))) {
                 const subContent = content[key];
@@ -67,8 +67,6 @@ exports.actions = {
         const rows = {};
         const addTR = (key, subContent) => {
 
-            const subUri = item.getUri() + '/' + key;
-
             const TR = document.createElement('TR');
             const TD_key = document.createElement('TD');
             const TD_value = document.createElement('TD');
@@ -84,7 +82,7 @@ exports.actions = {
             const TEXT_key = document.createTextNode(key);
             TD_key.appendChild(TEXT_key);
 
-            const TAG = item.renderElement('edit', subUri, item.getStatus(), subContent, subSettings, subOptions);
+            const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
             TD_value.appendChild(TAG);
 
             TR.appendChild(TD_key);
@@ -115,8 +113,7 @@ exports.actions = {
             TD_key.innerText = key;
             TR.appendChild(TD_key);
 
-            const subUri = item.getUri() + '/' + key;
-            const TAG = item.renderElement('view', subUri, item.getStatus(), subContent, subSettings, subOptions);
+            const TAG = item.renderSubElement('view', [key], item.getStatus(), subContent, subSettings, subOptions);
             TD_value.appendChild(TAG);
             TR.appendChild(TD_value);
             rows[key] = TR;

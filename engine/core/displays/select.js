@@ -26,6 +26,12 @@ exports.display = {
             const [entityClassName, entityId] = path;
             list.select(xyz, options.select, entityClassName, entityId);
         };
+        if (!options.initialValue) {
+            const OPTION = document.createElement('OPTION');
+            OPTION.innerText = 'Select...';
+            OPTION.disabled = true;
+            SELECT.appendChild(OPTION)
+        }
         WRAPPER.appendChild(SELECT);
         const entityClassNameList = uri.substr(1).split('/')[0] || '*';
         const fullUri = '/' + entityClassNameList;

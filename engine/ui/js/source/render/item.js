@@ -15,18 +15,21 @@ function Item(xyz, uri, status, content, settings, options, onChange, onDelete, 
     this.patch = (newContent, subUri) => (options.onChange || onChange)(newContent, subUri);
     this.delete = subUri => (options.onDelete || onDelete)(subUri);
 
-    this.renderElement = (action, uri, status, content, settings, options_) => {
+    this.renderSubElement = (action, subPropertyPath, status, content, settings, options_) => {
         if (options.display === 'create') {
             const TABLE = document.createElement('TABLE');
             TABLE.style.display = 'inline-block';
             //TODO pass initial value to creator
-            const TRs = render.creator(xyz, options_, uri, settings, 'TODO', creatorData)
-            for(let TR of TRs){
+            const TRs = render.creator(xyz, options_, uri, settings, 'TODO', creatorData);
+            for (let TR of TRs) {
                 TABLE.appendChild(TR);
             }
             return TABLE;
         } else {
-            return render.element(xyz, action, uri, status, content, settings, options_);
+            const subUri = subPropertyPath.length > 0
+                ? uri + '/' + subPropertyPath.join('/')
+                : uri;
+            return render.element(xyz, action, subUri, status, content, settings, options_);
         }
     };
 

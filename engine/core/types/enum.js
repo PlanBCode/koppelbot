@@ -9,7 +9,7 @@ exports.actions = {
 
         const choices = item.getSetting('choices') instanceof Array ? item.getSetting('choices') : [];
 
-        if(!item.getSetting('default')){
+        if (!item.getSetting('default') && item.getContent() === null) {
             const OPTION = document.createElement('OPTION');
             OPTION.innerText = 'Select...';
             OPTION.disabled = true;
@@ -17,7 +17,7 @@ exports.actions = {
             SELECT.appendChild(OPTION);
         }
 
-        const subSettings = item.getSetting('subType')|| {};
+        const subSettings = item.getSetting('subType') || {};
         const content = item.getContent();
         for (let choice of choices) {
             const OPTION = document.createElement('OPTION');
@@ -26,13 +26,13 @@ exports.actions = {
             }
             OPTION.innerText = choice; //TODO render choice content
             //OPTION.value = choice;
-           // item.renderElement('view', item.getUri(), item.getStatus(), choice, subSettings, options);
+            // item.renderSubElement('view', ??, item.getStatus(), choice, subSettings, options);
             SELECT.appendChild(OPTION);
         }
         item.onChange(node => {
             //TODO use status
             const content = node.getContent();
-            for (let id in SELECT.options ) {
+            for (let id in SELECT.options) {
                 const OPTION = SELECT.options[id];
                 if (OPTION.innerText === content) {
                     OPTION.selected = true;
@@ -42,9 +42,9 @@ exports.actions = {
         return SELECT;
     },
     view: function (item) {
-        const subSettings = item.getSetting('subType')|| {};
+        const subSettings = item.getSetting('subType') || {};
         // not item.onChange required this is handled by this:
-        const TAG = item.renderElement('view', item.getUri(), item.getStatus(), item.getContent(), subSettings, item.getOptions());
+        const TAG = item.renderSubElement('view', [], item.getStatus(), item.getContent(), subSettings, item.getOptions());
         return TAG;
     },
     validateContent: function (item) {

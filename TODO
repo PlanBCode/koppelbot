@@ -2,11 +2,6 @@ TODO
 
 
 
-ui:  validateContent
-- on editing
-- before patch & put?
-
-
 array object creating is broken:
 - item.js
 - - pass initial value to creator
@@ -21,6 +16,9 @@ add samples to types for testing
 
 
 
+ui:  validateContent
+- on editing
+- before patch & put?
 
  const dom = new JSDOM(`<body>
    <script>document.body.appendChild(document.createElement("hr"));</script>
@@ -73,6 +71,7 @@ php request.php : error if entity class not found
 
 replace /source?meta with /entity/source
 
+Connector_path : een hele directory als entity met subproperties zien
 
 Connector_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories

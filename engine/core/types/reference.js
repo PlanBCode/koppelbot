@@ -2,11 +2,8 @@ exports.actions = {
     edit: function (item) {
         const TAG = item.ui(item.getSetting('uri'), {
             display: 'select',
-            select: (entityClass, entityId) =>
-            {
-                console.log('>>>', entityClass, entityId);
-                item.patch('/' + entityClass + '/' + entityId)
-            },
+            select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId)
+            ,
             initialValue: item.getContent()
         });
         //TODO onchange : how to?
