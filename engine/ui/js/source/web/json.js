@@ -5,7 +5,11 @@ function json_set(object, keyPath, content) {
             return content;
         }
         if (typeof object !== 'object' || object === null) {
-            throw new TypeError('object not an object');
+            if(typeof fallBack !=='undefined') {
+                return null
+            }else{
+                throw new TypeError('object not an object');
+            }
         } else if (object.hasOwnProperty(keyPath[0])) {
             if (length === 1) {
                 object[keyPath[0]] = content;
@@ -22,14 +26,18 @@ function json_set(object, keyPath, content) {
     }
 }
 
-function json_unset(object, keyPath) {
+function json_unset(object, keyPath, fallBack) {
     {
         const length = keyPath.length;
         if (length === 0) {
             return undefined;
         }
         if (typeof object !== 'object' || object === null) {
-            throw new TypeError('object not an object');
+            if(typeof fallBack !=='undefined') {
+                return null
+            }else{
+                throw new TypeError('object not an object');
+            }
         } else if (object.hasOwnProperty(keyPath[0])) {
             if (length === 1) {
                 delete object[keyPath[0]];
@@ -42,14 +50,18 @@ function json_unset(object, keyPath) {
 }
 
 
-function json_get(object, keyPath) {
+function json_get(object, keyPath, fallBack) {
     {
         const length = keyPath.length;
         if (length === 0) {
             return object;
         }
         if (typeof object !== 'object' || object === null) {
-            throw new TypeError('object not an object');
+            if(typeof fallBack !=='undefined') {
+                return null
+            }else{
+                throw new TypeError('object not an object');
+            }
         } else if (object.hasOwnProperty(keyPath[0])) {
             return json_get(object[keyPath[0]], keyPath.slice(1));
         }

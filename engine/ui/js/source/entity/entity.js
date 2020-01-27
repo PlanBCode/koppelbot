@@ -149,7 +149,7 @@ function EntityClass(xyz, entityClassName, settings) {
 
     const handleEntityIdInput = input.handle(this, statusses, properties, entities);
 
-    this.handleInput = (method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
+    this.handleInput = (path, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
         const state = new State();
         if (entityClassStatus === 207) {
             for (let entityId of entityIds) {
@@ -165,7 +165,8 @@ function EntityClass(xyz, entityClassName, settings) {
                     const entityContent = entity207Wrapper.content;
                     const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
                     const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
-                    const entityState = handleEntityIdInput(method, entityId, entityStatus, entityContent, subRequestContent);
+                    const subPath = path.slice(1);
+                    const entityState = handleEntityIdInput(subPath, method, entityId, entityStatus, entityContent, subRequestContent);
                     state.addSubState(entityState);
                 }
             }
@@ -178,7 +179,8 @@ function EntityClass(xyz, entityClassName, settings) {
                     : entityClassContent[entityId];
                 const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
                 const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
-                const entityState = handleEntityIdInput(method, entityId, entityClassStatus, entityContent, subRequestContent);
+                const subPath =  path.slice(1);
+                const entityState = handleEntityIdInput(subPath, method, entityId, entityClassStatus, entityContent, subRequestContent);
                 state.addSubState(entityState);
             }
         }
@@ -221,7 +223,8 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
                     ? Object.keys(entityClassContent)
                     : entityIdList.split(',');
                 const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[entityClassName] : null;
-                const entityClassState = entityClass.handleInput(method, entityClassStatus, entityClassContent, subRequestContent, entityIds);
+                const subPath = path.slice(1);
+                const entityClassState = entityClass.handleInput(subPath, method, entityClassStatus, entityClassContent, subRequestContent, entityIds);
                 state.addSubState(entityClassState);
             }
         }
@@ -229,19 +232,20 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
         for (let entityClassName of entityClassNames) {
             const entityClassContent = responseContent[entityClassName];
             const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[entityClassName] : null;
+            const subPath = path.slice(1);
             if (entityClassContent === null || typeof entityClassContent !== 'object') {
                 const entityIds = entityIdList === '*'
                     ? []
                     : entityIdList.split(',');
                 const entityClass = entityClasses[entityClassName];
-                const entityClassState = entityClass.handleInput(method, 404, {}, subRequestContent, entityIds);
+                const entityClassState = entityClass.handleInput(subPath, method, 404, {}, subRequestContent, entityIds);
                 state.addSubState(entityClassState);
             } else {
                 const entityIds = entityIdList === '*'
                     ? Object.keys(entityClassContent)
                     : entityIdList.split(',');
                 const entityClass = entityClasses[entityClassName];
-                const entityClassState = entityClass.handleInput(method, status, entityClassContent, subRequestContent, entityIds);
+                const entityClassState = entityClass.handleInput(subPath, method, status, entityClassContent, subRequestContent, entityIds);
                 state.addSubState(entityClassState);
             }
         }

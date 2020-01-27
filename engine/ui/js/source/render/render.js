@@ -6,8 +6,6 @@ const json = require('../web/json.js');
 const DEFAULT_TYPE = 'string';
 
 function element(xyz, action, uri, subPropertyPath, status, content, settings, options) {
-    console.log('element', uri, subPropertyPath);
-
     const type = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(type)) {
         console.error('problem1');
@@ -19,7 +17,7 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
             onChange = (content, additionalSubPropertyPath) => {
                 additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
                 const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
-                xyz.patch(uri + subUri, uriTools.wrapContent(uri+subUri, content));
+                xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, content));
             };
             onDelete = subUri => {
                 //TODO use subPropertyPath
@@ -59,9 +57,6 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
 }
 
 function creator(xyz, options, uri, settings, subPropertyPath, data) {
-
-    console.log('creator', uri, subPropertyPath);
-
     const typeName = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(typeName)) {
         console.error('problem1'); //TODO return a TR containing the error

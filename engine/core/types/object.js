@@ -1,20 +1,15 @@
-const setupOnChange = (item, TAGs_row, addRow) => item.onChange(item => {
+const setupOnChange = (item, TAGs_row, addRow, deleteRow) => item.onChange(item => {
     const content = item.getContent();
-    console.log('addRow',item.getMethod(),content)
     //TODO use   const status = item.getStatus();
     if (item.getMethod() === 'DELETE') {
         for (let key in content) {
-            if (TAGs_row instanceof Array && key >=0 && key < TAGs_row.length) {
-                const TAG_row = TAGs_row[key];
-                TAGs_row.splice(key,1);
-                TAG_row.parentNode.removeChild(TAG_row);
-            }else if( !(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key)) {
-                const TAG_row = TAGs_row[key];
-                delete TAGs_row[key];
-                TAG_row.parentNode.removeChild(TAG_row);
+            if (TAGs_row instanceof Array && key >= 0 && key < TAGs_row.length) {
+            } else if (!(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key)) {
+
             }
+            deleteRow(key);
         }
-    } else if(item.getMethod() === 'PUT' || item.getMethod() === 'POST'){
+    } else if (item.getMethod() === 'PUT' || item.getMethod() === 'POST' || item.getMethod() === 'PATCH') {
         for (let key in content) {
             if ((TAGs_row instanceof Array && key >= TAGs_row.length) || (!(TAGs_row instanceof Array) && !TAGs_row.hasOwnProperty(key))) {
                 const subContent = content[key];
@@ -50,7 +45,7 @@ exports.actions = {
         TRs.forEach(TR => TABLE_create.appendChild(TR));
         INPUT_create.onclick = () => {
             const key = INPUT_key.value;
-            addTR(key, data['new']);
+//            addTR(key, data['new']);
             item.patch(data['new'], [key]);
         };
 
@@ -74,7 +69,7 @@ exports.actions = {
             //TODO add class
             INPUT_remove.value = 'x';
             INPUT_remove.onclick = () => {
-                item.delete(key);
+                item.delete([key]);
             };
             TD_key.appendChild(INPUT_remove);
             const TEXT_key = document.createTextNode(key);
@@ -88,13 +83,19 @@ exports.actions = {
             rows[key] = TR;
             TABLE.insertBefore(TR, TR_add);
         };
+        const deleteRow = key => {
+            const TAG_row = rows[key];
+            delete rows[key];
+            rows.parentNode.removeChild(TAG_row);
+        };
+
         if (typeof content === 'object' && content !== null) {
             for (let key in content) {
                 const subContent = content[key];
-                addTR(key, subContent);
+                addTR(key, subContent,);
             }
         }
-        setupOnChange(item, rows, addTR);
+        setupOnChange(item, rows, addTR, deleteRow);
         return TABLE;
     },
     view: function (item) {

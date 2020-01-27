@@ -1,10 +1,7 @@
 TODO
 
-object editing
-- handle add duplicate labels
-- keep values
-
-
+array/object
+- delete values
 
 add samples to types for testing
 - UI: headless browser testing

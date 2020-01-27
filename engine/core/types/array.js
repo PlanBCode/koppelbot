@@ -26,30 +26,30 @@ exports.actions = {
 
         const subSettings = item.getSetting('subType');
         const subOptions = {showLabels: false, display: item.getOption('display')};
-        const DIV_CREATE = document.createElement('TABLE');
+        const DIV_CREATE = document.createElement('DIV');
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
         //TODO add class
         INPUT_create.value = "Add";
         const data = {};
 
-        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings,[0], data);
+        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, [0], data);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
 
         DIV_CREATE.appendChild(TABLE_create);
         DIV_CREATE.appendChild(INPUT_create);
         SPAN.appendChild(DIV_CREATE);
-
+        let length = content.length;
         const rows = [];
         const addRow = (key, subContent) => {
-            console.log('addRow', key,subContent);
+            ++length;
             const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
             const DIV_sub = document.createElement('DIV');
             const INPUT_remove = document.createElement('INPUT');
             INPUT_remove.type = 'submit';
             INPUT_remove.onclick = () => {
-                item.delete(key);
+                item.delete([key]);
             };
             INPUT_remove.value = 'x';
             DIV_sub.appendChild(INPUT_remove);
@@ -57,11 +57,13 @@ exports.actions = {
             rows[key] = DIV_sub;
             SPAN.insertBefore(DIV_sub, DIV_CREATE);
         };
-
+        const deleteRow = key => {
+            const TAG_row = rows[key];
+            rows.splice(key, 1);
+            SPAN.removeChild(TAG_row);
+        };
         INPUT_create.onclick = () => {
-            console.log('xxx', data[0]); //TODO
-            addRow(content.length, data[0]);
-            item.patch(data[0], [content.length]);
+            item.patch(data[0], [length]);
         };
 
         for (let key in content) {
@@ -69,7 +71,7 @@ exports.actions = {
             addRow(key, subContent);
         }
 
-        object.setupOnChange(item, rows, addRow);
+        object.setupOnChange(item, rows, addRow, deleteRow);
         return SPAN;
     },
     view: function (item) {
@@ -83,11 +85,16 @@ exports.actions = {
             rows[key] = TAG;
             SPAN.appendChild(TAG);
         };
+        const deleteRow = key => {
+            const TAG_row = rows[key];
+            rows.splice(key, 1);
+            SPAN.removeChild(TAG_row);
+        };
         for (let key in content) {
             const subContent = content[key];
             addRow(key, subContent);
         }
-        object.setupOnChange(item, rows, addRow);
+        object.setupOnChange(item, rows, addRow, deleteRow);
         return SPAN;
     },
     validateContent: function (item) {

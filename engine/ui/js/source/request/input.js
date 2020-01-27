@@ -1,3 +1,4 @@
+const json = require('../web/json');
 const State = require('../entity/state.js').State;
 
 function changed(a, b) {
@@ -34,24 +35,36 @@ function changed(a, b) {
 }
 
 
-exports.handlePrimitive = (element, contents, statusses) => (method, entityId, responseStatus, responseContent, requestContent) => {
+exports.handlePrimitive = (element, contents, statusses) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
     if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
     if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
 
     const state = new State(method);
-
     if (contents.hasOwnProperty(entityId)) {
         const prevPropertyContent = contents[entityId];
         switch (responseStatus) {
             case 200:
+                if ((method === 'PATCH' || method === 'PUT' || method === 'POST') && responseContent === null) {
+                    const content = json.get(responseContent, path, null);
+                    contents[entityId] = json.set(contents[entityId], path, content, null);
+                } else if (method === 'GET') {
+                    contents[entityId] = responseContent;
+                } else if (method === 'DELETE') {
+//                    state.setChanged();
+
+                    json.unset(contents[entityId], path, null);
+                }
+                //console.log('UPDATE', responseContent, requestContent, path);
+
+                /*
                 if (changed(prevPropertyContent, responseContent) && typeof responseContent !== 'undefined') {
                     state.setChanged();
                 }
-                if ((method === 'PATCH' || method === 'PUT' || method === 'POST') && responseContent === null) {
+
                     contents[entityId] = requestContent;
                 } else {
                     contents[entityId] = responseContent;
-                }
+                }*/
                 break;
             case 404:
                 //TODO use message frop source if available
@@ -68,7 +81,7 @@ exports.handlePrimitive = (element, contents, statusses) => (method, entityId, r
                 if (typeof responseContent !== 'undefined') {
                     state.setChanged(); // TODO if new array value then Created
                     // for post and put methods, if no responseContent is returned, use the the requestContent instead
-                    if ((method === 'PUT' || method === 'POST') && responseContent === null) {
+                    if ((method === 'PUT' || method === 'POST' || method === 'PATCH') && responseContent === null) {
                         contents[entityId] = requestContent;
                     } else {
                         contents[entityId] = responseContent;
@@ -95,7 +108,7 @@ exports.handlePrimitive = (element, contents, statusses) => (method, entityId, r
     return state;
 };
 
-exports.handle = (element, statusses, subProperties, entities) => (method, entityId, responseStatus, responseContent, requestContent) => {
+exports.handle = (element, statusses, subProperties, entities) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
     if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
     if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
 
@@ -122,7 +135,8 @@ exports.handle = (element, statusses, subProperties, entities) => (method, entit
                 const subStatus = subProperty207Wrapper.status;
                 const subResponseContent = subProperty207Wrapper.content;
                 const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
-                const subState = subProperty.handleInput(method, entityId, subStatus, subResponseContent, subRequestContent);
+                const subPath = path.slice(1);
+                const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent);
                 state.addSubState(subState);
             }
         }
@@ -133,7 +147,8 @@ exports.handle = (element, statusses, subProperties, entities) => (method, entit
                 ? null
                 : responseContent[subPropertyName];
             const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
-            const subState = subProperty.handleInput(method, entityId, responseStatus, subResponseContent, subRequestContent);
+            const subPath = path.slice(1);
+            const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent);
             state.addSubState(subState);
         }
     }

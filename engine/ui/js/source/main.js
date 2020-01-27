@@ -100,8 +100,6 @@ function XYZ() {
             const INPUT = document.createElement('INPUT');
             INPUT.type = 'submit';
             INPUT.onclick = () => {
-                // console.log(data)
-                // return;
                 if (entityClass.isAutoIncremented()) {
                     this.post(uri, {[entityClassName]: {'new': data}},);
                 } else {
@@ -270,7 +268,7 @@ function XYZ() {
     this.patch = (uri, content) => request.patch(entityClasses, uri, content);
     this.put = (uri, content) => request.put(entityClasses, uri, content);
 
-    this.delete = (uri) => request.head(entityClasses, uri);
+    this.delete = uri => request.delete(entityClasses, uri);
 }
 
 const xyz = new XYZ();

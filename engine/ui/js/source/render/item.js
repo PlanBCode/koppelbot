@@ -1,3 +1,4 @@
+const response = require('../entity/response.js');
 const json = require('../web/json.js');
 const render = require('./render');
 
@@ -5,6 +6,7 @@ const render = require('./render');
 // onDelete = (content, [additionalSubPropertyPath]) => {...}
 
 function Item(xyz, baseUri, subPropertyPath, status, content, settings, options, onChange, onDelete, creatorData) {
+    const callbacks = [];
 
     this.getUri = () => baseUri;
     this.getStatus = () => status;
@@ -17,13 +19,20 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
     this.hasSetting = settingName => settings.hasOwnProperty(settingName);
 
     this.patch = (newContent, additionalSubPropertyPath) => {
-        console.log('x', newContent, subPropertyPath, additionalSubPropertyPath);
-        /*additionalSubPropertyPath = typeof additionalSubPropertyPath === 'undefined'
-            ? subPropertyPath
-            : subPropertyPath.concat(additionalSubPropertyPath);*/
+        additionalSubPropertyPath = additionalSubPropertyPath || [];
+        const data = json.set({}, additionalSubPropertyPath, newContent);
+        const node = new response.Node({}, '?', 200, data, [], 'PATCH'); // not defining object and entityId
+        for (let callback of callbacks) {
+            callback(node);
+        }
+        // note: adding the subPropertyPath and additionalSubPropertyPath is handled by the onChange function
         (options.onChange || onChange)(newContent, additionalSubPropertyPath);
     };
-    this.delete = subUri => (options.onDelete || onDelete)(subUri);
+
+    this.delete = subPropertyPath => {
+        //TODO call callbacks
+        (options.onDelete || onDelete)(subPropertyPath);
+    };
 
     this.renderSubElement = (action, additionalSubPropertyPath, status, content, settings, options_) => {
         if (options.display === 'create') {
@@ -42,7 +51,6 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
 
     this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData);
 
-
     //TODO this is not congruent with this.patch and this.delete
     this.get = (uri, dataCallback) => xyz.get(uri, dataCallback);
 
@@ -50,7 +58,7 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
     this.ui = xyz.ui;
     // callback = (status,content)=>{...}
     this.onChange = callback => {
-        console.log('onChange');
+        callbacks.push(callback);
         if (options.display !== 'create') {
             if (typeof callback !== 'function') throw new TypeError("callback is not a function.");
             const fullUri = subPropertyPath.length > 0
