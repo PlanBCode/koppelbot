@@ -4,13 +4,21 @@ array/object
 - delete values
 
 add samples to types for testing
+- type.json
+- - multiple samples for editing
+- - "PUT" "/0" "content"  "result"
+- create sample entity by adding all samples
+
 - UI: headless browser testing
 
+600 Invalid content
 
 
 ui:  validateContent
 - on editing
 - before patch & put?
+- create: no submit if something's broken
+- validate -> return a message why it's not valid
 
  const dom = new JSDOM(`<body>
    <script>document.body.appendChild(document.createElement("hr"));</script>
@@ -20,6 +28,8 @@ ui:  validateContent
  const { JSDOM } = jsdom;
 
 file type: viewer   https://viewerjs.org/
+
+
 
 
 

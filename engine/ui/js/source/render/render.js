@@ -33,20 +33,20 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
         // TODO add id from options (also for label for)
         // TODO add class from options
 
-        TAG.className = `xyz-status-${status}`;
+        TAG.classList.add(`xyz-status-${status}`);
         return TAG;
     } else if (settings.hasOwnProperty('signature')) { // create editor from signature view
         //TODO check if content if object
         //TODO check if settings.signature is object
         const DIV = document.createElement('DIV');
-        DIV.className = `xyz-status-${status}`;
+        DIV.classList.add(`xyz-status-${status}`);
         for (let subPropertyName in settings.signature) {
             const subSettings = settings.signature[subPropertyName];
             const subContent = content[subPropertyName];
             const subType = subSettings.type;
             const subUri = uri + '/' + subPropertyName;
             const TAG = element(xyz, subType, action, subUri, subPropertyPath.concat([subPropertyName]), status, subContent, subSettings, options);
-            TAG.className = `xyz-status-${status}`;
+            TAG.classList.add(`xyz-status-${status}`);
             DIV.appendChild(TAG);
         }
         return DIV;

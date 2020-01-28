@@ -15,6 +15,8 @@
     }
   },
   "string" : {
+    "minLength": 3,
+    "maxLength": 6,
     "type": "string"
   },
   "enum" : {

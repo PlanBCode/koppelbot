@@ -1,3 +1,4 @@
+const types = require('../../build/types.js');
 const response = require('../entity/response.js');
 const json = require('../web/json.js');
 const render = require('./render');
@@ -67,8 +68,16 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
             xyz.on(fullUri, 'changed', (entityClass, entityId, node, eventName) => callback(node));
             // TODO unregister these listeners somehow
         }
-    }
-
+    };
+    this.validateContent = (content_, settings_) => {
+        const typeName = settings.type || 'string';
+        if (!types.hasOwnProperty(typeName)) return false;
+        if (!types[typeName].hasOwnProperty('validateContent')) return false;
+        content_ = typeof content_ === 'undefined' ? content : content_;
+        settings_ = typeof settings_ === 'object' ? settings_ : settings;
+        const item = new Item(xyz, baseUri, subPropertyPath, status, content_, settings_, options);
+        return types[typeName].validateContent(item);
+    };
 }
 
 exports.constructor = Item;

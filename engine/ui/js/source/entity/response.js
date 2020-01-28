@@ -36,7 +36,11 @@ function Node(object, entityId, status_, content_, errors_, method_) {
     const content = content_;
     const errors = errors_;
     const method = method_;
-
+    /*
+    TODO object can be empty  maybe need to fix that?
+    this.hasSetting = settingName => object.getSettings().hasOwnProperty(settingName);
+    this.getSetting = settingName => object.getSettings()[settingName];
+    this.getSettings = () => object.getSettings();*/
     this.getMethod = () => method;
     this.getStatus = () => status;
     this.getContent = () => content;

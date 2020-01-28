@@ -2,12 +2,8 @@ exports.actions = {
     edit: function (item) {
         const INPUT = document.createElement('INPUT');
         INPUT.type = 'number';
-
-        const content = item.getContent();
-        if (content !== null) {
-            INPUT.value = content;
-        }
-
+        // TODO add id from options (for label for)
+        INPUT.value = item.getContent();
         INPUT.step = item.getSetting('step');
         INPUT.min = item.getSetting('min');
         INPUT.max = item.getSetting('max');
@@ -17,14 +13,23 @@ exports.actions = {
                 item.patch(INPUT.value)
             };
         }
-        item.onChange(node => {
+        const onChangeHandler = node => {
+            const content = node.getContent();
             //TODO use status
             if (INPUT !== document.activeElement) { // we don't want to interupt typing
-                INPUT.value = node.getContent();
+                INPUT.value = content;
             }
-        });
-        // TODO add id from options (for label for)
+            if (!item.validateContent(content)) {
 
+                INPUT.classList.add('xyz-invalid-content');
+                console.log('invalid',INPUT);
+            } else {
+                console.log('valid',content);
+                INPUT.classList.remove('xyz-invalid-content');
+            }
+        };
+        item.onChange(onChangeHandler);
+        onChangeHandler(item);
         return INPUT;
     },
     view: function (item) {
@@ -53,17 +58,17 @@ exports.actions = {
         return SPAN;
     },
     validateContent: function (item) {
-        const content = item.getContent();
-        if (typeof content !== 'number') {
+        const content = Number(item.getContent());
+        if (isNaN(content)) {
             return false;
         }
-        if (item.getSetting('max') && content > item.getSetting('max')) {
+        if (item.hasSetting('max') && content > item.getSetting('max')) {
             return false;
         }
-        if (item.getSetting('min') && content < item.getSetting('min')) {
+        if (item.hasSetting('min') && content < item.getSetting('min')) {
             return false;
         }
-        if (item.getSetting('step') && content / item.getSetting('step') !== Math.floor(content / item.getSetting('step'))) {
+        if (item.hasSetting('step') && content / item.getSetting('step') !== Math.floor(content / item.getSetting('step'))) {
             return false;
         }
         return true;

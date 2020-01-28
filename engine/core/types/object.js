@@ -131,11 +131,9 @@ exports.actions = {
             return false;
         }
         const subSettings = item.getSetting('subType');
-        const subOptions = item.getOptions(); //TODO
         for (let key in content) {
-            const subUri = item.getUri() + '/' + key;
             const subContent = content[key];
-            if (!item.validateContent(subUri, item.getStatus(), subContent, subSettings, subOptions)) {
+            if (!item.validateContent(content, subSettings)) {
                 return false;
             }
         }

@@ -46,6 +46,10 @@ if (PHP_SAPI === 'cli') {
         echo ' - queryString : ' . $queryString . PHP_EOL;
         echo ' - content     : ' . json_encode($content) . PHP_EOL;
     }
+    if($uri === ''){
+        showHelp($cliOptions);
+        exit(0);
+    }
 } else {
     $headers = getallheaders();
     $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
