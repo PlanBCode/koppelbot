@@ -25,6 +25,7 @@ class Connector_directory extends BasicConnector
     protected $path;
     protected $extension;
     protected $data;
+    protected $meta;
     protected $settings;
 
     protected $maxAutoIncrementedId;
@@ -98,6 +99,7 @@ class Connector_directory extends BasicConnector
         }
 
         $this->data = [];
+        $this->meta = [];
         $parse = $propertyRequest->getProperty()->getConnectorSetting('parse', 'none');
         foreach ($entityIds as $entityId) {
             $filePath = $this->createFilePath($entityId);
@@ -113,6 +115,10 @@ class Connector_directory extends BasicConnector
             } else { //TODO xml,yaml,csv,tsv
                 $this->data[$entityId] = $fileContent;
             }
+            if (!array_key_exists($entityId, $this->meta)) $this->meta[$entityId] = [];
+            $this->meta[$entityId]['_extension'] = pathinfo($filePath, PATHINFO_EXTENSION);
+            //TODO _timestamp
+            //TODO _size
         }
         return new connectorResponse(200);
     }

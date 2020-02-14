@@ -80,7 +80,12 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
         //TODO meta should be good or we have a problem
         //TODO get the data from cache if already in cache
         request('GET', uri, undefined, (status, responseStringContent) => {
-            const responseObjectContent = JSON.parse(responseStringContent);
+            let responseObjectContent;
+            try {
+                responseObjectContent = JSON.parse(responseStringContent);
+            } catch (e) {
+                console.error(responseStringContent, e);
+            }
             //TODO replace null with current content?
             const state = entity.handleInput('GET', uri, status, responseObjectContent, null, entityClasses);
             //TODO  word er nog iets met state gedaan...?

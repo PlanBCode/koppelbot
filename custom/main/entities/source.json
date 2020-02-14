@@ -22,10 +22,10 @@
           "key": "basename"
         }
       },
-      "mime": {
+      "extension": {
         "type": "string",
         "connector": {
-          "key": "mime"
+          "key": "_extension"
         }
       }
     },

@@ -75,15 +75,14 @@ abstract class BasicConnector extends Connector
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (array_key_exists($entityId, $this->data)) {
-                $entity = $this->data[$entityId];
                 if ($key === 'basename' || $key === 'key') {
                     $content = $entityId;
                     $connectorResponse->add(200, $propertyRequest, $entityId, $content);
-                } elseif ($key === 'mime') {
-                    $connectorResponse->add(200, $propertyRequest, $entityId, 'text');
                 } else {
                     if ($key === 'content') {
                         $keyPath = [];
+                    } elseif (substr($key, 0, 1) === '_') {
+                        $keyPath = [$key];
                     } elseif (is_string($key) && substr($key, 0, 1) === '.') {
                         $keyPath = explode('.', substr($key, 1));
                     } else {
@@ -91,6 +90,10 @@ abstract class BasicConnector extends Connector
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
+
+                    $entity = substr($key, 0, 1) === '_'
+                        ? $this->meta[$entityId]
+                        : $this->data[$entityId];
                     $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
                     if ($jsonActionResponse->succeeded()) {
                         $connectorResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);

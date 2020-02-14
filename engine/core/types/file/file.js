@@ -1,3 +1,6 @@
+const extensions = ['txt'];
+const viewers = Object.fromEntries(extensions.map(extension => [extension, require('./viewers/' + extension)]));
+
 exports.actions = {
     edit: function (item) {
         const prepareContent = (files) => {
@@ -49,21 +52,16 @@ exports.actions = {
     view: function (item) {
         //TODO use a file viewer:   https://viewerjs.org/
         const content = item.getContent();
-        const fileContent = content.content;
-        const mime = content.mime;
 
         const DIV_container = document.createElement('DIV');
         DIV_container.classList.add('xyz-file-container');
-        if (mime === 'pdf') { //TODO
 
-        } else if(mime==='image'){//TODO
+        const extension = content.extension;
+        const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
+            ? extension : 'txt';
+        const DIV_fileContent = viewers[fallbackExtension].view(item);
 
-        } else { // flat text
-            const DIV_flat = document.createElement('DIV');
-            DIV_flat.classList.add('xyz-file-flat');
-            DIV_flat.innerHTML = fileContent;
-            DIV_container.appendChild(DIV_flat);
-        }
+        DIV_container.appendChild(DIV_fileContent);
         //TODO onChange
         return DIV_container;
     },
