@@ -21,12 +21,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     const type = meta.type;
     //TODO handle type alliasses?
     const settings = meta; //TODO check if object
-    let isId = false;
-    if (settings.hasOwnProperty('connector')) {
-        if (settings.connector.key === 'key' || settings.connector.key === 'basename' || settings.type === 'id') {
-            isId = true;
-        }
-    }
+
     let isPrimitive = true;
     if (settings.hasOwnProperty('signature')) {
         isPrimitive = false;
@@ -34,12 +29,36 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, settings.signature[subPropertyName]);
         }
     }
+    this.getStatus = entityId => {
+        if (isPrimitive) return statusses[entityId];
+        let status;
+        for (let subPropertyName in subProperties) {
+            const subStatus = subProperties[subPropertyName].getStatus(entityId);
+            if (typeof status === 'undefined') {
+                status = subStatus;
+            } else if (status !== subStatus) {
+                return 207;
+            }
+        }
+        return status;
+    };
+
+    this.getContent = entityId => {
+        if (isPrimitive) return contents[entityId];
+        const content = {};
+        for (let subPropertyName in subProperties) {
+            content[subPropertyName] = subProperties[subPropertyName].getContent(entityId);
+        }
+        return content;
+    };
 
     this.getSettings = () => settings;
 
     this.getUri = entityId => parent.getUri(entityId) + '/' + propertyName;
 
     this.getEntityClassName = () => parent.getEntityClassName();
+
+    this.getParent = () => parent;
 
     this.getResponse = (path, entityId, method) => {
         if (isPrimitive) {
@@ -138,13 +157,18 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getIdFromContent = data => {
         if (isPrimitive) {
-            return isId ? data : null;
+            if (types.hasOwnProperty(type) && typeof types[type].getIdFromContent === 'function') {
+                return types[type].getIdFromContent(data)
+            } else if (settings.hasOwnProperty('connector')) {
+                if (settings.connector.key === 'key' || settings.connector.key === 'basename') {
+                    return data;
+                }
+            }
+            return null;
         } else {
-
             if (typeof data !== 'object' || data === null) { //TODO is_object
                 return null;
             }
-
             for (let subPropertyName in subProperties) {
                 if (data.hasOwnProperty(subPropertyName)) {
                     const id = subProperties[subPropertyName].getIdFromContent(data[subPropertyName]);
@@ -157,16 +181,16 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         }
     };
 
+
     this.render = (action, options, entityId) => {
-        //TODO get xyz here
-        if (isPrimitive) {
+        const hasRenderMethod = types.hasOwnProperty(type) && types[type].hasOwnProperty(action);
+        if (isPrimitive||hasRenderMethod) {
             const uri = this.getUri(entityId);
-            const content = contents[entityId];
-            const status = statusses[entityId];
+            const content = this.getContent(entityId);
+            const status = this.getStatus(entityId);
             const TAG = render.element(xyz, action, uri, [], status, content, settings, options);
             return TAG;
         } else {
-            //TODO loop through subproperties and render all
             const DIV = document.createElement('DIV');
             for (let subPropertyName in subProperties) {
                 const TAG = subProperties[subPropertyName].render(action, options, entityId);

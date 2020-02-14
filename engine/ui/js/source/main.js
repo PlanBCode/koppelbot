@@ -136,8 +136,7 @@ function XYZ() {
         const display = displays[displayName];
         const action = options.action || DEFAULT_ACTION;
         const path = uriTools.pathFromUri(uri);
-        response.filter(node, path.slice(2)); // filter the content that was not requested
-
+        node = response.filter(node, path.slice(2)); // filter the content that was not requested
         if (WRAPPER.classList.contains('xyz-empty')) {
             WRAPPER.classList.remove('xyz-empty');
             if (display && display.hasOwnProperty('first')) {

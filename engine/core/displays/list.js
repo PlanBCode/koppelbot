@@ -32,9 +32,7 @@ function getUrisFromVariable(xyz, variableName, entityClassName) {
 }
 
 function flatten2(source, target, prefix) {
-    if (source.constructor !== Object) {
-        return;
-    }
+    if (source.constructor !== Object) return;
     for (let key in source) {
         const value = source[key];
         if (value.constructor === Object) {
@@ -46,6 +44,7 @@ function flatten2(source, target, prefix) {
 }
 
 function flatten(source) {
+    if (source.constructor !== Object) return source;
     const target = {};
     flatten2(source, target, '');
     return target;

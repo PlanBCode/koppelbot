@@ -51,7 +51,7 @@ abstract class Type
             if ($typeName === 'type') {
                 $typeClass = Type_type::class;
             } else {
-                $fileName = './engine/core/types/' . $typeName . '.php'; // TODO or custom/types
+                $fileName = './engine/core/types/' . $typeName . '/' . $typeName . '.php'; // TODO or custom/types
                 if (!file_exists($fileName)) {
                     echo 'ERROR Type ' . $typeName . ' : file does not exist!';
                     return null;

@@ -9,7 +9,7 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
     const type = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(type)) {
         console.error('problem1');
-        return;
+        return null;
     }
     if (types[type].hasOwnProperty(action)) {
         let onChange, onDelete;
@@ -51,8 +51,9 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
         }
         return DIV;
     } else {
-        console.error('problem2');
         //TODO something default and/or error
+        console.error('problem2');
+        return null;
     }
 }
 

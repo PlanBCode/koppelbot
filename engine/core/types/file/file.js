@@ -46,11 +46,27 @@ exports.actions = {
 
         return INPUT;
     },
-    /*view: function (item) {
+    view: function (item) {
         //TODO use a file viewer:   https://viewerjs.org/
+        const content = item.getContent();
+        const fileContent = content.content;
+        const mime = content.mime;
+
+        const DIV_container = document.createElement('DIV');
+        DIV_container.classList.add('xyz-file-container');
+        if (mime === 'pdf') { //TODO
+
+        } else if(mime==='image'){//TODO
+
+        } else { // flat text
+            const DIV_flat = document.createElement('DIV');
+            DIV_flat.classList.add('xyz-file-flat');
+            DIV_flat.innerHTML = fileContent;
+            DIV_container.appendChild(DIV_flat);
+        }
         //TODO onChange
-        return content;
-    },*/
+        return DIV_container;
+    },
     validateContent: function (item) {
         //TODO implement client side validation
         //todo mime/accept

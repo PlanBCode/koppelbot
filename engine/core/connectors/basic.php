@@ -79,6 +79,8 @@ abstract class BasicConnector extends Connector
                 if ($key === 'basename' || $key === 'key') {
                     $content = $entityId;
                     $connectorResponse->add(200, $propertyRequest, $entityId, $content);
+                } elseif ($key === 'mime') {
+                    $connectorResponse->add(200, $propertyRequest, $entityId, 'text');
                 } else {
                     if ($key === 'content') {
                         $keyPath = [];
@@ -121,6 +123,9 @@ abstract class BasicConnector extends Connector
 
             if ($propertyRequest->getMethod() === 'POST') {
                 $entityId = $this->getAutoIncrementedId($entityId);
+                /*TODO if (is_null($entityId)) {
+                    echo "failed to autoincrement";
+                }*/
             }
 
             if (!array_key_exists($entityId, $this->data)) {

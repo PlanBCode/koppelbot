@@ -41,11 +41,15 @@ const write = (path, content) => cb => {
 
 const generateRequiresFile = (name, component) => cb => {
     let js = `// This file is created by gulpfile.js using the type definitions of engine/core/${name}/*.js. \n\n`;
-    forEachFile(`../../core/${name}/*.js`,
+    forEachFile(`../../core/${name}/*`,
         file => cb => {
-            js += `exports.${baseName(file.path)} = require('../../../core/${name}/${baseName(file.path)}.js').${component};\n`;
+        const id = baseName(file.path);
             if(name === 'types') {
-                js += `exports.${baseName(file.path)}.json = require('../../../core/${name}/${baseName(file.path)}.json');\n\n`;
+                js += `exports.${baseName(file.path)} = require('../../../core/${name}/${id}/${id}.js').${component};\n`;
+                js += `exports.${baseName(file.path)}.json = require('../../../core/${name}/${id}/${id}.json');\n\n`;
+            }else{
+                js += `exports.${baseName(file.path)} = require('../../../core/${name}/${id}.js').${component};\n`;
+
             }
             cb();
         }
@@ -59,7 +63,7 @@ const webPack = execute(`node_modules/webpack/bin/webpack.js --config "conf/webp
 const generateTypesFile = generateRequiresFile('types','actions');
 const generateDisplaysFile = generateRequiresFile('displays','display');
 
-gulp.watch([`../../core/types/*.js`], gulp.series(generateTypesFile,webPack));
+gulp.watch([`../../core/types/*/*.js`], gulp.series(generateTypesFile,webPack));
 gulp.watch([`../../core/displays/*.js`], gulp.series(generateDisplaysFile,webPack));
 gulp.watch([`./source/**/*.js`], webPack);
 

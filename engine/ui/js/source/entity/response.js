@@ -1,22 +1,67 @@
+function extractContentFromNode(contentOrNode) {
+    if (contentOrNode instanceof Node) {
+        return [
+            contentOrNode.getObject(),
+            contentOrNode.getEntityId(),
+            contentOrNode.getStatus(),
+            contentOrNode.getContent(),
+            contentOrNode.getErrors(),
+            contentOrNode.getMethod()
+        ];
+    } else {
+
+
+        let entityId, method;
+        let errors = [];
+        let status = 200;
+        const content = {};
+        let subObject, subStatus, subContent, subErrors;
+        for (let propertyName in contentOrNode) {
+            [subObject, entityId, subStatus, subContent, subErrors, method] = extractContentFromNode(contentOrNode[propertyName]);
+
+            if (typeof status === 'undefined') {
+                status = subStatus;
+            } else if (status !== subStatus) {
+                status = 207;
+            }
+            errors.push.apply(errors, subErrors);
+            content[propertyName] = subContent;
+        }
+        const object = subObject.getParent();
+        return [object, entityId, status, content, errors, method]
+    }
+}
+
+function mergeIntoSingleNode(contentOrNode) {
+    if (contentOrNode instanceof Node) {
+        return contentOrNode;
+    } else {
+        const [object, entityId, status, content, subErrors, method] = extractContentFromNode(contentOrNode);
+        return new Node(object, entityId, status, content, subErrors, method);
+    }
+}
+
 function filter(content, path) {
     if (path.length === 0) {
-        return;
-    }
-    const subPath = path.slice(1);
-    const propertyNameList = path[0];
-    if (propertyNameList === '*') {
-        for (let propertyName in content) {
-            filter(content[propertyName], subPath);
-        }
+        return mergeIntoSingleNode(content);
     } else {
-        const propertyNames = propertyNameList.split(',');
-        for (let propertyName in content) {
-            if (propertyNames.indexOf(propertyName) === -1) {
-                delete content[propertyName];
-            } else {
+        const subPath = path.slice(1);
+        const propertyNameList = path[0];
+        if (propertyNameList === '*') {
+            for (let propertyName in content) {
                 filter(content[propertyName], subPath);
             }
+        } else {
+            const propertyNames = propertyNameList.split(',');
+            for (let propertyName in content) {
+                if (propertyNames.indexOf(propertyName) === -1) {
+                    delete content[propertyName];
+                } else {
+                    filter(content[propertyName], subPath);
+                }
+            }
         }
+        return content;
     }
 }
 
@@ -41,6 +86,8 @@ function Node(object, entityId, status_, content_, errors_, method_) {
     this.hasSetting = settingName => object.getSettings().hasOwnProperty(settingName);
     this.getSetting = settingName => object.getSettings()[settingName];
     this.getSettings = () => object.getSettings();*/
+    this.getObject= () => object; //TODO need private
+    this.getEntityId = () => entityId;
     this.getMethod = () => method;
     this.getStatus = () => status;
     this.getContent = () => content;

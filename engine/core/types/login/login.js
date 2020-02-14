@@ -2,8 +2,19 @@ exports.actions = {
     edit: function (item) {
         //TODO notify if caps lock is on
         const TABLE = document.createElement('TABLE');
-        // if edit, not create then request also current password
+
+        const TR_username = document.createElement('TR');
+        const TD_usernameLabel = document.createElement('TD');
+        const TD_usernameInput = document.createElement('TD');
+        const INPUT_username = document.createElement('INPUT');
+        TD_usernameLabel.innerText = 'Username';
+        TD_usernameInput.appendChild(INPUT_username);
+        TR_username.appendChild(TD_usernameLabel);
+        TR_username.appendChild(TD_usernameInput);
+        TABLE.appendChild(TR_username);
+
         let INPUT_old;
+        // if edit, not create then request also current password
         if (item.getOption('display') !== 'create') { // edit password -> confirm old + double to confirm
             const TR_old = document.createElement('TR');
             const TD_oldLabel = document.createElement('TD');
@@ -53,12 +64,26 @@ exports.actions = {
             TABLE.appendChild(TR_submit);
             //TODO check if they match, if not: indicate!
             INPUT_submit.onclick = () => {
-                item.patch({old: INPUT_old.value, new: INPUT_new.value, confirm: INPUT_confirm.value})
+                item.patch({
+                    old: INPUT_old.value,
+                    new: INPUT_new.value,
+                    confirm: INPUT_confirm.value,
+                    username: INPUT_username.value
+                })
             };
         } else { // create password : update data continuously
             const onChangeHandler = () => {
-                //TODO check if they match, if not: indicate!
-                item.patch({new: INPUT_new.value, confirm: INPUT_confirm.value})
+                if(INPUT_new.value !== INPUT_confirm.value){
+                    INPUT_confirm.classList.add('xyz-invalid-content');
+                }else {
+                    INPUT_confirm.classList.remove('xyz-invalid-content');
+                    item.patch({
+                        // old: INPUT_old.value,
+                        new: INPUT_new.value,
+                        confirm: INPUT_confirm.value,
+                        username: INPUT_username.value
+                    });
+                }
             };
             INPUT_new.oninput = onChangeHandler;
             INPUT_confirm.oninput = onChangeHandler;
@@ -67,11 +92,19 @@ exports.actions = {
     },
     view: function (item) {
         const SPAN = document.createElement('SPAN');
-        SPAN.innerText = '***';
+        const content = item.getContent();
+        SPAN.innerText = content.username;
         return SPAN;
     },
     validateContent: function (item) {
-        //TODO implement client side validation
-        return typeof item.getContent() === 'string';//TODO min, max length, allowedCharacters
+        const content = item.getContent();
+        if(typeof content !== 'object' || content === null) return false;
+        if(typeof content.new !=='string') return false;
+        if(typeof content.confirm !=='string') return false;
+        if(typeof content.username !=='string') return false;
+        return content.confirm === content.new; // TODO min/max length, allow chars, regex
+    },
+    getIdFromContent: function(content){
+        return content.username;
     }
 };

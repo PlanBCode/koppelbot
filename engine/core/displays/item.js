@@ -10,11 +10,12 @@ exports.display = {
     empty: (xyz, action, options, WRAPPER) => {
         WRAPPER.innerHTML = 'No items to display.';
     },
-    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
+    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {
         WRAPPER.innerHTML = '';
     },
-    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
-        const columns = list.flatten(content);
+    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {
+        const columns = list.flatten(content, requestUri);
+
         const TABLE_entity = document.createElement('TABLE');
         TABLE_entity.className = 'xyz-item';
         const uri = '/' + entityClassName + '/' + entityId;
@@ -23,27 +24,37 @@ exports.display = {
             TR_header.className = 'xyz-item-header';
             const TD_header = document.createElement('TD');
             TD_header.innerHTML = uri;
-            TD_header.setAttribute('colspan', options.showLabel !== false ? 2 : 1);
+            TD_header.setAttribute('colspan', options.showLabel !== false ? '2' : '1');
             TR_header.appendChild(TD_header);
             TABLE_entity.appendChild(TR_header);
         }
-
-        for (let flatPropertyName in columns) {
-            const TR_flatProperty = document.createElement('TR');
-
-            if (options.showLabel !== false) {
-                const TD_flatPropertyName = document.createElement('TD');
-                TD_flatPropertyName.innerHTML = flatPropertyName;
-                TR_flatProperty.appendChild(TD_flatPropertyName);
-            }
-            const TD_flatPropertyContent = document.createElement('TD');
-            const node = columns[flatPropertyName];
+        if (columns.constructor !== Object){
+            const node =  columns;
+            const TR_entity = document.createElement('TR');
+            //todo name
+            const TD_entityContent =document.createElement('TD');
             const TAG = node.render(action, options);
-            TD_flatPropertyContent.appendChild(TAG);
-            TR_flatProperty.appendChild(TD_flatPropertyContent);
-            TABLE_entity.appendChild(TR_flatProperty);
-        }
+            TD_entityContent.appendChild(TAG);
+            TR_entity.appendChild(TD_entityContent);
+            TABLE_entity.appendChild(TR_entity);
+        }else {
 
+            for (let flatPropertyName in columns) {
+                const TR_flatProperty = document.createElement('TR');
+
+                if (options.showLabel !== false) {
+                    const TD_flatPropertyName = document.createElement('TD');
+                    TD_flatPropertyName.innerHTML = flatPropertyName;
+                    TR_flatProperty.appendChild(TD_flatPropertyName);
+                }
+                const TD_flatPropertyContent = document.createElement('TD');
+                const node = columns[flatPropertyName];
+                const TAG = node.render(action, options);
+                TD_flatPropertyContent.appendChild(TAG);
+                TR_flatProperty.appendChild(TD_flatPropertyContent);
+                TABLE_entity.appendChild(TR_flatProperty);
+            }
+        }
         if (options.showDeleteButton === true) {
             const TR_deleteButton = document.createElement('TR');
             const TD_deleteButton = document.createElement('TD');

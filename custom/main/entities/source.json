@@ -21,6 +21,12 @@
         "connector": {
           "key": "basename"
         }
+      },
+      "mime": {
+        "type": "string",
+        "connector": {
+          "key": "mime"
+        }
       }
     },
     "type": "file"

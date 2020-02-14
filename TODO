@@ -1,7 +1,25 @@
 TODO
 
+file type: viewer
+- pdf, odt https://viewerjs.org/ Only pdf and odt.
+- office docx, pptx, xlsx  (microsoft/google api: require public access
+- txt,csv -> flat text
+- images -> browser
+
+
+
+check validateContent @ onChange
+- for element : block patch and set css classes
+- for creator : block submit button and set css classes
+- validate -> return messages why it's not valid
+
+
 array/object
 - delete values
+
+
+
+
 
 add samples to types for testing
 - type.json
@@ -9,16 +27,11 @@ add samples to types for testing
 - - "PUT" "/0" "content"  "result"
 - create sample entity by adding all samples
 
+
+
+
+
 - UI: headless browser testing
-
-600 Invalid content
-
-
-ui:  validateContent
-- on editing
-- before patch & put?
-- create: no submit if something's broken
-- validate -> return a message why it's not valid
 
  const dom = new JSDOM(`<body>
    <script>document.body.appendChild(document.createElement("hr"));</script>
@@ -27,7 +40,7 @@ ui:  validateContent
  const jsdom = require("jsdom");
  const { JSDOM } = jsdom;
 
-file type: viewer   https://viewerjs.org/
+
 
 
 
@@ -35,9 +48,6 @@ file type: viewer   https://viewerjs.org/
 
 
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
-
-move types into separate folders
-
 
 werkend maken:
 - xyz.create('/source?content=default');
@@ -108,7 +118,6 @@ navigation in /ui endpoints for (sub) property names
 
 types:
  - time
- - type type : meta :)
  - datetime
 
 maybe entity inheritance

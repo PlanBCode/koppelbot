@@ -40,5 +40,8 @@ exports.actions = {
     validateContent: function (item) {
         //TODO should be 0 or null always?
         return true;//TODO
+    },
+    getIdFromContent: function(content){
+        return content;
     }
 };

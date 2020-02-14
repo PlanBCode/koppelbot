@@ -4,11 +4,7 @@
       "type": "session"
     }
   },
-  "username": {
-    "type": "id"
-  },
-  "password": {
-    "type": "string",
-    "password": true
+  "login": {
+    "type": "login"
   }
 }

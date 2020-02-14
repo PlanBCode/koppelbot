@@ -4,7 +4,7 @@ class Type_file extends Type
 {
     public static function signature(array &$settings)
     {
-        return ['id' => 'string', 'content' => 'string'];
+        return ['id' => 'string', 'content' => 'string', 'mime' => 'string'];
     }
 
     public static function validateContent($value, array $settings): bool

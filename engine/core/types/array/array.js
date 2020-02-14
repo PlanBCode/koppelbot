@@ -1,4 +1,4 @@
-const object = require('./object');
+const object = require('../object/object');
 
 function makeArray(content) {
     if (content === null) {

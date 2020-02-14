@@ -103,3 +103,20 @@ li.xyz-page-navigation-depth-0 {
     display: inline-block;
     float: left;
 }
+
+/* ====================================================================================================
+FILE
+==================================================================================================== */
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    box-shadow: 2px 2px 2px;
+    background-color: white;
+    padding: 10px;
+}

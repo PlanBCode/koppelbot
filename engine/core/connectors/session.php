@@ -37,11 +37,10 @@ class Connector_session extends Connector
         $connectorResponse = new connectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
         $userName = $propertyRequest->getEntityId();
+
         if ($userName === '*') {
             return $connectorResponse->add(400, $propertyRequest, $userName, 'Session not defined.');
-        } elseif ($propertyName === 'username') {
-            return $connectorResponse->add(200, $propertyRequest, $userName, $userName);
-        } elseif ($propertyName === 'password') {
+        } elseif ($propertyName === 'login') { //TODO should not rely on name but should use type instead
             //TODO verify password with /account/username/password
             if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
             $_SESSION['content'][$userName] = [];
@@ -87,7 +86,6 @@ class Connector_session extends Connector
             session_destroy();
         }
         return $connectorResponse->add(200, $propertyRequest, $userName, 'Successfully logged out.');
-        return $connectorResponse;
     }
 
     protected function getSession(PropertyRequest &$propertyRequest): connectorResponse
@@ -110,12 +108,9 @@ class Connector_session extends Connector
                 $connectorResponse->add(404, $propertyRequest, $userName, 'Not found');
                 continue;
             }
-            if ($propertyName === 'username') {
-                $connectorResponse->add(200, $propertyRequest, $userName, $userName);
-                continue;
-            }
-            if ($propertyName === 'password') {
-                $connectorResponse->add(403, $propertyRequest, $userName, '***');
+
+            if ($propertyName === 'login') { // TODO should not rely on name but use type instead
+                $connectorResponse->add(200, $propertyRequest, $userName, ['username'=> $userName, 'password'=> '***']);
                 continue;
             }
             $keyPath = array_merge([$userName], $propertyRequest->getPropertyPath());
