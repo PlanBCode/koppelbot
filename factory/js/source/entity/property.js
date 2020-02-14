@@ -126,15 +126,15 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return listeners;
     };
 
-    this.createCreator = (options, data) => {
+    this.createCreator = (options, data, INPUT_submit) => {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
             const uri = this.getUri('$new');
-            return render.creator(xyz, options, uri, settings, [propertyName], data);
+            return render.creator(xyz, options, uri, settings, [propertyName], data, INPUT_submit);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {
                 data[propertyName] = {};
-                TRs.push(...subProperties[propertyName].createCreator(options, data[propertyName]));
+                TRs.push(...subProperties[propertyName].createCreator(options, data[propertyName], INPUT_submit));
             }
         } else {
             console.error('No available rendering method for edit ' + type);
@@ -184,7 +184,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.render = (action, options, entityId) => {
         const hasRenderMethod = types.hasOwnProperty(type) && types[type].hasOwnProperty(action);
-        if (isPrimitive||hasRenderMethod) {
+        if (isPrimitive || hasRenderMethod) {
             const uri = this.getUri(entityId);
             const content = this.getContent(entityId);
             const status = this.getStatus(entityId);

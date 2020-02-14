@@ -101,7 +101,7 @@ function EntityClass(xyz, entityClassName, settings) {
         return content;
     };
 
-    this.createCreator = (options, data) => {
+    this.createCreator = (options, data, INPUT_submit) => {
         const TABLE = document.createElement('TABLE');
         TABLE.classList.add('xyz-create');
         const TR_header = document.createElement('TR');
@@ -112,7 +112,7 @@ function EntityClass(xyz, entityClassName, settings) {
         TABLE.appendChild(TR_header);
         TD_header.innerText = 'New ' + entityClassName;
         for (let propertyName in properties) {
-            for (let TR of properties[propertyName].createCreator(options, data)) {
+            for (let TR of properties[propertyName].createCreator(options, data, INPUT_submit)) {
                 TABLE.appendChild(TR);
             }
         }

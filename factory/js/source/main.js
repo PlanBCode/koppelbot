@@ -95,11 +95,11 @@ function XYZ() {
             const entityClassName = uriTools.pathFromUri(uri)[0];
             const entityClass = entityClasses[entityClassName];
             const data = {};
-            const TABLE = entityClass.createCreator(options, data);
+            const INPUT_submit = document.createElement('INPUT');
+            INPUT_submit.type = 'submit';
+            const TABLE = entityClass.createCreator(options, data, INPUT_submit);
             TAG.appendChild(TABLE);
-            const INPUT = document.createElement('INPUT');
-            INPUT.type = 'submit';
-            INPUT.onclick = () => {
+            INPUT_submit.onclick = () => {
                 if (entityClass.isAutoIncremented()) {
                     this.post(uri, {[entityClassName]: {'new': data}},);
                 } else {
@@ -107,7 +107,7 @@ function XYZ() {
                     this.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}},);
                 }
             };
-            TAG.appendChild(INPUT);
+            TAG.appendChild(INPUT_submit);
         });
         return TAG;
     };
@@ -147,6 +147,7 @@ function XYZ() {
         }
 
         if (display && display.hasOwnProperty('entity')) {
+            console.log(node);
             display.entity(this, action, options, WRAPPER, entityClassName, entityId, node);
         } else {
             //TODO a default way of handeling stuff

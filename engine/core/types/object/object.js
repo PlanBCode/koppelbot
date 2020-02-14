@@ -40,7 +40,7 @@ exports.actions = {
         //TODO add class
         INPUT_create.value = "Add";
         const data = {};
-        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, ['new'], data);
+        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, ['new'], data, INPUT_create);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
         INPUT_create.onclick = () => {

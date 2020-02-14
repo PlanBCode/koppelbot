@@ -59,10 +59,16 @@ exports.display = {
             list.select(xyz, options, entityClassName, entityId);
             OPTION.selected = true;
         }
-        for (let flatPropertyName in columns) {
-            const node = columns[flatPropertyName];
+        if (columns.constructor !== Object) {
+            const node = columns;
             const TAG = node.render(action, options);
             OPTION.appendChild(TAG);
+        }else {
+            for (let flatPropertyName in columns) {
+                const node = columns[flatPropertyName];
+                const TAG = node.render(action, options);
+                OPTION.appendChild(TAG);
+            }
         }
 
         SELECT.appendChild(OPTION);

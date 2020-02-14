@@ -50,7 +50,7 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
         }
     };
 
-    this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData);
+    this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit);
 
     //TODO this is not congruent with this.patch and this.delete
     this.get = (uri, dataCallback) => xyz.get(uri, dataCallback);

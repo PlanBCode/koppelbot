@@ -73,17 +73,12 @@ exports.actions = {
             };
         } else { // create password : update data continuously
             const onChangeHandler = () => {
-                if(INPUT_new.value !== INPUT_confirm.value){
-                    INPUT_confirm.classList.add('xyz-invalid-content');
-                }else {
-                    INPUT_confirm.classList.remove('xyz-invalid-content');
-                    item.patch({
-                        // old: INPUT_old.value,
-                        new: INPUT_new.value,
-                        confirm: INPUT_confirm.value,
-                        username: INPUT_username.value
-                    });
-                }
+                item.patch({
+                    // old: INPUT_old.value,
+                    new: INPUT_new.value,
+                    confirm: INPUT_confirm.value,
+                    username: INPUT_username.value
+                });
             };
             INPUT_new.oninput = onChangeHandler;
             INPUT_confirm.oninput = onChangeHandler;

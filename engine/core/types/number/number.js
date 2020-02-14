@@ -19,14 +19,6 @@ exports.actions = {
             if (INPUT !== document.activeElement) { // we don't want to interupt typing
                 INPUT.value = content;
             }
-            if (!item.validateContent(content)) {
-
-                INPUT.classList.add('xyz-invalid-content');
-                console.log('invalid',INPUT);
-            } else {
-                console.log('valid',content);
-                INPUT.classList.remove('xyz-invalid-content');
-            }
         };
         item.onChange(onChangeHandler);
         onChangeHandler(item);

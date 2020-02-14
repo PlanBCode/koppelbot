@@ -33,7 +33,7 @@ exports.actions = {
         INPUT_create.value = "Add";
         const data = {};
 
-        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, [0], data);
+        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, [0], data, INPUT_create);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
 

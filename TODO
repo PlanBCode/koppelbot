@@ -6,20 +6,10 @@ file type: viewer
 - txt,csv -> flat text
 - images -> browser
 
-make parts of signature optional (for example extension in file)
-
-check validateContent @ onChange
-- for element : block patch and set css classes
-- for creator : block submit button and set css classes
-- validate -> return messages why it's not valid
-
+validateContent -> return messages why it's not valid
 
 array/object
 - delete values
-
-
-
-
 
 add samples to types for testing
 - type.json

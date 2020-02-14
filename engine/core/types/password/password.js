@@ -57,13 +57,7 @@ exports.actions = {
             };
         } else { // create password : update data continuously
             const onChangeHandler = () => {
-                if(INPUT_new.value !== INPUT_confirm.value){
-                    INPUT_confirm.classList.add('xyz-invalid-content');
-                }else {
-                    INPUT_confirm.classList.remove('xyz-invalid-content');
-                    //TODO check if they match, if not: indicate!
-                    item.patch({new: INPUT_new.value, confirm: INPUT_confirm.value})
-                }
+                item.patch({new: INPUT_new.value, confirm: INPUT_confirm.value})
             };
             INPUT_new.oninput = onChangeHandler;
             INPUT_confirm.oninput = onChangeHandler;
@@ -77,9 +71,9 @@ exports.actions = {
     },
     validateContent: function (item) {
         const content = item.getContent();
-        if(typeof content !== 'object' || content === null) return false;
-        if(typeof content.new !=='string') return false;
-        if(typeof content.confirm !=='string') return false;
+        if (typeof content !== 'object' || content === null) return false;
+        if (typeof content.new !== 'string') return false;
+        if (typeof content.confirm !== 'string') return false;
         return content.confirm === content.new; // TODO min/max length, allow chars, regex
     }
 };

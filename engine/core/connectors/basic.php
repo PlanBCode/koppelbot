@@ -80,20 +80,19 @@ abstract class BasicConnector extends Connector
                     $connectorResponse->add(200, $propertyRequest, $entityId, $content);
                 } else {
                     if ($key === 'content') {
+                        $entity = $this->data[$entityId];
                         $keyPath = [];
-                    } elseif (substr($key, 0, 1) === '_') {
-                        $keyPath = [$key];
                     } elseif (is_string($key) && substr($key, 0, 1) === '.') {
+                        $entity = $this->data[$entityId];
                         $keyPath = explode('.', substr($key, 1));
+                    } elseif (is_string($key)) {
+                        $entity = $this->meta[$entityId];
+                        $keyPath = explode('.', $key);
                     } else {
                         $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
-
-                    $entity = substr($key, 0, 1) === '_'
-                        ? $this->meta[$entityId]
-                        : $this->data[$entityId];
                     $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
                     if ($jsonActionResponse->succeeded()) {
                         $connectorResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);

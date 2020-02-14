@@ -6,18 +6,26 @@ const json = require('../web/json.js');
 const DEFAULT_TYPE = 'string';
 
 function element(xyz, action, uri, subPropertyPath, status, content, settings, options) {
-    const type = settings.type || DEFAULT_TYPE;
-    if (!types.hasOwnProperty(type)) {
+    const typeName = settings.type || DEFAULT_TYPE;
+    if (!types.hasOwnProperty(typeName)) {
         console.error('problem1');
         return null;
     }
-    if (types[type].hasOwnProperty(action)) {
+    const type = types[typeName]
+    if (type.hasOwnProperty(action)) {
         let onChange, onDelete;
+        let TAG;
         if (action === 'edit') {
             onChange = (content, additionalSubPropertyPath) => {
                 additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
                 const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
-                xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, content));
+                const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
+                if(type.validateContent(item)){
+                    TAG.classList.remove('xyz-invalid-content');
+                    xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, content));
+                }else{
+                    TAG.classList.add('xyz-invalid-content');
+                }
             };
             onDelete = subUri => {
                 //TODO use subPropertyPath
@@ -25,9 +33,9 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
                 xyz.delete(uri + subUri);
             };
         }
-
         const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
-        const TAG = types[type][action](item); // TODO
+        TAG = type[action](item); // TODO
+
         //  item.forceChange();
 
         // TODO add id from options (also for label for)
@@ -57,7 +65,7 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
     }
 }
 
-function creator(xyz, options, uri, settings, subPropertyPath, data) {
+function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submit) {
     const typeName = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(typeName)) {
         console.error('problem1'); //TODO return a TR containing the error
@@ -68,7 +76,6 @@ function creator(xyz, options, uri, settings, subPropertyPath, data) {
     if (typeName === 'id' && xyz.isAutoIncremented(entityClassName)) {
         return [];
     }
-
     const type = types[typeName];
 
     if (!type.hasOwnProperty('edit')) {
@@ -83,13 +90,23 @@ function creator(xyz, options, uri, settings, subPropertyPath, data) {
         TD_label.innerText = subPropertyPath[0];
         TR.appendChild(TD_label);
     }
-    const onChange = (content, additionalSubPropertyPath) => {
+    let TAG;
+    let onChange,onDelete;
+    onChange = (content, additionalSubPropertyPath) => {
         const keyPath = typeof additionalSubPropertyPath === 'undefined'
             ? subPropertyPath
             : subPropertyPath.concat(additionalSubPropertyPath);
-        json.set(data, keyPath, content);
+        const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
+        if(type.validateContent(item)) {
+            TAG.classList.remove('xyz-invalid-content');
+            if(INPUT_submit) INPUT_submit.disabled = false;
+            json.set(data, keyPath, content);
+        }else{
+            if(INPUT_submit) INPUT_submit.disabled = true;
+            TAG.classList.add('xyz-invalid-content');
+        }
     };
-    const onDelete = subUri => {
+    onDelete = subUri => {
         //TODO rewrite for subPropertyPath
         const keyPath = typeof subUri === 'undefined' ?
             [subPropertyPath] :
@@ -109,11 +126,11 @@ function creator(xyz, options, uri, settings, subPropertyPath, data) {
     }
 
     const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
-    const ELEMENT = type.edit(item);
+    TAG = type.edit(item);
     // TODO add id from options (also for label for)
     // TODO add class from options
     const TD_content = document.createElement('TD');
-    TD_content.appendChild(ELEMENT);
+    TD_content.appendChild(TAG);
     TR.appendChild(TD_content);
     TRs.push(TR);
     return TRs;
