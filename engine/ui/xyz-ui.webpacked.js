@@ -87,18 +87,18 @@ var xyz =
 /************************************************************************/
 /******/ ({
 
-/***/ "../../core/displays/item.js":
+/***/ "../../engine/core/displays/item.js":
 /*!*****************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/displays/item.js ***!
   \*****************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const list = __webpack_require__(/*! ./list.js */ \"../../core/displays/list.js\");\n\nexports.display = {\n    waitingForInput: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for input...';\n    },\n    waitingForData: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for data...';\n    },\n    empty: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'No items to display.';\n    },\n    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {\n        WRAPPER.innerHTML = '';\n    },\n    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {\n        const columns = list.flatten(content, requestUri);\n\n        const TABLE_entity = document.createElement('TABLE');\n        TABLE_entity.className = 'xyz-item';\n        const uri = '/' + entityClassName + '/' + entityId;\n        if (options.showHeader !== false) {\n            const TR_header = document.createElement('TR');\n            TR_header.className = 'xyz-item-header';\n            const TD_header = document.createElement('TD');\n            TD_header.innerHTML = uri;\n            TD_header.setAttribute('colspan', options.showLabel !== false ? '2' : '1');\n            TR_header.appendChild(TD_header);\n            TABLE_entity.appendChild(TR_header);\n        }\n        if (columns.constructor !== Object){\n            const node =  columns;\n            const TR_entity = document.createElement('TR');\n            //todo name\n            const TD_entityContent =document.createElement('TD');\n            const TAG = node.render(action, options);\n            TD_entityContent.appendChild(TAG);\n            TR_entity.appendChild(TD_entityContent);\n            TABLE_entity.appendChild(TR_entity);\n        }else {\n\n            for (let flatPropertyName in columns) {\n                const TR_flatProperty = document.createElement('TR');\n\n                if (options.showLabel !== false) {\n                    const TD_flatPropertyName = document.createElement('TD');\n                    TD_flatPropertyName.innerHTML = flatPropertyName;\n                    TR_flatProperty.appendChild(TD_flatPropertyName);\n                }\n                const TD_flatPropertyContent = document.createElement('TD');\n                const node = columns[flatPropertyName];\n                const TAG = node.render(action, options);\n                TD_flatPropertyContent.appendChild(TAG);\n                TR_flatProperty.appendChild(TD_flatPropertyContent);\n                TABLE_entity.appendChild(TR_flatProperty);\n            }\n        }\n        if (options.showDeleteButton === true) {\n            const TR_deleteButton = document.createElement('TR');\n            const TD_deleteButton = document.createElement('TD');\n            TD_deleteButton.setAttribute('colspan', 2);\n            const INPUT_deleteButton = document.createElement('INPUT');\n            INPUT_deleteButton.type = 'submit';\n            INPUT_deleteButton.value = 'Delete';\n            INPUT_deleteButton.onclick = () => {\n                xyz.delete(uri)\n            };\n            TD_deleteButton.appendChild(INPUT_deleteButton);\n            TR_deleteButton.appendChild(TD_deleteButton);\n            TABLE_entity.appendChild(TR_deleteButton);\n        }\n        WRAPPER.appendChild(TABLE_entity);\n    }\n};\n\n\n\n//# sourceURL=webpack://xyz//Users/Rouke/Documents/Mijn_projecten/koppelbot/site/engine/core/displays/item.js?");
+eval("const list = __webpack_require__(/*! ./list.js */ \"../../engine/core/displays/list.js\");\n\nexports.display = {\n    waitingForInput: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for input...';\n    },\n    waitingForData: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for data...';\n    },\n    empty: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'No items to display.';\n    },\n    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {\n        WRAPPER.innerHTML = '';\n    },\n    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {\n        const columns = list.flatten(content, requestUri);\n\n        const TABLE_entity = document.createElement('TABLE');\n        TABLE_entity.className = 'xyz-item';\n        const uri = '/' + entityClassName + '/' + entityId;\n        if (options.showHeader !== false) {\n            const TR_header = document.createElement('TR');\n            TR_header.className = 'xyz-item-header';\n            const TD_header = document.createElement('TD');\n            TD_header.innerHTML = uri;\n            TD_header.setAttribute('colspan', options.showLabel !== false ? '2' : '1');\n            TR_header.appendChild(TD_header);\n            TABLE_entity.appendChild(TR_header);\n        }\n        if (columns.constructor !== Object){\n            const node =  columns;\n            const TR_entity = document.createElement('TR');\n            //todo name\n            const TD_entityContent =document.createElement('TD');\n            const TAG = node.render(action, options);\n            TD_entityContent.appendChild(TAG);\n            TR_entity.appendChild(TD_entityContent);\n            TABLE_entity.appendChild(TR_entity);\n        }else {\n\n            for (let flatPropertyName in columns) {\n                const TR_flatProperty = document.createElement('TR');\n\n                if (options.showLabel !== false) {\n                    const TD_flatPropertyName = document.createElement('TD');\n                    TD_flatPropertyName.innerHTML = flatPropertyName;\n                    TR_flatProperty.appendChild(TD_flatPropertyName);\n                }\n                const TD_flatPropertyContent = document.createElement('TD');\n                const node = columns[flatPropertyName];\n                const TAG = node.render(action, options);\n                TD_flatPropertyContent.appendChild(TAG);\n                TR_flatProperty.appendChild(TD_flatPropertyContent);\n                TABLE_entity.appendChild(TR_flatProperty);\n            }\n        }\n        if (options.showDeleteButton === true) {\n            const TR_deleteButton = document.createElement('TR');\n            const TD_deleteButton = document.createElement('TD');\n            TD_deleteButton.setAttribute('colspan', 2);\n            const INPUT_deleteButton = document.createElement('INPUT');\n            INPUT_deleteButton.type = 'submit';\n            INPUT_deleteButton.value = 'Delete';\n            INPUT_deleteButton.onclick = () => {\n                xyz.delete(uri)\n            };\n            TD_deleteButton.appendChild(INPUT_deleteButton);\n            TR_deleteButton.appendChild(TD_deleteButton);\n            TABLE_entity.appendChild(TR_deleteButton);\n        }\n        WRAPPER.appendChild(TABLE_entity);\n    }\n};\n\n\n\n//# sourceURL=webpack://xyz//Users/Rouke/Documents/Mijn_projecten/koppelbot/site/engine/core/displays/item.js?");
 
 /***/ }),
 
-/***/ "../../core/displays/list.js":
+/***/ "../../engine/core/displays/list.js":
 /*!*****************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/displays/list.js ***!
   \*****************************************************************************************/
@@ -109,29 +109,29 @@ eval("/*\n\noptions\n- select\n- multiSelect\n- addCreateButton\n- TODO default\
 
 /***/ }),
 
-/***/ "../../core/displays/select.js":
+/***/ "../../engine/core/displays/select.js":
 /*!*******************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/displays/select.js ***!
   \*******************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const list = __webpack_require__(/*! ./list.js */ \"../../core/displays/list.js\");\n\n/*\nTODO add radio flavor to provide radio box\n\noptions\n- select\n- flavor  dropdown|TODO radio\n- addCreateButton\n */\n\nexports.display = {\n    waitingForInput: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for input...';\n    },\n    waitingForData: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for data...';\n    },\n    empty: (xyz, action, options, WRAPPER, uri) => {\n        WRAPPER.innerHTML = '';\n        const SELECT = document.createElement('SELECT');\n        SELECT.className = 'xyz-select';\n        SELECT.onchange = () => {\n            const selectedUri = SELECT.options[SELECT.selectedIndex].value;\n            const path = selectedUri.substr(1).split('/');\n            const [entityClassName, entityId] = path;\n            list.select(xyz, options.select, entityClassName, entityId);\n        };\n        if (!options.initialValue) {\n            const OPTION = document.createElement('OPTION');\n            OPTION.innerText = 'Select...';\n            OPTION.disabled = true;\n            SELECT.appendChild(OPTION)\n        }\n        WRAPPER.appendChild(SELECT);\n        const entityClassNameList = uri.substr(1).split('/')[0] || '*';\n        const fullUri = '/' + entityClassNameList;\n        list.addCreateButton(xyz, fullUri, WRAPPER, options);\n    },\n    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {\n        //TODO something with wrapper?\n    },\n\n    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {\n        const columns = list.flatten(content);\n\n        const SELECT = WRAPPER.firstChild;\n\n        if (SELECT.childElementCount === 0 && !options.initialValue) { // select the first option as default TODO unless other default is defined\n            list.select(xyz, options, entityClassName, entityId);\n        }\n\n        const OPTION = document.createElement('OPTION');\n        OPTION.value = '/' + entityClassName + '/' + entityId;\n        if (typeof options.select === 'string' && xyz.getVariable() === options.select) {\n            OPTION.selected = true;\n        }\n        if (options.initialValue === entityId) {\n            list.select(xyz, options, entityClassName, entityId);\n            OPTION.selected = true;\n        }\n        for (let flatPropertyName in columns) {\n            const node = columns[flatPropertyName];\n            const TAG = node.render(action, options);\n            OPTION.appendChild(TAG);\n        }\n\n        SELECT.appendChild(OPTION);\n    }\n};\n\n//# sourceURL=webpack://xyz//Users/Rouke/Documents/Mijn_projecten/koppelbot/site/engine/core/displays/select.js?");
+eval("const list = __webpack_require__(/*! ./list.js */ \"../../engine/core/displays/list.js\");\n\n/*\nTODO add radio flavor to provide radio box\n\noptions\n- select\n- flavor  dropdown|TODO radio\n- addCreateButton\n */\n\nexports.display = {\n    waitingForInput: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for input...';\n    },\n    waitingForData: (xyz, action, options, WRAPPER) => {\n        WRAPPER.innerHTML = 'Waiting for data...';\n    },\n    empty: (xyz, action, options, WRAPPER, uri) => {\n        WRAPPER.innerHTML = '';\n        const SELECT = document.createElement('SELECT');\n        SELECT.className = 'xyz-select';\n        SELECT.onchange = () => {\n            const selectedUri = SELECT.options[SELECT.selectedIndex].value;\n            const path = selectedUri.substr(1).split('/');\n            const [entityClassName, entityId] = path;\n            list.select(xyz, options.select, entityClassName, entityId);\n        };\n        if (!options.initialValue) {\n            const OPTION = document.createElement('OPTION');\n            OPTION.innerText = 'Select...';\n            OPTION.disabled = true;\n            SELECT.appendChild(OPTION)\n        }\n        WRAPPER.appendChild(SELECT);\n        const entityClassNameList = uri.substr(1).split('/')[0] || '*';\n        const fullUri = '/' + entityClassNameList;\n        list.addCreateButton(xyz, fullUri, WRAPPER, options);\n    },\n    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {\n        //TODO something with wrapper?\n    },\n\n    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {\n        const columns = list.flatten(content);\n\n        const SELECT = WRAPPER.firstChild;\n\n        if (SELECT.childElementCount === 0 && !options.initialValue) { // select the first option as default TODO unless other default is defined\n            list.select(xyz, options, entityClassName, entityId);\n        }\n\n        const OPTION = document.createElement('OPTION');\n        OPTION.value = '/' + entityClassName + '/' + entityId;\n        if (typeof options.select === 'string' && xyz.getVariable() === options.select) {\n            OPTION.selected = true;\n        }\n        if (options.initialValue === entityId) {\n            list.select(xyz, options, entityClassName, entityId);\n            OPTION.selected = true;\n        }\n        for (let flatPropertyName in columns) {\n            const node = columns[flatPropertyName];\n            const TAG = node.render(action, options);\n            OPTION.appendChild(TAG);\n        }\n\n        SELECT.appendChild(OPTION);\n    }\n};\n\n//# sourceURL=webpack://xyz//Users/Rouke/Documents/Mijn_projecten/koppelbot/site/engine/core/displays/select.js?");
 
 /***/ }),
 
-/***/ "../../core/types/array/array.js":
+/***/ "../../engine/core/types/array/array.js":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/array/array.js ***!
   \*********************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const object = __webpack_require__(/*! ../object/object */ \"../../core/types/object/object.js\");\n\nfunction makeArray(content) {\n    if (content === null) {\n        return [];\n    } else if (content instanceof Array) {\n        return content;\n    } else if (typeof content === 'object') { // if data is an object, reshape to array\n        const tmp = [];\n        for (let key in content) {\n            tmp[key] = content[key];\n        }\n        return tmp;\n    } else {\n        //TODO problem\n        return [];\n    }\n}\n\nexports.actions = {\n    edit: function (item) {\n        // TODO create ui for adding/removing elements\n        // TODO create drop ui to drag elements to\n        const SPAN = document.createElement('SPAN');\n        const content = makeArray(item.getContent());\n\n        const subSettings = item.getSetting('subType');\n        const subOptions = {showLabels: false, display: item.getOption('display')};\n        const DIV_CREATE = document.createElement('DIV');\n        const INPUT_create = document.createElement('INPUT');\n        INPUT_create.type = \"submit\";\n        //TODO add class\n        INPUT_create.value = \"Add\";\n        const data = {};\n\n        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, [0], data);\n        const TABLE_create = document.createElement('TABLE');\n        TRs.forEach(TR => TABLE_create.appendChild(TR));\n\n        DIV_CREATE.appendChild(TABLE_create);\n        DIV_CREATE.appendChild(INPUT_create);\n        SPAN.appendChild(DIV_CREATE);\n        let length = content.length;\n        const rows = [];\n        const addRow = (key, subContent) => {\n            ++length;\n            const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);\n            const DIV_sub = document.createElement('DIV');\n            const INPUT_remove = document.createElement('INPUT');\n            INPUT_remove.type = 'submit';\n            INPUT_remove.onclick = () => {\n                item.delete([key]);\n            };\n            INPUT_remove.value = 'x';\n            DIV_sub.appendChild(INPUT_remove);\n            DIV_sub.appendChild(TAG);\n            rows[key] = DIV_sub;\n            SPAN.insertBefore(DIV_sub, DIV_CREATE);\n        };\n        const deleteRow = key => {\n            const TAG_row = rows[key];\n            rows.splice(key, 1);\n            SPAN.removeChild(TAG_row);\n        };\n        INPUT_create.onclick = () => {\n            item.patch(data[0], [length]);\n        };\n\n        for (let key in content) {\n            const subContent = content[key];\n            addRow(key, subContent);\n        }\n\n        object.setupOnChange(item, rows, addRow, deleteRow);\n        return SPAN;\n    },\n    view: function (item) {\n        const SPAN = document.createElement('SPAN');\n        const subSettings = item.getSetting('subType');\n        const subOptions = item.getOptions(); //TODO\n        const content = makeArray(item.getContent());\n        const rows = [];\n        const addRow = (key, subContent) => {\n            const TAG = item.renderSubElement('view', [key], item.getStatus(), subContent, subSettings, subOptions);\n            rows[key] = TAG;\n            SPAN.appendChild(TAG);\n        };\n        const deleteRow = key => {\n            const TAG_row = rows[key];\n            rows.splice(key, 1);\n            SPAN.removeChild(TAG_row);\n        };\n        for (let key in content) {\n            const subContent = content[key];\n            addRow(key, subContent);\n        }\n        object.setupOnChange(item, rows, addRow, deleteRow);\n        return SPAN;\n    },\n    validateContent: function (item) {\n        const content = item.getContent();\n        if (content === null || typeof content !== 'object') {\n            return false;\n        }\n        const subSettings = item.getSetting('subType');\n        for (let key in content) {\n            const subContent = content[key];\n            if (!item.validateContent(subContent, subSettings)) {\n                return false;\n            }\n        }\n        return true;\n    },\n    validateSubPropertyPath: function (subPropertyPath, settings, validateSubPropertyPath) {\n        const subType = settings.subType.type || 'string';\n        return subPropertyPath instanceof Array &&\n            !isNaN(subPropertyPath[0]) &&\n            Number(subPropertyPath) === Math.floor(subPropertyPath) &&\n            validateSubPropertyPath(subType, subPropertyPath.slice(1));\n    }\n};\n\n//# sourceURL=webpack://xyz//Users/Rouke/Documents/Mijn_projecten/koppelbot/site/engine/core/types/array/array.js?");
+eval("const object = __webpack_require__(/*! ../object/object */ \"../../engine/core/types/object/object.js\");\n\nfunction makeArray(content) {\n    if (content === null) {\n        return [];\n    } else if (content instanceof Array) {\n        return content;\n    } else if (typeof content === 'object') { // if data is an object, reshape to array\n        const tmp = [];\n        for (let key in content) {\n            tmp[key] = content[key];\n        }\n        return tmp;\n    } else {\n        //TODO problem\n        return [];\n    }\n}\n\nexports.actions = {\n    edit: function (item) {\n        // TODO create ui for adding/removing elements\n        // TODO create drop ui to drag elements to\n        const SPAN = document.createElement('SPAN');\n        const content = makeArray(item.getContent());\n\n        const subSettings = item.getSetting('subType');\n        const subOptions = {showLabels: false, display: item.getOption('display')};\n        const DIV_CREATE = document.createElement('DIV');\n        const INPUT_create = document.createElement('INPUT');\n        INPUT_create.type = \"submit\";\n        //TODO add class\n        INPUT_create.value = \"Add\";\n        const data = {};\n\n        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, [0], data);\n        const TABLE_create = document.createElement('TABLE');\n        TRs.forEach(TR => TABLE_create.appendChild(TR));\n\n        DIV_CREATE.appendChild(TABLE_create);\n        DIV_CREATE.appendChild(INPUT_create);\n        SPAN.appendChild(DIV_CREATE);\n        let length = content.length;\n        const rows = [];\n        const addRow = (key, subContent) => {\n            ++length;\n            const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);\n            const DIV_sub = document.createElement('DIV');\n            const INPUT_remove = document.createElement('INPUT');\n            INPUT_remove.type = 'submit';\n            INPUT_remove.onclick = () => {\n                item.delete([key]);\n            };\n            INPUT_remove.value = 'x';\n            DIV_sub.appendChild(INPUT_remove);\n            DIV_sub.appendChild(TAG);\n            rows[key] = DIV_sub;\n            SPAN.insertBefore(DIV_sub, DIV_CREATE);\n        };\n        const deleteRow = key => {\n            const TAG_row = rows[key];\n            rows.splice(key, 1);\n            SPAN.removeChild(TAG_row);\n        };\n        INPUT_create.onclick = () => {\n            item.patch(data[0], [length]);\n        };\n\n        for (let key in content) {\n            const subContent = content[key];\n            addRow(key, subContent);\n        }\n\n        object.setupOnChange(item, rows, addRow, deleteRow);\n        return SPAN;\n    },\n    view: function (item) {\n        const SPAN = document.createElement('SPAN');\n        const subSettings = item.getSetting('subType');\n        const subOptions = item.getOptions(); //TODO\n        const content = makeArray(item.getContent());\n        const rows = [];\n        const addRow = (key, subContent) => {\n            const TAG = item.renderSubElement('view', [key], item.getStatus(), subContent, subSettings, subOptions);\n            rows[key] = TAG;\n            SPAN.appendChild(TAG);\n        };\n        const deleteRow = key => {\n            const TAG_row = rows[key];\n            rows.splice(key, 1);\n            SPAN.removeChild(TAG_row);\n        };\n        for (let key in content) {\n            const subContent = content[key];\n            addRow(key, subContent);\n        }\n        object.setupOnChange(item, rows, addRow, deleteRow);\n        return SPAN;\n    },\n    validateContent: function (item) {\n        const content = item.getContent();\n        if (content === null || typeof content !== 'object') {\n            return false;\n        }\n        const subSettings = item.getSetting('subType');\n        for (let key in content) {\n            const subContent = content[key];\n            if (!item.validateContent(subContent, subSettings)) {\n                return false;\n            }\n        }\n        return true;\n    },\n    validateSubPropertyPath: function (subPropertyPath, settings, validateSubPropertyPath) {\n        const subType = settings.subType.type || 'string';\n        return subPropertyPath instanceof Array &&\n            !isNaN(subPropertyPath[0]) &&\n            Number(subPropertyPath) === Math.floor(subPropertyPath) &&\n            validateSubPropertyPath(subType, subPropertyPath.slice(1));\n    }\n};\n\n//# sourceURL=webpack://xyz//Users/Rouke/Documents/Mijn_projecten/koppelbot/site/engine/core/types/array/array.js?");
 
 /***/ }),
 
-/***/ "../../core/types/array/array.json":
+/***/ "../../engine/core/types/array/array.json":
 /*!***********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/array/array.json ***!
   \***********************************************************************************************/
@@ -142,7 +142,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"array\\\"
 
 /***/ }),
 
-/***/ "../../core/types/bool/bool.js":
+/***/ "../../engine/core/types/bool/bool.js":
 /*!*******************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/bool/bool.js ***!
   \*******************************************************************************************/
@@ -153,7 +153,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        //TODO radio fla
 
 /***/ }),
 
-/***/ "../../core/types/bool/bool.json":
+/***/ "../../engine/core/types/bool/bool.json":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/bool/bool.json ***!
   \*********************************************************************************************/
@@ -164,7 +164,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"bool\\\",
 
 /***/ }),
 
-/***/ "../../core/types/enum/enum.js":
+/***/ "../../engine/core/types/enum/enum.js":
 /*!*******************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/enum/enum.js ***!
   \*******************************************************************************************/
@@ -175,7 +175,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        const SELECT = d
 
 /***/ }),
 
-/***/ "../../core/types/enum/enum.json":
+/***/ "../../engine/core/types/enum/enum.json":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/enum/enum.json ***!
   \*********************************************************************************************/
@@ -186,7 +186,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"enum\\\"}
 
 /***/ }),
 
-/***/ "../../core/types/file/file.js":
+/***/ "../../engine/core/types/file/file.js":
 /*!*******************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/file/file.js ***!
   \*******************************************************************************************/
@@ -197,7 +197,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        const prepareCon
 
 /***/ }),
 
-/***/ "../../core/types/file/file.json":
+/***/ "../../engine/core/types/file/file.json":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/file/file.json ***!
   \*********************************************************************************************/
@@ -208,7 +208,7 @@ eval("module.exports = JSON.parse(\"{\\\"accepts\\\":{\\\"type\\\":\\\"array\\\"
 
 /***/ }),
 
-/***/ "../../core/types/id/id.js":
+/***/ "../../engine/core/types/id/id.js":
 /*!***************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/id/id.js ***!
   \***************************************************************************************/
@@ -219,7 +219,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        //TODO make visi
 
 /***/ }),
 
-/***/ "../../core/types/id/id.json":
+/***/ "../../engine/core/types/id/id.json":
 /*!*****************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/id/id.json ***!
   \*****************************************************************************************/
@@ -230,7 +230,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"id\\\"},\
 
 /***/ }),
 
-/***/ "../../core/types/json/json.js":
+/***/ "../../engine/core/types/json/json.js":
 /*!*******************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/json/json.js ***!
   \*******************************************************************************************/
@@ -241,7 +241,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        const TEXTAREA =
 
 /***/ }),
 
-/***/ "../../core/types/json/json.json":
+/***/ "../../engine/core/types/json/json.json":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/json/json.json ***!
   \*********************************************************************************************/
@@ -252,7 +252,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"json\\\"}
 
 /***/ }),
 
-/***/ "../../core/types/login/login.js":
+/***/ "../../engine/core/types/login/login.js":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/login/login.js ***!
   \*********************************************************************************************/
@@ -263,7 +263,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        //TODO notify if
 
 /***/ }),
 
-/***/ "../../core/types/login/login.json":
+/***/ "../../engine/core/types/login/login.json":
 /*!***********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/login/login.json ***!
   \***********************************************************************************************/
@@ -274,7 +274,7 @@ eval("module.exports = JSON.parse(\"{\\\"minLength\\\":{\\\"type\\\":\\\"number\
 
 /***/ }),
 
-/***/ "../../core/types/number/number.js":
+/***/ "../../engine/core/types/number/number.js":
 /*!***********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/number/number.js ***!
   \***********************************************************************************************/
@@ -285,7 +285,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        const INPUT = do
 
 /***/ }),
 
-/***/ "../../core/types/number/number.json":
+/***/ "../../engine/core/types/number/number.json":
 /*!*************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/number/number.json ***!
   \*************************************************************************************************/
@@ -296,7 +296,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"number\\\
 
 /***/ }),
 
-/***/ "../../core/types/object/object.js":
+/***/ "../../engine/core/types/object/object.js":
 /*!***********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/object/object.js ***!
   \***********************************************************************************************/
@@ -307,7 +307,7 @@ eval("const setupOnChange = (item, TAGs_row, addRow, deleteRow) => item.onChange
 
 /***/ }),
 
-/***/ "../../core/types/object/object.json":
+/***/ "../../engine/core/types/object/object.json":
 /*!*************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/object/object.json ***!
   \*************************************************************************************************/
@@ -318,7 +318,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"object\\\
 
 /***/ }),
 
-/***/ "../../core/types/password/password.js":
+/***/ "../../engine/core/types/password/password.js":
 /*!***************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/password/password.js ***!
   \***************************************************************************************************/
@@ -329,7 +329,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        //TODO notify if
 
 /***/ }),
 
-/***/ "../../core/types/password/password.json":
+/***/ "../../engine/core/types/password/password.json":
 /*!*****************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/password/password.json ***!
   \*****************************************************************************************************/
@@ -340,7 +340,7 @@ eval("module.exports = JSON.parse(\"{\\\"minLength\\\":{\\\"type\\\":\\\"number\
 
 /***/ }),
 
-/***/ "../../core/types/reference/reference.js":
+/***/ "../../engine/core/types/reference/reference.js":
 /*!*****************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/reference/reference.js ***!
   \*****************************************************************************************************/
@@ -351,7 +351,7 @@ eval("exports.actions = {\n    edit: function (item) {\n        const TAG = item
 
 /***/ }),
 
-/***/ "../../core/types/reference/reference.json":
+/***/ "../../engine/core/types/reference/reference.json":
 /*!*******************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/reference/reference.json ***!
   \*******************************************************************************************************/
@@ -362,7 +362,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"reference
 
 /***/ }),
 
-/***/ "../../core/types/string/string.js":
+/***/ "../../engine/core/types/string/string.js":
 /*!***********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/string/string.js ***!
   \***********************************************************************************************/
@@ -373,7 +373,7 @@ eval("function edit(item) {\n    const INPUT = document.createElement('INPUT');\
 
 /***/ }),
 
-/***/ "../../core/types/string/string.json":
+/***/ "../../engine/core/types/string/string.json":
 /*!*************************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/string/string.json ***!
   \*************************************************************************************************/
@@ -384,7 +384,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"string\\\
 
 /***/ }),
 
-/***/ "../../core/types/type/type.js":
+/***/ "../../engine/core/types/type/type.js":
 /*!*******************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/type/type.js ***!
   \*******************************************************************************************/
@@ -395,7 +395,7 @@ eval("exports.actions = {\n    edit: function (originalItem) {\n        const TA
 
 /***/ }),
 
-/***/ "../../core/types/type/type.json":
+/***/ "../../engine/core/types/type/type.json":
 /*!*********************************************************************************************!*\
   !*** /Users/Rouke/Documents/Mijn projecten/koppelbot/site/engine/core/types/type/type.json ***!
   \*********************************************************************************************/
@@ -413,7 +413,7 @@ eval("module.exports = JSON.parse(\"{\\\"default\\\":{\\\"type\\\":\\\"type\\\",
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("// This file is created by gulpfile.js using the type definitions of engine/core/displays/*.js. \n\nexports.item = __webpack_require__(/*! ../../../core/displays/item.js */ \"../../core/displays/item.js\").display;\nexports.list = __webpack_require__(/*! ../../../core/displays/list.js */ \"../../core/displays/list.js\").display;\nexports.select = __webpack_require__(/*! ../../../core/displays/select.js */ \"../../core/displays/select.js\").display;\n\n\n//# sourceURL=webpack://xyz/./build/displays.js?");
+eval("// This file is created by gulpfile.js using the type definitions of engine/core/displays/*.js. \n\nexports.item = __webpack_require__(/*! ../../../engine/core/displays/item.js */ \"../../engine/core/displays/item.js\").display;\nexports.list = __webpack_require__(/*! ../../../engine/core/displays/list.js */ \"../../engine/core/displays/list.js\").display;\nexports.select = __webpack_require__(/*! ../../../engine/core/displays/select.js */ \"../../engine/core/displays/select.js\").display;\n\n\n//# sourceURL=webpack://xyz/./build/displays.js?");
 
 /***/ }),
 
@@ -424,7 +424,7 @@ eval("// This file is created by gulpfile.js using the type definitions of engin
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("// This file is created by gulpfile.js using the type definitions of engine/core/types/*.js. \n\nexports.array = __webpack_require__(/*! ../../../core/types/array/array.js */ \"../../core/types/array/array.js\").actions;\nexports.array.json = __webpack_require__(/*! ../../../core/types/array/array.json */ \"../../core/types/array/array.json\");\n\nexports.bool = __webpack_require__(/*! ../../../core/types/bool/bool.js */ \"../../core/types/bool/bool.js\").actions;\nexports.bool.json = __webpack_require__(/*! ../../../core/types/bool/bool.json */ \"../../core/types/bool/bool.json\");\n\nexports.enum = __webpack_require__(/*! ../../../core/types/enum/enum.js */ \"../../core/types/enum/enum.js\").actions;\nexports.enum.json = __webpack_require__(/*! ../../../core/types/enum/enum.json */ \"../../core/types/enum/enum.json\");\n\nexports.file = __webpack_require__(/*! ../../../core/types/file/file.js */ \"../../core/types/file/file.js\").actions;\nexports.file.json = __webpack_require__(/*! ../../../core/types/file/file.json */ \"../../core/types/file/file.json\");\n\nexports.id = __webpack_require__(/*! ../../../core/types/id/id.js */ \"../../core/types/id/id.js\").actions;\nexports.id.json = __webpack_require__(/*! ../../../core/types/id/id.json */ \"../../core/types/id/id.json\");\n\nexports.json = __webpack_require__(/*! ../../../core/types/json/json.js */ \"../../core/types/json/json.js\").actions;\nexports.json.json = __webpack_require__(/*! ../../../core/types/json/json.json */ \"../../core/types/json/json.json\");\n\nexports.login = __webpack_require__(/*! ../../../core/types/login/login.js */ \"../../core/types/login/login.js\").actions;\nexports.login.json = __webpack_require__(/*! ../../../core/types/login/login.json */ \"../../core/types/login/login.json\");\n\nexports.number = __webpack_require__(/*! ../../../core/types/number/number.js */ \"../../core/types/number/number.js\").actions;\nexports.number.json = __webpack_require__(/*! ../../../core/types/number/number.json */ \"../../core/types/number/number.json\");\n\nexports.object = __webpack_require__(/*! ../../../core/types/object/object.js */ \"../../core/types/object/object.js\").actions;\nexports.object.json = __webpack_require__(/*! ../../../core/types/object/object.json */ \"../../core/types/object/object.json\");\n\nexports.password = __webpack_require__(/*! ../../../core/types/password/password.js */ \"../../core/types/password/password.js\").actions;\nexports.password.json = __webpack_require__(/*! ../../../core/types/password/password.json */ \"../../core/types/password/password.json\");\n\nexports.reference = __webpack_require__(/*! ../../../core/types/reference/reference.js */ \"../../core/types/reference/reference.js\").actions;\nexports.reference.json = __webpack_require__(/*! ../../../core/types/reference/reference.json */ \"../../core/types/reference/reference.json\");\n\nexports.string = __webpack_require__(/*! ../../../core/types/string/string.js */ \"../../core/types/string/string.js\").actions;\nexports.string.json = __webpack_require__(/*! ../../../core/types/string/string.json */ \"../../core/types/string/string.json\");\n\nexports.type = __webpack_require__(/*! ../../../core/types/type/type.js */ \"../../core/types/type/type.js\").actions;\nexports.type.json = __webpack_require__(/*! ../../../core/types/type/type.json */ \"../../core/types/type/type.json\");\n\n\n\n//# sourceURL=webpack://xyz/./build/types.js?");
+eval("// This file is created by gulpfile.js using the type definitions of engine/core/types/*/*.js. \n\nexports.array = __webpack_require__(/*! ../../../engine/core/types/array/array.js */ \"../../engine/core/types/array/array.js\").actions;\nexports.array.json = __webpack_require__(/*! ../../../engine/core/types/array/array.json */ \"../../engine/core/types/array/array.json\");\n\nexports.bool = __webpack_require__(/*! ../../../engine/core/types/bool/bool.js */ \"../../engine/core/types/bool/bool.js\").actions;\nexports.bool.json = __webpack_require__(/*! ../../../engine/core/types/bool/bool.json */ \"../../engine/core/types/bool/bool.json\");\n\nexports.enum = __webpack_require__(/*! ../../../engine/core/types/enum/enum.js */ \"../../engine/core/types/enum/enum.js\").actions;\nexports.enum.json = __webpack_require__(/*! ../../../engine/core/types/enum/enum.json */ \"../../engine/core/types/enum/enum.json\");\n\nexports.file = __webpack_require__(/*! ../../../engine/core/types/file/file.js */ \"../../engine/core/types/file/file.js\").actions;\nexports.file.json = __webpack_require__(/*! ../../../engine/core/types/file/file.json */ \"../../engine/core/types/file/file.json\");\n\nexports.id = __webpack_require__(/*! ../../../engine/core/types/id/id.js */ \"../../engine/core/types/id/id.js\").actions;\nexports.id.json = __webpack_require__(/*! ../../../engine/core/types/id/id.json */ \"../../engine/core/types/id/id.json\");\n\nexports.json = __webpack_require__(/*! ../../../engine/core/types/json/json.js */ \"../../engine/core/types/json/json.js\").actions;\nexports.json.json = __webpack_require__(/*! ../../../engine/core/types/json/json.json */ \"../../engine/core/types/json/json.json\");\n\nexports.login = __webpack_require__(/*! ../../../engine/core/types/login/login.js */ \"../../engine/core/types/login/login.js\").actions;\nexports.login.json = __webpack_require__(/*! ../../../engine/core/types/login/login.json */ \"../../engine/core/types/login/login.json\");\n\nexports.number = __webpack_require__(/*! ../../../engine/core/types/number/number.js */ \"../../engine/core/types/number/number.js\").actions;\nexports.number.json = __webpack_require__(/*! ../../../engine/core/types/number/number.json */ \"../../engine/core/types/number/number.json\");\n\nexports.object = __webpack_require__(/*! ../../../engine/core/types/object/object.js */ \"../../engine/core/types/object/object.js\").actions;\nexports.object.json = __webpack_require__(/*! ../../../engine/core/types/object/object.json */ \"../../engine/core/types/object/object.json\");\n\nexports.password = __webpack_require__(/*! ../../../engine/core/types/password/password.js */ \"../../engine/core/types/password/password.js\").actions;\nexports.password.json = __webpack_require__(/*! ../../../engine/core/types/password/password.json */ \"../../engine/core/types/password/password.json\");\n\nexports.reference = __webpack_require__(/*! ../../../engine/core/types/reference/reference.js */ \"../../engine/core/types/reference/reference.js\").actions;\nexports.reference.json = __webpack_require__(/*! ../../../engine/core/types/reference/reference.json */ \"../../engine/core/types/reference/reference.json\");\n\nexports.string = __webpack_require__(/*! ../../../engine/core/types/string/string.js */ \"../../engine/core/types/string/string.js\").actions;\nexports.string.json = __webpack_require__(/*! ../../../engine/core/types/string/string.json */ \"../../engine/core/types/string/string.json\");\n\nexports.type = __webpack_require__(/*! ../../../engine/core/types/type/type.js */ \"../../engine/core/types/type/type.js\").actions;\nexports.type.json = __webpack_require__(/*! ../../../engine/core/types/type/type.json */ \"../../engine/core/types/type/type.json\");\n\n\n\n//# sourceURL=webpack://xyz/./build/types.js?");
 
 /***/ }),
 
