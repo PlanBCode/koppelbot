@@ -97,10 +97,16 @@ exports.display = {
             const TD_checkbox = document.createElement('TD');
             TR_header.appendChild(TD_checkbox);
         }
-        for (let flatPropertyName in columns) {
+        if (columns.constructor !== Object) {
             const TD_header = document.createElement('TD');
-            TD_header.innerHTML = flatPropertyName;
+            TD_header.innerHTML = entityClassName;
             TR_header.appendChild(TD_header);
+        } else {
+            for (let flatPropertyName in columns) {
+                const TD_header = document.createElement('TD');
+                TD_header.innerHTML = flatPropertyName;
+                TR_header.appendChild(TD_header);
+            }
         }
         const TABLE = WRAPPER.firstChild;
         TABLE.appendChild(TR_header);
@@ -149,13 +155,20 @@ exports.display = {
             TD_checkbox.appendChild(INPUT_checkbox);
             TR_entity.appendChild(TD_checkbox);
         }
-
-        for (let flatPropertyName in columns) {
-            const TD_flatProperty = document.createElement('TD');
-            const node = columns[flatPropertyName];
+        if (columns.constructor !== Object) {
+            const node = columns;
+            const TD_entityContent = document.createElement('TD');
             const TAG = node.render(action, options);
-            TD_flatProperty.appendChild(TAG);
-            TR_entity.appendChild(TD_flatProperty);
+            TD_entityContent.appendChild(TAG);
+            TR_entity.appendChild(TD_entityContent);
+        } else {
+            for (let flatPropertyName in columns) {
+                const TD_flatProperty = document.createElement('TD');
+                const node = columns[flatPropertyName];
+                const TAG = node.render(action, options);
+                TD_flatProperty.appendChild(TAG);
+                TR_entity.appendChild(TD_flatProperty);
+            }
         }
 
         const TABLE = WRAPPER.firstChild;

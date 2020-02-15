@@ -147,7 +147,6 @@ function XYZ() {
         }
 
         if (display && display.hasOwnProperty('entity')) {
-            console.log(node);
             display.entity(this, action, options, WRAPPER, entityClassName, entityId, node);
         } else {
             //TODO a default way of handeling stuff
