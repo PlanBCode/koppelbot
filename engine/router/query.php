@@ -8,9 +8,9 @@ class QueryStatement
 
     public function __construct(string $queryStatementString)
     {
-        //TODO parse parentheses properly  GET /cars?(color==blue|color==red)&hatchback==true
+        //TODO parse parentheses/boolean expressions etc:  GET /cars?(color==blue|color==red)&hatchback==true
         $matches = [];
-        preg_match('/^(\w+)([=!><-]*)(.*)$/', $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
+        preg_match('/^([\w.]+)([=!><-]*)(.*)$/', $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
         $this->lhs = $matches[1];
         $this->operator = $matches[2];
         $this->rhs = $matches[3];
@@ -29,6 +29,32 @@ class QueryStatement
     public function getOperator()
     {
         return $this->operator;
+    }
+
+    public function getAllUsedPropertyNames(): array
+    {
+        //todo this only catches color==red
+        // TODO color1==color2  (how to distinguish between color="red" color=red ?)  solution: use .red for rhs columns
+        // TODO (color==red|color==blue)
+        if (in_array($this->operator, ['==', '!=', '<', '>', '<=', '>='])) {
+            return [$this->lhs];
+        } else {
+            return [];
+        }
+    }
+
+    public function match($entityContent): bool
+    {
+        //TODO check other operators
+        //TODO refactor to ease inclusion of more operators
+        //TODO use .property notation for rhs red = "red" , .red = $entityContent['red']
+        if ($this->operator === '==') {
+            $propertyPath = explode('.', $this->lhs);
+            $jsonActionResponse = json_get($entityContent,  $propertyPath);
+            if(!$jsonActionResponse->succeeded()) return false;
+            return $jsonActionResponse->content === $this->rhs;
+        }
+        return false;
     }
 }
 
@@ -55,17 +81,17 @@ class Query
         return $query;
     }
 
-    public function get(string $variableName): ?string
+    public function get(string $variableName, $default = null): ?string
     {
         foreach ($this->queryStatements as $queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {
                 $operator = $queryStatement->getOperator();
                 if ($operator === '=') {
-                    return  $queryStatement->getRhs();
+                    return $queryStatement->getRhs();
                 }
             }
         }
-        return null;
+        return $default;
     }
 
     public function checkToggle(string $variableName): bool
@@ -80,5 +106,37 @@ class Query
             }
         }
         return false;
+    }
+
+    public function getAllUsedPropertyNames(): array
+    {
+        $propertyNames = [];
+        foreach ($this->queryStatements as $queryStatement) {
+            $propertyNamesUsdByStatement = $queryStatement->getAllUsedPropertyNames();
+            if (count($propertyNamesUsdByStatement) > 0) {
+                array_push($propertyNames, ...$propertyNamesUsdByStatement);
+            }
+        }
+        return array_unique($propertyNames);
+    }
+
+
+    public function getMatchingEntityIds(&$content): array
+    {
+        $entityIds = [];
+        //TODO handle multi class requests
+        foreach ($content as $entityClassName => $entityClassContent) {
+            foreach ($entityClassContent as $entityId => $entityContent) {
+                $flagMatch = true;
+                foreach ($this->queryStatements as $queryStatement) {
+                    if (!$queryStatement->match($entityContent)) {
+                        $flagMatch = false;
+                        break;
+                    }
+                }
+                if ($flagMatch) array_push($entityIds, $entityId);
+            }
+        }
+        return $entityIds;
     }
 }

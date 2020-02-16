@@ -1,6 +1,6 @@
-# koppelbot
+# XYZ
 
-Koppelbot is a server side application that provides API and UI interfaces to your data.
+XYZ is a server side application that provides API and UI interfaces to your data.
 
 Using data models and html templates you can quickly build your web based applications.
 

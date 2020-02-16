@@ -1,15 +1,14 @@
 TODO
 
-
-filtering & searching:
-- query->getConnectorRequests
-- if they match the actual requests get them together with the rest
-- otherwise get them first, analyze and use to get the ids
+filtering & searching :
+- extend and refactor operators != , < , > , <=, >=, ...
+- implement sort
+- implement limit,offset
+- optimization: if the query connector requests match the actual requests get them together with the rest
+- - otherwise get them first, analyze and use to get the ids
 
 add dot notation: /source/*/file.content,id
-property paths -> property tree's?
-
-
+- property paths -> property tree's
 
 file type: viewer
 - pdf, odt https://viewerjs.org/ Only pdf and odt.
@@ -22,22 +21,11 @@ validateContent -> return messages why it's not valid
 array/object
 - delete values
 
-add samples to types for testing
-- type.json
+testing
+- - add samples to types for testing
 - - multiple samples for editing
-- - "PUT" "/0" "content"  "result"
-- create sample entity by adding all samples
-
-test.curl('GET','/api/')
- .shouldFail
- .shouldMatch
-
-test.file.write
-
-
-
-- UI: headless browser testing
-
+- - create sample entity by adding all samples
+- - UI: headless browser testing using test.browse
  const dom = new JSDOM(`<body>
    <script>document.body.appendChild(document.createElement("hr"));</script>
  </body>`, { runScripts: "dangerously", resources: "usable" });
@@ -58,7 +46,8 @@ werkend maken:
 - xyz.create('/source?content=default');
 - xyz.create('/$type', {});
 
-
+?raw option to get raw content for single entity (error if multiple requested)
+- add content type mime header
 
 EntityClass
 - "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -67,7 +56,7 @@ EntityClass
 - - only additions, modifications and removals
 - - HTTP status code xxx : object has been removed
 
-xyz.globals({options)  die worden aan alle ui.displays meegegeve
+xyz.globals({options})  die worden aan alle ui.displays meegegeven
 
 provide display settings schema in json form
 - - generate auto documentation for displays
