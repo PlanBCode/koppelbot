@@ -78,7 +78,7 @@ class ApiRequest extends HttpRequest2
 
         $propertyNames = $query->getAllUsedPropertyNames();
         if (count($propertyNames) === 0) return [];
-        if (count($propertyNames) !== 1){
+        if (count($propertyNames) !== 1) {
             echo 'ERROR : multi property query not yet supported';
             //TODO transform into propertyTree
             return [];
@@ -93,11 +93,8 @@ class ApiRequest extends HttpRequest2
         return getConnectorRequests('GET', '', $entityClassList, $entityIdList, $propertyPath, $query);
     }
 
-    public function createResponse()
+    protected function getRequestResponses()
     {
-        if ($this->uri === '') {
-            return new DocResponse('api' . $this->uri, 'API blabla');
-        }
         $path = explode('/', $this->uri);
         $entityClassList = count($path) > 1 ? $path[1] : '*';
         $entityIdList = count($path) > 2 ? $path[2] : '*';
@@ -112,7 +109,7 @@ class ApiRequest extends HttpRequest2
             $requestResponse = array_values($queryRequestResponses)[0];
             $data = $requestResponse->getContent();
             $entityIds = $query->getMatchingEntityIds($data);
-            $entityIdList = implode(',',$entityIds);
+            $entityIdList = implode(',', $entityIds);
         }
 
         /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.
@@ -121,8 +118,50 @@ before getting the actual data
 */
         $connectorRequests = getConnectorRequests($this->method, $this->content, $entityClassList, $entityIdList, $propertyPath, $query);
 
-        $requestResponses = getRequestResponses($connectorRequests);
-        return new ApiResponse($this->method, $requestResponses);
+        return getRequestResponses($connectorRequests);
+    }
+
+    public function createResponse()
+    {
+        if ($this->uri === '') {
+            return new DocResponse('api' . $this->uri, 'API blabla');
+        }
+
+        return new ApiResponse($this->method, $this->getRequestResponses());
+    }
+
+    public function getInternalApiResponse(): InternalApiResponse
+    {
+        return new InternalApiResponse($this->getRequestResponses());
+    }
+}
+
+class InternalApiResponse
+{
+    protected $status;
+    protected $content;
+
+    public function __construct(array $requestResponses)
+    {
+        $count = count($requestResponses);
+        if ($count == 0) {
+            $this->status = 200;
+            $this->content = [];
+        } else {
+            $requestResponse = array_values($requestResponses)[0];
+            $this->content =& $requestResponse->getContent();
+            $this->status = $requestResponse->getStatus();
+        } // TODO multi request
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function getContent()
+    {
+        return $this->content;
     }
 }
 
@@ -151,3 +190,20 @@ class ApiResponse extends HttpResponse2
          }*/
     }
 }
+
+function request(string $method, string $url, $content = '', $headers = []) : InternalApiResponse
+{
+    //todo pass content as object, parse to string
+    $splitUriOnQuestionMark = explode('?', $url);
+    $uri = array_get($splitUriOnQuestionMark, 0, '');
+    $queryString = array_get($splitUriOnQuestionMark, 1, '');
+    $request = new ApiRequest(
+        $method,
+        $uri,
+        $queryString,
+        $headers,
+        $content
+    );
+    return $request->getInternalApiResponse();
+}
+

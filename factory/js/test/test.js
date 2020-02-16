@@ -9,6 +9,11 @@ curl('GET', '/source/fruit/file/content')
     .contentShouldMatch({"source":{"fruit":{"file":{"content":"appel"}}}})
     .run();
 
+curl('GET', '/source/fruit')
+    .statusShouldMatch(200)
+    .contentShouldMatch('appel',['source','fruit','file','content'])
+    .run();
+
 exports.curl = curl;
 exports.file = require('./file');
 exports.browse = require('./browse');

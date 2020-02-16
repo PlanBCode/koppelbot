@@ -1,7 +1,7 @@
 TODO
 
 filtering & searching :
-- extend and refactor operators != , < , > , <=, >=, ...
+- implement full blown boolean expressions
 - implement sort
 - implement limit,offset
 - optimization: if the query connector requests match the actual requests get them together with the rest

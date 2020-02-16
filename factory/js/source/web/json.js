@@ -5,9 +5,9 @@ function json_set(object, keyPath, content) {
             return content;
         }
         if (typeof object !== 'object' || object === null) {
-            if(typeof fallBack !=='undefined') {
+            if (typeof fallBack !== 'undefined') {
                 return null
-            }else{
+            } else {
                 throw new TypeError('object not an object');
             }
         } else if (object.hasOwnProperty(keyPath[0])) {
@@ -33,9 +33,9 @@ function json_unset(object, keyPath, fallBack) {
             return undefined;
         }
         if (typeof object !== 'object' || object === null) {
-            if(typeof fallBack !=='undefined') {
+            if (typeof fallBack !== 'undefined') {
                 return null
-            }else{
+            } else {
                 throw new TypeError('object not an object');
             }
         } else if (object.hasOwnProperty(keyPath[0])) {
@@ -57,9 +57,9 @@ function json_get(object, keyPath, fallBack) {
             return object;
         }
         if (typeof object !== 'object' || object === null) {
-            if(typeof fallBack !=='undefined') {
+            if (typeof fallBack !== 'undefined') {
                 return null
-            }else{
+            } else {
                 throw new TypeError('object not an object');
             }
         } else if (object.hasOwnProperty(keyPath[0])) {
@@ -68,6 +68,7 @@ function json_get(object, keyPath, fallBack) {
         return null;
     }
 }
+
 //TODO json_get
 
 exports.get = json_get;

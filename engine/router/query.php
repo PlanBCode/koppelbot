@@ -1,7 +1,47 @@
 <?php
 
+
 class QueryStatement
 {
+    static protected function eq($lhs, $rhs): bool
+    {
+        return $lhs === $rhs;
+    }
+
+    static protected function neq($lhs, $rhs): bool
+    {
+        return $lhs !== $rhs;
+    }
+
+    static protected function lt($lhs, $rhs): bool
+    {
+        return $lhs < $rhs;
+    }
+
+    static protected function gt($lhs, $rhs): bool
+    {
+        return $lhs > $rhs;
+    }
+
+    static protected function leq($lhs, $rhs): bool
+    {
+        return $lhs <= $rhs;
+    }
+
+    static protected function geq($lhs, $rhs): bool
+    {
+        return $lhs >= $rhs;
+    }
+
+    static protected $comparisonOperators = [
+        '==' => 'eq',
+        '!=' => 'neq',
+        '<' => 'lt',
+        '>' => 'gt',
+        '<=' => 'leq',
+        '>=' => 'geq'
+    ];
+
     protected $lhs;
     protected $operator;
     protected $rhs;
@@ -10,7 +50,9 @@ class QueryStatement
     {
         //TODO parse parentheses/boolean expressions etc:  GET /cars?(color==blue|color==red)&hatchback==true
         $matches = [];
-        preg_match('/^([\w.]+)([=!><-]*)(.*)$/', $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
+        $operators = array_merge(array_keys(self::$comparisonOperators), ['=']);
+
+        preg_match('/^([\w.]+)(' . implode('|', $operators) . ')(.*)$/', $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
         $this->lhs = $matches[1];
         $this->operator = $matches[2];
         $this->rhs = $matches[3];
@@ -36,7 +78,7 @@ class QueryStatement
         //todo this only catches color==red
         // TODO color1==color2  (how to distinguish between color="red" color=red ?)  solution: use .red for rhs columns
         // TODO (color==red|color==blue)
-        if (in_array($this->operator, ['==', '!=', '<', '>', '<=', '>='])) {
+        if (array_key_exists($this->operator, self::$comparisonOperators)) {
             return [$this->lhs];
         } else {
             return [];
@@ -45,16 +87,14 @@ class QueryStatement
 
     public function match($entityContent): bool
     {
-        //TODO check other operators
-        //TODO refactor to ease inclusion of more operators
         //TODO use .property notation for rhs red = "red" , .red = $entityContent['red']
-        if ($this->operator === '==') {
-            $propertyPath = explode('.', $this->lhs);
-            $jsonActionResponse = json_get($entityContent,  $propertyPath);
-            if(!$jsonActionResponse->succeeded()) return false;
-            return $jsonActionResponse->content === $this->rhs;
-        }
-        return false;
+        $comparisonFunctionName = array_get(self::$comparisonOperators, $this->operator);
+        if (is_null($comparisonFunctionName)) return false;
+
+        $propertyPath = explode('.', $this->lhs);
+        $jsonActionResponse = json_get($entityContent, $propertyPath);
+        if (!$jsonActionResponse->succeeded()) return false;
+        return call_user_func_array(['self', $comparisonFunctionName], [$jsonActionResponse->content, $this->rhs]);
     }
 }
 

@@ -1,5 +1,6 @@
 const child_process = require('child_process');
 const util = require('./util');
+const json = require('../source/web/json');
 
 function ApiRequest(method, uri, data) {
     const tests = [];
@@ -9,13 +10,18 @@ function ApiRequest(method, uri, data) {
         return this;
     };
 
-    this.contentShouldMatch = content => {
-        tests.push((_, content_) => new util.TestResult(util.match(content, content_), `Content "${content_}" did not match expected content "${content}".`));
+    this.contentShouldMatch = (expectedContent, path) => {
+        tests.push((_, content) => {
+            if (path) {
+                content = json.get(content, path, true);
+            }
+            return new util.TestResult(util.match(content, expectedContent), `Content "${content}" did not match expected content "${expectedContent}".`)
+        });
         return this;
     };
 
-    this.statusShouldMatch = status => {
-        tests.push((status_, _) => new util.TestResult(status % 256 === status_ % 256, 'Status did not match.')); // NB: exit codes are capped at 255. 404%255 = 148
+    this.statusShouldMatch = expectedStatus => {
+        tests.push((status, _) => new util.TestResult(expectedStatus % 256 === status % 256, 'Status did not match.')); // NB: exit codes are capped at 255. 404%255 = 148
         return this;
     };
 
