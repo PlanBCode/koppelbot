@@ -10,7 +10,7 @@ function ApiRequest(method, uri, data) {
     };
 
     this.contentShouldMatch = content => {
-        tests.push((_, content_) => new util.TestResult(util.match(content, content_), 'Content did not match.'));
+        tests.push((_, content_) => new util.TestResult(util.match(content, content_), `Content "${content_}" did not match expected content "${content}".`));
         return this;
     };
 
