@@ -1,5 +1,16 @@
 TODO
 
+
+filtering & searching:
+- query->getConnectorRequests
+- if they match the actual requests get them together with the rest
+- otherwise get them first, analyze and use to get the ids
+
+add dot notation: /source/*/file.content,id
+property paths -> property tree's?
+
+
+
 file type: viewer
 - pdf, odt https://viewerjs.org/ Only pdf and odt.
 - office docx, pptx, xlsx  (microsoft/google api: require public access
@@ -17,7 +28,11 @@ add samples to types for testing
 - - "PUT" "/0" "content"  "result"
 - create sample entity by adding all samples
 
+test.curl('GET','/api/')
+ .shouldFail
+ .shouldMatch
 
+test.file.write
 
 
 
@@ -44,10 +59,6 @@ werkend maken:
 - xyz.create('/$type', {});
 
 
-filtering & searching:
-- query->getConnectorRequests
-- if they match the actual requests get them together with the rest
-- otherwise get them first, analyze and use to get the ids
 
 EntityClass
 - "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -82,7 +93,6 @@ drag&drop: als er een reference input veld is dan worden die entities sleepbaar
 
 hide private connector settings or better only expose specified ones
 
-add dot notation: /source/*/file.content,id
 
 "_" -> root is labeled as string (because no type)	: string(connector:{....},...)
         would be nice to give this a root type :)

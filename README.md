@@ -41,7 +41,7 @@ The uri's for UI endpoints are structured as:
 
 Examples:
 
-`http://localhost:8080/ui/list/car?color=red`
+`http://localhost:8080/ui/list/car?color==red`
 Get a list overview for all red cars.
 
 `http://localhost:8080/ui/create/fruit`

@@ -50,7 +50,6 @@ const generateRequiresFile = (name, component) => cb => {
                 js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}/${id}.js').${component};\n`;
                 js += `exports.${baseName(file.path)}.json = require('../../../engine/core/${name}/${id}/${id}.json');\n\n`;
             } else {
-                console.log(id);
                 js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}.js').${component};\n`;
             }
             cb();
@@ -60,13 +59,13 @@ const generateRequiresFile = (name, component) => cb => {
     })
 };
 
-const webPack = execute(`node_modules/webpack/bin/webpack.js --config "conf/webpack.conf.js" --mode development`);
+const build = execute(`sh ../build.sh`);
 
 const generateTypesFile = generateRequiresFile('types', 'actions');
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 
-gulp.watch([`../../engine/core/types/*/*.js`], gulp.series(generateTypesFile, webPack));
-gulp.watch([`../../engine/core/displays/*.js`], gulp.series(generateDisplaysFile, webPack));
-gulp.watch([`./source/**/*.js`], webPack);
+gulp.watch([`../../engine/core/types/*/*.js`], gulp.series(generateTypesFile, build));
+gulp.watch([`../../engine/core/displays/*.js`], gulp.series(generateDisplaysFile, build));
+gulp.watch([`./source/**/*.js`], build);
 
-exports.default = gulp.series(generateTypesFile, generateDisplaysFile, webPack);
+exports.default = gulp.series(generateTypesFile, generateDisplaysFile, build);

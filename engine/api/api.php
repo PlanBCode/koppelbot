@@ -1,48 +1,41 @@
 <?php
 
-class ApiRequest extends HttpRequest2
+function addConnectorRequest(array &$connectorRequests, $requestId, string $method, string $entityClassNameList, string $entityIdList, array $propertyPath, $content, Query &$query): void
 {
-    protected $connectorRequests = [];
-
-    private function add($requestId, string $method, string $entityClassNameList, string $entityIdList, array $propertyPath, $content, Query $query): void
-    {
-        $entityClassNames = explode(',', $entityClassNameList);
-        foreach ($entityClassNames as $entityClassName) {
-            $entityClass = EntityClass::get($entityClassName);
-            if (is_null($entityClass)) {
-                //TODO
-                echo 'ERROR' . $entityClassName . ' not found';
-            } else {
-                $entityClassContent = array_null_get($content, $entityClassName);
-                $connectorRequests = $entityClass->createconnectorRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
-                foreach ($connectorRequests as $connectorString => $connectorRequest) {
-                    if (!array_key_exists($connectorString, $this->connectorRequests)) {
-                        $this->connectorRequests[$connectorString] = $connectorRequests[$connectorString];
-                    } else {
-                        $this->connectorRequests[$connectorString]->merge($connectorRequests[$connectorString]);
-                    }
+    $entityClassNames = explode(',', $entityClassNameList);
+    foreach ($entityClassNames as $entityClassName) {
+        $entityClass = EntityClass::get($entityClassName);
+        if (is_null($entityClass)) {
+            //TODO
+            echo 'ERROR' . $entityClassName . ' not found';
+        } else {
+            $entityClassContent = array_null_get($content, $entityClassName);
+            $entityClassConnectorRequests = $entityClass->createconnectorRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
+            foreach ($entityClassConnectorRequests as $connectorString => $entityClassConnectorRequest) {
+                if (!array_key_exists($connectorString, $connectorRequests)) {
+                    $connectorRequests[$connectorString] = $entityClassConnectorRequest;
+                } else {
+                    $connectorRequests[$connectorString]->merge($entityClassConnectorRequest);
                 }
             }
         }
     }
+}
 
-    private function parseContent(): void
+class ApiRequest extends HttpRequest2
+{
+    private function getConnectorRequests(string $method, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query): array
     {
-        $path = explode('/', $this->uri);
-        $entityClassList = count($path) > 1 ? $path[1] : '*';
-        $entityIdList = count($path) > 2 ? $path[2] : '*';
-        $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
-
-        $query = new Query($this->queryString);
+        $connectorRequests = [];
         if ($this->method === 'GET' || $this->method === 'DELETE' || $this->method === 'HEAD') {
-            $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, null, $query);
+            addConnectorRequest($connectorRequests, null, $this->method, $entityClassList, $entityIdList, $propertyPath, null, $query);
         } elseif ($this->method === 'PATCH' || $this->method === 'PUT' || $this->method === 'POST') {
             $jsonContent = json_decode($this->content, true); //TODO catch errors
-            $this->add(null, $this->method, $entityClassList, $entityIdList, $propertyPath, $jsonContent, $query);
+            addConnectorRequest($connectorRequests, null, $this->method, $entityClassList, $entityIdList, $propertyPath, $jsonContent, $query);
         } else {
             //TODO error unknown method
         }
-        /*
+        /*  TODO multi request
             foreach ($jsonContent as $requestId => $subRequest) {
                 // TODO supplement with subUri?
                  $subEntityClass = array_get($subRequest, 'class', $entityClass);
@@ -52,9 +45,24 @@ class ApiRequest extends HttpRequest2
                  $subQuery = array_key_exists('query', $subRequest) ? $query->add($subRequest['query']) : $query;
                  $subMethod = array_get($subRequest, 'method', 'GET');
                  $subContent = array_get($subRequest, 'content', null);
-                 $this->add($requestId, $subMethod, $subEntityClass, $subEntityId, $subPropertyName,$propertyPath, $subContent, $subQuery);
+                 addConnectorRequest($connectorRequests, $requestId, $subMethod, $subEntityClass, $subEntityId, $subPropertyName,$propertyPath, $subContent, $subQuery);
             }
         }*/
+        return $connectorRequests;
+    }
+
+    public function getQueryConnectorRequests(Query& $query): array
+    {
+        $path = explode('/', $this->uri);
+        $entityClassList = count($path) > 1 ? $path[1] : '*';
+        $entityIdList = count($path) > 2 ? $path[2] : '*';
+
+        $propertyPath = []; //TODO determine propertyPath/propertyTree
+        /*
+         TODO get query parameters for comparative operators  (not =, but ==, !=, <, >,>= etc
+        also sortBy=abc.def?, offset=10, limit=10
+         */
+        return $this->getConnectorRequests('GET', $entityClassList, $entityIdList, $propertyPath, $query);
     }
 
     public function createResponse()
@@ -62,11 +70,24 @@ class ApiRequest extends HttpRequest2
         if ($this->uri === '') {
             return new DocResponse('api' . $this->uri, 'API blabla');
         }
+        $path = explode('/', $this->uri);
+        $entityClassList = count($path) > 1 ? $path[1] : '*';
+        $entityIdList = count($path) > 2 ? $path[2] : '*';
+        $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
 
-        $this->parseContent();
+        $query = new Query($this->queryString);
+
+        $queryConnectorRequests = $this->getQueryConnectorRequests($query);
+        $connectorRequests = $this->getConnectorRequests($this->method, $entityClassList, $entityIdList, $propertyPath, $query);
+
+        /*TODO compare connector strings in $queryConnectorRequests and  $connectorRequests.
+        then decide to first get the query id's and update the $connectorRequests
+        before getting the actual data
+        */
+
         $requestResponses = [];
 
-        foreach ($this->connectorRequests as $connectorRequest) {
+        foreach ($connectorRequests as $connectorRequest) {
             $connectorResponse = Connector::getConnectorResponse($connectorRequest);
 
             foreach ($connectorResponse->getRequestResponses() as $requestId => $requestResponse) {
@@ -94,16 +115,16 @@ class ApiResponse extends HttpResponse2
             $data = $requestResponse->getContent();
             parent::__construct($requestResponse->getStatus(), json_encode($data));
         }
-       /* } else { //TODO multi request
-            $data = [];
-            foreach ($requestResponses as $requestId => $requestResponse) {
-                $this->addStatus($requestResponse->getStatus());
-                $data[$requestId] = [
-                    'status' => $requestResponse->getStatus(),
-                    'result' => $requestResponse->getContent(),
-                ];
-            }
-            parent::__construct($this->status, json_encode($data));
-        }*/
+        /* } else { //TODO multi request
+             $data = [];
+             foreach ($requestResponses as $requestId => $requestResponse) {
+                 $this->addStatus($requestResponse->getStatus());
+                 $data[$requestId] = [
+                     'status' => $requestResponse->getStatus(),
+                     'result' => $requestResponse->getContent(),
+                 ];
+             }
+             parent::__construct($this->status, json_encode($data));
+         }*/
     }
 }

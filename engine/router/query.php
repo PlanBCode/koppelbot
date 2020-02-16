@@ -8,6 +8,7 @@ class QueryStatement
 
     public function __construct(string $queryStatementString)
     {
+        //TODO parse parentheses properly  GET /cars?(color==blue|color==red)&hatchback==true
         $matches = [];
         preg_match('/^(\w+)([=!><-]*)(.*)$/', $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
         $this->lhs = $matches[1];
@@ -73,7 +74,7 @@ class Query
             if ($queryStatement->getLhs() === $variableName) {
                 $rhs = $queryStatement->getRhs();
                 $operator = $queryStatement->getOperator();
-                if ($operator === '' || ($operator === '=' && ($rhs === 'true' || $rhs === '1')) || ($operator === '!=' && ($rhs === 'false' || $rhs === '0'))) {
+                if ($operator === '' || ($operator === '=' && ($rhs === 'true' || $rhs === '1'))) {
                     return true;
                 }
             }
