@@ -109,10 +109,11 @@ class HttpResponse2 extends Response
         echo $this->content;
     }
 
-    public function echo(): void
+    public function echo(): int
     {
         $this->echoHeaders();
-        $this->echoStatus();
         $this->echoContent();
+        $this->echoStatus();
+        return $this->status;
     }
 }

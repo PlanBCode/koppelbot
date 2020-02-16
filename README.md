@@ -55,20 +55,3 @@ Documentation can be found at:
 
 `http(s)://$HOST:$PORT/doc`
 
-## Code
-
-The code is separated into three distinct parts:
-
-- data: The raw data.
-
-- custom: All custom entity, content and type definitions. 
-
-- engine: The code for the server and client side engines.</dd>
-
-
-
-```
-   Data <-> Connector <-> Server Engine <-> REST API <-> Client Engine <-> UI
-json,xml,    php              php            http            js          html,css
-csv,..
-```

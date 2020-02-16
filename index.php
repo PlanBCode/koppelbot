@@ -93,4 +93,8 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
 }
 
 $response = $request->createResponse();
-$response->echo();
+$status = $response->echo();
+
+if (PHP_SAPI === 'cli' && $status !== 200) {
+    exit($status); // Nb: exit code is 0-255 so 404 becomes 404%256 = 148
+}
