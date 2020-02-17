@@ -70,7 +70,7 @@ function addCreateButton(xyz, fullUri, WRAPPER, options) {
         const DIV = document.createElement('DIV');
         DIV.style.display = 'none';
         const entityClassName = fullUri.substr(1).split('/')[0];
-        xyz.ui('/' + entityClassName, {display: 'create'}, DIV);
+        xyz.ui({uri:'/' + entityClassName, display: 'create'}, DIV);
         WRAPPER.appendChild(DIV);
     }
 }

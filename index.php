@@ -18,7 +18,9 @@ if (PHP_SAPI === 'cli') {
     $cliOptions = [
         new CliOption('m', 'method', 1, "Set HTTP method. ", "GET"),
         new CliOption('v', 'verbose', 0, "Set verbose output. ", false),
+        new CliOption('S', 'server', 1, "Run local server. ", 'localhost:8000')
     ];
+
     /*TODO
         new CliOption('H', 'headers', 1, "Set HTTP headers. ", ""),
    -f  --file     set file input
@@ -35,21 +37,27 @@ if (PHP_SAPI === 'cli') {
         ? '/api' . $options['args'][1]
         : ''; //TODO fallback
 
-    $content = array_get($options['args'],2,'');
+    $content = array_get($options['args'], 2, '');
     $uriQueryString = explode('?', $requestUri);
     $uri = array_get($uriQueryString, 0, '');
     $queryString = array_get($uriQueryString, 1, '');
     $method = array_get($options, 'method', 'GET');
-    if(array_get($options,'verbose',false)) {
+    if (array_get($options, 'verbose', false)) {
         echo ' - method      : ' . $method . PHP_EOL;
         echo ' - uri         : ' . $uri . PHP_EOL;
         echo ' - queryString : ' . $queryString . PHP_EOL;
         echo ' - content     : ' . json_encode($content) . PHP_EOL;
     }
-    if($uri === ''){
+    if ($uri === '') {
         showHelp($cliOptions);
         exit(0);
     }
+} else if (php_sapi_name() === 'cli-server') {
+    $headers = getallheaders();
+    $uri = '/' . substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
+    $method = $_SERVER['REQUEST_METHOD'];
+    $queryString = array_get($_SERVER, 'QUERY_STRING', '');
+    $content = @file_get_contents('php://input');
 } else {
     $headers = getallheaders();
     $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));

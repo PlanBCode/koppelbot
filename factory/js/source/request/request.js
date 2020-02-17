@@ -2,7 +2,7 @@ const entity = require('../entity/entity.js');
 
 function request(method, uri, data, callback) {
     //TODO allow for multiple hosts by prepending http(s)://..
-    const location = 'http://localhost:8888/site/'; //TODO determine dynamically
+    const location = 'http://localhost:8000/'; //TODO determine dynamically
     const xhr = new XMLHttpRequest();
     xhr.open(method, location + 'api' + uri, true);
 

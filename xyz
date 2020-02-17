@@ -1,2 +1,10 @@
 #!/bin/sh
-php -f index.php -- $@
+if [ "$1" = "-S" ]; then
+  if [ -z "$2" ]; then
+    php -S localhost:8000 index.php
+  else
+    php -S "$2" index.php
+  fi
+else
+  php -f index.php -- $@
+fi

@@ -1,0 +1,24 @@
+{
+  "_": {
+    "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/fruits.json"
+    }
+  },
+  "color": {
+    "type": "string",
+    "default" : "green"
+  },
+  "size": {
+    "type": "enum",
+    "choices" : ["small","medium","large"]
+  },
+  "name": {
+    "type": "string",
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+}

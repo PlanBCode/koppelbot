@@ -43,7 +43,7 @@ class DocResponse extends HttpResponse2
 
     public function __construct(string $currentUri, $content, $extraMenuItems = [])
     {
-        $rootUri = 'http://localhost:8888/site/';//TODO proper location
+        $rootUri = 'http://localhost:8000/';//TODO proper location
 
 
         $menuItems = $this->spliceInExtraMenuItems($extraMenuItems);

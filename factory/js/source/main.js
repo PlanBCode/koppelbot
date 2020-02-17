@@ -90,7 +90,8 @@ function XYZ() {
 
     this.isAutoIncremented = entityClassName => entity.isAutoIncremented(entityClasses, entityClassName);
 
-    const renderUiCreate = (uri, options, TAG) => {
+    const renderUiCreate = (options, TAG) => {
+        const uri = options.uri;
         request.retrieveMeta(this, entityClasses, uri, () => {
             const entityClassName = uriTools.pathFromUri(uri)[0];
             const entityClass = entityClasses[entityClassName];
@@ -155,7 +156,8 @@ function XYZ() {
 
     const displayListenersPerWrapper = new Map();
 
-    const renderUiElement = (uri, options, WRAPPER) => { //TODO rename
+    const renderUiElement = (options, WRAPPER) => { //TODO rename
+        const uri = options.uri;
         const displayName = options.display || DEFAULT_DISPLAYNAME;
         if (!displays.hasOwnProperty(displayName)) {
             throw new Error('Unrecognized displayName.');
@@ -225,7 +227,7 @@ function XYZ() {
             });
     };
 
-    this.ui = (uri, options, WRAPPER) => {//TODO rename
+    this.ui = (options, WRAPPER) => {//TODO rename
         options = options || {};
         if (options.display === 'edit') {
             options.action = 'edit';
@@ -253,9 +255,9 @@ function XYZ() {
             SCRIPT.parentNode.removeChild(SCRIPT);
         }
         if (options.display === 'create') {
-            renderUiCreate(uri, options, WRAPPER);
+            renderUiCreate(options, WRAPPER);
         } else {
-            renderUiElement(uri, options, WRAPPER);//TODO rename
+            renderUiElement(options, WRAPPER);//TODO rename
         }
         return WRAPPER;
     };

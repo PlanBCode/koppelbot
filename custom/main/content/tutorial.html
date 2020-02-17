@@ -1,0 +1,19 @@
+<html>
+<head>
+    <script type="text/javascript" src="./xyz-ui.js"></script>
+    <link rel="stylesheet" type="text/css" href="./xyz-style.css"/>
+    <title>xyz - tutorial</title>
+</head>
+<body style="padding: 1cm 3cm 3cm 3cm">
+    <h1>xyz - Tutorial</h1>
+
+    <h3>List of fruits</h3>
+
+    <xyz uri="/fruit/*/name" display="list" select="myFruit"/>
+
+    <h3>Selected fruit</h3>
+
+    <xyz uri="$myFruit" display="item"/>
+
+</body>
+</html>

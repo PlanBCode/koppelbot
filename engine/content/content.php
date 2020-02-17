@@ -1,5 +1,29 @@
 <?php
 
+function replaceXyzTag($fileContent): string
+{
+    $pattern = '/<(xyz|XYZ)((\s+(\w+)="([^"]*?)")+)\s*\/>/';
+    $fileContent = preg_replace_callback(
+        $pattern,
+        function ($xyzTagMatches) {
+            $attributeString = $xyzTagMatches[2];
+            $attributeMatches = [];
+            preg_match_all('/(\w+)="([^"]*?)"/', $attributeString, $attributeMatches);
+            $count = count($attributeMatches[0]);
+            $attributeNames = $attributeMatches[1];
+            $attributeValues = $attributeMatches[2];
+            $attributes = [];
+            for ($i = 0; $i < $count; ++$i) {
+                $attributes[$attributeNames[$i]] = $attributeValues [$i];
+            }
+            return '<script>xyz.ui('.json_encode($attributes,JSON_UNESCAPED_SLASHES).');</script>';
+        },
+        $fileContent
+    );
+    return $fileContent;
+}
+
+
 class ContentRequest extends HttpRequest2
 {
     public function createResponse(): ContentResponse
@@ -7,7 +31,7 @@ class ContentRequest extends HttpRequest2
         if ($this->uri === '') {
             if (file_exists('custom/main/content/index.html')) {
                 $fileContent = file_get_contents('custom/main/content/index.html');
-                return new ContentResponse(200, $fileContent);
+                return new ContentResponse(200, replaceXyzTag($fileContent));
             } else {
                 return new ContentResponse(200, 'Hello World');
             }
@@ -19,6 +43,9 @@ class ContentRequest extends HttpRequest2
             return new ContentResponse(200, $fileContent);
         } elseif (file_exists('custom/main/content' . $this->uri)) {
             $fileContent = file_get_contents('custom/main/content' . $this->uri);//TODO make safe!
+            if (pathinfo('custom/main/content' . $this->uri, PATHINFO_EXTENSION) === 'html') {
+                $fileContent = replaceXyzTag($fileContent);
+            }
             return new ContentResponse(200, $fileContent);
         } elseif (file_exists('custom/main/content/404.html')) {
             $fileContent = file_get_contents('custom/main/content/404.html');

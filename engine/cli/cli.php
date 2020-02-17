@@ -33,8 +33,9 @@ class CliOption
 function showHelp(array &$cliOptions)
 {
     echo 'Usage: xyz [options] uri [content]' . PHP_EOL;
-    echo '   xyz "/car?color==red"' . PHP_EOL;
-    echo '   xyz "/fruit/*/size"' . PHP_EOL;
+    echo '   xyz "/fruit/apple"' . PHP_EOL;
+    echo '   xyz "/fruit/*/color"' . PHP_EOL;
+    echo '   xyz "/fruit/*?color==green"' . PHP_EOL;
     echo '   xyz --method PATCH "/fruit/melon/size" large' . PHP_EOL;
     echo PHP_EOL;
     foreach ($cliOptions as $cliOption) {

@@ -11,7 +11,7 @@ class UiRequest extends HttpRequest2
         $entityId = count($path) > 2 ? $path[2] : '*';
         $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
 
-        $rootUri = 'http://localhost:8888/site/';//TODO proper location
+        $rootUri = 'http://localhost:8000/';//TODO proper location
 
         $menuItems = [];
         foreach (glob('./engine/core/displays/*.js') as $file) {
@@ -47,10 +47,8 @@ class UiRequest extends HttpRequest2
             } else {
                 $uri = '/' . $entityClassName . '/' . $entityId . '/' . implode('/', $propertyPath) ;//. '?' . $this->queryString; //TODO proper merge
             }
-            $body = '<script>xyz.ui("' . $uri . '",{display:"' . $display . '"});</script>';
+            $body = '<script>xyz.ui({uri:"'.$uri.'", display:"' . $display . '"});</script>';
         }
-
-
         return new DocResponse('ui' . $this->uri, $body, $menuItems);
     }
 }
