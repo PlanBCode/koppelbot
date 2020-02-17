@@ -236,10 +236,24 @@ function XYZ() {
         WRAPPER.appendChild(A_signin);
         WRAPPER.appendChild(A_signup);
 
-        DIV_session =  document.createElement('A');
-        this.ui({uri: options.uri, display:'create'}, DIV_session);
+        const DIV_session = document.createElement('A');
+        this.ui({
+            style: 'display:none;',
+            uri: options.uri,
+            display: 'create'
+        }, DIV_session);
         WRAPPER.appendChild(DIV_session);
 
+        const DIV_account = document.createElement('A');
+        this.ui({
+            uri: '/account',
+            style: 'display:none;',
+            display: 'create'
+        }, DIV_account); //TODO retrieve /account from session metadata?
+        WRAPPER.appendChild(DIV_account);
+
+        A_signin.onclick = () => {DIV_session.style.display = 'block';}
+        A_signup.onclick = () => {DIV_account.style.display = 'block';}
     };
 
     this.ui = (options, WRAPPER) => {//TODO rename
