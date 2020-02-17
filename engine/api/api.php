@@ -191,7 +191,7 @@ class ApiResponse extends HttpResponse2
     }
 }
 
-function request(string $method, string $url, $content = '', $headers = []) : InternalApiResponse
+function request(string $url, string $method = 'GET', $content = '', $headers = []): InternalApiResponse
 {
     //todo pass content as object, parse to string
     $splitUriOnQuestionMark = explode('?', $url);
