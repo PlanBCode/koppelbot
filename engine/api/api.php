@@ -148,7 +148,7 @@ class ApiResponse extends HttpResponse2
         } else {
             $requestResponse = array_values($requestResponses)[0];
             $data = $requestResponse->getContent();
-            parent::__construct($requestResponse->getStatus(), json_encode($data));
+            parent::__construct($requestResponse->getStatus(), json_encode($data, JSON_PRETTY_PRINT));
         }
         /* } else { //TODO multi request
              $data = [];

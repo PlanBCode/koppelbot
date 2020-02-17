@@ -45,7 +45,15 @@ Usage: xyz [options] uri [content]
 
 ```
 $ ./xyz "/fruit/apple"
-TODO
+{
+    "fruit": {
+        "apple": {
+            "color": "red",
+            "size": "medium",
+            "name": "apple"
+        }
+    }
+}
 ```
 
  This will give the data for apple
@@ -54,7 +62,22 @@ TODO
 
 ```
 $ ./xyz "/fruit/*/color"
-TODO
+{
+    "fruit": {
+        "grape": {
+            "color": "green"
+        },
+        "melon": {
+            "color": "green"
+        },
+        "apple": {
+            "color": "red"
+        },
+        "orange": {
+            "color": "orange"
+        }
+    }
+}
 ```
 
  This will give the color property for all fruits
@@ -63,7 +86,20 @@ TODO
 
 ```
 $ ./xyz "/fruit/*?color==green"
-TODO
+{
+    "fruit": {
+        "grape": {
+            "color": "green",
+            "size": "small",
+            "name": "grape"
+        },
+        "melon": {
+            "color": "green",
+            "size": "small",
+            "name": "melon"
+        }
+    }
+}
 ```
 
 This will give all the data for the fruits which have a green color
@@ -72,14 +108,28 @@ This will give all the data for the fruits which have a green color
 
 ```
 $ ./xyz --method PATCH "/fruit/melon/size" large
-TODO
+{
+    "fruit": {
+        "melon": {
+            "size": null
+        }
+    }
+}
 ```
 
 And let's check if it's correct now:
 
 ```
-$ ./xyz -"/fruit/melon"
-TODO
+$ ./xyz "/fruit/melon"
+{
+    "fruit": {
+        "melon": {
+            "color": "green",
+            "size": "large",
+            "name": "melon"
+        }
+    }
+}
 ```
 
 That's looks better.
@@ -156,8 +206,19 @@ When the `myFruit` variable is not empty this will retrieve the specified fruit 
 
 10. Now browse to http://localhost:8000/tutorial.html
 
+11. Press the `+` Button below the list to unfold the creation interface. Try to add a fruit.
 
+12. Open the `./custom/main/content/tutorial.html` file in your text editor and change the 
 
+```
+    <xyz uri="$myFruit" display="item"/>
+```
 
+Into: 
 
+```
+    <xyz uri="$myFruit" display="edit"/>
+```
 
+This will display an editor instead of an item viewer. Browse to http://localhost:8000/tutorial.html again to edit 
+the selected piece of fruit.
