@@ -222,3 +222,91 @@ Into:
 
 This will display an editor instead of an item viewer. Browse to http://localhost:8000/tutorial.html again to edit 
 the selected piece of fruit.
+
+13. Now view `./custom/main/entities/fruit.json` in your text editor.
+(or run `cat ./custom/main/entities/fruit.json` in your terminal to view it.)
+
+```
+{
+  "_": {
+    "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/fruits.json"
+    }
+  },
+  "color": {
+    "type": "string",
+    "default" : "green"
+  },
+  "size": {
+    "type": "enum",
+    "choices" : ["small","medium","large"]
+  },
+  "name": {
+    "type": "string",
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+}
+```
+
+This file shows the property definitions for the fruit entity. 
+
+```
+  "_": {
+```
+
+Root properties, indicated by the underscore, are used for all properties.
+
+```
+ "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/fruits.json"
+    }
+```
+
+The connector settings define the way the data is stored.
+
+```
+"color": {
+    "type": "string",
+    "default" : "green"
+  },
+```
+
+color is a string that defaults to green.
+
+```
+"size": {
+    "type": "enum",
+    "choices" : ["small","medium","large"]
+  },
+```
+
+The size of a fruit is one of the choices in the list small, medium or large.
+
+```
+  "name": {
+    "type": "string",
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+```
+
+The name is used as the key by the connector.
+
+14. Now view `./custom/data/fruits.json` in your text editor.
+(or run `cat ./custom/data/fruits.json` in your terminal to view it.)
+
+```
+{"grape":{"color":"green","size":"small"},"melon":{"color":"green","size":"large"},"apple":{"color":"red","size":"medium"},"orange":{"color":"orange","size":"medium"}}
+```
+
+This is the raw data for the fruit entities.
+
