@@ -36,7 +36,7 @@ function showHelp(array &$cliOptions)
     echo '   xyz "/fruit/apple"' . PHP_EOL;
     echo '   xyz "/fruit/*/color"' . PHP_EOL;
     echo '   xyz "/fruit/*?color==green"' . PHP_EOL;
-    echo '   xyz --method PATCH "/fruit/melon/size" large' . PHP_EOL;
+    echo '   xyz --method PATCH "/fruit/melon/size" \'{"fruit":{"melon":{"size":"large"}}}\'' . PHP_EOL;
     echo PHP_EOL;
     foreach ($cliOptions as $cliOption) {
         echo $cliOption->showHelp() . PHP_EOL;
