@@ -1,10 +1,13 @@
 #!/bin/sh
+SCRIPTDIR=$(dirname "$0")
+XYZ_HOME=$(cd "$SCRIPTDIR" && pwd)
+
 if [ "$1" = "-S" ]; then
   if [ -z "$2" ]; then
-    php -S localhost:8000 index.php
+    php -S localhost:8000 "$XYZ_HOME/index.php"
   else
-    php -S "$2" index.php
+    php -S "$2" "$XYZ_HOME/index.php"
   fi
 else
-  php -f index.php -- $@
+  php -f "$XYZ_HOME/index.php" -- $@
 fi
