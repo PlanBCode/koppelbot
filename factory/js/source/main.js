@@ -227,6 +227,21 @@ function XYZ() {
             });
     };
 
+    const renderUiLogin = (options, WRAPPER) => {
+        WRAPPER.classList.add('xyz-login');
+        const A_signin = document.createElement('A');
+        A_signin.innerText = 'sign in';
+        const A_signup = document.createElement('A');
+        A_signup.innerText = 'sign up';
+        WRAPPER.appendChild(A_signin);
+        WRAPPER.appendChild(A_signup);
+
+        DIV_session =  document.createElement('A');
+        this.ui({uri: options.uri, display:'create'}, DIV_session);
+        WRAPPER.appendChild(DIV_session);
+
+    };
+
     this.ui = (options, WRAPPER) => {//TODO rename
         options = options || {};
         if (options.display === 'edit') {
@@ -244,18 +259,18 @@ function XYZ() {
             WRAPPER = document.createElement(tag);
             SCRIPT = document.currentScript;
         }
-        if (options.id) {
-            WRAPPER.id = options.id;
-        }
-        if (options.class) {
-            WRAPPER.classList.add(options.class)
-        }
+        if (options.id) WRAPPER.id = options.id;
+        if (options.class) WRAPPER.className += ' ' + options.class;
+        if (options.style) WRAPPER.style = options.style;
+
         if (SCRIPT) {
             SCRIPT.parentNode.insertBefore(WRAPPER, SCRIPT);
             SCRIPT.parentNode.removeChild(SCRIPT);
         }
         if (options.display === 'create') {
             renderUiCreate(options, WRAPPER);
+        } else if (options.display === 'login') {
+            renderUiLogin(options, WRAPPER);
         } else {
             renderUiElement(options, WRAPPER);//TODO rename
         }

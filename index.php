@@ -54,7 +54,7 @@ if (PHP_SAPI === 'cli') {
     }
 } else if (php_sapi_name() === 'cli-server') {
     $headers = getallheaders();
-    $uri = '/' . substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
+    $uri =  strtok($_SERVER["REQUEST_URI"], '?');
     $method = $_SERVER['REQUEST_METHOD'];
     $queryString = array_get($_SERVER, 'QUERY_STRING', '');
     $content = @file_get_contents('php://input');
