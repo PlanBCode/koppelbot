@@ -149,9 +149,9 @@ If you close terminal or press Control + C the server will be stopped.
 
 8. Browse to the following - probably familiar looking - places:
 
-http://localhost:8000/fruit/apple
-http://localhost:8000/fruit/*/color
-http://localhost:8000/fruit/*?color==green
+- http://localhost:8000/fruit/apple
+- http://localhost:8000/fruit/*/color
+- http://localhost:8000/fruit/*?color==green
 
 9. With your a text editor open the file `./custom/main/content/tutorial.html`
 (or run `cat ./custom/main/content/tutorial.html` in your terminal to view it.)
