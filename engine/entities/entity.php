@@ -236,6 +236,11 @@ class EntityResponse extends Response
         return $this->entityId;
     }
 
+    public function getPropertyResponses() : array
+    {
+        return $this->propertyResponses;
+    }
+
     public function getContent()
     {
         $content = [];

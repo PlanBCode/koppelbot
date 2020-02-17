@@ -51,7 +51,7 @@ class QueryStatement
         //TODO parse parentheses/boolean expressions etc:  GET /cars?(color==blue|color==red)&hatchback==true
         $matches = [];
         $operators = array_merge(array_keys(self::$comparisonOperators), ['=']);
-        $pattern = '/^([\w.]+)(|' . implode('|', $operators) . ')(.*)$/';
+        $pattern = '/^([\w.]+)(' . implode('|', $operators) . '|)(.*)$/';
         preg_match($pattern, $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
         $this->lhs = $matches[1];
         $this->operator = $matches[2];

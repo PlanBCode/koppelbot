@@ -164,8 +164,10 @@ abstract class BasicConnector extends Connector
                 $currentContent = $jsonActionResponseGet->succeeded() ? $jsonActionResponseGet->content : null;
 
                 $processResponse = $propertyRequest->processBeforeConnector($newContent, $currentContent);
+
                 if (!$processResponse->succeeded()) {
                     $connectorResponse->add($processResponse->getStatus(), $propertyRequest, $entityId, $processResponse->getError());
+                    continue;
                 }
 
                 $newContent = $processResponse->getContent();

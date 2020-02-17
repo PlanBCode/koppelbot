@@ -1,5 +1,7 @@
 <?php
 
+require 'internal.php';
+
 function getConnectorRequests(string $method, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query): array
 {
     $connectorRequests = [];
@@ -136,35 +138,6 @@ before getting the actual data
     }
 }
 
-class InternalApiResponse
-{
-    protected $status;
-    protected $content;
-
-    public function __construct(array $requestResponses)
-    {
-        $count = count($requestResponses);
-        if ($count == 0) {
-            $this->status = 200;
-            $this->content = [];
-        } else {
-            $requestResponse = array_values($requestResponses)[0];
-            $this->content =& $requestResponse->getContent();
-            $this->status = $requestResponse->getStatus();
-        } // TODO multi request
-    }
-
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
-
-    public function getContent()
-    {
-        return $this->content;
-    }
-}
-
 class ApiResponse extends HttpResponse2
 {
     public function __construct(string $method, $requestResponses)
@@ -189,21 +162,5 @@ class ApiResponse extends HttpResponse2
              parent::__construct($this->status, json_encode($data));
          }*/
     }
-}
-
-function request(string $url, string $method = 'GET', $content = '', $headers = []): InternalApiResponse
-{
-    //todo pass content as object, parse to string
-    $splitUriOnQuestionMark = explode('?', $url);
-    $uri = array_get($splitUriOnQuestionMark, 0, '');
-    $queryString = array_get($splitUriOnQuestionMark, 1, '');
-    $request = new ApiRequest(
-        $method,
-        $uri,
-        $queryString,
-        $headers,
-        $content
-    );
-    return $request->getInternalApiResponse();
 }
 

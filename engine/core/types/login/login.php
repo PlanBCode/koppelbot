@@ -6,13 +6,11 @@ class Type_login extends Type
     {
         if (!is_array($content)) return false;
         if (!array_key_exists('username', $content)) return false;
-        if (!array_key_exists('new', $content)) return false;
-        if (!array_key_exists('confirm', $content)) return false;
-        if (!is_string($content['new'])) return false;
-        if (!is_string($content['confirm'])) return false;
+        if (!array_key_exists('password', $content)) return false;
         if (!is_string($content['username'])) return false;
-        if ($content['new'] !== $content['confirm']) return false;
-        return true;
+        if (!is_string($content['password'])) return false;
+        if ($content['username'] === $content['password']) return false;
+        return true;  // TODO min/max length, allow chars, regex
     }
 
     static function processBeforeConnector(string $method, &$newContent, &$currentContent): ProcessResponse
@@ -20,26 +18,15 @@ class Type_login extends Type
         switch ($method) {
             case 'PUT' :  // create new password $newContent = {new: "$password", confirm: "$password"}
                 if (!is_array($newContent)) return new ProcessResponse(400, $newContent, 'Expected object.');
-                if (!array_key_exists('new', $newContent)) new ProcessResponse(400, $newContent, 'Missing new password.');
-                if (!array_key_exists('confirm', $newContent)) return new ProcessResponse(400, $newContent, 'Missing confirmed password.');
-                if (!is_string($newContent['new'])) new ProcessResponse(400, $newContent, 'Expected new password to be a string.');
-                if (!is_string($newContent['confirm'])) new ProcessResponse(400, $newContent, 'Expected confirm password to be a string.');
-                if ($newContent['new'] !== $newContent['confirm']) return new ProcessResponse(400, $newContent, 'New does not match confirmed.');
-                $hash = password_hash($newContent['new'], PASSWORD_DEFAULT);
+                if (!array_key_exists('username', $newContent)) new ProcessResponse(400, $newContent, 'Missing username');
+                if (!array_key_exists('password', $newContent)) return new ProcessResponse(400, $newContent, 'Missing  password.');
+                if (!is_string($newContent['username'])) new ProcessResponse(400, $newContent, 'Expected username to be a string.');
+                if (!is_string($newContent['password'])) new ProcessResponse(400, $newContent, 'Expected password to be a string.');
+                $hash = password_hash($newContent['password'], PASSWORD_DEFAULT);
                 return new ProcessResponse(200, $hash);
-            case 'PATCH' : // edit existing password $newContent = {old: "$oldPassword", new: "$newPassword", confirm: "$newPassword"}
-                if (!is_array($newContent)) return new ProcessResponse(400, $newContent, 'Expected object.');
-                if (!array_key_exists('new', $newContent)) new ProcessResponse(400, $newContent, 'Missing new password.');
-                if (!array_key_exists('old', $newContent)) new ProcessResponse(400, $newContent, 'Missing old password');
-                if (!array_key_exists('confirm', $newContent)) return new ProcessResponse(400, $newContent, 'Missing confirmed password.');
-                if (!is_string($newContent['new'])) new ProcessResponse(400, $newContent, 'Expected new password to be a string.');
-                if (!is_string($newContent['old'])) new ProcessResponse(400, $newContent, 'Expected old password to be a string.');
-                if (!is_string($newContent['confirm'])) new ProcessResponse(400, $newContent, 'Expected confirm password to be a string.');
-                if ($newContent['new'] !== $newContent['confirm']) return new ProcessResponse(400, $newContent, 'New does not match confirmed.');
-                if (!password_verify($newContent['old'], $currentContent)) return new ProcessResponse(403, $newContent, 'Old password is incorrect.');
-                $hash = password_hash($newContent['new'], PASSWORD_DEFAULT);
-                return new ProcessResponse(200, $hash);
-                break;
+            case 'PATCH' :
+                $message = 'Cannot edit login';
+                return new ProcessResponse(400, $message);
             default:
                 return $newContent;
         }

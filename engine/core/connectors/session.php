@@ -1,5 +1,34 @@
 <?php
 
+function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$connectorResponse): ConnectorResponse
+{
+    $userName = $propertyRequest->getEntityId();
+    $submittedPasswordArray = $propertyRequest->getContent();
+
+    if (!is_array($submittedPasswordArray) || !array_key_exists('password', $submittedPasswordArray)) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+
+    $accountsMatchingUserName = request('/account/*/password?email==' . $userName)->getResultsById();
+    if (count($accountsMatchingUserName) === 0) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+
+    /** @var InternalEntityResponse */
+    $account = array_values($accountsMatchingUserName)[0];
+
+    /** @var InternalPropertyResponse */
+    $passwordResponse = $account->get('password');
+    if ($passwordResponse->getStatus() !== 200) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+
+    $storedPasswordHash = $passwordResponse->getContent();
+    $submittedPassword = $submittedPasswordArray['password'];
+
+    if (!password_verify($submittedPassword, $storedPasswordHash)) {
+        return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+    }
+    if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
+    $_SESSION['content'][$userName] = [];
+    return $connectorResponse->add(200, $propertyRequest, $userName, 'Login successfull');
+
+}
+
 class Connector_session extends Connector
 {
     static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
@@ -41,23 +70,20 @@ class Connector_session extends Connector
         if ($userName === '*') {
             return $connectorResponse->add(400, $propertyRequest, $userName, 'Session not defined.');
         } elseif ($propertyName === 'login') { //TODO should not rely on name but should use type instead
-            //TODO verify password with /account/username/password
-            if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
-            $_SESSION['content'][$userName] = [];
-            return $connectorResponse->add(200, $propertyRequest, $userName, 'Login successfull');
+            return handleLogin($propertyRequest, $connectorResponse);
         } else if (array_key_exists('content', $_SESSION) && array_key_exists($userName, $_SESSION['content'])) {
             $keyPath = array_merge(['content', $userName], $propertyRequest->getPropertyPath());
             $newContent = $propertyRequest->getContent();
 
             $jsonActionResponseGet = json_get($_SESSION, $keyPath);
-            $currentContent = $jsonActionResponseGet->succeeded()?$jsonActionResponseGet->content:null;
+            $currentContent = $jsonActionResponseGet->succeeded() ? $jsonActionResponseGet->content : null;
 
             $processResponse = $propertyRequest->processBeforeConnector($newContent, $currentContent);
-            if(!$processResponse->succeeded()){
-                $connectorResponse->add($processResponse->getStatus(), $propertyRequest, $userName, $processResponse->getError());
+            if (!$processResponse->succeeded()) {
+                return $connectorResponse->add($processResponse->getStatus(), $propertyRequest, $userName, $processResponse->getError());
             }
 
-            $newContent =  $processResponse->getContent();
+            $newContent = $processResponse->getContent();
             $jsonActionResponseSet = json_set($_SESSION, $keyPath, $newContent);
             if ($jsonActionResponseSet->succeeded()) {
                 return $connectorResponse->add(200, $propertyRequest, $userName, null);
@@ -110,7 +136,7 @@ class Connector_session extends Connector
             }
 
             if ($propertyName === 'login') { // TODO should not rely on name but use type instead
-                $connectorResponse->add(200, $propertyRequest, $userName, ['username'=> $userName, 'password'=> '***']);
+                $connectorResponse->add(200, $propertyRequest, $userName, ['username' => $userName, 'password' => '***']);
                 continue;
             }
             $keyPath = array_merge([$userName], $propertyRequest->getPropertyPath());

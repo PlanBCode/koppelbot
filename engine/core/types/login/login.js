@@ -1,5 +1,11 @@
 exports.actions = {
     edit: function (item) {
+        if (item.getOption('display') !== 'create') {
+            const SPAN = document.createElement('SPAN');
+            SPAN.innerText = 'Cannot edit login';
+            return SPAN;
+        }
+
         //TODO notify if caps lock is on
         const TABLE = document.createElement('TABLE');
 
@@ -13,76 +19,25 @@ exports.actions = {
         TR_username.appendChild(TD_usernameInput);
         TABLE.appendChild(TR_username);
 
-        let INPUT_old;
-        // if edit, not create then request also current password
-        if (item.getOption('display') !== 'create') { // edit password -> confirm old + double to confirm
-            const TR_old = document.createElement('TR');
-            const TD_oldLabel = document.createElement('TD');
-            const TD_oldInput = document.createElement('TD');
-            INPUT_old = document.createElement('INPUT');
-            INPUT_old.type = 'password';
-            TD_oldLabel.innerText = 'Current';
-            TD_oldInput.appendChild(INPUT_old);
-            TR_old.appendChild(TD_oldLabel);
-            TR_old.appendChild(TD_oldInput);
-            TABLE.appendChild(TR_old);
-        }
+        const TR_password = document.createElement('TR');
+        const TD_passwordLabel = document.createElement('TD');
+        const TD_passwordInput = document.createElement('TD');
+        const INPUT_password = document.createElement('INPUT');
+        INPUT_password.type = 'password';
+        TD_passwordLabel.innerText = 'Password';
+        TD_passwordInput.appendChild(INPUT_password);
+        TR_password.appendChild(TD_passwordLabel);
+        TR_password.appendChild(TD_passwordInput);
+        TABLE.appendChild(TR_password);
 
-        // double to confirm
-        const TR_new = document.createElement('TR');
-        const TD_newLabel = document.createElement('TD');
-        const TD_newInput = document.createElement('TD');
-        const INPUT_new = document.createElement('INPUT');
-        INPUT_new.type = 'password';
-        TD_newLabel.innerText = 'Password';
-        TD_newInput.appendChild(INPUT_new);
-        TR_new.appendChild(TD_newLabel);
-        TR_new.appendChild(TD_newInput);
-        TABLE.appendChild(TR_new);
-
-
-        const TR_confirm = document.createElement('TR');
-        const TD_confirmLabel = document.createElement('TD');
-        const TD_confirmInput = document.createElement('TD');
-        const INPUT_confirm = document.createElement('INPUT');
-        INPUT_confirm.type = 'password';
-        TD_confirmLabel.innerText = 'Confirm';
-        TD_confirmInput.appendChild(INPUT_confirm);
-        TR_confirm.appendChild(TD_confirmLabel);
-        TR_confirm.appendChild(TD_confirmInput);
-        TABLE.appendChild(TR_confirm);
-
-        if (item.getOption('display') !== 'create') { // edit password -> confirm old + double to confirm
-            const TR_submit = document.createElement('TR');
-            const TD_submit = document.createElement('TD');
-            const INPUT_submit = document.createElement('INPUT');
-            INPUT_submit.setAttribute('colspan', 2);
-            INPUT_submit.type = 'Submit';
-            INPUT_submit.value = 'Update';
-            TD_submit.appendChild(INPUT_submit);
-            TR_submit.appendChild(TD_submit);
-            TABLE.appendChild(TR_submit);
-            //TODO check if they match, if not: indicate!
-            INPUT_submit.onclick = () => {
-                item.patch({
-                    old: INPUT_old.value,
-                    new: INPUT_new.value,
-                    confirm: INPUT_confirm.value,
-                    username: INPUT_username.value
-                })
-            };
-        } else { // create password : update data continuously
-            const onChangeHandler = () => {
-                item.patch({
-                    // old: INPUT_old.value,
-                    new: INPUT_new.value,
-                    confirm: INPUT_confirm.value,
-                    username: INPUT_username.value
-                });
-            };
-            INPUT_new.oninput = onChangeHandler;
-            INPUT_confirm.oninput = onChangeHandler;
-        }
+        const onChangeHandler = () => {
+            item.patch({
+                username: INPUT_username.value,
+                password: INPUT_password.value
+            });
+        };
+        INPUT_username.oninput = onChangeHandler;
+        INPUT_password.oninput = onChangeHandler;
         return TABLE;
     },
     view: function (item) {
@@ -93,13 +48,13 @@ exports.actions = {
     },
     validateContent: function (item) {
         const content = item.getContent();
-        if(typeof content !== 'object' || content === null) return false;
-        if(typeof content.new !=='string') return false;
-        if(typeof content.confirm !=='string') return false;
-        if(typeof content.username !=='string') return false;
-        return content.confirm === content.new; // TODO min/max length, allow chars, regex
+        if (typeof content !== 'object' || content === null) return false;
+        if (typeof content.password !== 'string') return false;
+        if (typeof content.username !== 'string') return false;
+        if (content.username === typeof content.password) return false;
+        return true; // TODO min/max length, allow chars, regex
     },
-    getIdFromContent: function(content){
+    getIdFromContent: function (content) {
         return content.username;
     }
 };
