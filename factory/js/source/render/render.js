@@ -11,7 +11,7 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
         console.error('problem1');
         return null;
     }
-    const type = types[typeName]
+    const type = types[typeName];
     if (type.hasOwnProperty(action)) {
         let onChange, onDelete;
         let TAG;
@@ -20,10 +20,11 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
                 additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
                 const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
                 const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
-                if(type.validateContent(item)){
+                if (type.validateContent(item)) {
                     TAG.classList.remove('xyz-invalid-content');
                     xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, content));
-                }else{
+                    if (typeof options.onChange === 'function') options.onChange(content);
+                } else {
                     TAG.classList.add('xyz-invalid-content');
                 }
             };
@@ -31,16 +32,14 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
                 //TODO use subPropertyPath
                 subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
                 xyz.delete(uri + subUri);
+                //TODO options.onChange/onDelete?
             };
+        } else if (typeof options.onChange === 'function') {
+            onChange = options.onChange;
+            //TODO options.onDelete/onDelete?
         }
         const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
-        TAG = type[action](item); // TODO
-
-        //  item.forceChange();
-
-        // TODO add id from options (also for label for)
-        // TODO add class from options
-
+        TAG = type[action](item);
         TAG.classList.add(`xyz-status-${status}`);
         return TAG;
     } else if (settings.hasOwnProperty('signature')) { // create editor from signature view
@@ -91,18 +90,18 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
         TR.appendChild(TD_label);
     }
     let TAG;
-    let onChange,onDelete;
+    let onChange, onDelete;
     onChange = (content, additionalSubPropertyPath) => {
         const keyPath = typeof additionalSubPropertyPath === 'undefined'
             ? subPropertyPath
             : subPropertyPath.concat(additionalSubPropertyPath);
         const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
-        if(type.validateContent(item)) {
+        if (type.validateContent(item)) {
             TAG.classList.remove('xyz-invalid-content');
-            if(INPUT_submit) INPUT_submit.disabled = false;
+            if (INPUT_submit) INPUT_submit.disabled = false;
             json.set(data, keyPath, content);
-        }else{
-            if(INPUT_submit) INPUT_submit.disabled = true;
+        } else {
+            if (INPUT_submit) INPUT_submit.disabled = true;
             TAG.classList.add('xyz-invalid-content');
         }
     };

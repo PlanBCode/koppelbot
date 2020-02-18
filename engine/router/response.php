@@ -111,9 +111,9 @@ class HttpResponse2 extends Response
 
     public function echo(): int
     {
-        $this->echoHeaders();
-        $this->echoContent();
         $this->echoStatus();
+        $this->echoContent();
+        $this->echoHeaders();
         return $this->status;
     }
 }

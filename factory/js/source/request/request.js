@@ -26,7 +26,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     } else {
         request('GET', '/' + entityClassNames.join(',') + '?meta', undefined, (status, content) => {//TODO add querystring better
             //TODO check status
-            console.log(uri + ' ' + content);
+            console.log(uri + '?meta', content);
             const data = JSON.parse(content); //TODO check
             // TODO validate data
             for (let entityClassName of entityClassNames) {
@@ -86,6 +86,7 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
             } catch (e) {
                 console.error(responseStringContent, e);
             }
+            console.log('GET', uri,status, responseObjectContent);
             //TODO replace null with current content?
             const state = entity.handleInput('GET', uri, status, responseObjectContent, null, entityClasses);
             //TODO  word er nog iets met state gedaan...?

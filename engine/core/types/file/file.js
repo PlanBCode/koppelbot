@@ -51,17 +51,20 @@ exports.actions = {
     },
     view: function (item) {
         //TODO use a file viewer:   https://viewerjs.org/
-        const content = item.getContent();
-
         const DIV_container = document.createElement('DIV');
         DIV_container.classList.add('xyz-file-container');
 
-        const extension = content.extension;
-        const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
-            ? extension : 'txt';
-        const DIV_fileContent = viewers[fallbackExtension].view(item);
-
-        DIV_container.appendChild(DIV_fileContent);
+        const onChangeHandler = node => {
+            DIV_container.innerHTML = '';
+            const content = item.getContent();
+            const extension = content.extension;
+            const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
+                ? extension : 'txt';
+            const DIV_fileContent = viewers[fallbackExtension].view(item);
+            DIV_container.appendChild(DIV_fileContent);
+        };
+        item.onChange(onChangeHandler);
+        onChangeHandler(item);
         //TODO onChange
         return DIV_container;
     },

@@ -1,5 +1,10 @@
 TODO
 
+new response.Node gaat mis bij 207's
+
+add onSubmit option to creator
+add onChange option to creator/editor/list/item etc
+
 filtering & searching :
 - implement full blown boolean expressions
 - implement sort
@@ -43,8 +48,8 @@ testing
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 werkend maken:
-- xyz.create('/source?content=default');
-- xyz.create('/$type', {});
+- xyz.create({uri:'/source?content=default'});
+- xyz.create({uri:'$type'});
 
 ?raw option to get raw content for single entity (error if multiple requested)
 - add content type mime header
@@ -81,7 +86,6 @@ Connector_directory: split directory on spaces,comma's or (semi)colons
 drag&drop: als er een reference input veld is dan worden die entities sleepbaar
 
 hide private connector settings or better only expose specified ones
-
 
 "_" -> root is labeled as string (because no type)	: string(connector:{....},...)
         would be nice to give this a root type :)

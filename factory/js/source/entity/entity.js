@@ -179,7 +179,7 @@ function EntityClass(xyz, entityClassName, settings) {
                     : entityClassContent[entityId];
                 const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
                 const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
-                const subPath =  path.slice(1);
+                const subPath = path.slice(1);
                 const entityState = handleEntityIdInput(subPath, method, entityId, entityClassStatus, entityContent, subRequestContent);
                 state.addSubState(entityState);
             }

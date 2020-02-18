@@ -236,24 +236,59 @@ function XYZ() {
         WRAPPER.appendChild(A_signin);
         WRAPPER.appendChild(A_signup);
 
-        const DIV_session = document.createElement('A');
+        const DIV_listSession = document.createElement('SPAN');
+
+        this.ui({
+            //style: 'display:none;',
+            uri: options.uri,
+            display: 'list',
+            onChange: data => {
+                //TODO
+            }
+        }, DIV_listSession);
+        WRAPPER.appendChild(DIV_listSession);
+
+        const A_logout = document.createElement('A');
+        A_logout.innerText = 'log out';
+        A_logout.onclick = () => {
+            this.delete(options.uri);
+        };
+
+        WRAPPER.appendChild(A_logout);
+
+
+        const DIV_createSession = document.createElement('DIV');
+
         this.ui({
             style: 'display:none;',
             uri: options.uri,
-            display: 'create'
-        }, DIV_session);
-        WRAPPER.appendChild(DIV_session);
+            display: 'create',
+            onSubmit: data => {
+                DIV_createSession.style.display = 'none';
+                A_signin.style.display = 'none';
+                A_signup.style.display = 'none';
+            }
+        }, DIV_createSession);
 
-        const DIV_account = document.createElement('A');
+
+        WRAPPER.appendChild(DIV_createSession);
+
+        const DIV_account = document.createElement('DIV');
         this.ui({
             uri: '/account',
             style: 'display:none;',
-            display: 'create'
+            display: 'create',
+            onCreate: data => {
+            }//TODO
         }, DIV_account); //TODO retrieve /account from session metadata?
         WRAPPER.appendChild(DIV_account);
 
-        A_signin.onclick = () => {DIV_session.style.display = 'block';}
-        A_signup.onclick = () => {DIV_account.style.display = 'block';}
+        A_signin.onclick = () => {
+            DIV_createSession.style.display = 'block';
+        };
+        A_signup.onclick = () => {
+            DIV_account.style.display = 'block';
+        };
     };
 
     this.ui = (options, WRAPPER) => {//TODO rename

@@ -62,7 +62,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getResponse = (path, entityId, method) => {
         if (isPrimitive) {
-            return new response.Node(this, entityId, statusses[entityId], contents[entityId], errors[entityId], method);
+            return new response.Node(this, entityId, this.getStatus(entityId), this.getContent(entityId), errors[entityId], method);
         } else {
             const subPropertyNames = (path.length === 0 || path[0] === '*')
                 ? Object.keys(subProperties)
