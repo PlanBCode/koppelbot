@@ -18,6 +18,7 @@ exports.display = {
 
         const TABLE_entity = document.createElement('TABLE');
         TABLE_entity.className = 'xyz-item';
+        TABLE_entity.entityId = entityId;
         const uri = '/' + entityClassName + '/' + entityId;
         if (options.showHeader !== false) {
             const TR_header = document.createElement('TR');
@@ -70,6 +71,14 @@ exports.display = {
             TABLE_entity.appendChild(TR_deleteButton);
         }
         WRAPPER.appendChild(TABLE_entity);
+    },
+    remove: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
+        const TABLE = WRAPPER.firstChild;
+        for(let TABLE_entity of WRAPPER){
+            if(typeof TABLE_entity.entityId === 'string' && (TABLE_entity.entityId === entityId || entityId === '*')){
+                WRAPPER.removeChild(TABLE_entity);
+            }
+        }
     }
 };
 

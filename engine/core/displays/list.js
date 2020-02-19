@@ -116,6 +116,7 @@ exports.display = {
         const columns = flatten(content);
         const TR_entity = document.createElement('TR');
         TR_entity.className = 'xyz-list-item';
+        TR_entity.entityId = entityId;
         const uri = '/' + entityClassName + '/' + entityId;
 
         if (options.multiSelect) {
@@ -189,6 +190,14 @@ exports.display = {
             };
         }
         TABLE.appendChild(TR_entity);
+    },
+    remove: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
+        const TABLE = WRAPPER.firstChild;
+        for(let TR_entity of TABLE.childNodes){
+            if(typeof TR_entity.entityId === 'string' && (TR_entity.entityId === entityId || entityId === '*')){
+                TABLE.removeChild(TR_entity);
+            }
+        }
     }
 };
 

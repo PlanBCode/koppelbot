@@ -25,7 +25,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
     }
     if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
     $_SESSION['content'][$userName] = [];
-    return $connectorResponse->add(200, $propertyRequest, $userName, 'Login successfull');
+    return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'login successful;'
 
 }
 
@@ -102,7 +102,7 @@ class Connector_session extends Connector
         if ($userName === '*') {
             $_SESSION['content'] = [];
             session_destroy();
-            return $connectorResponse->add(200, $propertyRequest, '*', 'Successfully logged out.');
+            return $connectorResponse->add(200, $propertyRequest, '*', null);//TODO 'Successfully logged out.'
         }
         if (!array_key_exists($userName, $_SESSION['content'])) {
             return $connectorResponse->add(404, $propertyRequest, $userName, 'Not found.');
@@ -111,7 +111,7 @@ class Connector_session extends Connector
         if (empty($_SESSION['content'])) {
             session_destroy();
         }
-        return $connectorResponse->add(200, $propertyRequest, $userName, 'Successfully logged out.');
+        return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'Successfully logged out.'
     }
 
     protected function getSession(PropertyRequest &$propertyRequest): connectorResponse

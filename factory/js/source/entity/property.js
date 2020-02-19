@@ -155,6 +155,17 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         }
     };
 
+    this.isId = () => {
+        if (types.hasOwnProperty(type) && typeof types[type].getIdFromContent === 'function') {
+            return true;
+        } else if (settings.hasOwnProperty('connector')) {
+            if (settings.connector.key === 'key' || settings.connector.key === 'basename') {
+                return true;
+            }
+        }
+        return false;
+    };
+
     this.getIdFromContent = data => {
         if (isPrimitive) {
             if (types.hasOwnProperty(type) && typeof types[type].getIdFromContent === 'function') {

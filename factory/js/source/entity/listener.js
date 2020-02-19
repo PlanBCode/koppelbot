@@ -53,14 +53,14 @@ function ListenerHandler() {
         if (typeof entityId !== 'string') throw new TypeError("entityId is not a string.");
         if (!state instanceof State) throw new TypeError("state is not a State.");
 
-        if (state.isCreated()) {
+        if (state.isRemoved()) {
+            callAllListeners('removed', entityId, node, subUri);
+        }else if (state.isCreated()) {
             callAllListeners('created', entityId, node, subUri);
+            //TODO }else if(state.isError()){
+         //   callAllListeners('error', entityId, node, subUri);
         } else if (state.isChanged()) {
             callAllListeners('changed', entityId, node, subUri);
-        } else if (state.isRemoved()) {
-            callAllListeners('removed', entityId, node, subUri);
-            //TODO }else if(state.isError()){
-            callAllListeners('error', entityId, node, subUri);
         } else {
             // nothing to do
         }

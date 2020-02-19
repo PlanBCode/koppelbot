@@ -40,10 +40,8 @@ exports.display = {
     first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         //TODO something with wrapper?
     },
-
     entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const columns = list.flatten(content);
-
         const SELECT = WRAPPER.firstChild;
 
         if (SELECT.childElementCount === 0 && !options.initialValue) { // select the first option as default TODO unless other default is defined
@@ -70,7 +68,14 @@ exports.display = {
                 OPTION.appendChild(TAG);
             }
         }
-
         SELECT.appendChild(OPTION);
+    },
+    remove: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
+        const SELECT = WRAPPER.firstChild;
+        for (let OPTION of SELECT) {
+            if ((OPTION.value === '/' + entityClassName + '/' + entityId || entityId === '*')) {
+                SELECT.removeChild(OPTION);
+            }
+        }
     }
 };

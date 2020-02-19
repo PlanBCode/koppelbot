@@ -23,7 +23,6 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
                 if (type.validateContent(item)) {
                     TAG.classList.remove('xyz-invalid-content');
                     xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, content));
-                    if (typeof options.onChange === 'function') options.onChange(content);
                 } else {
                     TAG.classList.add('xyz-invalid-content');
                 }
@@ -32,11 +31,7 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
                 //TODO use subPropertyPath
                 subUri = typeof subUri === 'undefined' ? '' : ('/' + subUri);
                 xyz.delete(uri + subUri);
-                //TODO options.onChange/onDelete?
             };
-        } else if (typeof options.onChange === 'function') {
-            onChange = options.onChange;
-            //TODO options.onDelete/onDelete?
         }
         const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
         TAG = type[action](item);

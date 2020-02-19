@@ -43,7 +43,11 @@ exports.actions = {
     view: function (item) {
         const SPAN = document.createElement('SPAN');
         const content = item.getContent();
-        SPAN.innerText = content.username;
+        if(typeof content === 'object' && content !== null ) {
+            SPAN.innerText = content.username;
+        }else{
+            SPAN.innerText = 'ERROR';//TODO
+        }
         return SPAN;
     },
     validateContent: function (item) {

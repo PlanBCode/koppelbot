@@ -70,12 +70,8 @@ exports.put = (entityClasses, uri, content) => handleModifyRequest(entityClasses
 // callback = Response =>{}
 // get the requested uri from cache or request it from server
 exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
-    // get the meta data
-
     retrieveMeta(xyz, entityClasses, uri, () => {
-        if (typeof metaCallBack === 'function') {
-            metaCallBack();
-        }
+        if (typeof metaCallBack === 'function') metaCallBack();
 
         //TODO meta should be good or we have a problem
         //TODO get the data from cache if already in cache

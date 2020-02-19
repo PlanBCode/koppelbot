@@ -128,6 +128,16 @@ function EntityClass(xyz, entityClassName, settings) {
         return false;
     };
 
+    this.getIdProperty = () => {
+        for (let propertyName in properties) {
+            const property = properties[propertyName];
+            if (property.isId()) {
+                return propertyName;
+            }
+        }
+        return null;
+    };
+
     this.getIdFromContent = data => {
         if (typeof data !== 'object' || data === null) {//TODO is_object
             return null;
@@ -150,7 +160,8 @@ function EntityClass(xyz, entityClassName, settings) {
     const handleEntityIdInput = input.handle(this, statusses, properties, entities);
 
     this.handleInput = (path, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
-        const state = new State();
+        const state = new State(method);
+        const idProperty = this.getIdProperty();
         if (entityClassStatus === 207) {
             for (let entityId of entityIds) {
                 const entity207Wrapper = entityClassContent[entityId];
@@ -200,7 +211,7 @@ function EntityClass(xyz, entityClassName, settings) {
 
 
 const handleInput = (method, uri, status, responseContent, requestContent, entityClasses) => {
-    const state = new State();
+    const state = new State(method);
     //TODO check status
 
     const path = uriTools.pathFromUri(uri);

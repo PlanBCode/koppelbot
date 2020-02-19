@@ -9,48 +9,41 @@
 <table id="main">
     <tr class="header">
         <td colspan="2">Koppelbot</td>
-        <td><xyz uri="/session" display="login"/></td>
+        <td>
+            <xyz uri="/session" display="login"/>
+        </td>
     </tr>
     <tr>
         <td rowspan="4" id="sources" width="20%" valign="top">
-            <script>
-                xyz.ui({
-                    uri: '/source/*/file/id,content',
-                    display: 'list',
-                    select: 'source',
-                    multiSelect: 'multiSource'
-                });
-            </script>
+            <xyz uri="/source/*/file/id,content" display="list" select="source" multiSelect="multiSource"/>
         </td>
         <td valign="top">
             View source:
             <p>
-                <script>xyz.ui({uri: '$source', showLabel: false});</script>
+                <xyz uri="$source" showLabel="false"/>
             </p>
 
             Edit source content:
             <p>
-                <script>xyz.ui({uri: '$source/file/content', action: 'edit', dynamic: true, showLabel: false});</script>
+                <xyz uri="$source/file/content" action="edit" showLabel="false"/>
             </p>
         </td>
         <td rowspan="4" id="facts" width="20%" valign="top">
-            <script>xyz.ui({uri: '/fact/*', display: 'list', select: 'fact'});</script>
+            <xyz uri="/fact/*" display="list" select="fact"/>
         </td>
     </tr>
     <tr>
         <td>
             Multi selected sources:
-            <script>xyz.ui({uri: '$multiSource/file/id', dynamic: true, showLabel: false});</script>
+            <xyz uri="$multiSource/file/id" dynamic="true" showLabel="false"/>
         </td>
     </tr>
     <tr>
         <td>
             Edit fact:
-            <script>xyz.ui({uri: '$fact', action: 'edit'});</script>
+            <xyz uri="$fact" action="edit"/>
         </td>
     </tr>
 </table>
-
-
 </body>
 </html>

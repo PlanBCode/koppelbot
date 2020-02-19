@@ -1,10 +1,5 @@
 TODO
 
-new response.Node gaat mis bij 207's
-
-add onSubmit option to creator
-add onChange option to creator/editor/list/item etc
-
 filtering & searching :
 - implement full blown boolean expressions
 - implement sort
@@ -23,6 +18,10 @@ file type: viewer
 
 validateContent -> return messages why it's not valid
 
+types:
+ - time
+ - datetime
+ 
 array/object
 - delete values
 
@@ -93,6 +92,9 @@ hide private connector settings or better only expose specified ones
 use the plugin structure
 /custom/$PLUGINNAME/
 - package.json
+- sandbox plugin access
+- ini_set("open_basedir", "/mag/alleen/hier/bij/komen:/of/tot/hier/");
+- https://stackoverflow.com/questions/44854059/php-ini-set-open-basedir-has-no-effect
 
 Pass more stuff by reference
 
@@ -108,9 +110,5 @@ proper file locks
 
 $variable usage in /ui endpoints (generate inputs to update)
 navigation in /ui endpoints for (sub) property names
-
-types:
- - time
- - datetime
 
 maybe entity inheritance
