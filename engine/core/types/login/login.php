@@ -13,7 +13,7 @@ class Type_login extends Type
         return true;  // TODO min/max length, allow chars, regex
     }
 
-    static function processBeforeConnector(string $method, &$newContent, &$currentContent): ProcessResponse
+    static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
     {
         switch ($method) {
             case 'PUT' :  // create new password $newContent = {new: "$password", confirm: "$password"}
@@ -28,7 +28,7 @@ class Type_login extends Type
                 $message = 'Cannot edit login';
                 return new ProcessResponse(400, $message);
             default:
-                return $newContent;
+                return new ProcessResponse(200, $newContent);
         }
     }
 }

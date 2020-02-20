@@ -11,5 +11,9 @@
   },
   "step" : {
     "type": "number"
+  },
+  "leadingZeroes" : {
+    "type": "bool",
+    "default" : false
   }
 }

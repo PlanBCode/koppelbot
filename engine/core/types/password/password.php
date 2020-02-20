@@ -13,7 +13,7 @@ class Type_password extends Type
         return true;
     }
 
-    static function processBeforeConnector(string $method, &$newContent, &$currentContent): ProcessResponse
+    static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
     {
         switch ($method) {
             case 'PUT' :  // create new password $newContent = {new: "$password", confirm: "$password"}

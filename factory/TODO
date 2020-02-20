@@ -1,5 +1,9 @@
 TODO
 
+date type
+ - render to string
+
+
 filtering & searching :
 - implement full blown boolean expressions
 - implement sort
@@ -18,10 +22,7 @@ file type: viewer
 
 validateContent -> return messages why it's not valid
 
-types:
- - time
- - datetime
- 
+
 array/object
 - delete values
 

@@ -2,7 +2,7 @@ const types = require('../../build/types.js');
 const response = require('../entity/response.js');
 const json = require('../web/json.js');
 const render = require('./render');
-
+const DEFAULT_ACTION = 'view';
 // onChange = (content, [additionalSubPropertyPath]) => {...}
 // onDelete = (content, [additionalSubPropertyPath]) => {...}
 
@@ -13,6 +13,7 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
     this.getStatus = () => status;
     this.getContent = () => content;
     this.getOptions = () => options;
+    this.getAction = () => options.hasOwnProperty('action') ? options.action : DEFAULT_ACTION;
     this.getOption = optionName => options[optionName];
     this.hasOption = optionName => options.hasOwnProperty(optionName);
     this.getSettings = () => settings;
@@ -39,7 +40,12 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
         if (options.display === 'create') {
             const TABLE = document.createElement('TABLE');
             TABLE.style.display = 'inline-block';
-            json.set(creatorData, subPropertyPath.concat(additionalSubPropertyPath), content);
+            console.log(creatorData, subPropertyPath.concat(additionalSubPropertyPath), content)
+            try {
+                json.set(creatorData, subPropertyPath.concat(additionalSubPropertyPath), content);
+            } catch (e) {
+                console.error('Item.renderSubElement json.set failed', e);
+            }
             const TRs = render.creator(xyz, options_, baseUri, settings, subPropertyPath.concat(additionalSubPropertyPath), creatorData);
             for (let TR of TRs) {
                 TABLE.appendChild(TR);

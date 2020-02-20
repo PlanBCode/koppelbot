@@ -94,7 +94,7 @@ abstract class Type
         }
     }
 
-    static function processBeforeConnector(string $method, &$newContent, &$currentContent): ProcessResponse
+    static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
     {
         return new ProcessResponse(200, $newContent);
     }

@@ -14,31 +14,35 @@
       "key": "basename"
     }
   },
-  "string" : {
+  "string": {
     "minLength": 3,
     "maxLength": 6,
     "type": "string"
   },
-  "enum" : {
+  "enum": {
     "type": "enum",
-    "choices" : ["red","blue","green"]
+    "choices": [
+      "red",
+      "blue",
+      "green"
+    ]
   },
-  "bool" : {
+  "bool": {
     "type": "bool"
   },
-  "number" : {
+  "number": {
     "type": "number",
     "step": 1,
     "max": 10,
     "min": 1
   },
-  "array" : {
+  "array": {
     "type": "array",
     "subType": {
       "type": "string"
     }
   },
-  "object" : {
+  "object": {
     "type": "object",
     "subType": {
       "type": "string"
@@ -54,5 +58,9 @@
       "extension": "meta",
       "key": "content"
     }
+  },
+  "date": {
+    "type": "date",
+    "format": "d-m-Y"
   }
 }

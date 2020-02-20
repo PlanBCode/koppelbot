@@ -401,6 +401,6 @@ class Property
 
     public function processBeforeConnector(string $method, &$newContent, &$currentContent)
     {
-        return $this->typeClass::processBeforeConnector($method, $newContent, $currentContent);
+        return $this->typeClass::processBeforeConnector($method, $newContent, $currentContent, $this->settings);
     }
 }

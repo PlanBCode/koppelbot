@@ -81,7 +81,9 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
     const TR = document.createElement('TR');
     if (options.showLabels !== false) {
         const TD_label = document.createElement('TD');
-        TD_label.innerText = subPropertyPath[0];
+        TD_label.innerText = typeof options.label === 'string'
+            ? options.label
+            : subPropertyPath[0];
         TR.appendChild(TD_label);
     }
     let TAG;
@@ -108,7 +110,12 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
         json.unset(data, keyPath);
     };
 
-    let content = json.get(data, subPropertyPath);
+    let content;
+    try {
+        content = json.get(data, subPropertyPath);
+    } catch (e) {
+        content = null;
+    }
     if (content === null) {
         if (settings.hasOwnProperty('default')) {
             content = settings.default;
@@ -116,7 +123,11 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
             // does the default have a default
             content = type.json.default.default;
         }
-        json.set(data, subPropertyPath, content);
+        try {
+            json.set(data, subPropertyPath, content);
+        } catch (e) {
+            console.error('render.creator json.set failed', e);
+        }
     }
 
     const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);

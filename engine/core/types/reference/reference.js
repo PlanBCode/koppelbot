@@ -1,6 +1,7 @@
 exports.actions = {
     edit: function (item) {
-        const TAG = item.ui(item.getSetting('uri'), {
+        const TAG = item.ui({
+            uri: item.getSetting('uri'),
             display: 'select',
             select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId)
             ,
@@ -12,7 +13,7 @@ exports.actions = {
     view: function (item) {
         const DIV = document.createElement('DIV');
         if (typeof item.getContent() !== 'undefined') {
-            item.ui(item.getContent(), {display: 'item'}, DIV);
+            item.ui({uri: item.getContent(), display: 'item'}, DIV);
         }
         //TODO onchange : how to? redo the ui definition
         return DIV;

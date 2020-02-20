@@ -6,6 +6,9 @@ exports.array.json = require('../../../engine/core/types/array/array.json');
 exports.bool = require('../../../engine/core/types/bool/bool.js').actions;
 exports.bool.json = require('../../../engine/core/types/bool/bool.json');
 
+exports.date = require('../../../engine/core/types/date/date.js').actions;
+exports.date.json = require('../../../engine/core/types/date/date.json');
+
 exports.enum = require('../../../engine/core/types/enum/enum.js').actions;
 exports.enum.json = require('../../../engine/core/types/enum/enum.json');
 
