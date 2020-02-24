@@ -15,7 +15,7 @@ function ApiRequest(method, uri, data) {
             if (path) {
                 content = json.get(content, path, true);
             }
-            return new util.TestResult(util.match(content, expectedContent), `Content "${content}" did not match expected content "${expectedContent}".`)
+            return new util.TestResult(util.match(content, expectedContent), `Content ${JSON.stringify(content)} did not match expected content ${JSON.stringify(expectedContent)}.`)
         });
         return this;
     };

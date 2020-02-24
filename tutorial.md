@@ -46,13 +46,9 @@ Usage: xyz [options] uri [content]
 ```
 $ ./xyz "/fruit/apple"
 {
-    "fruit": {
-        "apple": {
-            "color": "red",
-            "size": "medium",
-            "name": "apple"
-        }
-    }
+    "color": "red",
+    "size": "medium",
+    "name": "apple"
 }
 ```
 
@@ -62,21 +58,11 @@ $ ./xyz "/fruit/apple"
 
 ```
 $ ./xyz "/fruit/*/color"
-{
-    "fruit": {
-        "grape": {
-            "color": "green"
-        },
-        "melon": {
-            "color": "green"
-        },
-        "apple": {
-            "color": "red"
-        },
-        "orange": {
-            "color": "orange"
-        }
-    }
+{    
+    "grape": "green",
+    "melon": "green",
+    "apple": "red",
+    "orange": "orange"   
 }
 ```
 
@@ -87,18 +73,16 @@ $ ./xyz "/fruit/*/color"
 ```
 $ ./xyz "/fruit/*?color==green"
 {
-    "fruit": {
-        "grape": {
-            "color": "green",
-            "size": "small",
-            "name": "grape"
-        },
-        "melon": {
-            "color": "green",
-            "size": "small",
-            "name": "melon"
-        }
-    }
+    "grape": {
+        "color": "green",
+        "size": "small",
+        "name": "grape"
+    },
+    "melon": {
+        "color": "green",
+        "size": "small",
+        "name": "melon"
+    }    
 }
 ```
 
@@ -108,13 +92,6 @@ This will give all the data for the fruits which have a green color
 
 ```
 $ ./xyz --method PATCH "/fruit/melon/size" '{"fruit":{"melon":{"size":"large"}}}'
-{
-    "fruit": {
-        "melon": {
-            "size": null
-        }
-    }
-}
 ```
 
 And let's check if it's correct now:
@@ -122,13 +99,9 @@ And let's check if it's correct now:
 ```
 $ ./xyz "/fruit/melon"
 {
-    "fruit": {
-        "melon": {
-            "color": "green",
-            "size": "large",
-            "name": "melon"
-        }
-    }
+    "color": "green",
+    "size": "large",
+    "name": "melon"            
 }
 ```
 

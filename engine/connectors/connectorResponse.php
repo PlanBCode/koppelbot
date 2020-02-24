@@ -1,6 +1,5 @@
 <?php
 
-
 class connectorResponse extends Response
 {
     /** @var RequestResponse[] */
@@ -16,7 +15,7 @@ class connectorResponse extends Response
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
         if (!array_key_exists($requestId, $this->requestResponses)) {
-            $this->requestResponses[$requestId] = new RequestResponse($requestId);
+            $this->requestResponses[$requestId] = new RequestResponse($propertyRequest->getRequestObject());
         }
         $method = $propertyRequest->getMethod();
         $this->requestResponses[$requestId]->add($method, $status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);

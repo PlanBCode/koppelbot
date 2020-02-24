@@ -89,8 +89,9 @@ class EntityClass
         return $propertyHandles;
     }
 
-    protected function validateAndCheckRequired(string $method, $requestId, string $entityId, $entityIdContent, array &$errorPropertyRequests, Query &$query)
+    protected function validateAndCheckRequired(RequestObject &$requestObject, string $entityId, $entityIdContent, array &$errorPropertyRequests)
     {
+        $method = $requestObject->getMethod();
         if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
             foreach ($this->properties as $propertyName => $property) {
                 $propertyContent = array_null_get($entityIdContent, $propertyName);
@@ -98,25 +99,28 @@ class EntityClass
                 if (!is_null($propertyContent)) {
                     if ($property->getTypeName() === 'id' && $method === 'POST') {
                         $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not bu supplied.';
-                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
+                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $path, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     } else if (!$property->validateContent($propertyContent)) {
                         $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                        $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
+                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $path, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     }
                 } elseif
                 (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
                     $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                    $errorPropertyRequest = new PropertyRequest(400, $requestId, $method, $this->entityClassName, $entityId, $error, $path, $propertyContent, $query);
+                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $path, $propertyContent);
                     $errorPropertyRequests[] = $errorPropertyRequest;
                 }
             }
         }
     }
 
-    protected function createPropertyRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query): array
+    protected function createPropertyRequests(RequestObject &$requestObject, string $entityIdList, array $propertyPath, $entityClassContent): array
     {
+
+        $method = $requestObject->getMethod();
+
         /** @var string[] */
         $entityIds = [];
         if ($entityIdList === '*') {
@@ -140,7 +144,7 @@ class EntityClass
             $propertyHandles = [new PropertyHandle(400, 'POST method expects uri of the form /' . $this->entityClassName . '', [$this->entityClassName])];
         } else {
             /** @var PropertyHandle[] */
-            $propertyHandles = $this->expand($propertyPath, $query);
+            $propertyHandles = $this->expand($propertyPath, $requestObject->getQuery());
         }
         /** @var PropertyRequest[] */
         $propertyRequests = [];
@@ -154,10 +158,10 @@ class EntityClass
                 $entityIdContent = null;
             }
 
-            $this->validateAndCheckRequired($method, $requestId, $entityId, $entityIdContent, $errorPropertyRequests, $query);
+            $this->validateAndCheckRequired($requestObject, $entityId, $entityIdContent, $errorPropertyRequests);
 
             foreach ($propertyHandles as $propertyHandle) {
-                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestId, $method, $this->entityClassName, $entityId, $entityIdContent, $query);
+                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityId, $entityIdContent);
             }
         }
         if (!empty($errorPropertyRequests)) {
@@ -167,10 +171,11 @@ class EntityClass
     }
 
     public
-    function createConnectorRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
+    function createConnectorRequests(RequestObject $requestObject, string $entityIdList, array $propertyPath, $entityClassContent)
     {
+
         /** @var PropertyRequest[] */
-        $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
+        $propertyRequests = $this->createPropertyRequests($requestObject, $entityIdList, $propertyPath, $entityClassContent);
 
         //TODO only when adding new : check if entity exists
         //TODO check if required properties are handled
@@ -189,9 +194,11 @@ class EntityClass
     }
 }
 
-function cleanWrapping(array &$wrapper, int $status)
+function cleanWrapping(&$wrapper, int $status)
 {
-    if ($status === 207) {
+    if (!is_array($wrapper)) {
+        return;
+    } elseif ($status === 207) {
         foreach ($wrapper as $subPropertyName => &$subWrapper) {
             if (array_key_exists('content2', $subWrapper)) {
                 $subWrapper['content'] = $subWrapper['content2'];
@@ -221,24 +228,24 @@ class EntityResponse extends Response
     protected $entityClass;
     protected $entityId;
 
-    /** @var string */
-    protected $method;
+    /** @var RequestObject */
+    protected $requestObject;
 
     /** @var PropertyResponse[] */
     protected $propertyResponses = [];
 
-    public function __construct(EntityClass &$entityClass, $entityId, string $method)
+    public function __construct(EntityClass &$entityClass, $entityId, RequestObject &$requestObject)
     {
         $this->entityId = $entityId;
         $this->entityClass = $entityClass;
-        $this->method = $method;
+        $this->requestObject = $requestObject;
     }
 
     public function add(int $status, array $propertyPath, $content)
     {
         $this->addStatus($status);
         $property = $this->entityClass->getProperty($propertyPath);
-        $this->propertyResponses[] = new PropertyResponse($property, $this->method, $status, $propertyPath, $content);
+        $this->propertyResponses[] = new PropertyResponse($property, $this->requestObject, $status, $propertyPath, $content);
     }
 
     public function merge(EntityResponse $entityResponse)
@@ -261,6 +268,16 @@ class EntityResponse extends Response
 
     public function getContent()
     {
+        /*
+         * /source/fruit/file
+         * /source/fruit
+         * /source/fruit/file/extension
+         * /source/fruit/file/content
+        */
+
+        $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);
+
+
         $content = [];
         foreach ($this->propertyResponses as $propertyResponse) {
             $propertyPath = $propertyResponse->getPropertyPath();
@@ -284,8 +301,24 @@ class EntityResponse extends Response
                 }
             }
         }
+        if (!$this->requestObject->getQuery()->checkToggle('expand')) {
+            foreach ($requestPropertyPath as $subPropertyName) {
+                if (count($content) > 1) {
+                    break;
+                } elseif (array_key_exists($subPropertyName, $content)) {
+                    $content = array_get($content, $subPropertyName);
+                    $this->status = array_get($content, 'status');
+                    if (array_key_exists('content', $content)) {
+                        $content = array_get($content, 'content');
+                    } elseif (array_key_exists('content2', $content)) {
+                        $content = array_get($content, 'content2');
+                    }
+                } else {
+                    $content = [];
+                }
+            }
+        }
         cleanWrapping($content, $this->getStatus());
-
         return $content;
     }
 }
@@ -294,22 +327,22 @@ class EntityClassResponse extends Response
 {
     /** @var EntityClass */
     protected $entityClass;
-    /** @var string */
-    protected $method;
+    /** @var RequestObject */
+    protected $requestObject;
     /** @var EntityResponse[] */
     protected $entityResponses = [];
 
-    public function __construct($entityClassName, string $method)
+    public function __construct($entityClassName, RequestObject &$requestObject)
     {
         $this->entityClass = EntityClass::get($entityClassName);
-        $this->method = $method;
+        $this->requestObject = $requestObject;
     }
 
     public function add(int $status, string $entityId, array $propertyPath, $content)
     {
         $this->addStatus($status);
         if (!array_key_exists($entityId, $this->entityResponses)) {
-            $this->entityResponses[$entityId] = new EntityResponse($this->entityClass, $entityId, $this->method);
+            $this->entityResponses[$entityId] = new EntityResponse($this->entityClass, $entityId, $this->requestObject);
         }
         $this->entityResponses[$entityId]->add($status, $propertyPath, $content);
     }
@@ -333,6 +366,16 @@ class EntityClassResponse extends Response
 
     public function getContent()
     {
+        $count = count($this->entityResponses);
+        if (!$this->requestObject->getQuery()->checkToggle('expand') && $count <= 1) {
+            if ($count === 1) {
+                $entityResponse = array_values($this->entityResponses)[0];
+                return $entityResponse->getContent();
+            } else {
+                return null;
+            }
+        }
+
         $content = [];
         foreach ($this->entityResponses as $entityId => $entityResponse) { //TODO use a map
             if ($this->status == 207) {

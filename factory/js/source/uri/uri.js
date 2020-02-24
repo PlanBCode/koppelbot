@@ -40,7 +40,15 @@ const getBaseUri = uri => {
     }
 };
 
+const addQueryString = (uri, queryString) => {
+
+    return uri.indexOf('?') ===-1
+        ? uri + '?' + queryString
+        : uri + '&'+ queryString;
+};
+
 exports.getBaseUri = getBaseUri;
 exports.getEntityClassNames = getEntityClassNames;
 exports.pathFromUri = pathFromUri;
 exports.wrapContent = wrapContent;
+exports.addQueryString = addQueryString;

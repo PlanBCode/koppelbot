@@ -29,7 +29,6 @@ class DocResponse extends HttpResponse2
             $index = 1;
             foreach (self::$menuItems as $uri => $menuItem) {
                 if (strpos($firstExtraMenuItemUri, $uri . '/') === 0) {
-                    //var_dump(array_splice(self::$menuItems, $index , 0, $extraMenuItems));
                     return  array_slice(self::$menuItems, 0, $index, true) +
                         $extraMenuItems +
                         array_slice(self::$menuItems, $index, true);

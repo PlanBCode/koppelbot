@@ -27,11 +27,9 @@ function getSingleSetting($name, $settings, $rootSettings)
 
 class  PropertyRequest
 {
-    /** @var mixed */
-    protected $requestId;
+    /** @var RequestObject */
+    protected $requestObject;
 
-    /** @var string */
-    protected $method;
     /** @var string */
     protected $entityClass;
     /** @var string */
@@ -42,23 +40,19 @@ class  PropertyRequest
     protected $propertyPath;
     /** @var mixed */
     protected $content;
-    /** @var Query */
-    protected $query;
-
     /** @var int */
     protected $status;
-
     /** @var string */
     protected $connectorString;
 
-    public function __construct(int $status, $requestId, string $method, string $entityClass, string $entityId, $propertyOrError, array $propertyPath, $propertyContent, Query $query)
+    public function __construct(int $status, RequestObject &$requestObject, string $entityClass, string $entityId, $propertyOrError, array $propertyPath, $propertyContent)
     {
-        $this->requestId = $requestId;
-        $this->method = $method;
+        $this->requestObject = $requestObject;
+
         $this->entityId = $entityId;
         $this->entityClass = $entityClass;
         $this->propertyPath = $propertyPath;
-        $this->query = $query;
+
         if ($status !== 200) {
             $this->status = $status;
             $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
@@ -73,7 +67,7 @@ class  PropertyRequest
             $this->status = 200;
             $connectorSettings = $this->property->getConnectorSettings();
             $connectorType = array_get($connectorSettings, 'type');
-            $this->connectorString = Connector::addConnector($connectorType, $connectorSettings, $method, $entityClass, $entityId, $this->propertyPath, $query);
+            $this->connectorString = Connector::addConnector($connectorType, $connectorSettings, $requestObject, $entityClass, $entityId, $this->propertyPath);
             if ($this->connectorString === Connector::CONNECTOR_STRING_ERROR) {
                 $this->status = 500;
                 $this->content = 'Connector failure for /' . $entityClass . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
@@ -84,12 +78,12 @@ class  PropertyRequest
 
     public function isReadOnly(): bool
     {
-        return $this->method === 'GET' || $this->method === 'HEAD';
+        return $this->requestObject->getMethod() === 'GET' || $this->requestObject->getMethod() === 'HEAD';
     }
 
     public function isDeletion(): bool
     {
-        return $this->method === 'DELETE';
+        return $this->requestObject->getMethod() === 'DELETE';
     }
 
     public function getPropertyPath(): array
@@ -104,12 +98,12 @@ class  PropertyRequest
 
     public function getRequestId()
     {
-        return $this->requestId;
+        return $this->requestObject->getId();
     }
 
     public function getMethod(): string
     {
-        return $this->method;
+        return $this->requestObject->getMethod();
     }
 
     public function getEntityId(): string
@@ -134,7 +128,17 @@ class  PropertyRequest
 
     public function getQuery(): Query
     {
-        return $this->query;
+        return $this->requestObject->getQuery();
+    }
+
+    public function getRequestUri(): string
+    {
+        return $this->requestObject->getUri();
+    }
+
+    public function getRequestObject(): RequestObject
+    {
+        return $this->requestObject;
     }
 
     public function getConnectorString(): string
@@ -144,7 +148,7 @@ class  PropertyRequest
 
     public function processBeforeConnector(&$newContent, &$currentContent)
     {
-        return $this->property->processBeforeConnector($this->method, $newContent, $currentContent);
+        return $this->property->processBeforeConnector($this->requestObject->getMethod(), $newContent, $currentContent);
     }
 }
 
@@ -156,15 +160,15 @@ class PropertyResponse extends Response
     /** @var string[] */
     protected $propertyPath;
 
-    public function __construct(Property &$property, string $method, int $status, array $propertyPath, $content = null)
+    public function __construct(Property &$property, RequestObject &$requestObject, int $status, array $propertyPath, $content = null)
     {
         $this->propertyPath = $propertyPath;
         $this->property = $property;
-        $processResponse = $property->processAfterConnector($method,$content);
-        if($processResponse->succeeded()){
+        $processResponse = $property->processAfterConnector($requestObject->getMethod(), $content);
+        if ($processResponse->succeeded()) {
             $this->addStatus($status);
             $this->content = $processResponse->getContent();
-        }else{
+        } else {
             $this->status = $processResponse->getStatus();
             $this->content = $processResponse->getError();
         }
@@ -203,14 +207,14 @@ class PropertyHandle
         }
     }
 
-    public function createPropertyRequest($requestId, string $method, string $entityClass, string $entityId, $entityIdContent, Query $query): PropertyRequest
+    public function createPropertyRequest(RequestObject &$requestObject, string $entityClass, string $entityId, $entityIdContent): PropertyRequest
     {
         $propertyContent =& $entityIdContent;
         foreach ($this->propertyPath as $subPropertyName) {
             $propertyContent = array_null_get($propertyContent, $subPropertyName);
         }
         $propertyOrError = $this->status === 200 ? $this->property : $this->error;
-        return new PropertyRequest($this->status, $requestId, $method, $entityClass, $entityId, $propertyOrError, $this->propertyPath, $propertyContent, $query);
+        return new PropertyRequest($this->status, $requestObject, $entityClass, $entityId, $propertyOrError, $this->propertyPath, $propertyContent);
     }
 }
 

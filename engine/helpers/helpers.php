@@ -80,10 +80,10 @@ function json_unset(&$object, array $keyPath): JsonActionResponse
         return new JsonActionResponse(false); // TODO error message cannot delete prime
     }
     if (array_key_exists($keyPath[0], $object)) {
-        if(count($keyPath) === 1){
+        if (count($keyPath) === 1) {
             unset($object[$keyPath[0]]);
             return new JsonActionResponse(true);
-        }else {
+        } else {
             return json_unset($object[$keyPath[0]], array_slice($keyPath, 1));
         }
     } elseif (is_array($object)) {

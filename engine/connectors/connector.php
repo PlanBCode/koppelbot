@@ -41,84 +41,86 @@ abstract class Connector
         return $connectorClass;
     }
 
-/*
-    require_once './engine/core/connectors/' . $type . '.php';
+    /*
+        require_once './engine/core/connectors/' . $type . '.php';
 
-    //TODO find the file and load it from there
-    $connectorClass = 'Connector_' . $type;
-    if (!class_exists($connectorClass)) {
-        return self::CONNECTOR_STRING_ERROR;
-    }
-    //TODO check if $connectorClass extends Connector class
+        //TODO find the file and load it from there
+        $connectorClass = 'Connector_' . $type;
+        if (!class_exists($connectorClass)) {
+            return self::CONNECTOR_STRING_ERROR;
+        }
+        //TODO check if $connectorClass extends Connector class
 
- */
+     */
 
-public
-static function createMetaResponse(connectorRequest $connectorRequest): connectorResponse
-{
-    $connectorResponse = new connectorResponse();
-    foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-        $property = $propertyRequest->getProperty();
-        $connectorResponse->add(200, $propertyRequest, $propertyRequest->getEntityId(), $property->getMeta());
-    }
-    return $connectorResponse;
-}
-
-public
-static function createErrorResponse(connectorRequest $connectorRequest): connectorResponse
-{
-    $connectorResponse = new connectorResponse();
-    foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-        /** @var Property */
-        $property = $propertyRequest->getProperty();
-        $propertyName = is_null($property) ? '*' : $property->getName();
-        $connectorResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyRequest->getContent());
-    }
-    return $connectorResponse;
-}
-
-public
-static function addConnector(string $typeName, array $connectorSettings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
-{
-    if ($query->checkToggle('meta')) {
-        return self::CONNECTOR_STRING_META;
+    public
+    static function createMetaResponse(connectorRequest $connectorRequest): connectorResponse
+    {
+        $connectorResponse = new connectorResponse();
+        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+            $property = $propertyRequest->getProperty();
+            $connectorResponse->add(200, $propertyRequest, $propertyRequest->getEntityId(), $property->getMeta());
+        }
+        return $connectorResponse;
     }
 
-    $connectorClass = self::getConnectorClass($typeName);
-
-
-    $connectorString = $typeName . '_' . $connectorClass::getConnectorString($connectorSettings, $method, $entityClass, $entityId, $propertyPath, $query);
-
-    if (!array_key_exists($connectorString, self::$connectors)) {
-        self::$connectors[$connectorString] = new $connectorClass($connectorSettings);
-    } else {
-        // TODO check if the existing connector class matched the requested type
+    public
+    static function createErrorResponse(connectorRequest $connectorRequest): connectorResponse
+    {
+        $connectorResponse = new connectorResponse();
+        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+            /** @var Property */
+            $property = $propertyRequest->getProperty();
+            $propertyName = is_null($property) ? '*' : $property->getName();
+            $connectorResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyRequest->getContent());
+        }
+        return $connectorResponse;
     }
 
-    return $connectorString;
-}
+    public
+    static function addConnector(string $typeName, array $connectorSettings, RequestObject &$requestObject, string $entityClass, string $entityId, array $propertyPath): string
+    {
+        $query = $requestObject->getQuery();
+        $method = $requestObject->getMethod();
 
-public
-static function getConnectorResponse(connectorRequest $connectorRequest): connectorResponse
-{
-    /** @var PropertyRequest|null $propertyRequest */
-    $propertyRequest = array_get($connectorRequest->getPropertyRequests(), 0);
-    if (!$propertyRequest instanceof PropertyRequest) {
-        return Connector::createErrorResponse($connectorRequest);
+        if ($query->checkToggle('meta')) {
+            return self::CONNECTOR_STRING_META;
+        }
+
+        $connectorClass = self::getConnectorClass($typeName);
+
+        $connectorString = $typeName . '_' . $connectorClass::getConnectorString($connectorSettings, $method, $entityClass, $entityId, $propertyPath, $query);
+
+        if (!array_key_exists($connectorString, self::$connectors)) {
+            self::$connectors[$connectorString] = new $connectorClass($connectorSettings);
+        } else {
+            // TODO check if the existing connector class matched the requested type
+        }
+
+        return $connectorString;
     }
-    $connectorString = $propertyRequest->getConnectorString();
 
-    switch ($connectorString) {
-        case self::CONNECTOR_STRING_ERROR:
+    public
+    static function getConnectorResponse(connectorRequest $connectorRequest): connectorResponse
+    {
+        /** @var PropertyRequest|null $propertyRequest */
+        $propertyRequest = array_get($connectorRequest->getPropertyRequests(), 0);
+        if (!$propertyRequest instanceof PropertyRequest) {
             return Connector::createErrorResponse($connectorRequest);
-        case self::CONNECTOR_STRING_META:
-            return Connector::createMetaResponse($connectorRequest);
-        default:
-            return Connector::$connectors[$connectorString]->createResponse($connectorRequest);
-    }
-}
+        }
+        $connectorString = $propertyRequest->getConnectorString();
 
-abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
+        switch ($connectorString) {
+            case self::CONNECTOR_STRING_ERROR:
+                return Connector::createErrorResponse($connectorRequest);
+            case self::CONNECTOR_STRING_META:
+                return Connector::createMetaResponse($connectorRequest);
+            default:
+                return Connector::$connectors[$connectorString]->createResponse($connectorRequest);
+        }
+    }
+
+    abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
 
     abstract public function createResponse(connectorRequest $connectorRequest): connectorResponse;
 }

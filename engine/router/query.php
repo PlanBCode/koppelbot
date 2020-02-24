@@ -87,6 +87,8 @@ class QueryStatement
 
     public function match($entityContent): bool
     {
+        if ($this->operator === '') return true;
+
         //TODO use .property notation for rhs red = "red" , .red = $entityContent['red']
         $comparisonFunctionName = array_get(self::$comparisonOperators, $this->operator);
         if (is_null($comparisonFunctionName)) return false;

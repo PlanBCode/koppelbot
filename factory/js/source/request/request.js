@@ -1,10 +1,11 @@
 const entity = require('../entity/entity.js');
+const addQueryString = require('../uri/uri.js').addQueryString;
 
 function request(method, uri, data, callback) {
     //TODO allow for multiple hosts by prepending http(s)://..
     const location = 'http://localhost:8000/'; //TODO determine dynamically
     const xhr = new XMLHttpRequest();
-    xhr.open(method, location + 'api' + uri, true);
+    xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
 
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4) {
@@ -24,7 +25,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     if (entityClassNames.length === 0) {
         callback();
     } else {
-        request('GET', '/' + entityClassNames.join(',') + '?meta', undefined, (status, content) => {//TODO add querystring better
+        request('GET', addQueryString('/' + entityClassNames.join(','), 'meta'), undefined, (status, content) => {//TODO add querystring better
             //TODO check status
             console.log(uri + '?meta', content);
             const data = JSON.parse(content); //TODO check
@@ -82,7 +83,7 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
             } catch (e) {
                 console.error(responseStringContent, e);
             }
-            console.log('GET', uri,status, responseObjectContent);
+            console.log('GET', uri, status, responseObjectContent);
             //TODO replace null with current content?
             const state = entity.handleInput('GET', uri, status, responseObjectContent, null, entityClasses);
             //TODO  word er nog iets met state gedaan...?

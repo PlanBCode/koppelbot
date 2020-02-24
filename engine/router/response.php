@@ -24,21 +24,24 @@ class Response
 
 class RequestResponse extends Response
 {
-    protected $requestId;
+    /** @var RequestObject */
+    protected $requestObject;
 
     /** @var EntityClassResponse[] */
     protected $entityClassResponses = [];
 
-    public function __construct($requestId)
+    protected $query;
+
+    public function __construct(RequestObject &$requestObject)
     {
-        $this->requestId = $requestId;
+        $this->requestObject = $requestObject;
     }
 
     public function add(string $method, int $status, string $entityClassName, string $entityId, array $propertyPath, $content): void
     {
         $this->addStatus($status);
         if (!array_key_exists($entityClassName, $this->entityClassResponses)) {
-            $this->entityClassResponses[$entityClassName] = new EntityClassResponse($entityClassName, $method);
+            $this->entityClassResponses[$entityClassName] = new EntityClassResponse($entityClassName, $this->requestObject);
         }
         $this->entityClassResponses[$entityClassName]->add($status, $entityId, $propertyPath, $content);
     }
@@ -62,6 +65,16 @@ class RequestResponse extends Response
 
     public function getContent()
     {
+        $count = count($this->entityClassResponses);
+        if (!$this->requestObject->getQuery()->checkToggle('expand') && $count <= 1) {
+            if ($count === 1) {
+                $entityClassResponse = array_values($this->entityClassResponses)[0];
+                return $entityClassResponse->getContent();
+            } else {
+                return null;
+            }
+        }
+
         $content = [];
         foreach ($this->entityClassResponses as $entityClass => $entityClassResponse) {
             if ($this->status == 207) {
