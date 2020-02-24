@@ -21,37 +21,42 @@ function ApiRequest(method, uri, data) {
     };
 
     this.statusShouldMatch = expectedStatus => {
-        tests.push((status, _) => new util.TestResult(expectedStatus % 256 === status % 256, 'Status did not match.')); // NB: exit codes are capped at 255. 404%255 = 148
+        tests.push((status, _) => new util.TestResult(expectedStatus % 256 === status % 256, `Status did not match expected status ${expectedStatus}.`)); // NB: exit codes are capped at 255. 404%255 = 148
         return this;
     };
 
-    const validate = (status, content) => {
+    const validate = (name, status, content) => {
         content = JSON.parse(content);
-        for (let test of tests) {
-            test(status, content).validate();
+        try {
+            for (let test of tests) {
+                test(status, content).validate();
+            }
+            console.log('\033[32m[v] Test ' + name + ' succeeded \033[0m');
+        } catch (e) {
+            console.log('\033[31m[x] Test ' + name + ' failed \033[0m', e);
         }
     };
 
-    this.run = () => {
-        child_process.exec(`./xyz --method ${method} ${uri} ${data}`,
+    this.run = name => {
+        child_process.exec(`./xyz --method ${method} '${uri}' '${data}'`,
             {cwd: `${__dirname}/../../..`},
             (error, stdout, stderr) => {
                 const status = error === null ? 200 : error.code;
                 const content = stdout.toString();
-                validate(status, content);
+                validate(name, status, content);
             }
         );
     };
 
-    this.runSync = () => {
+    this.runSync = name => {
         let status, content;
         try {
-            content = child_process.execSync(`./xyz --method ${method} ${uri} ${data}`, {cwd: `${__dirname}/../../..`});
+            content = child_process.execSync(`./xyz --method ${method} '${uri}' '${data}'`, {cwd: `${__dirname}/../../..`});
         } catch (e) {
             status = e.status;
             content = e.stdout.toString();
         }
-        validate(status, content);
+        validate(name, status, content);
     }
 }
 

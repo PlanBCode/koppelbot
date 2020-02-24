@@ -375,7 +375,6 @@ class EntityClassResponse extends Response
                 return null;
             }
         }
-
         $content = [];
         foreach ($this->entityResponses as $entityId => $entityResponse) { //TODO use a map
             if ($this->status == 207) {
@@ -387,7 +386,6 @@ class EntityClassResponse extends Response
                 $content[$entityId] = $entityResponse->getContent();
             }
         }
-
         return $content;
     }
 }

@@ -2,7 +2,7 @@ const curl = require('./curl').curl;
 
 curl('GET', '/fruit/banana')
     .statusShouldMatch(404)
-    .run();
+    .run('Fruit: GET 404');
 
 curl('GET', '/fruit/apple')
     .statusShouldMatch(200)
@@ -11,7 +11,7 @@ curl('GET', '/fruit/apple')
         "size": "medium",
         "name": "apple"
     })
-    .run();
+    .run('Fruit GET');
 
 curl('GET', '/fruit/apple?expand')
     .statusShouldMatch(200)
@@ -25,7 +25,7 @@ curl('GET', '/fruit/apple?expand')
             }
         }
     })
-    .run();
+    .run('Fruit GET ?expand');
 
 curl('GET', '/fruit/*/color')
     .statusShouldMatch(200)
@@ -35,7 +35,7 @@ curl('GET', '/fruit/*/color')
         "apple": "red",
         "orange": "orange"
     })
-    .run();
+    .run('Fruit : get color');
 
 curl('GET', '/fruit/*?color==green')
     .statusShouldMatch(200)
@@ -51,7 +51,34 @@ curl('GET', '/fruit/*?color==green')
             "name": "melon"
         }
     })
-    .run();
+    .run('Fruit: filter on color=green');
+
+curl('GET', '/fruit/*/name')
+    .statusShouldMatch(200)
+    .contentShouldMatch({
+        "grape": "grape",
+        "melon": "melon",
+        "apple": "apple",
+        "orange": "orange"
+    })
+    .run('Fruit: No sorting');
+
+curl('GET', '/fruit/*/name?sortBy=color')
+    .statusShouldMatch(200)
+    .contentShouldMatch({
+        "grape": "grape",
+        "melon": "melon",
+        "orange": "orange",
+        "apple": "apple"
+    })
+    .run('Fruit: Sorting');
+
+curl('GET', '/fruit/*/name?sortBy=color&offset=1&limit=2')
+    .contentShouldMatch({
+        "melon": "melon",
+        "orange": "orange"
+    })
+    .run('Fruit: Limit and offset');
 
 exports.curl = curl;
 exports.file = require('./file');

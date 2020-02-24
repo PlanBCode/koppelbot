@@ -1,15 +1,18 @@
 TODO
 
+BUG ./xyz "/image/cluster-icon.jpg/file/content"
+
+implement expand for PUT content
+
 file: query options to display raw content with mime header
 - add content type mime header
+- propertyResponse : set mime, if mime already set application:json?
 
 date type
  - render to string
 
 filtering & searching :
 - implement full blown boolean expressions
-- implement sort
-- implement limit,offset
 - optimization: if the query connector requests match the actual requests get them together with the rest
 - - otherwise get them first, analyze and use to get the ids
 
@@ -23,7 +26,6 @@ file type: viewer
 - images -> browser
 
 validateContent -> return messages why it's not valid
-
 
 array/object
 - delete values
@@ -91,6 +93,7 @@ php request.php : error if entity class not found
 - - zou het moeten werken? iig goede foutmelding
 
 replace /source?meta with /entity/source
+- los root merge dingen op client side
 
 Connector_path : een hele directory als entity met subproperties zien
 

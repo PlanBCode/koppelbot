@@ -88,6 +88,7 @@ class QueryStatement
     public function match($entityContent): bool
     {
         if ($this->operator === '') return true;
+        if ($this->operator === '=') return true;
 
         //TODO use .property notation for rhs red = "red" , .red = $entityContent['red']
         $comparisonFunctionName = array_get(self::$comparisonOperators, $this->operator);
@@ -97,6 +98,16 @@ class QueryStatement
         $jsonActionResponse = json_get($entityContent, $propertyPath);
         if (!$jsonActionResponse->succeeded()) return false;
         return call_user_func_array(['self', $comparisonFunctionName], [$jsonActionResponse->content, $this->rhs]);
+    }
+
+    public function checkToggle(): bool
+    {
+        return $this->operator === '' || ($this->operator === '=' && ($this->rhs === 'true' || $this->rhs === '1'));
+    }
+
+    public function isOption(): bool
+    {
+        return $this->operator === '=';
     }
 }
 
@@ -123,7 +134,22 @@ class Query
         return $query;
     }
 
-    public function get(string $variableName, $default = null): ?string
+    public function has(string $variableName): bool
+    {
+        return array_key_exists($variableName, $this->queryStatements);
+    }
+
+    public function hasOption(string $variableName): bool
+    {
+        foreach ($this->queryStatements as $queryStatement) {
+            if ($queryStatement->getLhs() === $variableName) {
+                if ($queryStatement->isOption()) return true;
+            }
+        }
+        return false;
+    }
+
+    public function getOption(string $variableName, $default = null): ?string
     {
         foreach ($this->queryStatements as $queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {
@@ -140,11 +166,7 @@ class Query
     {
         foreach ($this->queryStatements as $queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {
-                $rhs = $queryStatement->getRhs();
-                $operator = $queryStatement->getOperator();
-                if ($operator === '' || ($operator === '=' && ($rhs === 'true' || $rhs === '1'))) {
-                    return true;
-                }
+                if ($queryStatement->checkToggle()) return true;
             }
         }
         return false;
@@ -162,7 +184,6 @@ class Query
         return array_unique($propertyNames);
     }
 
-
     public function getMatchingEntityIds(&$content): array
     {
         $entityIds = [];
@@ -179,6 +200,21 @@ class Query
                 if ($flagMatch) array_push($entityIds, $entityId);
             }
         }
+        if ($this->hasOption('sortBy')) {
+            //TODO handle multi class requests
+            $entityClassName = array_keys($content)[0];
+            $sortPath = explode('.', $this->getOption('sortBy'));
+            usort($entityIds, function ($entityIdA, $entityIdB) use ($sortPath, $entityClassName, $content) {
+                $entityContentA = json_get($content, array_merge([$entityClassName, $entityIdA], $sortPath));
+                $entityContentB = json_get($content, array_merge([$entityClassName, $entityIdB], $sortPath));
+                $entityContentA = $entityContentA->content;
+                $entityContentB = $entityContentB->content;
+                return strcmp($entityContentA, $entityContentB);                 //perform sorting, return -1, 0, 1
+            });
+        }
+        $offset = $this->getOption('offset',0);
+        $limit = $this->getOption('limit',count($entityIds));
+        $entityIds = array_slice($entityIds,$offset, $limit);
         return $entityIds;
     }
 }

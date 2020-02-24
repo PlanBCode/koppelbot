@@ -137,6 +137,9 @@ class ApiRequest extends HttpRequest2
         $entityClassList = count($path) > 1 ? $path[1] : '*';
         $entityIdList = count($path) > 2 ? $path[2] : '*';
         $propertyNames = $query->getAllUsedPropertyNames();
+        if ($query->hasOption('sortBy')) {
+            $propertyNames[] = $query->getOption('sortBy');
+        }
         if (count($propertyNames) === 0) return [];
         if (count($propertyNames) !== 1) {
             echo 'ERROR : multi property query not yet supported';
@@ -147,11 +150,6 @@ class ApiRequest extends HttpRequest2
         $requestURi = '/' . $entityClassList . '/' . $entityIdList . '/' . $propertyNames[0]; //TODO tree
         $queryString = $this->queryString . '&expand'; //TODO add better
         $otherQuery = new Query($queryString);
-        /*    TODO use
-         $limit = $query->get('limit');
-         $offset = $query->get('offset','0');
-         $sortBy = $query->get('sortBy');
-        */
         return getConnectorRequests('GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery);
     }
 
@@ -172,6 +170,7 @@ class ApiRequest extends HttpRequest2
             $data = $requestResponse->getContent();
             //TODO handle failure
             $entityIds = $this->query->getMatchingEntityIds($data);
+
             $entityIdList = implode(',', $entityIds);
         }
         /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.
