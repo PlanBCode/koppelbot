@@ -18,7 +18,8 @@ class connectorResponse extends Response
         if (!array_key_exists($requestId, $this->requestResponses)) {
             $this->requestResponses[$requestId] = new RequestResponse($requestId);
         }
-        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
+        $method = $propertyRequest->getMethod();
+        $this->requestResponses[$requestId]->add($method, $status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
         return $this;
     }
 

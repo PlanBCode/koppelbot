@@ -44,6 +44,16 @@ class EntityClass
         }
     }
 
+    public function getProperty(array &$propertyPath): ?Property
+    {
+        if (count($propertyPath) === 0) return null;
+        $propertyName = $propertyPath[0];
+        if (!is_string($propertyName)) return null;
+        $property = array_get($this->properties, $propertyName);
+        if (!$property) return null;
+        return $property->getProperty(array_slice($propertyPath, 1));
+    }
+
     public function getUri(?string $entityId = null): string
     {
         return '/' . $this->entityClassName . '/' . (is_null($entityId) ? '*' : $entityId);
@@ -157,7 +167,7 @@ class EntityClass
     }
 
     public
-    function createconnectorRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
+    function createConnectorRequests($requestId, string $method, string $entityIdList, array $propertyPath, $entityClassContent, Query &$query)
     {
         /** @var PropertyRequest[] */
         $propertyRequests = $this->createPropertyRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
@@ -207,20 +217,28 @@ function cleanWrapping(array &$wrapper, int $status)
 
 class EntityResponse extends Response
 {
+    /** @var  EntityClass */
+    protected $entityClass;
     protected $entityId;
+
+    /** @var string */
+    protected $method;
 
     /** @var PropertyResponse[] */
     protected $propertyResponses = [];
 
-    public function __construct($entityId)
+    public function __construct(EntityClass &$entityClass, $entityId, string $method)
     {
         $this->entityId = $entityId;
+        $this->entityClass = $entityClass;
+        $this->method = $method;
     }
 
     public function add(int $status, array $propertyPath, $content)
     {
         $this->addStatus($status);
-        $this->propertyResponses[] = new PropertyResponse($status, $propertyPath, $content);
+        $property = $this->entityClass->getProperty($propertyPath);
+        $this->propertyResponses[] = new PropertyResponse($property, $this->method, $status, $propertyPath, $content);
     }
 
     public function merge(EntityResponse $entityResponse)
@@ -236,7 +254,7 @@ class EntityResponse extends Response
         return $this->entityId;
     }
 
-    public function getPropertyResponses() : array
+    public function getPropertyResponses(): array
     {
         return $this->propertyResponses;
     }
@@ -274,21 +292,24 @@ class EntityResponse extends Response
 
 class EntityClassResponse extends Response
 {
+    /** @var EntityClass */
     protected $entityClass;
-
+    /** @var string */
+    protected $method;
     /** @var EntityResponse[] */
     protected $entityResponses = [];
 
-    public function __construct($entityClass)
+    public function __construct($entityClassName, string $method)
     {
-        $this->entityClass = $entityClass;
+        $this->entityClass = EntityClass::get($entityClassName);
+        $this->method = $method;
     }
 
     public function add(int $status, string $entityId, array $propertyPath, $content)
     {
         $this->addStatus($status);
         if (!array_key_exists($entityId, $this->entityResponses)) {
-            $this->entityResponses[$entityId] = new EntityResponse($entityId);
+            $this->entityResponses[$entityId] = new EntityResponse($this->entityClass, $entityId, $this->method);
         }
         $this->entityResponses[$entityId]->add($status, $propertyPath, $content);
     }
@@ -303,11 +324,6 @@ class EntityClassResponse extends Response
                 $this->entityResponses[$entityId]->merge($entityResponse);
             }
         }
-    }
-
-    public function getEntityClass(): string
-    {
-        return $this->entityClass;
     }
 
     public function getEntityResponses(): array

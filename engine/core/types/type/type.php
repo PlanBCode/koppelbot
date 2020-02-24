@@ -98,6 +98,11 @@ abstract class Type
     {
         return new ProcessResponse(200, $newContent);
     }
+
+    static function processAfterConnector(string $method, $content, array &$settings): ProcessResponse
+    {
+        return new ProcessResponse(200, $content);
+    }
 }
 
 class Type_type extends Type

@@ -20,5 +20,9 @@
   "password": {
     "type": "bool",
     "default" : false
+  },
+  "binary": {
+    "type": "bool",
+    "default" : false
   }
 }

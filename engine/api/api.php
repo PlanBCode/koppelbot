@@ -40,7 +40,7 @@ function addConnectorRequest(array &$connectorRequests, $requestId, string $meth
             echo 'ERROR' . $entityClassName . ' not found';
         } else {
             $entityClassContent = array_null_get($content, $entityClassName);
-            $entityClassConnectorRequests = $entityClass->createconnectorRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
+            $entityClassConnectorRequests = $entityClass->createConnectorRequests($requestId, $method, $entityIdList, $propertyPath, $entityClassContent, $query);
             foreach ($entityClassConnectorRequests as $connectorString => $entityClassConnectorRequest) {
                 if (!array_key_exists($connectorString, $connectorRequests)) {
                     $connectorRequests[$connectorString] = $entityClassConnectorRequest;

@@ -1,5 +1,39 @@
-const extensions = ['txt'];
-const viewers = Object.fromEntries(extensions.map(extension => [extension, require('./viewers/' + extension)]));
+const viewers = {
+    txt: require('./viewers/text'),
+    jpg: require('./viewers/image'),
+    jpeg: require('./viewers/image'),
+    png: require('./viewers/image'),
+    bmp: require('./viewers/image'),
+    gif: require('./viewers/image'),
+};
+
+const encodeContent = (data, item, file) => evt => {
+    const mimeTypeAndBase64String = evt.target.result;
+    const [mimeType, base64String] = mimeTypeAndBase64String
+        .substr(5) // 'data:${mimeType};base64,${base64String}' -> '${mimeType};base64,${base64String}'
+        .split(';base64,'); // '${mimeType};base64,${base64String}' -> ['${mimeType}','${base64String}']
+
+    if (item.getSetting('signature').content.binary) {
+        data['content'] = {
+            encoding: 'base64',
+            content: base64String
+        };
+    } else {
+        data['content'] = atob(base64String);
+    }
+
+    data['mime'] = mimeType;
+    const extension = item.getSetting('signature').id.connector.extension;
+    let key;
+    //TODO or extension is mixed extensions for example "json|xml"
+    if (extension && extension !== '*') {
+        key = file.name.split('.').slice(0, -1).join('.');
+    } else {
+        key = file.name;
+    }
+    data['id'] = key;
+    item.patch(data);
+};
 
 exports.actions = {
     edit: function (item) {
@@ -12,23 +46,12 @@ exports.actions = {
                 //TODO
             } else {
                 const reader = new FileReader();
-                reader.onload = evt => {
-                    data['content'] = evt.target.result;
-                    const extension = item.getSetting('signature').id.connector.extension;
-                    let key;
-                    //TODO or extension is mixed extensions for example "json|xml"
-                    if (extension && extension !== '*') {
-                        key = files[0].name.split('.').splice('.').slice(0, -1).join('.');
-                    } else {
-                        key = files[0].name;
-                    }
-                    data['id'] = key;
-                    item.patch(data);
-                };
+                reader.onload = encodeContent(data, item, files[0]);
                 reader.onerror = evt => {
                     //TODO
                 };
-                reader.readAsText(files[0], "UTF-8");
+                reader.readAsDataURL(files[0]);
+                const url = window.URL.createObjectURL(files[0]);
             }
         };
 
@@ -57,6 +80,7 @@ exports.actions = {
         const onChangeHandler = node => {
             DIV_container.innerHTML = '';
             const content = item.getContent();
+            //TODO use mime
             const extension = content.extension;
             const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
                 ? extension : 'txt';

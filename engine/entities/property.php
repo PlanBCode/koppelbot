@@ -151,13 +151,23 @@ class  PropertyRequest
 class PropertyResponse extends Response
 {
     protected $content;
+    /** @var Property */
+    protected $property;
+    /** @var string[] */
     protected $propertyPath;
 
-    public function __construct(int $status, array $propertyPath, $content = null)
+    public function __construct(Property &$property, string $method, int $status, array $propertyPath, $content = null)
     {
-        $this->addStatus($status);
-        $this->content = $content;
         $this->propertyPath = $propertyPath;
+        $this->property = $property;
+        $processResponse = $property->processAfterConnector($method,$content);
+        if($processResponse->succeeded()){
+            $this->addStatus($status);
+            $this->content = $processResponse->getContent();
+        }else{
+            $this->status = $processResponse->getStatus();
+            $this->content = $processResponse->getError();
+        }
     }
 
     public function getContent()
@@ -306,6 +316,16 @@ class Property
         return empty($this->subProperties);
     }
 
+    public function getProperty(array &$propertyPath): ?Property
+    {
+        if (count($propertyPath) === 0) return $this;
+        $subPropertyName = $propertyPath[0];
+        if (!is_string($subPropertyName)) return null;
+        $subProperty = array_get($this->subProperties, $subPropertyName);
+        if (!$subProperty) return null;
+        return $subProperty->getProperty(array_slice($propertyPath, 1));
+    }
+
     public function expand(array $propertyPath, int $depth, Query &$query): array
     {
         if (count($propertyPath) < $depth) {
@@ -402,5 +422,10 @@ class Property
     public function processBeforeConnector(string $method, &$newContent, &$currentContent)
     {
         return $this->typeClass::processBeforeConnector($method, $newContent, $currentContent, $this->settings);
+    }
+
+    public function processAfterConnector(string $method, &$content)
+    {
+        return $this->typeClass::processAfterConnector($method, $content, $this->settings);
     }
 }

@@ -1,3 +1,5 @@
+const encodings = ['utf8', 'base64'];  //TODO single source of truth (php+js)
+
 function edit(item) {
     const INPUT = document.createElement('INPUT');
     //TODO add id and classes from options
@@ -54,11 +56,20 @@ function view(item) {
 
 function validateContent(item) {
     const content = item.getContent();
-    if (typeof content !== 'string') return false;
-    if (item.hasSetting('maxLength') && content.length > item.getSetting('maxLength')) return false;
-    if (item.hasSetting('minLength') && content.length < item.getSetting('minLength')) return false;
-    //TODO  regex, allowed chars
-    return true;
+    if (typeof content === 'string') {
+        if (item.hasSetting('maxLength') && content.length > item.getSetting('maxLength')) return false;
+        if (item.hasSetting('minLength') && content.length < item.getSetting('minLength')) return false;
+        //TODO  regex, allowed chars
+        return true;
+    } else if (item.getSetting('binary') && typeof content === 'object') {
+        if (!content.hasOwnProperty('encoding')) return false;
+        if (!content.hasOwnProperty('content')) return false;
+        if (typeof content.content !== 'string') return false;
+        if (encodings.indexOf(content.encoding) === -1) return false;
+        //TODO validate encoding
+        return true;
+    }
+    return false;
 }
 
 exports.actions = {

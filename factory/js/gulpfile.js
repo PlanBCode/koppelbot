@@ -64,8 +64,8 @@ const build = execute(`sh ../build.sh`);
 const generateTypesFile = generateRequiresFile('types', 'actions');
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 
-gulp.watch([`../../engine/core/types/*/*.js`], gulp.series(generateTypesFile, build));
-gulp.watch([`../../engine/core/displays/*.js`], gulp.series(generateDisplaysFile, build));
+gulp.watch([`../../engine/core/types/**/*.js`], gulp.series(generateTypesFile, build));
+gulp.watch([`../../engine/core/displays/**/*.js`], gulp.series(generateDisplaysFile, build));
 gulp.watch([`./source/**/*.js`], build);
 
 exports.default = gulp.series(generateTypesFile, generateDisplaysFile, build);

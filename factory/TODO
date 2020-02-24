@@ -1,7 +1,11 @@
 TODO
 
+?raw option to get raw content for single entity (error if multiple requested)
+- add content type mime header
+
 date type
  - render to string
+
 
 
 filtering & searching :
@@ -44,6 +48,21 @@ testing
 
 
 
+string
+- encoding:
+- - utf8
+- - utf-16le
+- - macintosh
+- - base64
+
+file
+- content
+- mime
+- name
+- extension
+- size
+- lastModified
+- created
 
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
@@ -51,8 +70,6 @@ werkend maken:
 - xyz.create({uri:'/source?content=default'});
 - xyz.create({uri:'$type'});
 
-?raw option to get raw content for single entity (error if multiple requested)
-- add content type mime header
 
 EntityClass
 - "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
