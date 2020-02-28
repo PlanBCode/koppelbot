@@ -1,0 +1,35 @@
+{
+  "_": {
+    "connector": {
+      "type": "directory",
+      "parse": "none",
+      "path": "data/images/",
+      "extension": "*"
+    }
+  },
+  "file": {
+    "signature": {
+      "content": {
+        "type": "string",
+        "binary": true,
+        "connector": {
+          "key": "content"
+        },
+        "accept": "TODO"
+      },
+      "id": {
+        "type": "string",
+        "connector": {
+          "key": "basename"
+        }
+      },
+      "extension": {
+        "type": "string",
+        "connector": {
+          "key": "extension"
+        }
+      }
+    },
+    "type": "file"
+  }
+}
