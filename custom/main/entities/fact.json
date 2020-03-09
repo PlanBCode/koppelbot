@@ -16,5 +16,9 @@
   },
   "title" : {
     "type": "string"
+  },
+  "date": {
+    "type": "date",
+    "format": "d-m-Y"
   }
 }

@@ -2,7 +2,6 @@ const encodings = ['utf8', 'base64'];  //TODO single source of truth (php+js)
 
 function edit(item) {
     const INPUT = document.createElement('INPUT');
-    //TODO add id and classes from options
     INPUT.value = item.getContent();
     if (item.getSetting('password') === true) {
         INPUT.type = 'password';
@@ -15,7 +14,7 @@ function edit(item) {
     const onChangeHandler = node => {
         //TODO use status
         const content = node.getContent();
-        if (INPUT !== document.activeElement) { // we don't want to interupt typing
+        if (INPUT !== document.activeElement) { // we don't want to interrupt typing
             INPUT.value = content;
         }
     };

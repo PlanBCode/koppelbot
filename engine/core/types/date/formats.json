@@ -6,7 +6,7 @@
       "type": "number",
       "min" : 1,
       "max" : 31,
-      "default": 1
+      "default": "01"
     }
   },
   "m" : {
@@ -16,7 +16,8 @@
       "type": "number",
       "min" : 1,
       "max" : 12,
-      "default": 1
+      "default": "01",
+      "leadingZeroes": true
     }
   },
   "Y": {
@@ -26,7 +27,8 @@
       "type": "number",
       "min" : 0,
       "max" : 9999,
-      "default": 2020
+      "default": 2020,
+      "leadingZeroes": true
     }
   }
 }
