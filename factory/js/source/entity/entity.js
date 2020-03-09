@@ -5,7 +5,28 @@ const State = require('./state.js').State;
 const response = require('./response.js');
 const input = require('../request/input.js');
 
-function EntityClass(xyz, entityClassName, settings) {
+function compileSettings(rawSettings){
+    const settings = {};
+    const rootSettings = rawSettings.hasOwnProperty('_') ? rawSettings['_'] : {};
+    for (let propertyName in rawSettings) {
+        if (propertyName !== '_') {
+            settings[propertyName] = {...rootSettings};
+            for (let id in rawSettings[propertyName]) {
+                if ((id === 'access' || id === 'connector') && rootSettings.hasOwnProperty(id)) {
+                    settings[propertyName][id] = {...rootSettings[id], ...rawSettings[propertyName][id]};
+                } else {
+                    settings[propertyName][id] = rawSettings[propertyName][id];
+                }
+            }
+        }
+    }
+    return settings;
+}
+
+function EntityClass(xyz, entityClassName, rawSettings) {
+
+    const settings = compileSettings(rawSettings);
+
     if (typeof entityClassName !== 'string') throw new TypeError('entityClassName not a string.');
 
     const entities = {}; //TODO mark if entities are new or have been removed

@@ -25,14 +25,19 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     if (entityClassNames.length === 0) {
         callback();
     } else {
-        request('GET', addQueryString('/' + entityClassNames.join(','), 'meta'), undefined, (status, content) => {//TODO add querystring better
+        const metaUri = addQueryString('/entity/' + entityClassNames.join(','), 'expand');
+        request('GET', metaUri, undefined, (status, content) => {//TODO add querystring better
             //TODO check status
-            console.log(uri + '?meta', content);
+            console.log(metaUri, content);
             const data = JSON.parse(content); //TODO check
-            // TODO validate data
+            if(typeof data!=='object' || data === null || !data.hasOwnProperty('entity')){
+
+                return
+            }
             for (let entityClassName of entityClassNames) {
                 if (!entityClasses.hasOwnProperty(entityClassName)) {
-                    entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, data[entityClassName]['*']);
+                    const metaData = data['entity'][entityClassName]['content']; // TODO validate data
+                    entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metaData);
                 }
             }
             callback();

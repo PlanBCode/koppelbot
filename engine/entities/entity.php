@@ -35,8 +35,7 @@ class EntityClass
     protected function __construct(string $entityClassName, array &$meta)
     {
         $this->entityClassName = $entityClassName;
-        $rootSettings = array_key_exists('_', $meta) ? $meta['_'] : [];
-
+        $rootSettings = array_get($meta, '_', []);
         foreach ($meta as $propertyName => $settings) {
             if ($propertyName !== '_') {
                 $this->properties[$propertyName] = new Property($this, 0, $propertyName, $settings, $rootSettings);

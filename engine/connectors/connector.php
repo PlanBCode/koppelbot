@@ -4,7 +4,6 @@ require './engine/connectors/connectorResponse.php';
 
 abstract class Connector
 {
-    const CONNECTOR_STRING_META = 'META';
     const CONNECTOR_STRING_ERROR = 'ERROR';
 
     /** @var Connector[] */
@@ -54,17 +53,6 @@ abstract class Connector
      */
 
     public
-    static function createMetaResponse(connectorRequest $connectorRequest): connectorResponse
-    {
-        $connectorResponse = new connectorResponse();
-        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-            $property = $propertyRequest->getProperty();
-            $connectorResponse->add(200, $propertyRequest, $propertyRequest->getEntityId(), $property->getMeta());
-        }
-        return $connectorResponse;
-    }
-
-    public
     static function createErrorResponse(connectorRequest $connectorRequest): connectorResponse
     {
         $connectorResponse = new connectorResponse();
@@ -79,10 +67,6 @@ abstract class Connector
     {
         $query = $requestObject->getQuery();
         $method = $requestObject->getMethod();
-
-        if ($query->checkToggle('meta')) {
-            return self::CONNECTOR_STRING_META;
-        }
 
         $connectorClass = self::getConnectorClass($typeName);
 
@@ -110,8 +94,6 @@ abstract class Connector
         switch ($connectorString) {
             case self::CONNECTOR_STRING_ERROR:
                 return Connector::createErrorResponse($connectorRequest);
-            case self::CONNECTOR_STRING_META:
-                return Connector::createMetaResponse($connectorRequest);
             default:
                 return Connector::$connectors[$connectorString]->createResponse($connectorRequest);
         }

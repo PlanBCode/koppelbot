@@ -14,7 +14,6 @@ file type: viewer
 
 
 
-
 implement expand for PUT content
 
 add dot notation: /source/*/file.content,id
@@ -48,7 +47,6 @@ werkend maken:
 - xyz.create({uri:'/source?content=default'});
 - xyz.create({uri:'$type'});
 
-
 EntityClass
 - "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
 - - polling made easy :)
@@ -70,9 +68,6 @@ php request.php : error if entity class not found
 - http://localhost:8888/site/api/bestaatniet
 - werkt ook niet:  http://localhost:8888/site/api/*
 - - zou het moeten werken? iig goede foutmelding
-
-replace /source?meta with /entity/source
-- los root merge dingen op client side
 
 Connector_path : een hele directory als entity met subproperties zien
 

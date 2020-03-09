@@ -6,9 +6,7 @@ class Type_array extends Type
 
     public static function validateContent($content, array $settings): bool
     {
-        if (!is_array($content)) {
-            return false;
-        }
+        if (!is_array($content)) return false;
         $subSettings = array_get($settings, 'subSettings', []);
         $subTypeName = array_get($subSettings, 'type', 'string');
         $subTypeClass = Type::get($subTypeName);
@@ -30,5 +28,4 @@ class Type_array extends Type
             $subTypeClass::validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings)
             );
     }
-
 }

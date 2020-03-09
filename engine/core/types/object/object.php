@@ -1,14 +1,12 @@
 <?php
 
-class Type_object extends Type_array
+class Type_object extends Type
 {
     static protected $DEFAULT_TYPE = 'string';
 
     public static function validateContent($content, array $settings): bool
     {
-        if (!is_array($content)) {
-            return false;
-        }
+        if (!is_array($content)) return false;
         $subSettings = array_get($settings, 'subSettings', []);
         $subTypeName = array_get($subSettings, 'type', 'string');
         $subTypeClass = Type::get($subTypeName);
