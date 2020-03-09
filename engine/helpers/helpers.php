@@ -1,11 +1,11 @@
 <?php
 
-function array_get(array $array, $key, $default = null)
+function array_get(array &$array, $key, $default = null)
 {
     return array_key_exists($key, $array) ? $array[$key] : $default;
 }
 
-function array_null_get(?array $array, $key)
+function array_null_get(?array &$array, $key)
 {
     if (is_null($array)) {
         return null;
@@ -16,6 +16,30 @@ function array_null_get(?array $array, $key)
         return $array['*'];
     } else {
         return null;
+    }
+}
+
+function array_startsWith(array &$a, array &$b)
+{
+    $countA = count($a);
+    $countB = count($b);
+    if ($countA < $countB) return false;
+    for ($i = 0; $i < $countB; ++$i) {
+        if ($a[$i] !== $b[$i]) return false;
+    }
+    return true;
+}
+
+function json_simpleEncode(&$content): string
+{
+    if (is_string($content)) {
+        return $content;
+    } elseif (is_numeric($content)) {
+        return strval($content);
+    } elseif (is_bool($content)) {
+        return $content ? true : false;
+    } else {
+        return json_encode($content, JSON_PRETTY_PRINT);
     }
 }
 
@@ -51,7 +75,6 @@ function json_get(&$object, array $keyPath): JsonActionResponse
         return new JsonActionResponse(false, $object); //TODO add error message
     }
 }
-
 
 function json_set(&$object, array $keyPath, &$content): JsonActionResponse
 {

@@ -194,16 +194,16 @@ class EntityClass
     }
 }
 
-function cleanWrapping(&$wrapper, int $status)
+function cleanWrapping(&$wrapper, int $status): void
 {
     if (!is_array($wrapper)) {
         return;
     } elseif ($status === 207) {
         foreach ($wrapper as $subPropertyName => &$subWrapper) {
-            if (array_key_exists('content2', $subWrapper)) {
+            if (array_key_exists('content2', $subWrapper)) { // outer leaf
                 $subWrapper['content'] = $subWrapper['content2'];
                 unset($subWrapper['content2']); //TODO more efficient
-            } else {
+            } else { // inner node
                 $subContent =& $subWrapper['content'];
                 $subStatus = $subWrapper['status'];
                 cleanWrapping($subContent, $subStatus);
@@ -211,16 +211,34 @@ function cleanWrapping(&$wrapper, int $status)
         }
     } else {
         foreach ($wrapper as $subPropertyName => &$subWrapper) {
+            if (!is_array($subWrapper) || !array_key_exists('status', $subWrapper)) continue;
             $subStatus = $subWrapper['status']; // TODO Should match with $status;
-            if (array_key_exists('content2', $subWrapper)) {
+            if (array_key_exists('content2', $subWrapper)) {  // outer leaf
                 $wrapper[$subPropertyName] = $subWrapper['content2'];
-            } else {
+            } else { // inner node
                 $wrapper[$subPropertyName] = $subWrapper['content'];
                 cleanWrapping($subWrapper, $subStatus);
             }
         }
     }
 }
+
+/*class PropertyResponseNode
+{
+
+    protected $status;
+    protected $content;
+    protected $leaf;
+
+    public function __construct(int $status, $content, bool $leaf)
+    {
+        $this->status = $status;
+        $this->content = $content;
+        $this->leaf = $leaf;
+    }
+
+
+}*/
 
 class EntityResponse extends Response
 {
@@ -266,28 +284,39 @@ class EntityResponse extends Response
         return $this->propertyResponses;
     }
 
+    private function collapseContent(&$content)
+    {
+        $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);
+        foreach ($requestPropertyPath as $subPropertyName) {
+            if (count($content) > 1) {
+                break;
+            } elseif (array_key_exists($subPropertyName, $content)) {
+                $content =& array_get($content, $subPropertyName);
+                $this->status = array_get($content, 'status');
+                if (array_key_exists('content', $content)) {
+                    $content =& array_get($content, 'content');
+                } elseif (array_key_exists('content2', $content)) {
+                    $content =& array_get($content, 'content2');
+                }
+            } else {
+                $content = [];
+            }
+        }
+    }
+
     public function getContent()
     {
-        /*
-         * /source/fruit/file
-         * /source/fruit
-         * /source/fruit/file/extension
-         * /source/fruit/file/content
-        */
-
-        $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);
-
-
         $content = [];
         foreach ($this->propertyResponses as $propertyResponse) {
             $propertyPath = $propertyResponse->getPropertyPath();
             $wrapperIterator =& $content;
             foreach ($propertyPath as $depth => $subPropertyName) {
                 $subStatus = $propertyResponse->getStatus();
-                if ($depth === count($propertyPath) - 1) {
+                if ($depth === count($propertyPath) - 1) { // outer leaf
                     $subContent = $propertyResponse->getContent();
+                    // new PropertyResponseNode($subStatus, $subContent, true);
                     $wrapperIterator[$subPropertyName] = ["status" => $subStatus, "content2" => $subContent];
-                } else {
+                } else { // inner node
                     if (!array_key_exists($subPropertyName, $wrapperIterator)) {
                         $wrapperIterator[$subPropertyName] = ["status" => $subStatus, "content" => []];
                         $wrapperIterator =& $wrapperIterator[$subPropertyName]['content'];
@@ -301,23 +330,15 @@ class EntityResponse extends Response
                 }
             }
         }
+
+        // for singular requests ('/entity/id' versus '/entity/id1,id2') simplify the response
+        // from {entity: {id :'content'}} to 'content'
         if (!$this->requestObject->getQuery()->checkToggle('expand')) {
-            foreach ($requestPropertyPath as $subPropertyName) {
-                if (count($content) > 1) {
-                    break;
-                } elseif (array_key_exists($subPropertyName, $content)) {
-                    $content = array_get($content, $subPropertyName);
-                    $this->status = array_get($content, 'status');
-                    if (array_key_exists('content', $content)) {
-                        $content = array_get($content, 'content');
-                    } elseif (array_key_exists('content2', $content)) {
-                        $content = array_get($content, 'content2');
-                    }
-                } else {
-                    $content = [];
-                }
-            }
+            $this->collapseContent($content);
         }
+
+        // {a: {status:200, content: 1}, b: {status:200, content: 2}} => {a:1,b:2}
+        // {a: {status:200, content: 1}, b: {status:400, content: 'error'}} => remains the same
         cleanWrapping($content, $this->getStatus());
         return $content;
     }
@@ -376,7 +397,7 @@ class EntityClassResponse extends Response
             }
         }
         $content = [];
-        foreach ($this->entityResponses as $entityId => $entityResponse) { //TODO use a map
+        foreach ($this->entityResponses as $entityId => $entityResponse) {
             if ($this->status == 207) {
                 $content[$entityId] = [
                     "status" => $entityResponse->getStatus(),

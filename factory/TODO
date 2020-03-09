@@ -1,23 +1,7 @@
 TODO
 
-BUG ./xyz "/image/cluster-icon.jpg/file/content"
-
-implement expand for PUT content
-
-file: query options to display raw content with mime header
-- add content type mime header
-- propertyResponse : set mime, if mime already set application:json?
-
 date type
  - render to string
-
-filtering & searching :
-- implement full blown boolean expressions
-- optimization: if the query connector requests match the actual requests get them together with the rest
-- - otherwise get them first, analyze and use to get the ids
-
-add dot notation: /source/*/file.content,id
-- property paths -> property tree's
 
 file type: viewer
 - pdf, odt https://viewerjs.org/ Only pdf and odt.
@@ -25,10 +9,21 @@ file type: viewer
 - txt,csv -> flat text
 - images -> browser
 
-validateContent -> return messages why it's not valid
+
+
+
+
+
+
+implement expand for PUT content
+
+add dot notation: /source/*/file.content,id
+- property paths -> property tree's
 
 array/object
 - delete values
+
+validateContent -> return messages why it's not valid
 
 testing
 - - add samples to types for testing
@@ -42,26 +37,10 @@ testing
  const jsdom = require("jsdom");
  const { JSDOM } = jsdom;
 
-
-
-
-
-
-string
-- encoding:
-- - utf8
-- - utf-16le
-- - macintosh
-- - base64
-
-file
-- content
-- mime
-- name
-- extension
-- size
-- lastModified
-- created
+filtering & searching :
+- implement full blown boolean expressions
+- optimization: if the query connector requests match the actual requests get them together with the rest
+- - otherwise get them first, analyze and use to get the ids
 
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 

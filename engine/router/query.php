@@ -209,12 +209,12 @@ class Query
                 $entityContentB = json_get($content, array_merge([$entityClassName, $entityIdB], $sortPath));
                 $entityContentA = $entityContentA->content;
                 $entityContentB = $entityContentB->content;
-                return strcmp($entityContentA, $entityContentB);                 //perform sorting, return -1, 0, 1
+                return strcmp($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
             });
         }
-        $offset = $this->getOption('offset',0);
-        $limit = $this->getOption('limit',count($entityIds));
-        $entityIds = array_slice($entityIds,$offset, $limit);
+        $offset = $this->getOption('offset', 0);
+        $limit = $this->getOption('limit', count($entityIds));
+        $entityIds = array_slice($entityIds, $offset, $limit);
         return $entityIds;
     }
 }

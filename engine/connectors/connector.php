@@ -69,9 +69,6 @@ abstract class Connector
     {
         $connectorResponse = new connectorResponse();
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-            /** @var Property */
-            $property = $propertyRequest->getProperty();
-            $propertyName = is_null($property) ? '*' : $property->getName();
             $connectorResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyRequest->getContent());
         }
         return $connectorResponse;

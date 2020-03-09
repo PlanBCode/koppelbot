@@ -101,7 +101,6 @@ abstract class BasicConnector extends Connector
                         //TODO might result in 404 or 500
                         $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
                     }
-
                 }
             } else {
                 $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO

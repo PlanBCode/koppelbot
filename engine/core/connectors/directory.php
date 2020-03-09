@@ -117,8 +117,9 @@ class Connector_directory extends BasicConnector
             }
             if (!array_key_exists($entityId, $this->meta)) $this->meta[$entityId] = [];
             $this->meta[$entityId]['extension'] = pathinfo($filePath, PATHINFO_EXTENSION);
+            $this->meta[$entityId]['mime'] = mime_content_type($filePath);
             $this->meta[$entityId]['size'] = filesize($filePath);
-            //TODO creation timestamp, modification timestamp, mime
+            //TODO creation timestamp, modification timestamp
         }
         return new connectorResponse(200);
     }

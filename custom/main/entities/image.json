@@ -23,6 +23,12 @@
           "key": "basename"
         }
       },
+      "mime": {
+        "type": "string",
+        "connector": {
+          "key": "mime"
+        }
+      },
       "extension": {
         "type": "string",
         "connector": {

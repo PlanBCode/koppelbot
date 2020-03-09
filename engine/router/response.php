@@ -39,6 +39,7 @@ class RequestResponse extends Response
 
     public function add(string $method, int $status, string $entityClassName, string $entityId, array $propertyPath, $content): void
     {
+
         $this->addStatus($status);
         if (!array_key_exists($entityClassName, $this->entityClassResponses)) {
             $this->entityClassResponses[$entityClassName] = new EntityClassResponse($entityClassName, $this->requestObject);
@@ -125,8 +126,8 @@ class HttpResponse2 extends Response
     public function echo(): int
     {
         $this->echoStatus();
-        $this->echoContent();
         $this->echoHeaders();
+        $this->echoContent();
         return $this->status;
     }
 }

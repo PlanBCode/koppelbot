@@ -103,6 +103,14 @@ abstract class Type
     {
         return new ProcessResponse(200, $content);
     }
+
+    static function serve(int $status, &$content): HttpResponse2
+    {
+        //TODO Content-Type: text/html; charset=UTF-8
+        //Content-Type: multipart/form-data; boundary=something
+        $stringContent = json_simpleEncode($content);
+        return new HttpResponse2($status, $stringContent, ['Content-Type' => 'application/json']);
+    }
 }
 
 class Type_type extends Type

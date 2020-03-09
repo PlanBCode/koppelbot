@@ -300,6 +300,11 @@ class Property
         }
     }
 
+    public function serveContent(int $status, &$content)
+    {
+        return $this->typeClass::serve($status, $content);
+    }
+
     public function getUri(?string $entityId = null): string
     {
         return $this->parent->getUri() . '/' . $this->propertyName;

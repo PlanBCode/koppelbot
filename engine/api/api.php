@@ -111,7 +111,7 @@ class RequestObject
         return array_slice(explode('/', $this->requestUri), 1);
     }
 
-    public function isSingular(): bool
+    public function isSingular(): bool //TODO duplicate with below
     {
         foreach ($this->getPath() as $property) {
             if ($property === '*' || strpos($property, ',') !== false) return false;
@@ -120,14 +120,27 @@ class RequestObject
     }
 }
 
+function isSingularPath(array $path): bool //TODO duplicate with above
+{
+    $pathLength = count($path);
+    if ($pathLength <= 2) return false; // at least a property needs to be defined
+    foreach ($path as $item) {
+        if ($item === '*' || stripos($item, ',') !== false) return false;
+    }
+    return true;
+}
+
 class ApiRequest extends HttpRequest2
 {
     /** @var Query */
     protected $query;
+    /** @var string[] */
+    protected $path;
 
     public function __construct(string $method, string $uri, string $queryString, array $headers, string $content)
     {
         $this->query = new Query($queryString);
+        $this->path = array_slice(explode('/', $uri), 1); // '/a/b/c' -> ['a','b','c']
         parent::__construct($method, $uri, $queryString, $headers, $content);
     }
 
@@ -155,17 +168,16 @@ class ApiRequest extends HttpRequest2
 
     protected function getRequestResponses()
     {
-        $path = explode('/', $this->uri);
-        $entityClassList = count($path) > 1 ? $path[1] : '*';
-        $entityIdList = count($path) > 2 ? $path[2] : '*';
-        $propertyPath = count($path) > 3 ? array_slice($path, 3) : [];
+        $entityClassList = count($this->path) > 0 ? $this->path[0] : '*';
+        $entityIdList = count($this->path) > 1 ? $this->path[1] : '*';
+        $propertyPath = count($this->path) > 2 ? array_slice($this->path, 2) : [];
         $requestURi = $this->uri;
 
         $queryConnectorRequests = $this->getQueryConnectorRequests($this->query);
         $queryRequestResponses = getRequestResponses($queryConnectorRequests);
 
         if (count($queryRequestResponses) > 0) {
-
+            /** @var RequestResponse */
             $requestResponse = array_values($queryRequestResponses)[0];
             $data = $requestResponse->getContent();
             //TODO handle failure
@@ -181,13 +193,59 @@ before getting the actual data
         return getRequestResponses($connectorRequests);
     }
 
+
+    protected function createNonSingularContent(array &$requestResponses)
+    {
+        $count = count($requestResponses);
+        if ($count == 0) {
+            return null;
+        } else { //TODO handle multi requests
+            /** @var RequestResponse */
+            $requestResponse = array_values($requestResponses)[0]; // TODO because non multi request
+            return $requestResponse->getContent();
+        }
+    }
+
+    protected function stringifyContent($content): string
+    {
+        if (!$this->query->checkToggle('expand') && !is_array($content)) {
+            return json_simpleEncode($content);
+        } else {
+            return json_encode($content, JSON_PRETTY_PRINT);
+        }
+    }
+
+    protected function getStatus(array &$requestResponses)
+    {
+        $count = count($requestResponses);
+        if ($count == 0) {
+            return 200;
+        } else {
+            /** @var RequestResponse */
+            $requestResponse = array_values($requestResponses)[0]; // TODO because non multi request
+            return $requestResponse->getStatus();
+        }
+    }
+
     public function createResponse()
     {
         if ($this->uri === '') {
             return new DocResponse('api' . $this->uri, 'API blabla');
         }
-
-        return new ApiResponse($this->method, $this->query, $this->getRequestResponses());
+        $requestResponses = $this->getRequestResponses();
+        $content = $this->createNonSingularContent($requestResponses);
+        $status = $this->getStatus($requestResponses);
+        if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
+            $entityClassName = $this->path[0];
+            $entityClass = EntityClass::get($entityClassName);
+            $propertyPath = array_slice($this->path, 2);
+            /** @var Property */
+            $property = $entityClass->getProperty($propertyPath);
+            return $property->serveContent($status, $content);
+        }else {
+            $stringContent = $this->stringifyContent($content);
+            return new HttpResponse2($status, $stringContent, []);
+        }
     }
 
     public function getInternalApiResponse(): InternalApiResponse
@@ -195,40 +253,3 @@ before getting the actual data
         return new InternalApiResponse($this->getRequestResponses());
     }
 }
-
-class ApiResponse extends HttpResponse2
-{
-    public function __construct(string $method, Query &$query, $requestResponses)
-    {
-        $count = count($requestResponses);
-        if ($count == 0) {
-            parent::__construct(200, '{}');
-        } else {
-            /** @var  RequestResponse */
-            $requestResponse = array_values($requestResponses)[0];
-            $data = $requestResponse->getContent();
-            if (!$query->checkToggle('expand') && !is_array($data)) {
-                if (is_string($data) || is_numeric($data)) {
-                    $content = $data;
-                } else {
-                    $content = '';
-                }
-            } else {
-                $content = json_encode($data, JSON_PRETTY_PRINT);
-            }
-            parent::__construct($requestResponse->getStatus(), $content);
-        }
-        /* } else { //TODO multi request
-             $data = [];
-             foreach ($requestResponses as $requestId => $requestResponse) {
-                 $this->addStatus($requestResponse->getStatus());
-                 $data[$requestId] = [
-                     'status' => $requestResponse->getStatus(),
-                     'result' => $requestResponse->getContent(),
-                 ];
-             }
-             parent::__construct($this->status, json_encode($data));
-         }*/
-    }
-}
-
