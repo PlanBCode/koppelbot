@@ -94,21 +94,21 @@ class EntityClass
         if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
             foreach ($this->properties as $propertyName => $property) {
                 $propertyContent = array_null_get($entityIdContent, $propertyName);
-                $path = [$this->entityClassName, $entityId, $propertyName];
+                $propertyPath = [$propertyName];
                 if (!is_null($propertyContent)) {
                     if ($property->getTypeName() === 'id' && $method === 'POST') {
                         $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not bu supplied.';
-                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $path, $propertyContent);
+                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     } else if (!$property->validateContent($propertyContent)) {
                         $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $path, $propertyContent);
+                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     }
                 } elseif
                 (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
                     $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $path, $propertyContent);
+                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
                     $errorPropertyRequests[] = $errorPropertyRequest;
                 }
             }
