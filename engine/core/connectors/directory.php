@@ -124,7 +124,7 @@ class Connector_directory extends BasicConnector
         return new connectorResponse(200);
     }
 
-    protected function close(connectorRequest $connectorRequest): connectorResponse
+    protected function close(ConnectorRequest $connectorRequest): connectorResponse
     {
         $propertyRequest = $connectorRequest->getFirstPropertyRequest();
 

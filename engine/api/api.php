@@ -2,7 +2,7 @@
 
 require 'internal.php';
 
-function getConnectorRequests(string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query): array
+function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query): array
 {
     $requestObject = new RequestObject($method, null, $requestUri, $query);
 
@@ -10,10 +10,14 @@ function getConnectorRequests(string $method, string $requestUri, string $conten
     if ($method === 'GET' || $method === 'DELETE' || $method === 'HEAD') {
         addConnectorRequest($connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, null);
     } elseif ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
-        $jsonContent = json_decode($content, true); //TODO catch errors
-        addConnectorRequest($connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, $jsonContent);
+        $jsonContent = json_decode($content, true);
+        if (is_null($jsonContent)) {
+            $apiRequest->addError(400, 'Could not parse JSON: ' . json_last_error_msg() . '.');
+        } else {
+            addConnectorRequest($connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, $jsonContent);
+        }
     } else {
-        //TODO error unknown method
+        $apiRequest->addError(400, 'Unknown method: ' . $method);
     }
     /*  TODO multi request
         foreach ($jsonContent as $requestId => $subRequest) {
@@ -130,6 +134,23 @@ function isSingularPath(array $path): bool //TODO duplicate with above
     return true;
 }
 
+class ApiError
+{
+    protected $status;
+    protected $errorMessage;
+
+    public function __construct(int $status, string $errorMessage)
+    {
+        $this->status = $status;
+        $this->errorMessage = $errorMessage;
+    }
+
+    public function getErrorMessage(): string
+    {
+        return $this->errorMessage;
+    }
+}
+
 class ApiRequest extends HttpRequest2
 {
     /** @var Query */
@@ -137,11 +158,21 @@ class ApiRequest extends HttpRequest2
     /** @var string[] */
     protected $path;
 
+    /** @var ApiError[] */
+    protected $errors;
+
     public function __construct(string $method, string $uri, string $queryString, array $headers, string $content)
     {
         $this->query = new Query($queryString);
+        if (substr($uri, -1, 1) === '/') $uri = substr($uri, 0, -1); // '/a/b/c/' -> '/a/b/c'
         $this->path = array_slice(explode('/', $uri), 1); // '/a/b/c' -> ['a','b','c']
+        $this->errors = [];
         parent::__construct($method, $uri, $queryString, $headers, $content);
+    }
+
+    public function addError(int $status, string $errorMessage): void
+    {
+        $this->errors[] = new ApiError($status, $errorMessage);
     }
 
     public function getQueryConnectorRequests(Query &$query): array
@@ -155,7 +186,7 @@ class ApiRequest extends HttpRequest2
         }
         if (count($propertyNames) === 0) return [];
         if (count($propertyNames) !== 1) {
-            echo 'ERROR : multi property query not yet supported';
+            $this->addError(500, 'multi property query not yet supported');
             //TODO transform into propertyTree
             return [];
         }
@@ -163,7 +194,7 @@ class ApiRequest extends HttpRequest2
         $requestURi = '/' . $entityClassList . '/' . $entityIdList . '/' . $propertyNames[0]; //TODO tree
         $queryString = $this->queryString . '&expand'; //TODO add better
         $otherQuery = new Query($queryString);
-        return getConnectorRequests('GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery);
+        return getConnectorRequests($this, 'GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery);
     }
 
     protected function getRequestResponses()
@@ -189,7 +220,7 @@ class ApiRequest extends HttpRequest2
 then decide to first get the query id's and update the $connectorRequests
 before getting the actual data
 */
-        $connectorRequests = getConnectorRequests($this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query);
+        $connectorRequests = getConnectorRequests($this, $this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query);
         return getRequestResponses($connectorRequests);
     }
 
@@ -232,9 +263,20 @@ before getting the actual data
         if ($this->uri === '') {
             return new DocResponse('api' . $this->uri, 'API blabla');
         }
+
         $requestResponses = $this->getRequestResponses();
         $content = $this->createNonSingularContent($requestResponses);
         $status = $this->getStatus($requestResponses);
+
+        if (count($this->errors)) {
+            $stringContent ='';
+            foreach ($this->errors as $error){
+                $stringContent.=$error->getErrorMessage();
+            }
+            return new HttpResponse2(400, $stringContent, []);
+        }
+
+
         if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
             $entityClassName = $this->path[0];
             $entityClass = EntityClass::get($entityClassName);
@@ -242,7 +284,7 @@ before getting the actual data
             /** @var Property */
             $property = $entityClass->getProperty($propertyPath);
             return $property->serveContent($status, $content);
-        }else {
+        } else {
             $stringContent = $this->stringifyContent($content);
             return new HttpResponse2($status, $stringContent, []);
         }

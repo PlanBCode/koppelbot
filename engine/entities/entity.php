@@ -172,7 +172,6 @@ class EntityClass
     public
     function createConnectorRequests(RequestObject $requestObject, string $entityIdList, array $propertyPath, $entityClassContent)
     {
-
         /** @var PropertyRequest[] */
         $propertyRequests = $this->createPropertyRequests($requestObject, $entityIdList, $propertyPath, $entityClassContent);
 
@@ -180,12 +179,12 @@ class EntityClass
         //TODO check if required properties are handled
 
 
-        /** @var connectorRequest[] */
+        /** @var ConnectorRequest[] */
         $connectorRequests = [];
         foreach ($propertyRequests as $propertyRequest) {
             $connectorString = $propertyRequest->getConnectorString();
             if (!array_key_exists($connectorString, $connectorRequests)) {
-                $connectorRequests[$connectorString] = new connectorRequest();
+                $connectorRequests[$connectorString] = new ConnectorRequest();
             }
             $connectorRequests[$connectorString]->add($propertyRequest);
         }

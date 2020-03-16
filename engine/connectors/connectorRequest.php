@@ -1,16 +1,16 @@
 <?php
 
-class connectorRequest
+class ConnectorRequest
 {
     /** @var PropertyRequest[] */
     protected $propertyRequests = [];
 
-    public function add($propertyRequest): void
+    public function add(PropertyRequest &$propertyRequest): void
     {
         $this->propertyRequests[] = $propertyRequest;
     }
 
-    public function merge($connectorRequest): void
+    public function merge(ConnectorRequest &$connectorRequest): void
     {
         array_push($this->propertyRequests, ...$connectorRequest->propertyRequests);
     }

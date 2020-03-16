@@ -4,8 +4,8 @@ class Type_date extends Type
 {
     public static function validateContent($content, array $settings): bool
     {
-        $formatFileContent = file_get_contents('/engine/core/types/data/formats.json');
-        $formats = json_decode($formatFileContent);
+        $formatFileContent = file_get_contents('./engine/core/types/date/formats.json');
+        $formats = json_decode($formatFileContent, true);
         if (!is_string($content)) return false;
         $format = array_get($settings, 'format');
         $contentIndex = 0;
