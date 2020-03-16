@@ -50,19 +50,12 @@ exports.actions = {
         return SPAN;
     },
     validateContent: function (item) {
+        //TODO nr of decimals
         const content = Number(item.getContent());
-        if (isNaN(content)) {
-            return false;
-        }
-        if (item.hasSetting('max') && content > item.getSetting('max')) {
-            return false;
-        }
-        if (item.hasSetting('min') && content < item.getSetting('min')) {
-            return false;
-        }
-        if (item.hasSetting('step') && content / item.getSetting('step') !== Math.floor(content / item.getSetting('step'))) {
-            return false;
-        }
+        if (isNaN(content)) return false;
+        if (item.hasSetting('max') && content > item.getSetting('max')) return false;
+        if (item.hasSetting('min') && content < item.getSetting('min')) return false;
+        if (item.hasSetting('step') && content / item.getSetting('step') !== Math.floor(content / item.getSetting('step'))) return false;
         return true;
     }
 };
