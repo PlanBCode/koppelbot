@@ -41,7 +41,7 @@ Usage: xyz [options] uri [content]
    xyz "/fruit/apple"
    xyz "/fruit/*/color"
    xyz "/fruit/*?color==green"
-   xyz --method PATCH "/fruit/melon/size" '{"fruit":{"melon":{"size":"large"}}}'
+   xyz --method PATCH "/fruit/melon/size" large
 
   -m  --method <arg>      Set HTTP method. (Default = GET)
   -v  --verbose           Set verbose output. (Default = false)
@@ -98,7 +98,7 @@ This will give all the data for the fruits which have a green color
 7. The size for melon is small. That doesn't seem right. Let's fix that using the fourth suggestion
 
 ```
-$ ./xyz --method PATCH "/fruit/melon/size" '{"fruit":{"melon":{"size":"large"}}}'
+$ ./xyz --method PATCH "/fruit/melon/size" large
 ```
 
 And let's check if it's correct now:

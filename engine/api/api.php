@@ -2,6 +2,12 @@
 
 require 'internal.php';
 
+function pathFromUri(string $uri): ?array
+{
+    if (substr($uri, 0, 1) !== '/') return null;
+    return explode('/', substr($uri, 1));
+}
+
 function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query): array
 {
     $requestObject = new RequestObject($method, null, $requestUri, $query);
@@ -10,7 +16,18 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
     if ($method === 'GET' || $method === 'DELETE' || $method === 'HEAD') {
         addConnectorRequest($connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, null);
     } elseif ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
+
         $jsonContent = json_decode($content, true);
+
+        if (!$query->checkToggle('expand')) {
+            $jsonContent = is_null($jsonContent) // TODO somehow decide on json decoding based on property type
+                ? $content
+                : $jsonContent;
+            $path = pathFromUri($requestUri);
+            foreach (array_reverse($path) as $item) {
+                $jsonContent = [$item => $jsonContent];
+            }
+        }
         if (is_null($jsonContent)) {
             $apiRequest->addError(400, 'Could not parse JSON: ' . json_last_error_msg() . '.');
         } else {
@@ -269,9 +286,9 @@ before getting the actual data
         $status = $this->getStatus($requestResponses);
 
         if (count($this->errors)) {
-            $stringContent ='';
-            foreach ($this->errors as $error){
-                $stringContent.=$error->getErrorMessage();
+            $stringContent = '';
+            foreach ($this->errors as $error) {
+                $stringContent .= $error->getErrorMessage();
             }
             return new HttpResponse2(400, $stringContent, []);
         }

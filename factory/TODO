@@ -1,15 +1,9 @@
 TODO
 
-- add source reference (array) to fact
-
-
-implement expand for PUT content
-
-add dot notation: /source/*/file.content,id
-- property paths -> property tree's
-
 array/object
 - delete values
+
+drag&drop: als er een reference input veld is dan worden die entities sleepbaar (array for multiple)
 
 validateContent -> return messages why it's not valid
 
@@ -27,6 +21,9 @@ testing
 
 number type
  - leading zeroes
+
+add dot notation: /source/*/file.content,id
+- property paths -> property tree's
 
 filtering & searching :
 - implement full blown boolean expressions
@@ -63,8 +60,6 @@ Connector_path : een hele directory als entity met subproperties zien
 
 Connector_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
-
-drag&drop: als er een reference input veld is dan worden die entities sleepbaar (array for multiple)
 
 hide private connector settings or better only expose specified ones
 
