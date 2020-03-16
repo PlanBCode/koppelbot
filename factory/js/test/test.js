@@ -80,6 +80,19 @@ curl('GET', '/fruit/*/name?sortBy=color&offset=1&limit=2')
     })
     .run('Fruit: Limit and offset');
 
+curl('PATCH', '/fruit/melon/size','small')
+    .contentShouldMatch(null)
+    .run('Fruit: Patch melon');
+
+curl('PATCH', '/fruit/melon/size?expand','{"fruit":{"melon":{"size":"small"}}}')
+    .contentShouldMatch({fruit:{melon:{size:null}}})
+    .run('Fruit: Patch melon ?expand');
+
+curl('PATCH', '/fruit/melon/size?expand','{brokenJson')
+    .shouldFail()
+    .contentShouldMatch('Could not parse JSON: Syntax error.')
+    .run('Fruit: Patch melon ?expand broken JSON');
+
 exports.curl = curl;
 exports.file = require('./file');
 exports.browse = require('./browse');

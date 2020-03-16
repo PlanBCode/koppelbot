@@ -26,7 +26,9 @@ function ApiRequest(method, uri, data) {
     };
 
     const validate = (name, status, content) => {
-        content = JSON.parse(content);
+        try {
+            content = JSON.parse(content);
+        }catch(e){} // Skip parsing, contentShouldMatch will handle this
         try {
             for (let test of tests) {
                 test(status, content).validate();
