@@ -76,8 +76,8 @@ function getCliOption(array &$cliOptions, array &$options, int $argc, array &$ar
                 }
             }
         }
-        if(!$flag_found){
-            echo 'ERROR Unknown option: '.$arg.PHP_EOL;
+        if (!$flag_found) {
+            echo 'ERROR Unknown option: ' . $arg . PHP_EOL;
             showHelp($cliOptions);
             $i = $argc;
             $options['help'] = true;
@@ -86,6 +86,11 @@ function getCliOption(array &$cliOptions, array &$options, int $argc, array &$ar
     } else {
         $options['args'][] = $arg;
         ++$i;
+    }
+    foreach ($cliOptions as $cliOption) {
+        if(!array_key_exists($cliOption->long, $options) && !is_null($cliOption->default)){
+            $options[$cliOption->long] = $cliOption->default;
+        }
     }
 }
 
