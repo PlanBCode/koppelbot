@@ -1,15 +1,9 @@
 TODO
 
-date type
- - render to string
+number type
+ - leading zeroes
 
-file type: viewer
-- pdf, odt https://viewerjs.org/ Only pdf and odt.
-- office docx, pptx, xlsx  (microsoft/google api: require public access
-- txt,csv -> flat text
-- images -> browser
-
-
+- add source reference (array) to fact
 
 
 
@@ -54,8 +48,6 @@ EntityClass
 - - only additions, modifications and removals
 - - HTTP status code xxx : object has been removed
 
-xyz.globals({options})  die worden aan alle ui.displays meegegeven
-
 provide display settings schema in json form
 - - generate auto documentation for displays
 - - create a ui interface to generate a ui interface
@@ -74,7 +66,7 @@ Connector_path : een hele directory als entity met subproperties zien
 Connector_directory: split directory on spaces,comma's or (semi)colons
 - - - to browse multiple directories
 
-drag&drop: als er een reference input veld is dan worden die entities sleepbaar
+drag&drop: als er een reference input veld is dan worden die entities sleepbaar (array for multiple)
 
 hide private connector settings or better only expose specified ones
 
@@ -89,6 +81,10 @@ use the plugin structure
 - https://stackoverflow.com/questions/44854059/php-ini-set-open-basedir-has-no-effect
 
 Pass more stuff by reference
+
+file type: viewer
+- odt https://viewerjs.org/ uses an odt lib that can be extracted
+- office docx, pptx, xlsx  (microsoft/google api: require public access
 
 custom view html definition:
 "label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}

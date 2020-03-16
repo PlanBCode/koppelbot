@@ -3,7 +3,7 @@
     "connector": {
       "type": "directory",
       "parse": "none",
-      "path": "data/images/",
+      "path": "data/sample/files/",
       "extension": "*"
     }
   },

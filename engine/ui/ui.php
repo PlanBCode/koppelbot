@@ -43,11 +43,14 @@ class UiRequest extends HttpRequest2
             $body .= '</ul> ';
         } else {
             if ($display === 'create') {
-                $uri = '/' . $entityClassName ;// TODO merge this properly. //'?' . $this->queryString;
+                $uri = '/' . $entityClassName;// TODO merge this properly. //'?' . $this->queryString;
             } else {
-                $uri = '/' . $entityClassName . '/' . $entityId . '/' . implode('/', $propertyPath) ;//. '?' . $this->queryString; //TODO proper merge
+                $propertyUri = count($propertyPath) > 0
+                    ? '/' . implode('/', $propertyPath)
+                    : '';
+                $uri = '/' . $entityClassName . '/' . $entityId . $propertyUri;//. '?' . $this->queryString; //TODO proper merge
             }
-            $body = '<script>xyz.ui({uri:"'.$uri.'", display:"' . $display . '"});</script>';
+            $body = '<script>xyz.ui({uri:"' . $uri . '", display:"' . $display . '"});</script>';
         }
         return new DocResponse('ui' . $this->uri, $body, $menuItems);
     }

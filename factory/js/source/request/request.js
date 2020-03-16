@@ -86,7 +86,7 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
             try {
                 responseObjectContent = JSON.parse(responseStringContent);
             } catch (e) {
-                console.error(responseStringContent, e);
+                console.error('GET',uri, responseStringContent, e);
             }
             console.log('GET', uri, status, responseObjectContent);
             //TODO replace null with current content?

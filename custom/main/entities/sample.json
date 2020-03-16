@@ -3,7 +3,7 @@
     "connector": {
       "type": "directory",
       "parse": "json",
-      "path": "data/samples/",
+      "path": "data/sample/types/",
       "extension": "json"
     }
   },

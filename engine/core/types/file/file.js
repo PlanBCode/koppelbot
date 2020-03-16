@@ -5,6 +5,8 @@ const viewers = {
     png: require('./viewers/image'),
     bmp: require('./viewers/image'),
     gif: require('./viewers/image'),
+    pdf: require('./viewers/pdf'),
+
 };
 
 const encodeContent = (data, item, file) => evt => {
