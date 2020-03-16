@@ -12,15 +12,6 @@ testing
 - - multiple samples for editing
 - - create sample entity by adding all samples
 - - UI: headless browser testing using test.browse
- const dom = new JSDOM(`<body>
-   <script>document.body.appendChild(document.createElement("hr"));</script>
- </body>`, { runScripts: "dangerously", resources: "usable" });
-
- const jsdom = require("jsdom");
- const { JSDOM } = jsdom;
-
-number type
- - leading zeroes
 
 add dot notation: /source/*/file.content,id
 - property paths -> property tree's
@@ -33,8 +24,8 @@ filtering & searching :
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 werkend maken:
-- xyz.create({uri:'/source?content=default'});
-- xyz.create({uri:'$type'});
+- xyz.ui({uri:'/source?content=default',display:'create'});
+- xyz.ui({uri:'$type',display:'create'});
 
 EntityClass
 - "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
@@ -67,8 +58,6 @@ use the plugin structure
 - sandbox plugin access
 - ini_set("open_basedir", "/mag/alleen/hier/bij/komen:/of/tot/hier/");
 - https://stackoverflow.com/questions/44854059/php-ini-set-open-basedir-has-no-effect
-
-Pass more stuff by reference
 
 file type: viewer
 - odt https://viewerjs.org/ uses an odt lib that can be extracted
