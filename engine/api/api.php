@@ -14,7 +14,7 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
 
     $connectorRequests = [];
     if ($method === 'GET' || $method === 'DELETE' || $method === 'HEAD') {
-        addConnectorRequest($connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, null);
+        addConnectorRequest($apiRequest, $connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, null);
     } elseif ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
 
         $jsonContent = json_decode($content, true);
@@ -31,7 +31,7 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
         if (is_null($jsonContent)) {
             $apiRequest->addError(400, 'Could not parse JSON: ' . json_last_error_msg() . '.');
         } else {
-            addConnectorRequest($connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, $jsonContent);
+            addConnectorRequest($apiRequest, $connectorRequests, $requestObject, $entityClassList, $entityIdList, $propertyPath, $jsonContent);
         }
     } else {
         $apiRequest->addError(400, 'Unknown method: ' . $method);
@@ -53,14 +53,17 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
 }
 
 
-function addConnectorRequest(array &$connectorRequests, RequestObject &$requestObject, string $entityClassNameList, string $entityIdList, array $propertyPath, $content): void
+function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests, RequestObject &$requestObject, string $entityClassNameList, string $entityIdList, array $propertyPath, $content): void
 {
     $entityClassNames = explode(',', $entityClassNameList);
     foreach ($entityClassNames as $entityClassName) {
         $entityClass = EntityClass::get($entityClassName);
         if (is_null($entityClass)) {
-            //TODO
-            echo 'ERROR' . $entityClassName . ' not found';
+            if($entityClassName ==='*'){
+                $apiRequest->addError(400, 'Illegal full wildcard * request. Please specify entities.');
+                $path = [$entityClassName];
+                $apiRequest->addError(404, $entityClassName . ' not found', $path);
+            }
         } else {
             $entityClassContent = array_null_get($content, $entityClassName);
             $entityClassConnectorRequests = $entityClass->createConnectorRequests($requestObject, $entityIdList, $propertyPath, $entityClassContent);
@@ -131,17 +134,9 @@ class RequestObject
     {
         return array_slice(explode('/', $this->requestUri), 1);
     }
-
-    public function isSingular(): bool //TODO duplicate with below
-    {
-        foreach ($this->getPath() as $property) {
-            if ($property === '*' || strpos($property, ',') !== false) return false;
-        }
-        return true;
-    }
 }
 
-function isSingularPath(array $path): bool //TODO duplicate with above
+function isSingularPath(array $path): bool
 {
     $pathLength = count($path);
     if ($pathLength <= 2) return false; // at least a property needs to be defined
@@ -155,17 +150,30 @@ class ApiError
 {
     protected $status;
     protected $errorMessage;
+    protected $path;
 
-    public function __construct(int $status, string $errorMessage)
+    public function __construct(int $status, string $errorMessage, array &$path)
     {
         $this->status = $status;
         $this->errorMessage = $errorMessage;
+        $this->path = $path;
     }
 
     public function getErrorMessage(): string
     {
         return $this->errorMessage;
     }
+
+    public function getPath(): array
+    {
+        return $this->path;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
 }
 
 class ApiRequest extends HttpRequest2
@@ -187,9 +195,9 @@ class ApiRequest extends HttpRequest2
         parent::__construct($method, $uri, $queryString, $headers, $content);
     }
 
-    public function addError(int $status, string $errorMessage): void
+    public function addError(int $status, string $errorMessage, array &$path = []): void
     {
-        $this->errors[] = new ApiError($status, $errorMessage);
+        $this->errors[] = new ApiError($status, $errorMessage, $path);
     }
 
     public function getQueryConnectorRequests(Query &$query): array
@@ -245,7 +253,7 @@ before getting the actual data
     protected function createNonSingularContent(array &$requestResponses)
     {
         $count = count($requestResponses);
-        if ($count == 0) {
+        if ($count === 0) {
             return null;
         } else { //TODO handle multi requests
             /** @var RequestResponse */
@@ -288,11 +296,23 @@ before getting the actual data
         if (count($this->errors)) {
             $stringContent = '';
             foreach ($this->errors as $error) {
-                $stringContent .= $error->getErrorMessage();
-            }
-            return new HttpResponse2(400, $stringContent, []);
-        }
+                $path = $error->getPath();
+                if (count($path) === 0) {
+                    $stringContent .= $error->getErrorMessage();
+                } else {
+                    if ($content === null) {
+                        $content = [];
+                        json_set($content, $path, $error->getErrorMessage());
+                        $status = $error->getStatus();
 
+                    } else {  //TODO add error properly
+                        echo $status . '<br/>';
+                        echo implode('/', $path) . ' ' . $error->getErrorMessage() . '<br/>';;
+                    }
+                }
+            }
+            if ($stringContent !== '') return new HttpResponse2(400, $stringContent, []);
+        }
 
         if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
             $entityClassName = $this->path[0];

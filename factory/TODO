@@ -51,11 +51,6 @@ provide display settings schema in json form
 - - generate auto documentation for types
 - - build ui interfaces for creating entity definitions
 
-php request.php : error if entity class not found
-- http://localhost:8888/site/api/bestaatniet
-- werkt ook niet:  http://localhost:8888/site/api/*
-- - zou het moeten werken? iig goede foutmelding
-
 Connector_path : een hele directory als entity met subproperties zien
 
 Connector_directory: split directory on spaces,comma's or (semi)colons
