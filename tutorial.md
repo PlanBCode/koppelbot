@@ -1,12 +1,17 @@
 # XYZ - Tutorial
 
+
+## Installation
+
 1. Download the source from github
 
     https://github.com/PlanBCode/koppelbot/archive/master.zip
 
   or clone using git
-
-    `$ git clone https://github.com/PlanBCode/koppelbot.git`
+  
+    ```
+    $ git clone https://github.com/PlanBCode/koppelbot.git
+    ```
 
 2. Open your terminal and go to the directory. If you run a `ls` list command you should see the following content
 
@@ -25,6 +30,8 @@ custom		engine		index.php	xyz
 -  `index.php` : the main entry point for the server
 
 -  `xyz` : the command to interact with your server from the command line.
+
+## First commands
 
 3.  Run your first server command. If you enter `./xyz` the help information will be shown:
 
@@ -107,6 +114,8 @@ $ ./xyz "/fruit/melon"
 
 That's looks better.
 
+## Running a local server
+
 7. Now we want to use the server through the browser. To start your server locally run `./xyz -S`.
 This will start a local test server. It will act like the regular server but without the need for Apache software and
 it won't be available through the internet for other users.
@@ -125,6 +134,8 @@ If you close terminal or press Control + C the server will be stopped.
 - http://localhost:8000/api/fruit/apple
 - http://localhost:8000/api/fruit/*/color
 - http://localhost:8000/api/fruit/*?color==green
+
+## Templates
 
 9. With your a text editor open the file `./custom/main/content/tutorial.html`
 (or run `cat ./custom/main/content/tutorial.html` in your terminal to view it.)
