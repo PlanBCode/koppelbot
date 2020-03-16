@@ -8,22 +8,31 @@
 <body>
 <table id="main">
     <tr class="header">
-        <td colspan="2">Koppelbot</td>
+        <td colspan="2">XYZ - Sample</td>
         <td>
             <xyz uri="/session" display="login"/>
         </td>
     </tr>
     <tr>
         <td rowspan="4" id="sources" width="20%" valign="top">
-            <xyz uri="/source/*/file/id" display="list" select="source"/>
+            <xyz uri="/sample/*/id,string,enum,number,bool" display="list" select="sample" multiSelect="multiSample"/>
         </td>
         <td valign="top">
+            View sample:
             <p>
-                <xyz uri="$source" showLabel="false"/>
+                <xyz uri="$sample" showLabel="false"/>
+            </p>
+
+            Edit sample string:
+            <p>
+                <xyz uri="$sample/string" action="edit" showLabel="false"/>
             </p>
         </td>
-        <td rowspan="4" id="facts" width="20%" valign="top">
-            <xyz uri="/fact/*" display="list" select="fact"/>
+    </tr>
+    <tr>
+        <td>
+            Multi selected sources:
+            <xyz uri="$multiSample/id" dynamic="true" showLabel="false"/>
         </td>
     </tr>
 </table>

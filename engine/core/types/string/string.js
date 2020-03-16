@@ -1,5 +1,23 @@
 const encodings = ['utf8', 'base64'];  //TODO single source of truth (php+js)
 
+function recodeString(content, targetEncoding) {
+    if (typeof content === 'string') {
+        return content;
+    } else if (typeof content === 'object' && content !== null && content.hasOwnProperty('content')) {
+        const encoding = content.hasOwnProperty('encoding') ? content.encoding : 'utf8';
+        switch (encoding) {
+            case 'utf8' :
+                return content.content;
+            case 'base64' :
+                return atob(content.content).toString();
+            default:
+                console.error('unknown encoding', encoding);
+                break;
+                return 'Error: unknown encoding';
+        }
+    }
+}
+
 function edit(item) {
     const INPUT = document.createElement('INPUT');
     INPUT.value = item.getContent();
@@ -43,7 +61,8 @@ function view(item) {
                 if (item.getSetting('password') === true) {
                     SPAN.innerText = '***';
                 } else {
-                    SPAN.innerText = node.getContent();
+                    const stringContent = recodeString(node.getContent(), 'utf8');
+                    SPAN.innerText = stringContent;
                 }
                 break;
         }
@@ -71,6 +90,7 @@ function validateContent(item) {
     return false;
 }
 
+exports.recodeString = recodeString;
 exports.actions = {
     edit,
     view,

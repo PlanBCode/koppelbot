@@ -4,13 +4,14 @@
       "type": "directory",
       "parse": "none",
       "path": "data/sources/",
-      "extension": "txt"
+      "extension": "*"
     }
   },
   "file": {
     "signature": {
       "content": {
         "type": "string",
+        "binary": true,
         "connector": {
           "key": "content"
         },
@@ -27,6 +28,12 @@
         "connector": {
           "key": "extension"
         }
+      },
+      "mime": {
+        "type": "string",
+        "connector": {
+          "key": "mime"
+        }
       }
     },
     "type": "file"
@@ -36,7 +43,7 @@
     "connector": {
       "type": "directory",
       "parse": "none",
-      "path": "data/sources/",
+      "path": "data/sources/meta",
       "extension": "meta",
       "key": "content"
     }
