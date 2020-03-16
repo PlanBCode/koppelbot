@@ -14,6 +14,9 @@ require_once './engine/core/connectors/basic.php';
       key: "extension"
       key: "content.a.b"
    TODO modified/created = timestamps
+TODO include hidden
+TODO include directories
+TODO recursive
  */
 
 class Connector_directory extends BasicConnector
@@ -54,7 +57,9 @@ class Connector_directory extends BasicConnector
     {
         $entityIds = [];
         foreach (glob($this->createFilePath('*')) as $filePath) {
-            $entityIds[] = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
+            if(!is_dir($filePath)){
+                $entityIds[] = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
+            }
         }
         return $entityIds;
     }
