@@ -1,11 +1,6 @@
 TODO
 
-number type
- - leading zeroes
-
 - add source reference (array) to fact
-
-
 
 
 implement expand for PUT content
@@ -29,6 +24,9 @@ testing
 
  const jsdom = require("jsdom");
  const { JSDOM } = jsdom;
+
+number type
+ - leading zeroes
 
 filtering & searching :
 - implement full blown boolean expressions

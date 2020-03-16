@@ -21,8 +21,8 @@ class Type_date extends Type
                         $max = array_get($subSettings, 'max', 0);
                         $length = ceil(log10($max));
                     } else {
-                        preg_match('[^0-9]',$content,$matches, PREG_OFFSET_CAPTURE, $contentIndex);
-                        if(count($matches)>1){
+                        preg_match('/[^0-9]+/',$content,$matches, PREG_OFFSET_CAPTURE, $contentIndex);
+                        if(count($matches)>0){
                             $length = $matches[0][1];
                         }else{
                             $length = strlen($content) - $contentIndex;
@@ -32,8 +32,12 @@ class Type_date extends Type
                     //TODO enum/error
                 }
                 $subContent = substr($content, $contentIndex, $length);
-                if (!$subTypeClass::validateContent($subContent, $subSettings)) return false;
+                if (!$subTypeClass::validateContent($subContent, $subSettings)){
+                    return false;
+                }
+                $contentIndex+=$length;
             } elseif (substr($content, $contentIndex, 1) !== $c) {
+                echo substr($content, $contentIndex, 1) .'!=='. $c;
                 return false;
             } else {
                 ++$contentIndex;
