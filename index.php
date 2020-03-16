@@ -18,7 +18,8 @@ if (PHP_SAPI === 'cli') {
     $cliOptions = [
         new CliOption('m', 'method', 1, "Set HTTP method. ", "GET"),
         new CliOption('v', 'verbose', 0, "Set verbose output. ", false),
-        new CliOption('S', 'server', 1, "Run local server. ", 'localhost:8000')
+        new CliOption('S', 'server', 1, "Run local server. ", 'localhost:8000'),
+        new CliOption('p', 'prefix', 1, "Set uri prefix ", '/api')
     ];
 
     /*TODO
@@ -33,8 +34,9 @@ if (PHP_SAPI === 'cli') {
         exit(0);
     }
     $headers = [];//TODO from cliOptions
+
     $requestUri = count($options['args']) > 1
-        ? '/api' . $options['args'][1]
+        ? $options['prefix'] . $options['args'][1]
         : ''; //TODO fallback
 
     $content = array_get($options['args'], 2, '');
@@ -54,7 +56,7 @@ if (PHP_SAPI === 'cli') {
     }
 } else if (php_sapi_name() === 'cli-server') {
     $headers = getallheaders();
-    $uri =  strtok($_SERVER["REQUEST_URI"], '?');
+    $uri = strtok($_SERVER["REQUEST_URI"], '?');
     $method = $_SERVER['REQUEST_METHOD'];
     $queryString = array_get($_SERVER, 'QUERY_STRING', '');
     $content = @file_get_contents('php://input');
