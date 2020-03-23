@@ -172,6 +172,17 @@ class Query
         return false;
     }
 
+    public function getOptions(): array
+    {
+        $options = [];
+        foreach ($this->queryStatements as $queryStatement) {
+            if ($queryStatement->getOperator() === '=') {
+                $options[$queryStatement->getLhs()] = $queryStatement->getRhs();
+            }
+        }
+        return $options;
+    }
+
     public function getAllUsedPropertyNames(): array
     {
         $propertyNames = [];

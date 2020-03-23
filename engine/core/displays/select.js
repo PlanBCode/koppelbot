@@ -78,7 +78,7 @@ exports.display = {
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
         const SELECT = WRAPPER.firstChild;
-        for (let OPTION of SELECT) {
+        for (let OPTION of SELECT.childNodes) {
             if ((OPTION.value === '/' + entityClassName + '/' + entityId || entityId === '*')) {
                 SELECT.removeChild(OPTION);
             }

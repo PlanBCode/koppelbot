@@ -50,7 +50,17 @@ class UiRequest extends HttpRequest2
                     : '';
                 $uri = '/' . $entityClassName . '/' . $entityId . $propertyUri;//. '?' . $this->queryString; //TODO proper merge
             }
-            $body = '<script>xyz.ui({uri:"' . $uri . '", display:"' . $display . '"});</script>';
+            $query = new Query($this->queryString);
+            $options = array_merge([
+                'uri' => $uri,
+                'display' => $display
+            ], $query->getOptions());
+            foreach ($options as $optionName => $option){
+                if($option === 'false') $options[$optionName] = false;
+                if($option === 'true') $options[$optionName] = true;
+            }
+
+            $body = '<script>xyz.ui(' . json_encode($options) . ');</script>';
         }
         return new DocResponse('ui' . $this->uri, $body, $menuItems);
     }

@@ -1,5 +1,11 @@
 TODO
 
+fix errors on source upload (mark extension etc as auto)
+
+timeline : ensure labels do not overlap and do not go outside wrapper
+
+type toNumber, toString function for sorting and timeline
+
 display
 - filter content before passing to display functions
 

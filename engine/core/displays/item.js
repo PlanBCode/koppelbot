@@ -95,7 +95,7 @@ exports.display = {
     remove: display => {
         const WRAPPER = display.getWRAPPER();
         const entityId = display.getEntityId();
-        for (let TABLE_entity of WRAPPER) {
+        for (let TABLE_entity of WRAPPER.childNodes) {
             if (typeof TABLE_entity.entityId === 'string' && (TABLE_entity.entityId === entityId || entityId === '*')) {
                 WRAPPER.removeChild(TABLE_entity);
             }
