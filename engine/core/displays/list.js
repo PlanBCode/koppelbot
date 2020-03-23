@@ -3,7 +3,11 @@
 options
 - select
 - multiSelect
+- showHeaders
 - addCreateButton
+
+- createButtonText
+
 - TODO default
 - TODO addDeleteButtons
 - TODO addEditButtons
@@ -56,13 +60,13 @@ function addCreateButton(xyz, fullUri, WRAPPER, options) {
         const INPUT = document.createElement('INPUT');
         INPUT.type = "submit";
         //TODO add class
-        INPUT.value = "+";
+        INPUT.value = options.createButtonText || "+";
         INPUT.onclick = () => {
             if (DIV.style.display === 'none') {
                 DIV.style.display = 'block';
                 INPUT.value = "-";
             } else {
-                INPUT.value = "+";
+                INPUT.value = options.createButtonText || "+";
                 DIV.style.display = 'none';
             }
         };
@@ -70,7 +74,7 @@ function addCreateButton(xyz, fullUri, WRAPPER, options) {
         const DIV = document.createElement('DIV');
         DIV.style.display = 'none';
         const entityClassName = fullUri.substr(1).split('/')[0];
-        xyz.ui({uri:'/' + entityClassName, display: 'create'}, DIV);
+        xyz.ui({uri: '/' + entityClassName, display: 'create'}, DIV);
         WRAPPER.appendChild(DIV);
     }
 }
@@ -90,26 +94,28 @@ exports.display = {
         addCreateButton(xyz, uri, WRAPPER, options);
     },
     first: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
-        const columns = flatten(content);
-        const TR_header = document.createElement('TR');
-        TR_header.className = 'xyz-list-header';
-        if (options.multiSelect) {
-            const TD_checkbox = document.createElement('TD');
-            TR_header.appendChild(TD_checkbox);
-        }
-        if (columns.constructor !== Object) {
-            const TD_header = document.createElement('TD');
-            TD_header.innerHTML = entityClassName;
-            TR_header.appendChild(TD_header);
-        } else {
-            for (let flatPropertyName in columns) {
-                const TD_header = document.createElement('TD');
-                TD_header.innerHTML = flatPropertyName;
-                TR_header.appendChild(TD_header);
+        if (options.showHeader !== false) {
+            const columns = flatten(content);
+            const TABLE = WRAPPER.firstChild;
+            const TR_header = document.createElement('TR');
+            TR_header.className = 'xyz-list-header';
+            if (options.multiSelect) {
+                const TD_checkbox = document.createElement('TD');
+                TR_header.appendChild(TD_checkbox);
             }
+            if (columns.constructor !== Object) {
+                const TD_header = document.createElement('TD');
+                TD_header.innerHTML = entityClassName;
+                TR_header.appendChild(TD_header);
+            } else {
+                for (let flatPropertyName in columns) {
+                    const TD_header = document.createElement('TD');
+                    TD_header.innerHTML = flatPropertyName;
+                    TR_header.appendChild(TD_header);
+                }
+            }
+            TABLE.appendChild(TR_header);
         }
-        const TABLE = WRAPPER.firstChild;
-        TABLE.appendChild(TR_header);
     },
     //TODO uri
     entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
@@ -193,8 +199,8 @@ exports.display = {
     },
     remove: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const TABLE = WRAPPER.firstChild;
-        for(let TR_entity of TABLE.childNodes){
-            if(typeof TR_entity.entityId === 'string' && (TR_entity.entityId === entityId || entityId === '*')){
+        for (let TR_entity of TABLE.childNodes) {
+            if (typeof TR_entity.entityId === 'string' && (TR_entity.entityId === entityId || entityId === '*')) {
                 TABLE.removeChild(TR_entity);
             }
         }

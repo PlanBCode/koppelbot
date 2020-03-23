@@ -4,12 +4,30 @@ html, body {
     font-family: sans-serif;
 }
 
+input[type='submit']{
+    background-color: rgb(76,175,80);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    float:right;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+input[type='submit']:hover{
+    background-color: rgb(106,205,110)
+}
+
 /* ====================================================================================================
 DISPLAYS
 ==================================================================================================== */
 table.xyz-create, table.xyz-item, table.xyz-list {
-    border: 1px solid lightgrey;
-    margin-bottom: 5px;
+    /*border: 1px solid lightgrey;
+    margin-bottom: 5px;*/
+    padding:0;
+    border-collapse: collapse;
 }
 
 table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
@@ -19,6 +37,9 @@ table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xy
 .xyz-create-header, .xyz-list-header, .xyz-item-header {
     background-color: darkslateblue;
     color: white;
+}
+.xyz-list, .xyz-item{
+    width:100%;
 }
 
 .xyz-list-item {
@@ -116,7 +137,7 @@ FILE
 .xyz-file-flat {
     font-family: monospace;
     white-space: pre-wrap;
-    box-shadow: 2px 2px 2px;
+    /*box-shadow: 2px 2px 2px;*/
     background-color: white;
     padding: 10px;
 }

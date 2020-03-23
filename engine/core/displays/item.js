@@ -1,3 +1,14 @@
+/*
+options:
+
+- showHeaders
+- showLabels
+- showDeleteButton
+
+
+
+ */
+
 const list = require('./list.js');
 const reponse = require('../../../factory/js/source/entity/response'); //TODO better solution
 
@@ -29,7 +40,7 @@ exports.display = {
             TR_header.className = 'xyz-item-header';
             const TD_header = document.createElement('TD');
             TD_header.innerHTML = uri;
-            TD_header.setAttribute('colspan', options.showLabel !== false ? '2' : '1');
+            TD_header.setAttribute('colspan', options.showLabels !== false ? '2' : '1');
             TR_header.appendChild(TD_header);
             TABLE_entity.appendChild(TR_header);
         }
@@ -47,7 +58,7 @@ exports.display = {
             for (let flatPropertyName in columns) {
                 const TR_flatProperty = document.createElement('TR');
 
-                if (options.showLabel !== false) {
+                if (options.showLabels !== false) {
                     const TD_flatPropertyName = document.createElement('TD');
                     TD_flatPropertyName.innerHTML = flatPropertyName;
                     TR_flatProperty.appendChild(TD_flatPropertyName);

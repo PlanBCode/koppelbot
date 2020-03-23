@@ -20,5 +20,12 @@
   "date": {
     "type": "date",
     "format": "d-m-Y"
+  },
+  "sources" : {
+    "type": "array",
+    "subType": {
+      "type": "reference",
+      "uri": "/source/*"
+    }
   }
 }

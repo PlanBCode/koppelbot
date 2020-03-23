@@ -14,16 +14,16 @@
         </td>
     </tr>
     <tr>
-        <td rowspan="4" id="sources" width="20%" valign="top">
-            <xyz uri="/source/*/file/id" display="list" select="source"/>
+        <td id="sources" width="20%" valign="top">
+            <h3>Sources</h3>
+            <xyz uri="/source/*/file/id" createButtonText="Upload source" display="list" select="source" showHeader="false"/>
         </td>
-        <td valign="top">
-            <p>
-                <xyz uri="$source/file" showLabel="false"/>
-            </p>
+        <td id="view" valign="top">
+            <xyz uri="$source/file" showLabels="false" showHeader="false"/>
         </td>
-        <td rowspan="4" id="facts" width="20%" valign="top">
-            <xyz uri="/fact/*/title,date" display="list" select="fact"/>
+        <td id="facts" width="20%" valign="top">
+            <h3>Facts</h3>
+            <xyz uri="/fact/*/title,date" createButtonText="Add fact" display="list" select="fact" showHeader="false"/>
         </td>
     </tr>
 </table>

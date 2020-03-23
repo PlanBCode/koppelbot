@@ -6,6 +6,10 @@ const DEFAULT_TAG = 'DIV';
 
 const ui = (xyz, entityClasses, options, WRAPPER) => {
     options = options || {};
+    for (let optionName in options) {
+        if (options[optionName] === 'false') options[optionName] = false;
+        if (options[optionName] === 'true') options[optionName] = true;
+    }
     if (options.display === 'edit') {
         options.action = 'edit';
         options.display = 'item';
