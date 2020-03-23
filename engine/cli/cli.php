@@ -88,7 +88,7 @@ function getCliOption(array &$cliOptions, array &$options, int $argc, array &$ar
         ++$i;
     }
     foreach ($cliOptions as $cliOption) {
-        if(!array_key_exists($cliOption->long, $options) && !is_null($cliOption->default)){
+        if (!array_key_exists($cliOption->long, $options) && !is_null($cliOption->default)) {
             $options[$cliOption->long] = $cliOption->default;
         }
     }
@@ -106,4 +106,16 @@ function getCliOptions(array &$cliOptions, int $argc, array $argv): array
         }
     }
     return $options;
+}
+
+function createCliRequestUri($options): string
+{
+    if (empty($options['args'])) return '';
+    $uri = $options['args'][1];
+    if (substr($uri, 0, 1) === '.') $uri = substr($uri, 1);  // './abc' -> 'abc'
+    if (substr($options['prefix'], -1) === '/' && substr($uri, 0, 1) === '/') {
+        return $options['prefix'] . substr($uri, 1); // '/abc' -> '/prefix/abc'  (not '/prefix//abc'
+    } else {
+        return $options['prefix'] . $uri; // '/abc' -> '/prefix/abc'
+    }
 }

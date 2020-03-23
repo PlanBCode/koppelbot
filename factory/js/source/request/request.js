@@ -2,8 +2,11 @@ const entity = require('../entity/entity.js');
 const addQueryString = require('../uri/uri.js').addQueryString;
 
 function request(method, uri, data, callback) {
+
+
     //TODO allow for multiple hosts by prepending http(s)://..
     const location = 'http://localhost:8000/'; //TODO determine dynamically
+
     const xhr = new XMLHttpRequest();
     xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
 
@@ -15,7 +18,40 @@ function request(method, uri, data, callback) {
         }
     };
     xhr.send(data);
+    /*
+    //const headers: {//        'Content-Type': 'application/json'
+    //TODO content length
+    //};
+    const body = JSON.stringify(data);
+
+    fetch(location + 'api' + uri+'?expand', {method, body})
+        .then((response) => {
+            const status = response.status;
+            response.text()
+                .then(content => {
+                    content = content === 'null' ? '{}' : content;
+                    console.log(uri, status, content);
+                    callback(status,content )
+                })
+        }).catch(error=>{console.error(error)});
+*/
 }
+
+/*
+const xhr = new XMLHttpRequest();
+xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
+
+xhr.onreadystatechange = () => {
+    if (xhr.readyState === 4) {
+        const status = xhr.status;
+        const content = xhr.responseText;
+        callback(status, content);
+    }
+};
+xhr.send(data);
+
+ */
+
 
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     const path = uri.substr(1).split('/');
@@ -30,7 +66,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
             //TODO check status
             console.log(metaUri, content);
             const data = JSON.parse(content); //TODO check
-            if(typeof data!=='object' || data === null || !data.hasOwnProperty('entity')){
+            if (typeof data !== 'object' || data === null || !data.hasOwnProperty('entity')) {
 
                 return
             }
@@ -86,7 +122,7 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
             try {
                 responseObjectContent = JSON.parse(responseStringContent);
             } catch (e) {
-                console.error('GET',uri, responseStringContent, e);
+                console.error('GET', uri, responseStringContent, e);
             }
             console.log('GET', uri, status, responseObjectContent);
             //TODO replace null with current content?

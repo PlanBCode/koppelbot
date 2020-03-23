@@ -8,10 +8,8 @@ drag&drop: als er een reference input veld is dan worden die entities sleepbaar 
 validateContent -> return messages why it's not valid
 
 testing
-- - add samples to types for testing
-- - multiple samples for editing
+- - add multiple samples for editing
 - - create sample entity by adding all samples
-- - UI: headless browser testing using test.browse
 
 add dot notation: /source/*/file.content,id
 - property paths -> property tree's
@@ -24,7 +22,7 @@ filtering & searching :
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 werkend maken:
-- xyz.ui({uri:'/source?content=default',display:'create'});
+- xyz.ui({uri:'/source?content==default',display:'create'});
 - xyz.ui({uri:'$type',display:'create'});
 
 EntityClass

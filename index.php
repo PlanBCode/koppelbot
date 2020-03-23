@@ -34,10 +34,7 @@ if (PHP_SAPI === 'cli') {
         exit(0);
     }
     $headers = [];//TODO from cliOptions
-
-    $requestUri = count($options['args']) > 1
-        ? $options['prefix'] . $options['args'][1]
-        : ''; //TODO fallback
+    $requestUri = createCliRequestUri($options);
 
     $content = array_get($options['args'], 2, '');
     $uriQueryString = explode('?', $requestUri);

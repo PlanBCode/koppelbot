@@ -1,4 +1,5 @@
 const curl = require('./curl').curl;
+const browse = require('./browse').browse;
 
 curl('GET', '/fruit/banana')
     .statusShouldMatch(404)
@@ -92,6 +93,10 @@ curl('PATCH', '/fruit/melon/size?expand','{brokenJson')
     .shouldFail()
     .contentShouldMatch('Could not parse JSON: Syntax error.')
     .run('Fruit: Patch melon ?expand broken JSON');
+
+browse('sample.html')
+    .run('Test browse');
+
 
 exports.curl = curl;
 exports.file = require('./file');
