@@ -10,37 +10,42 @@ options:
  */
 
 const list = require('./list.js');
-const reponse = require('../../../factory/js/source/entity/response'); //TODO better solution
+const response = require('../../../factory/js/source/entity/response'); //TODO better solution
 
 exports.display = {
-    waitingForInput: (xyz, action, options, WRAPPER) => {
-        WRAPPER.innerHTML = 'Waiting for input...';
+    waitingForInput: display => {
+        display.getWRAPPER().innerHTML = 'Waiting for input...';
     },
-    waitingForData: (xyz, action, options, WRAPPER) => {
-        WRAPPER.innerHTML = 'Waiting for data...';
+    waitingForData: display => {
+        display.getWRAPPER().innerHTML = 'Waiting for data...';
     },
-    empty: (xyz, action, options, WRAPPER) => {
-        WRAPPER.innerHTML = 'No items to display.';
+    empty: display => {
+        display.getWRAPPER().innerHTML = 'No items to display.';
     },
-    first: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {
-        WRAPPER.innerHTML = '';
+    first: display => {
+        display.getWRAPPER().innerHTML = '';
     },
-    entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {
-        const path = requestUri.substr(1).split('/').slice(2);
-        content = reponse.filter(content, path); //TODO move to before calling entity
+    entity: display => {
+        const WRAPPER = display.getWRAPPER();
+        const entityId = display.getEntityId();
+        const entityClassName = display.getEntityClassName();
 
-        const columns = list.flatten(content, requestUri);
+        let content = display.getContent();
+        const path = display.getRequestUri().substr(1).split('/').slice(2);
+        content = response.filter(content, path); //TODO move to before calling entity
+
+        const columns = list.flatten(content, display.getRequestUri());
 
         const TABLE_entity = document.createElement('TABLE');
         TABLE_entity.className = 'xyz-item';
         TABLE_entity.entityId = entityId;
         const uri = '/' + entityClassName + '/' + entityId;
-        if (options.showHeader !== false) {
+        if (display.getOption('showHeader') !== false) {
             const TR_header = document.createElement('TR');
             TR_header.className = 'xyz-item-header';
             const TD_header = document.createElement('TD');
             TD_header.innerHTML = uri;
-            TD_header.setAttribute('colspan', options.showLabels !== false ? '2' : '1');
+            TD_header.setAttribute('colspan', display.getOption('showLabels') !== false ? '2' : '1');
             TR_header.appendChild(TD_header);
             TABLE_entity.appendChild(TR_header);
         }
@@ -49,7 +54,7 @@ exports.display = {
             const TR_entity = document.createElement('TR');
             //todo name
             const TD_entityContent = document.createElement('TD');
-            const TAG = node.render(action, options);
+            const TAG = node.render(display.getAction(), display.getOptions());
             TD_entityContent.appendChild(TAG);
             TR_entity.appendChild(TD_entityContent);
             TABLE_entity.appendChild(TR_entity);
@@ -58,20 +63,20 @@ exports.display = {
             for (let flatPropertyName in columns) {
                 const TR_flatProperty = document.createElement('TR');
 
-                if (options.showLabels !== false) {
+                if (display.getOption('showLabels') !== false) {
                     const TD_flatPropertyName = document.createElement('TD');
                     TD_flatPropertyName.innerHTML = flatPropertyName;
                     TR_flatProperty.appendChild(TD_flatPropertyName);
                 }
                 const TD_flatPropertyContent = document.createElement('TD');
                 const node = columns[flatPropertyName];
-                const TAG = node.render(action, options);
+                const TAG = node.render(display.getAction(), display.getOptions());
                 TD_flatPropertyContent.appendChild(TAG);
                 TR_flatProperty.appendChild(TD_flatPropertyContent);
                 TABLE_entity.appendChild(TR_flatProperty);
             }
         }
-        if (options.showDeleteButton === true) {
+        if (display.getOption('showDeleteButton') === true) {
             const TR_deleteButton = document.createElement('TR');
             const TD_deleteButton = document.createElement('TD');
             TD_deleteButton.setAttribute('colspan', 2);
@@ -79,7 +84,7 @@ exports.display = {
             INPUT_deleteButton.type = 'submit';
             INPUT_deleteButton.value = 'Delete';
             INPUT_deleteButton.onclick = () => {
-                xyz.delete(uri)
+                display.xyz.delete(uri); //TODO encapsulate xyz
             };
             TD_deleteButton.appendChild(INPUT_deleteButton);
             TR_deleteButton.appendChild(TD_deleteButton);
@@ -87,8 +92,9 @@ exports.display = {
         }
         WRAPPER.appendChild(TABLE_entity);
     },
-    remove: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
-        const TABLE = WRAPPER.firstChild;
+    remove: display => {
+        const WRAPPER = display.getWRAPPER();
+        const entityId = display.getEntityId();
         for (let TABLE_entity of WRAPPER) {
             if (typeof TABLE_entity.entityId === 'string' && (TABLE_entity.entityId === entityId || entityId === '*')) {
                 WRAPPER.removeChild(TABLE_entity);
