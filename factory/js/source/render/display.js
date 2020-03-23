@@ -49,7 +49,7 @@ const uiElementFirst = (xyz, display, action, entityClassName, entityId, uri, op
 
 const uiElementEntity = (xyz, display, action, entityClassName, entityId, uri, options, WRAPPER, node) => {
     if (display && display.hasOwnProperty('entity')) {
-        display.entity(xyz, action, options, WRAPPER, entityClassName, entityId, node);
+        display.entity(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
     } else {
         //TODO a default way of handeling stuff
     }
@@ -57,7 +57,7 @@ const uiElementEntity = (xyz, display, action, entityClassName, entityId, uri, o
 
 const uiElementRemove = (xyz, display, action, entityClassName, entityId, uri, options, WRAPPER, node) => {
     if (display && display.hasOwnProperty('remove')) {
-        display.remove(xyz, action, options, WRAPPER, entityClassName, entityId, node);
+        display.remove(xyz, action, options, WRAPPER, entityClassName, entityId, node,uri);
     } else {
         //TODO a default way of handeling stuff
     }

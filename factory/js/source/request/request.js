@@ -3,7 +3,7 @@ const addQueryString = require('../uri/uri.js').addQueryString;
 
 function request(method, uri, data, callback) {
 
-
+    //TODO set content type and length headers
     //TODO allow for multiple hosts by prepending http(s)://..
     const location = 'http://localhost:8000/'; //TODO determine dynamically
 
@@ -18,40 +18,7 @@ function request(method, uri, data, callback) {
         }
     };
     xhr.send(data);
-    /*
-    //const headers: {//        'Content-Type': 'application/json'
-    //TODO content length
-    //};
-    const body = JSON.stringify(data);
-
-    fetch(location + 'api' + uri+'?expand', {method, body})
-        .then((response) => {
-            const status = response.status;
-            response.text()
-                .then(content => {
-                    content = content === 'null' ? '{}' : content;
-                    console.log(uri, status, content);
-                    callback(status,content )
-                })
-        }).catch(error=>{console.error(error)});
-*/
 }
-
-/*
-const xhr = new XMLHttpRequest();
-xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
-
-xhr.onreadystatechange = () => {
-    if (xhr.readyState === 4) {
-        const status = xhr.status;
-        const content = xhr.responseText;
-        callback(status, content);
-    }
-};
-xhr.send(data);
-
- */
-
 
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     const path = uri.substr(1).split('/');
@@ -67,7 +34,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
             console.log(metaUri, content);
             const data = JSON.parse(content); //TODO check
             if (typeof data !== 'object' || data === null || !data.hasOwnProperty('entity')) {
-
+                console.error('PROBLEM parsing meta response');
                 return
             }
             for (let entityClassName of entityClassNames) {

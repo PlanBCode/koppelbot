@@ -1,5 +1,9 @@
 TODO
 
+display
+- pass a single parameter object to display functions
+- filter content before passing to display functions
+
 array/object
 - delete values
 

@@ -49,7 +49,7 @@ function filter(content, path) {
         const propertyNameList = path[0];
         if (propertyNameList === '*') {
             for (let propertyName in content) {
-                filter(content[propertyName], subPath);
+                content[propertyName] = filter(content[propertyName], subPath);
             }
         } else {
             const propertyNames = propertyNameList.split(',');
@@ -57,7 +57,7 @@ function filter(content, path) {
                 if (propertyNames.indexOf(propertyName) === -1) {
                     delete content[propertyName];
                 } else {
-                    filter(content[propertyName], subPath);
+                    content[propertyName] = filter(content[propertyName], subPath);
                 }
             }
         }
@@ -86,7 +86,7 @@ function Node(object, entityId, status_, content_, errors_, method_) {
     this.hasSetting = settingName => object.getSettings().hasOwnProperty(settingName);
     this.getSetting = settingName => object.getSettings()[settingName];
     this.getSettings = () => object.getSettings();*/
-    this.getObject= () => object; //TODO need private
+    this.getObject = () => object; //TODO need private
     this.getEntityId = () => entityId;
     this.getMethod = () => method;
     this.getStatus = () => status;

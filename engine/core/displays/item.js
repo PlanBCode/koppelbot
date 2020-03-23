@@ -1,4 +1,5 @@
 const list = require('./list.js');
+const reponse = require('../../../factory/js/source/entity/response'); //TODO better solution
 
 exports.display = {
     waitingForInput: (xyz, action, options, WRAPPER) => {
@@ -14,6 +15,9 @@ exports.display = {
         WRAPPER.innerHTML = '';
     },
     entity: (xyz, action, options, WRAPPER, entityClassName, entityId, content, requestUri) => {
+        const path = requestUri.substr(1).split('/').slice(2);
+        content = reponse.filter(content, path); //TODO move to before calling entity
+
         const columns = list.flatten(content, requestUri);
 
         const TABLE_entity = document.createElement('TABLE');
@@ -29,16 +33,16 @@ exports.display = {
             TR_header.appendChild(TD_header);
             TABLE_entity.appendChild(TR_header);
         }
-        if (columns.constructor !== Object){
-            const node =  columns;
+        if (columns.constructor !== Object) {
+            const node = columns;
             const TR_entity = document.createElement('TR');
             //todo name
-            const TD_entityContent =document.createElement('TD');
+            const TD_entityContent = document.createElement('TD');
             const TAG = node.render(action, options);
             TD_entityContent.appendChild(TAG);
             TR_entity.appendChild(TD_entityContent);
             TABLE_entity.appendChild(TR_entity);
-        }else {
+        } else {
 
             for (let flatPropertyName in columns) {
                 const TR_flatProperty = document.createElement('TR');
@@ -74,8 +78,8 @@ exports.display = {
     },
     remove: (xyz, action, options, WRAPPER, entityClassName, entityId, content) => {
         const TABLE = WRAPPER.firstChild;
-        for(let TABLE_entity of WRAPPER){
-            if(typeof TABLE_entity.entityId === 'string' && (TABLE_entity.entityId === entityId || entityId === '*')){
+        for (let TABLE_entity of WRAPPER) {
+            if (typeof TABLE_entity.entityId === 'string' && (TABLE_entity.entityId === entityId || entityId === '*')) {
                 WRAPPER.removeChild(TABLE_entity);
             }
         }
