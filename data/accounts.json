@@ -1,1 +1,1 @@
-{"aap":{"title":"Aap","email":"banaan@jungle.com","password":"$2y$10$QNAFDJit/m.X3hkv.CJW1e4kimSBsU8veKHDKykgn74/HeFwUtT6y"},"noot":{"title":"Noot","email":"info@cashew.com","password":"$2y$10$QNAFDJit/m.X3hkv.CJW1e4kimSBsU8veKHDKykgn74/HeFwUtT6y"}}
+{"banaan@jungle.com":{"username":"Aap","email":"banaan@jungle.com","password":"$2y$10$QNAFDJit/m.X3hkv.CJW1e4kimSBsU8veKHDKykgn74/HeFwUtT6y"},"info@cashew.com":{"username":"Noot","email":"info@cashew.com","password":"$2y$10$QNAFDJit/m.X3hkv.CJW1e4kimSBsU8veKHDKykgn74/HeFwUtT6y"}}

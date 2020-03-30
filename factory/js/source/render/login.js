@@ -1,3 +1,9 @@
+/*
+
+options.signUpButtonText || 'Create account',
+options.loginButtonText || 'Log in',
+ */
+
 const renderUiLogin = (xyz, options, WRAPPER) => {
     WRAPPER.classList.add('xyz-login');
     const A_signin = document.createElement('A');
@@ -31,6 +37,7 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         style: 'display:none;',
         uri: options.uri,
         display: 'create',
+        createButtonText: options.loginButtonText || 'Log in',
         onSubmit: data => {
             /*
             DIV_createSession.style.display = 'none';
@@ -64,15 +71,18 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
     xyz.ui({
         uri: '/account',
         style: 'display:none;',
-        display: 'create'
+        display: 'create',
+        createButtonText: options.signUpButtonText || 'Create account',
     }, DIV_account); //TODO retrieve /account from session metadata?
     WRAPPER.appendChild(DIV_account);
 
     A_signin.onclick = () => {
         DIV_createSession.style.display = 'block';
+        DIV_account.style.display = 'none';
     };
     A_signup.onclick = () => {
         DIV_account.style.display = 'block';
+        DIV_createSession.style.display = 'none';
     };
 };
 

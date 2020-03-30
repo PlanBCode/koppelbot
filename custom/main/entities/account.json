@@ -9,20 +9,16 @@
   "email": {
     "type": "string",
     "regex": "^TODO$",
-    "default": "hello@default.com"
+    "default": "hello@default.com",
+    "connector": {
+      "key": "key"
+    }
   },
   "password": {
     "type": "password"
   },
-  "title": {
+  "username": {
     "type": "string",
-    "regex": "^TODO$"
-  },
-  "id": {
-    "type": "string",
-    "required": true,
-    "connector": {
-      "key": "key"
-    }
+    "minLength": 3
   }
 }

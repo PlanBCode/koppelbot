@@ -1,7 +1,7 @@
 const request = require('../request/request.js');
 const uriTools = require('../uri/uri.js');
 
-const renderUiCreate = (xyz,entityClasses, options, TAG) => {
+const renderUiCreate = (xyz, entityClasses, options, TAG) => {
     const uri = options.uri;
     request.retrieveMeta(xyz, entityClasses, uri, () => {
         const entityClassName = uriTools.pathFromUri(uri)[0];
@@ -9,6 +9,7 @@ const renderUiCreate = (xyz,entityClasses, options, TAG) => {
         const data = {};
         const INPUT_submit = document.createElement('INPUT');
         INPUT_submit.type = 'submit';
+        INPUT_submit.value = options.createButtonText || 'Create ' + entityClassName;
         INPUT_submit.validUris = {};
         INPUT_submit.onclick = () => {
             if (entityClass.isAutoIncremented()) {
