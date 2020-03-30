@@ -4,7 +4,7 @@ BUG: ./xyz "/source/*/note" does not return an object for all results
 
 timeline : ensure labels do not overlap and do not go outside wrapper
 
-type toNumber, toString function for sorting and timeline
+type toString function for sorting
 
 display
 - filter content before passing to display functions

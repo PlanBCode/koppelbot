@@ -4,7 +4,7 @@ class Type_string extends Type
 {
     static protected $encodings = ['utf8', 'base64']; //TODO single source of truth (php+js)
 
-    public static function validateContent($content, array $settings): bool
+    public static function validateContent($content, array &$settings): bool
     {
         if (is_string($content)) {
             return true;//TODO  min, max length, regex

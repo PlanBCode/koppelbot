@@ -214,13 +214,17 @@ class Query
         if ($this->hasOption('sortBy')) {
             //TODO handle multi class requests
             $entityClassName = array_keys($content)[0];
+            $entityClass = EntityClass::get($entityClassName);
+
             $sortPath = explode('.', $this->getOption('sortBy'));
-            usort($entityIds, function ($entityIdA, $entityIdB) use ($sortPath, $entityClassName, $content) {
+
+            $property = $entityClass->getProperty($sortPath);
+            usort($entityIds, function ($entityIdA, $entityIdB) use ($sortPath, $entityClassName, $content, $property) {
                 $entityContentA = json_get($content, array_merge([$entityClassName, $entityIdA], $sortPath));
                 $entityContentB = json_get($content, array_merge([$entityClassName, $entityIdB], $sortPath));
                 $entityContentA = $entityContentA->content;
                 $entityContentB = $entityContentB->content;
-                return strcmp($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
+                return $property->sort($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
             });
         }
         $offset = $this->getOption('offset', 0);

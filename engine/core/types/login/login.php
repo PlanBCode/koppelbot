@@ -2,7 +2,7 @@
 
 class Type_login extends Type
 {
-    public static function validateContent($content, array $settings): bool
+    public static function validateContent($content, array &$settings): bool
     {
         if (!is_array($content)) return false;
         if (!array_key_exists('username', $content)) return false;

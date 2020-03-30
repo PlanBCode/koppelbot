@@ -284,22 +284,22 @@ class Property
         if (is_array($customSignatureSettings)) {
             $signature = $this->typeClass::signature($this->settings);
 
-                foreach ($customSignatureSettings as $subPropertyName => $customSubSettings) {
-                    if (!array_key_exists($subPropertyName, $signature)) {
-                        echo 'ERROR Incorrect signature!';
-                        //TODO error
-                    } else {
-                        $defaultSubSettings = $signature[$subPropertyName];
+            foreach ($customSignatureSettings as $subPropertyName => $customSubSettings) {
+                if (!array_key_exists($subPropertyName, $signature)) {
+                    echo 'ERROR Incorrect signature!';
+                    //TODO error
+                } else {
+                    $defaultSubSettings = $signature[$subPropertyName];
 
-                        //TODO check if type matches and supports these customSubSettings
-                        $subSettings = mergeSubSettings($customSubSettings, $defaultSubSettings);
+                    //TODO check if type matches and supports these customSubSettings
+                    $subSettings = mergeSubSettings($customSubSettings, $defaultSubSettings);
 
-                        //TODO use $this->settings instead or $rootSettings
-                        $subProperty = new Property($this, $this->depth + 1, $subPropertyName, $subSettings, $rootSettings);
+                    //TODO use $this->settings instead or $rootSettings
+                    $subProperty = new Property($this, $this->depth + 1, $subPropertyName, $subSettings, $rootSettings);
 
-                        $this->subProperties[$subPropertyName] = $subProperty;
-                        $this->settings['signature'][$subPropertyName] = $subProperty->getMeta();
-                    }
+                    $this->subProperties[$subPropertyName] = $subProperty;
+                    $this->settings['signature'][$subPropertyName] = $subProperty->getMeta();
+                }
 
             }
         }
@@ -441,5 +441,10 @@ class Property
     public function processAfterConnector(string $method, &$content)
     {
         return $this->typeClass::processAfterConnector($method, $content, $this->settings);
+    }
+
+    public function sort(&$content1, &$content2): int
+    {
+        return $this->typeClass::sort($content1, $content2, $this->settings);
     }
 }

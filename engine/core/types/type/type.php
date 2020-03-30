@@ -76,7 +76,7 @@ abstract class Type
         }
     }
 
-    abstract static public function validateContent($content, array $settings): bool;
+    abstract static public function validateContent($content, array &$settings): bool;
 
     static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
     {
@@ -85,7 +85,26 @@ abstract class Type
 
     static function signature(array &$settings): array
     {
-       return [];
+        return [];
+    }
+
+    static function sort(&$content1, &$content2, array &$settings): int
+    {
+        // first try to parse as numbers
+        $number1 = self::toNumber($content1, $settings);
+        $number2 = self::toNumber($content2, $settings);
+        if (!is_nan($number1) || !is_nan($number2)) {
+            return $number1 <=> $number2;
+        } else if ((is_string($content1) && is_string($content2))) { //TODO use toString to try this
+            return strnatcmp($content1, $content2);
+        } else { // fallback to default php behaviour
+            return $content1 <=> $content2;
+        }
+    }
+
+    static function toNumber(&$content, array &$settings)
+    {
+        return NAN;
     }
 
     static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
@@ -109,7 +128,7 @@ abstract class Type
 
 class Type_type extends Type
 {
-    static public function validateContent($content, array $settings): bool
+    static public function validateContent($content, array &$settings): bool
     {
         return true;
     }

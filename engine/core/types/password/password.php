@@ -2,7 +2,7 @@
 
 class Type_password extends Type
 {
-    public static function validateContent($content, array $settings): bool
+    public static function validateContent($content, array &$settings): bool
     {
         if (!is_array($content)) return false;
         if (!array_key_exists('new', $content)) return false;
