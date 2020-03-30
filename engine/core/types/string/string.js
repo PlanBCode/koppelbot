@@ -12,7 +12,6 @@ function recodeString(content, targetEncoding) {
                 return atob(content.content).toString();
             default:
                 console.error('unknown encoding', encoding);
-                break;
                 return 'Error: unknown encoding';
         }
     }

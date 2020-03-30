@@ -38,6 +38,7 @@ exports.actions = {
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
         //TODO add class
+        INPUT_create.validUris = {};
         INPUT_create.value = "Add";
         const data = {};
         const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, ['new'], data, INPUT_create);

@@ -128,7 +128,7 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         const TR_header = document.createElement('TR');
         TR_header.classList.add('xyz-create-header');
         const TD_header = document.createElement('TD');
-        TD_header.setAttribute('colspan', 2);
+        TD_header.setAttribute('colspan', '2');
         TR_header.appendChild(TD_header);
         TABLE.appendChild(TR_header);
         TD_header.innerText = 'New ' + entityClassName;

@@ -93,18 +93,17 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
         const uri = item.getUri();
         if (type.validateContent(item)) {
             TAG.classList.remove('xyz-invalid-content');
-            if (INPUT_submit){
-                if(INPUT_submit.validUris){
-                    INPUT_submit.validUris[uri] = true;
-                    INPUT_submit.disabled = Object.values(INPUT_submit.validUris).reduce((disabled, valid) => disabled || !valid, false);
-                }
+            if (INPUT_submit) {
+                INPUT_submit.validUris[uri] = true;
+                const disabled = Object.values(INPUT_submit.validUris).reduce((disabled, valid) => disabled || !valid, false);
+                if (!disabled) INPUT_submit.removeAttribute('disabled');
             }
             return true;
         } else {
             TAG.classList.add('xyz-invalid-content');
             if (INPUT_submit) {
-                if(INPUT_submit.validUris) INPUT_submit.validUris[uri] = false;
-                INPUT_submit.disabled = false;
+                INPUT_submit.validUris[uri] = false;
+                INPUT_submit.setAttribute('disabled', 'true');
             }
             return false;
         }

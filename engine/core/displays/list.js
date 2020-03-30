@@ -74,7 +74,6 @@ function addCreateButton(display) {
         const DIV = document.createElement('DIV');
         DIV.style.display = 'none';
         const entityClassName = display.getEntityClassName();
-        console.log('appel', entityClassName)
         display.xyz.ui({uri: '/' + entityClassName, display: 'create'}, DIV); // TODO encapsulate xyz
         WRAPPER.appendChild(DIV);
     }

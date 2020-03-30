@@ -12,7 +12,7 @@ exports.actions = {
         if (!item.getSetting('default') && item.getContent() === null) {
             const OPTION = document.createElement('OPTION');
             OPTION.innerText = 'Select...';
-            OPTION.disabled = true;
+            OPTION.setAttribute('disabled' ,'true');
             OPTION.selected = true;
             SELECT.appendChild(OPTION);
         }

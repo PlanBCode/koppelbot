@@ -3,8 +3,7 @@ exports.actions = {
         const TAG = item.ui({
             uri: item.getSetting('uri'),
             display: 'select',
-            select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId)
-            ,
+            select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId),
             initialValue: item.getContent()
         });
         //TODO onchange : how to?

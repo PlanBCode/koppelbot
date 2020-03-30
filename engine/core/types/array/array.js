@@ -30,6 +30,7 @@ exports.actions = {
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
         //TODO add class
+        INPUT_create.validUris = {};
         INPUT_create.value = "Add";
         const data = {};
 

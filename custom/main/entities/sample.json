@@ -39,6 +39,7 @@
   "array": {
     "type": "array",
     "subType": {
+      "minLength": 3,
       "type": "string"
     }
   },

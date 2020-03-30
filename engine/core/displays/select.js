@@ -30,7 +30,7 @@ exports.display = {
         if (!display.getOption('initialValue')) {
             const OPTION = document.createElement('OPTION');
             OPTION.innerText = 'Select...';
-            OPTION.disabled = true;
+            OPTION.setAttribute('disabled' ,'true');
             SELECT.appendChild(OPTION)
         }
         WRAPPER.appendChild(SELECT);
