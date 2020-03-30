@@ -1,11 +1,9 @@
 /*
 options:
 
-- showHeaders
+- showHeader
 - showLabels
 - showDeleteButton
-
-
 
  */
 

@@ -3,7 +3,7 @@
 options
 - select
 - multiSelect
-- showHeaders
+- showHeader
 - addCreateButton
 - createButtonText
 

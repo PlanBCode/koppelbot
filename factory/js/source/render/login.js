@@ -18,7 +18,8 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
     xyz.ui({
         style: 'display:none;',
         uri: options.uri,
-        display: 'list'
+        display: 'list',
+        showHeader: false
     }, DIV_listSession);
     WRAPPER.appendChild(DIV_listSession);
 
@@ -39,13 +40,11 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         display: 'create',
         createButtonText: options.loginButtonText || 'Log in',
         onSubmit: data => {
-            /*
+            DIV_listSession.style.display = 'inline-block';
             DIV_createSession.style.display = 'none';
             A_signin.style.display = 'none';
             A_signup.style.display = 'none';
             A_logout.style.display = 'inline-block';
-             */
-
         }
     }, DIV_createSession);
 
@@ -62,8 +61,8 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         A_signin.style.display = 'inline-block';
         A_signup.style.display = 'inline-block';
         A_logout.style.display = 'none';
-        DIV_listSession.style.display = 'none';
-        DIV_createSession.style.display = 'inline-block';
+        DIV_listSession.style.display = 'none'; // TODO Only if all sessions have been removed
+        //TODO message "You've been succesfully logged out."
     });
     WRAPPER.appendChild(DIV_createSession);
 
@@ -73,6 +72,13 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         style: 'display:none;',
         display: 'create',
         createButtonText: options.signUpButtonText || 'Create account',
+        onSubmit: data => {
+            //TODO Message "account x has been created"
+            //TODO use date to fill in username
+            //console.log('create Account', data);
+            DIV_createSession.style.display = 'block';
+            DIV_account.style.display = 'none';
+        }
     }, DIV_account); //TODO retrieve /account from session metadata?
     WRAPPER.appendChild(DIV_account);
 
