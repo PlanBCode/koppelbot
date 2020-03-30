@@ -9,8 +9,7 @@ const renderUiCreate = (xyz,entityClasses, options, TAG) => {
         const data = {};
         const INPUT_submit = document.createElement('INPUT');
         INPUT_submit.type = 'submit';
-        const TABLE = entityClass.createCreator(options, data, INPUT_submit);
-        TAG.appendChild(TABLE);
+        INPUT_submit.validUris = {};
         INPUT_submit.onclick = () => {
             if (entityClass.isAutoIncremented()) {
                 xyz.post(uri, {[entityClassName]: {'new': data}},);
@@ -22,6 +21,8 @@ const renderUiCreate = (xyz,entityClasses, options, TAG) => {
                 options.onSubmit(data);
             }
         };
+        const TABLE = entityClass.createCreator(options, data, INPUT_submit);
+        TAG.appendChild(TABLE);
         TAG.appendChild(INPUT_submit);
     });
     return TAG;

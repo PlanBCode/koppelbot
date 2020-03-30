@@ -87,19 +87,37 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
         TR.appendChild(TD_label);
     }
     let TAG;
-    let onChange, onDelete;
-    onChange = (content, additionalSubPropertyPath) => {
-        const keyPath = typeof additionalSubPropertyPath === 'undefined'
-            ? subPropertyPath
-            : subPropertyPath.concat(additionalSubPropertyPath);
-        const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
+
+    const validate = item => {
+
+        const uri = item.getUri();
         if (type.validateContent(item)) {
             TAG.classList.remove('xyz-invalid-content');
-            if (INPUT_submit) INPUT_submit.disabled = false;
-            json.set(data, keyPath, content);
+            if (INPUT_submit){
+                if(INPUT_submit.validUris){
+                    INPUT_submit.validUris[uri] = true;
+                    INPUT_submit.disabled = Object.values(INPUT_submit.validUris).reduce((disabled, valid) => disabled || !valid, false);
+                }
+            }
+            return true;
         } else {
-            if (INPUT_submit) INPUT_submit.disabled = true;
             TAG.classList.add('xyz-invalid-content');
+            if (INPUT_submit) {
+                if(INPUT_submit.validUris) INPUT_submit.validUris[uri] = false;
+                INPUT_submit.disabled = false;
+            }
+            return false;
+        }
+    };
+
+    let onChange, onDelete;
+    onChange = (content, additionalSubPropertyPath) => {
+        const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
+        if (validate(item)) {
+            const keyPath = typeof additionalSubPropertyPath === 'undefined'
+                ? subPropertyPath
+                : subPropertyPath.concat(additionalSubPropertyPath);
+            json.set(data, keyPath, content);
         }
     };
     onDelete = subUri => {
@@ -132,6 +150,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
 
     const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
     TAG = type.edit(item);
+    validate(item);
     // TODO add id from options (also for label for)
     // TODO add class from options
     const TD_content = document.createElement('TD');

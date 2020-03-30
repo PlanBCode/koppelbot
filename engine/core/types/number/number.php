@@ -2,7 +2,7 @@
 
 class Type_number extends Type
 {
-    public static function toNumber($content, array &$settings): bool
+    public static function toNumber(&$content, array &$settings): bool
     {
         return $content + 0;
     }

@@ -61,6 +61,8 @@ exports.actions = {
     validateContent: function (item) {
         const format = item.getSetting('format');
         const content = item.getContent();
+        if (typeof content !== 'string') return false; //TODO maybe numbers for single date things?
+
         let contentIndex = 0;
         for (let formatIndex = 0; formatIndex < format.length; ++formatIndex) {
             const format = item.getSetting('format');

@@ -31,7 +31,7 @@ class Type_date extends Type
 
     public static function validateContent($content, array &$settings): bool
     {
-        if (!is_string($content)) return false;
+        if (!is_string($content)) return false; //TODO maybe numbers for single date things?
 
         $format = array_get($settings, 'format');
         if (is_null($format)) return false; // no format specified

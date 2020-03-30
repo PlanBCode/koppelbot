@@ -31,7 +31,15 @@ function sortLabels(A, B) {
 
 function drawNodes(DIV, display) {
     const horizontal = display.getOption('horizontal');
-    const Q = (display.getOption('midLine') || '0') + '%';
+    const left = horizontal ? 'left' : 'top';
+    const right = horizontal ? 'right' : 'bottom';
+
+    const top = horizontal ? 'top' : 'left';
+    const bottom = horizontal ? 'bottom' : 'right';
+
+    const width = horizontal ? 'width' : 'height';
+
+    const Q = Number(display.getOption('midLine') || 0);
 
     let minTime = Infinity;
     let maxTime = -Infinity;
@@ -50,51 +58,45 @@ function drawNodes(DIV, display) {
         if (NODE.classList.contains('xyz-timeline-node')) {
             const time = parseDateString(NODE.date);
             const ratio = (time - minTime) / (maxTime - minTime);
-            if (horizontal) {
-                NODE.style.top = Q;
-                NODE.style.left = (ratio * 100) + '%';
-            } else {
-                NODE.style.left = Q;
-                NODE.style.top = (ratio * 100) + '%';
-            }
+            NODE.style[top] = Q+'%';
+            NODE.style[left] = (ratio * 100) + '%';
         }
     }
+
     for (let i = 0; i < LABELS.length; ++i) {
         const LABEL = LABELS[i];
         const time = parseDateString(LABEL.date);
         const ratio = (time - minTime) / (maxTime - minTime);
-        if (Q === '100%') {
-            if (horizontal) {
-                LABEL.style.bottom = `40px`;
-                LABEL.style.top = null;
-            } else {
-                LABEL.style.right = `40px`;
-                LABEL.style.left = null;
-            }
-        } else if (i % 2 && Q === '50%') {
-            if (horizontal) {
-                LABEL.style.bottom = `calc(${Q} + 40px)`;
-                LABEL.style.top = null;
-            } else {
-                LABEL.style.right = `calc(${Q} + 40px)`;
-                LABEL.style.left = null;
-            }
 
-        } else {
-            if (horizontal) {
-                LABEL.style.top = `calc(${Q} + 40px)`;
-                LABEL.style.bottom = null;
-            } else {
-                LABEL.style.right = null;
-                LABEL.style.left = `calc(${Q} + 40px)`;
+        const sizeDIV = DIV.getBoundingClientRect()[width];
+        let rectLABEL = LABEL.getBoundingClientRect();
+        const sizeLABEL = rectLABEL[width];
+        let position = ratio * sizeDIV;
+        if (position + sizeLABEL > sizeDIV) position = sizeDIV - sizeLABEL; //ensure labels do not go out of bounds
+
+        LABEL.style[left] = position + 'px';
+        rectLABEL = LABEL.getBoundingClientRect();
+
+        let defaultTop = 40;
+        if (i > 0) { // ensure labels do not overlap with previous
+            const prevRectLABEL = LABELS[i - 1].getBoundingClientRect();
+            if (prevRectLABEL[right] > rectLABEL[left]) {
+                defaultTop = prevRectLABEL[bottom] + 20;
             }
         }
-        if (horizontal) {
-            LABEL.style.left = (ratio * 100) + '%';
+
+        if (Q === 100) {
+            LABEL.style[bottom] = `${defaultTop}px`;
+            LABEL.style[top] = null;
+        } else if (i % 2 && Q === 50) {
+            LABEL.style[bottom] = `calc(${Q}% + ${defaultTop}px)`;
+            LABEL.style[top] = null;
         } else {
-            LABEL.style.top = (ratio * 100) + '%';
+            LABEL.style[top] = `calc(${Q}% + ${defaultTop}px)`;
+            LABEL.style[bottom] = null;
         }
     }
+
     //DIV.offsetHeight;
     const rDIV = DIV.getBoundingClientRect();
     let i = 0;
@@ -135,7 +137,6 @@ exports.display = {
     },
     first: display => {
         const horizontal = display.getOption('horizontal');
-        console.log('horizontal', horizontal)
         const Q = (display.getOption('midLine') || '0') + '%';
         const WRAPPER = display.getWRAPPER();
         WRAPPER.innerHTML = '';
@@ -187,7 +188,6 @@ exports.display = {
         CONNECTOR.NODE = NODE;
         DIV.appendChild(CONNECTOR);
         //TODO add a listener for changes on this node
-
 
         drawNodes(DIV, display);
     },

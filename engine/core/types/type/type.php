@@ -88,7 +88,7 @@ abstract class Type
         return [];
     }
 
-    static function sort(&$content1, &$content2, array &$settings): int
+    public static function sort(&$content1, &$content2, array &$settings): int
     {
         // first try to parse as numbers
         $number1 = self::toNumber($content1, $settings);
@@ -102,7 +102,7 @@ abstract class Type
         }
     }
 
-    static function toNumber(&$content, array &$settings)
+    public static function toNumber(&$content, array &$settings)
     {
         return NAN;
     }

@@ -15,7 +15,8 @@
     }
   },
   "title" : {
-    "type": "string"
+    "type": "string",
+    "minLength": 1
   },
   "date": {
     "type": "date",
@@ -25,7 +26,7 @@
     "type": "array",
     "subType": {
       "type": "reference",
-      "uri": "/source/*"
+      "uri": "/source/*/file/id"
     }
   }
 }
