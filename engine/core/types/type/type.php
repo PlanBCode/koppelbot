@@ -83,15 +83,9 @@ abstract class Type
         return false;
     }
 
-    static function signature(array &$settings)
+    static function signature(array &$settings): array
     {
-        $className = get_called_class();
-        if (substr($className, 0, 5) === 'Type_') {
-            return substr($className, 5);
-        } else {
-            //TODO
-            return 'SIGNATURE ERROR';
-        }
+       return [];
     }
 
     static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse

@@ -2,9 +2,15 @@
 
 class Type_file extends Type
 {
-    public static function signature(array &$settings)
+    public static function signature(array &$settings): array
     {
-        return ['id' => 'string', 'content' => 'string', 'extension' => 'string', 'size' => 'number', 'mime' => 'string'];
+        return [
+            'id' => ['type' => 'string'],
+            'content' => ['type' => 'string'],
+            'extension' => ['type' => 'string', 'required' => false],
+            'size' => ['type' => 'number', 'required' => false],
+            'mime' => ['type' => 'string', 'required' => false]
+        ];
     }
 
     public static function validateContent($value, array $settings): bool

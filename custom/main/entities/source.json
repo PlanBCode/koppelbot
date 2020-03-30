@@ -43,7 +43,7 @@
     "connector": {
       "type": "directory",
       "parse": "none",
-      "path": "data/sources/meta",
+      "path": "data/sources/meta/",
       "extension": "meta",
       "key": "content"
     }

@@ -1,6 +1,6 @@
 TODO
 
-fix errors on source upload (mark extension etc as auto)
+BUG: ./xyz "/source/*/note" does not return an object for all results
 
 timeline : ensure labels do not overlap and do not go outside wrapper
 

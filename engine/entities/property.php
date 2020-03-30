@@ -25,6 +25,16 @@ function getSingleSetting($name, $settings, $rootSettings)
     }
 }
 
+function mergeSubSettings(array $customSubSettings, array &$defaultSubSettings): array
+{
+    foreach ($defaultSubSettings as $subSettingName => $subSetting) {
+        if (!array_key_exists($subSettingName, $customSubSettings)) {
+            $customSubSettings[$subSettingName] = $subSetting;
+        }
+    }
+    return $customSubSettings;
+}
+
 class  PropertyRequest
 {
     /** @var RequestObject */
@@ -270,32 +280,27 @@ class Property
         $connector = array_merge($rootSettingConnector, $settingConnector);
         $this->settings['connector'] = $connector;
 
-        $signatureProperties = array_get($this->settings, 'signature');
-        if (is_array($signatureProperties)) {
+        $customSignatureSettings = array_get($this->settings, 'signature');
+        if (is_array($customSignatureSettings)) {
             $signature = $this->typeClass::signature($this->settings);
-            if ($this->typeName !== $signature) {
-                // TODO this signature is an alias, do a lookup
-            }
-            if (!is_array($signature)) {
-                echo 'ERROR Incorrect signature!';
-                //TODO error
-            } else {
-                foreach ($signatureProperties as $subPropertyName => $subSettings) {
+
+                foreach ($customSignatureSettings as $subPropertyName => $customSubSettings) {
                     if (!array_key_exists($subPropertyName, $signature)) {
                         echo 'ERROR Incorrect signature!';
                         //TODO error
                     } else {
-                        //TODO check if type signature  {"content":"string"} supports these subProperties
+                        $defaultSubSettings = $signature[$subPropertyName];
+
+                        //TODO check if type matches and supports these customSubSettings
+                        $subSettings = mergeSubSettings($customSubSettings, $defaultSubSettings);
 
                         //TODO use $this->settings instead or $rootSettings
                         $subProperty = new Property($this, $this->depth + 1, $subPropertyName, $subSettings, $rootSettings);
-                        if ($subProperty->isRequired()) {
-                            $this->required = true;
-                        }
+
                         $this->subProperties[$subPropertyName] = $subProperty;
                         $this->settings['signature'][$subPropertyName] = $subProperty->getMeta();
                     }
-                }
+
             }
         }
     }
