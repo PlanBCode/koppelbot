@@ -59,7 +59,7 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
     foreach ($entityClassNames as $entityClassName) {
         $entityClass = EntityClass::get($entityClassName);
         if (is_null($entityClass)) {
-            if($entityClassName ==='*'){
+            if ($entityClassName === '*') {
                 $apiRequest->addError(400, 'Illegal full wildcard * request. Please specify entities.');
                 $path = [$entityClassName];
                 $apiRequest->addError(404, $entityClassName . ' not found', $path);
@@ -128,6 +128,11 @@ class RequestObject
     public function getQuery(): Query
     {
         return $this->query;
+    }
+
+    public function getEntityIdList(): string
+    {
+        return array_get($this->getPath(), 1, '*');
     }
 
     public function getPath(): array

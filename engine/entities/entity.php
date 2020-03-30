@@ -385,9 +385,11 @@ class EntityClassResponse extends Response
 
     public function getContent()
     {
-        $count = count($this->entityResponses);
-        if (!$this->requestObject->getQuery()->checkToggle('expand') && $count <= 1) {
-            if ($count === 1) {
+        $entityIdList = $this->requestObject->getEntityIdList();
+        $requestedMultipleIds = $entityIdList === '*' || strpos($entityIdList, ',') !== false;
+
+        if (!$this->requestObject->getQuery()->checkToggle('expand') && !$requestedMultipleIds) {
+            if (count($this->entityResponses) === 1) {
                 $entityResponse = array_values($this->entityResponses)[0];
                 return $entityResponse->getContent();
             } else {
