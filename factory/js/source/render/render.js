@@ -5,6 +5,18 @@ const json = require('../web/json.js');
 
 const DEFAULT_TYPE = 'string';
 
+function createTmpContentToValidate(data, content, subPropertyPath, additionalSubPropertyPath) {
+    /*  fix for patching  sub data
+    suppose current your current data data = {myArray: ['value1']}
+    and your patching a (content='value2', additionalSubPropertyPath=[1])
+    then construct tmpContent {myArray: ['value1','value2']} to validate the contents
+    */
+    const mainContent = json.get(data, subPropertyPath);
+    let tmpContent = JSON.parse(JSON.stringify(mainContent));
+    tmpContent = json.set(tmpContent, additionalSubPropertyPath, content);
+    return tmpContent;
+}
+
 function element(xyz, action, uri, subPropertyPath, status, content, settings, options) {
     const typeName = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(typeName)) {
@@ -16,13 +28,16 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
         let onChange, onDelete;
         let TAG;
         if (action === 'edit') {
-            onChange = (content, additionalSubPropertyPath) => {
-                additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
-                const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
-                const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
-                if (type.validateContent(item)) {
+            onChange = (subContent, additionalSubPropertyPath) => {
+
+                const tmpContentToValidate = createTmpContentToValidate(content, subContent, subPropertyPath, additionalSubPropertyPath);
+
+                const item = new Item(xyz, uri, subPropertyPath, status, tmpContentToValidate, settings, options, onChange, onDelete);
+                if (item.validateContent()) {
+                    additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
+                    const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
                     TAG.classList.remove('xyz-invalid-content');
-                    xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, content));
+                    xyz.patch(uri + subUri, uriTools.wrapContent(uri + subUri, subContent));
                 } else {
                     TAG.classList.add('xyz-invalid-content');
                 }
@@ -111,18 +126,8 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
 
     let onChange, onDelete;
     onChange = (content, additionalSubPropertyPath) => {
-
-        /*  fix for patching  sub data
-        suppose current your current data data = {myArray: ['value1']}
-        and your patching a (content='value2', additionalSubPropertyPath=[1])
-        then construct tmpContent {myArray: ['value1','value2']} to validate the contents
-        */
-
-        const mainContent = json.get(data,subPropertyPath);
-        let tmpContent = JSON.parse(JSON.stringify(mainContent));
-        tmpContent = json.set(tmpContent, additionalSubPropertyPath, content);
-
-        const item = new Item(xyz, uri, subPropertyPath, 200, tmpContent, settings, options, onChange, onDelete, data);
+        const tmpContentToValidate = createTmpContentToValidate(data, content, subPropertyPath, additionalSubPropertyPath);
+        const item = new Item(xyz, uri, subPropertyPath, 200, tmpContentToValidate, settings, options, onChange, onDelete, data);
         if (validate(item)) {
             const keyPath = typeof additionalSubPropertyPath === 'undefined'
                 ? subPropertyPath

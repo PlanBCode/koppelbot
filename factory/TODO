@@ -24,6 +24,11 @@ timeline : ensure labels do not overlap and do not go outside wrapper
 - - move away from line
 
 
+replace createTmpContentToValidate in render.js with ability to validate subData for types
+- validateContent(content, settings, subPropertyPath)
+
+
+validate @ Item.patch to set status to faulty
 
 type toString function for sorting
 
