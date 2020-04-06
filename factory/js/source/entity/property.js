@@ -142,14 +142,34 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return TRs;
     };
 
+    this.getTitlePropertyPath = () => {
+        if (isPrimitive) {
+            return settings.title === true ? [] : null;
+        } else {
+            for (let subPropertyName in subProperties) {
+                const titlePropertyPath = subProperties[subPropertyName].getTitlePropertyPath();
+                if (titlePropertyPath !== null) return [subPropertyName].concat(titlePropertyPath);
+            }
+            return null;
+        }
+    };
+
+    this.getDisplayName = propertyPath => {
+        if (isPrimitive || !(propertyPath instanceof Array) || propertyPath.length === 0) {
+            return settings.displayName || propertyName;
+        } else if (subProperties.hasOwnProperty(propertyPath[0])) {
+            return subProperties[propertyPath[0]].getDisplayName(propertyPath.slice(1));
+        } else {
+            return 'Unknown';
+        }
+    };
+
     this.isAutoIncremented = () => {
         if (isPrimitive) {
             return type === 'id' && settings.autoIncrement === true;
         } else {
             for (let subPropertyName in subProperties) {
-                if (subProperties[subPropertyName].isAutoIncremented()) {
-                    return true;
-                }
+                if (subProperties[subPropertyName].isAutoIncremented()) return true;
             }
             return false;
         }
@@ -159,9 +179,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         if (types.hasOwnProperty(type) && typeof types[type].getIdFromContent === 'function') {
             return true;
         } else if (settings.hasOwnProperty('connector')) {
-            if (settings.connector.key === 'key' || settings.connector.key === 'basename') {
-                return true;
-            }
+            if (settings.connector.key === 'key' || settings.connector.key === 'basename') return true;
         }
         return false;
     };
@@ -171,21 +189,15 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             if (types.hasOwnProperty(type) && typeof types[type].getIdFromContent === 'function') {
                 return types[type].getIdFromContent(data)
             } else if (settings.hasOwnProperty('connector')) {
-                if (settings.connector.key === 'key' || settings.connector.key === 'basename') {
-                    return data;
-                }
+                if (settings.connector.key === 'key' || settings.connector.key === 'basename') return data;
             }
             return null;
         } else {
-            if (typeof data !== 'object' || data === null) { //TODO is_object
-                return null;
-            }
+            if (typeof data !== 'object' || data === null) return null;
             for (let subPropertyName in subProperties) {
                 if (data.hasOwnProperty(subPropertyName)) {
                     const id = subProperties[subPropertyName].getIdFromContent(data[subPropertyName]);
-                    if (id) {
-                        return id;
-                    }
+                    if (id) return id;
                 }
             }
             return null;

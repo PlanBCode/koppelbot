@@ -1,5 +1,6 @@
 <html>
 <head>
+    <title>Koppelbot</title>
     <link rel="stylesheet" type="text/css" href="./xyz-style.css"/>
     <script type="text/javascript" src="./xyz-ui.js"></script>
 
@@ -14,16 +15,22 @@
         </td>
     </tr>
     <tr>
-        <td id="sources" width="20%" valign="top">
+        <td rowspan="2" id="sources" width="20%" valign="top">
             <h3>Sources</h3>
             <xyz uri="/source/*/file/id" createButtonText="Upload source" display="list" select="source" showHeader="false"/>
         </td>
         <td id="view" valign="top">
-            <xyz uri="$source/file" showLabels="false" showHeader="false"/>
+            <xyz uri="$source/file" showLabels="false" showTitle="true" showEditButton="true" showDeleteButton="true"/>
+
         </td>
-        <td id="facts" width="20%" valign="top">
+        <td rowspan="2" id="facts" width="20%" valign="top">
             <h3>Facts</h3>
             <xyz id="timeline" uri="/fact/*" createButtonText="Add fact" display="timeline" horizontal="false" select="fact" showHeader="false"/>
+        </td>
+    </tr>
+    <tr>
+        <td  valign="top">
+           <xyz uri="$fact/title,date,sources" showLabels="true" showTitle="true" showEditButton="true" showDeleteButton="true"/>
         </td>
     </tr>
 </table>

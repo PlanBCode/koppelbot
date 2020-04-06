@@ -54,7 +54,7 @@ function json_get(object, keyPath, fallBack) {
         }
         if (typeof object !== 'object' || object === null) {
             if (typeof fallBack !== 'undefined') {
-                return null
+                return fallBack
             } else {
                 throw new TypeError('object not an object');
             }
@@ -64,8 +64,6 @@ function json_get(object, keyPath, fallBack) {
         return null;
     }
 }
-
-//TODO json_get
 
 exports.get = json_get;
 exports.set = json_set;

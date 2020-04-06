@@ -1,6 +1,8 @@
 TODO
 
-- add unique setting to array
+- item display: maak edit knop werkend
+
+- maak references klikbaar -> select as variable
 
 test using "de bevoegde instanties" data
 
@@ -25,6 +27,7 @@ timeline : ensure labels do not overlap and do not go outside wrapper
 - - move to other side of line
 - - move away from line
 
+- add unique setting to array
 
 replace createTmpContentToValidate in render.js with ability to validate subData for types
 - validateContent(content, settings, subPropertyPath)

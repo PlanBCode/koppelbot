@@ -4,7 +4,7 @@ options
 - select
 - multiSelect
 - showHeader
-- addCreateButton
+- showCreateButton
 - createButtonText
 
 - TODO default
@@ -13,12 +13,14 @@ options
 - TODO add multiselect tools
  */
 
-function select(xyz, variableNameOrCallback, entityClassName, entityId) {
+function select(xyz, display, entityClassName, entityId) {
+    const variableNameOrCallback = display.getOption('select');
     if (typeof variableNameOrCallback === 'string') {
         if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
             xyz.clearVariable(variableNameOrCallback);
         } else {
-            xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId);
+            const uriPostfix = display.hasOption('selectUri') ? display.getOption('selectUri') : '';
+            xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId + uriPostfix);
         }
     } else if (typeof variableNameOrCallback === 'function') {
         variableNameOrCallback(entityClassName, entityId);
@@ -53,9 +55,9 @@ function flatten(source) {
     return target;
 }
 
-function addCreateButton(display) {
+function showCreateButton(display) {
     //TODO only if has the permissions to add
-    if (display.getOption('addCreateButton') !== false) {
+    if (display.getOption('showCreateButton') !== false) {
         const INPUT = document.createElement('INPUT');
         INPUT.type = "submit";
         //TODO add class
@@ -94,7 +96,7 @@ exports.display = {
         const TABLE = document.createElement('TABLE');
         TABLE.className = 'xyz-list';
         WRAPPER.appendChild(TABLE);
-        addCreateButton(display);
+        showCreateButton(display);
     },
     first: display => {
         if (display.getOption('showHeader') !== false) {
@@ -133,7 +135,7 @@ exports.display = {
         TR_entity.entityId = display.getEntityId();
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
-        const uri = '/' + entityClassName+ '/' + entityId;
+        const uri = '/' + entityClassName + '/' + entityId;
 
         if (display.getOption('multiSelect')) {
             const variableName = display.getOption('multiSelect');
@@ -163,9 +165,9 @@ exports.display = {
                     .filter(path => path[0] === entityClassName)
                     .map(path => path[1]);
                 if (entityIds.length === 0) {
-                    select(display.xyz, variableName, undefined, undefined)// TODO encapsulate xyz
+                    select(display.xyz, display, undefined, undefined)// TODO encapsulate xyz
                 } else {
-                    select(display.xyz, variableName, entityClassName, entityIds.join(','))// TODO encapsulate xyz
+                    select(display.xyz, display, entityClassName, entityIds.join(','))// TODO encapsulate xyz
                 }
                 event.stopPropagation();
             };
@@ -195,7 +197,7 @@ exports.display = {
                 TR_entity.classList.add('xyz-list-selected');
             }
             TR_entity.onclick = () => {
-                select(display.xyz, display.getOption('select'), entityClassName, entityId); // TODO encapsulate xyz
+                select(display.xyz, display, entityClassName, entityId); // TODO encapsulate xyz
                 for (let row of TABLE.childNodes) {
                     if (row === TR_entity) {
                         row.classList.add('xyz-list-selected');
@@ -219,6 +221,6 @@ exports.display = {
     }
 };
 
-exports.addCreateButton = addCreateButton;
+exports.showCreateButton = showCreateButton;
 exports.flatten = flatten;
 exports.select = select;

@@ -2,20 +2,33 @@ const displays = require('../../build/displays');
 const uriTools = require('../uri/uri.js');
 const response = require('../entity/response.js');
 const variables = require('../variables/variables.js');
+const json = require('../web/json.js');
 
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';
 
-function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entityId, content, uri) {
+function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri) {
     this.getRequestUri = () => uri;
     this.getAction = () => action;
+    this.hasOption = optionName => options.hasOwnProperty(optionName);
     this.getOptions = () => options;
     this.getOption = optionName => options[optionName];
     this.getWRAPPER = () => WRAPPER;
     this.getEntityClassName = () => entityClassName;
     this.getEntityId = () => entityId;
+    this.getContent = () => node;
+    this.getDisplayName = propertyPath => xyz.getDisplayName(entityClassName, propertyPath);
 
-    this.getContent = () => content;
+    this.getTitle = () => {
+        const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
+
+        const fallback = '/' + entityClassName + '/' + entityId;
+        const titleResponse = response.getSubNode(node, titlePropertyPath);
+        const title = titleResponse && !titleResponse.hasErrors()
+            ? titleResponse.getContent()
+            : fallback;
+        return title;
+    };
     this.xyz = xyz; // TODO encapsulate
 }
 

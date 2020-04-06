@@ -6,7 +6,7 @@ TODO add radio flavor to provide radio box
 options
 - select
 - flavor  dropdown|TODO radio
-- addCreateButton
+- showCreateButton
  */
 
 exports.display = {
@@ -25,7 +25,7 @@ exports.display = {
             const selectedUri = SELECT.options[SELECT.selectedIndex].value;
             const path = selectedUri.substr(1).split('/');
             const [entityClassName, entityId] = path;
-            list.select(display.xyz, display.getOption('select'), entityClassName, entityId); // TODO encapsulate xyz
+            list.select(display.xyz, display, entityClassName, entityId); // TODO encapsulate xyz
         };
         if (!display.getOption('initialValue')) {
             const OPTION = document.createElement('OPTION');
@@ -36,7 +36,7 @@ exports.display = {
         WRAPPER.appendChild(SELECT);
         const entityClassNameList = display.getRequestUri().substr(1).split('/')[0] || '*';
         const fullUri = '/' + entityClassNameList;
-        list.addCreateButton(display);
+        list.showCreateButton(display);
     },
     first: display => {
         //TODO something with wrapper?
@@ -48,7 +48,7 @@ exports.display = {
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
         if (SELECT.childElementCount === 0 && !display.getOption('initialValue')) { // select the first option as default
-            list.select(display.xyz, display.getOption('select'), entityClassName, entityId); //TODO encapsulate xyz
+            list.select(display.xyz, display, entityClassName, entityId); //TODO encapsulate xyz
         }
 
         const OPTION = document.createElement('OPTION');
@@ -57,7 +57,7 @@ exports.display = {
             OPTION.selected = true;
         }
         if (display.getOption('initialValue') ===  OPTION.value) {
-            list.select(display.xyz, display.getOption('select'), entityClassName, entityId);  //TODO encapsulate xyz
+            list.select(display.xyz, display, entityClassName, entityId);  //TODO encapsulate xyz
             OPTION.selected = true;
         }
         if (columns.constructor !== Object) {

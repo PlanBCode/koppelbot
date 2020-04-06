@@ -14,6 +14,14 @@ input[type='submit'] {
     margin: 4px 2px;
     cursor: pointer;
 }
+input[type='submit'].xyz-delete {
+    /*background-color: red;*/
+}
+
+input[type='submit'].xyz-edit {
+    /*background-color: orange;*/
+}
+
 
 input[type='submit']:hover {
     background-color: rgb(106, 205, 110)

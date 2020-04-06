@@ -5,7 +5,7 @@ const State = require('./state.js').State;
 const response = require('./response.js');
 const input = require('../request/input.js');
 
-function compileSettings(rawSettings){
+function compileSettings(rawSettings) {
     const settings = {};
     const rootSettings = rawSettings.hasOwnProperty('_') ? rawSettings['_'] : {};
     for (let propertyName in rawSettings) {
@@ -46,7 +46,6 @@ function EntityClass(xyz, entityClassName, rawSettings) {
 
     this.getUri = entityId => {
         if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
-
         return '/' + entityClassName + '/' + entityId;
     };
 
@@ -140,11 +139,27 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         return TABLE;
     };
 
+    this.getTitlePropertyPath = () => {
+        for (let propertyName in properties) {
+            const titlePropertyPath = properties[propertyName].getTitlePropertyPath();
+            if (titlePropertyPath !== null) return [propertyName].concat(titlePropertyPath);
+        }
+        return null;
+    };
+
+    this.getDisplayName = propertyPath => {
+      if(!(propertyPath instanceof Array) || propertyPath.length === 0 ){
+          return entityClassName; //TODO also add option to $entity.json for a display name
+      } else if(properties.hasOwnProperty(propertyPath[0])){
+          return properties[propertyPath[0]].getDisplayName(propertyPath.slice(1));
+      } else{
+          return 'Unknown';
+      }
+    };
+
     this.isAutoIncremented = () => {
         for (let propertyName in properties) {
-            if (properties[propertyName].isAutoIncremented()) {
-                return true;
-            }
+            if (properties[propertyName].isAutoIncremented()) return true;
         }
         return false;
     };
@@ -152,9 +167,7 @@ function EntityClass(xyz, entityClassName, rawSettings) {
     this.getIdProperty = () => {
         for (let propertyName in properties) {
             const property = properties[propertyName];
-            if (property.isId()) {
-                return propertyName;
-            }
+            if (property.isId()) return propertyName;
         }
         return null;
     };
@@ -166,9 +179,7 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         for (let propertyName in properties) {
             if (data.hasOwnProperty(propertyName)) {
                 const id = properties[propertyName].getIdFromContent(data[propertyName]);
-                if (id) {
-                    return id;
-                }
+                if (id) return id;
             }
         }
         return null;
@@ -309,7 +320,22 @@ const isAutoIncremented = (entityClasses, entityClassName) => {
         : entityClasses[entityClassName].isAutoIncremented();
 };
 
+const getTitlePropertyPath = (entityClasses, entityClassName) => {
+    return entityClasses.hasOwnProperty(entityClassName)
+        ? entityClasses[entityClassName].getTitlePropertyPath()
+        : null;
+};
+
+const getDisplayName = (entityClasses, entityClassName, propertyPath) => {
+    return entityClasses.hasOwnProperty(entityClassName)
+        ? entityClasses[entityClassName].getDisplayName(propertyPath)
+        : 'Unknown';
+};
+
 exports.isAutoIncremented = isAutoIncremented;
+exports.getTitlePropertyPath = getTitlePropertyPath;
+exports.getDisplayName = getDisplayName;
+
 exports.getResponse = getResponse;
 exports.Class = EntityClass;
 exports.handleInput = handleInput;

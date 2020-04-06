@@ -18,6 +18,7 @@
         "accept": "TODO"
       },
       "id": {
+        "title": true,
         "type": "string",
         "connector": {
           "key": "basename"

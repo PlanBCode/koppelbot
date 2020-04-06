@@ -91,18 +91,19 @@ function Node(object, entityId, status_, content_, errors_, method_) {
     this.getMethod = () => method;
     this.getStatus = () => status;
     this.getContent = () => content;
+    this.hasErrors = () => !((status >= 200 && status <= 299) || status === 304) || (errors instanceof Array && errors.length > 0)
     this.getErrors = () => errors;
     this.render = (action, options) => object.render(action, options, entityId);
     this.getSubNode = subPath => getSubNodeFromNode(subPath, object, entityId, status, content, errors);
 }
 
-function getSubNode(object, entityId, node, subPath) {
+function getSubNode(node, subPath) {
     if (subPath.length === 0) { //TODO or has errors?
         return node;
     } else if (node instanceof Node) {
         return node.getSubNode(subPath);
     } else if (node !== null && typeof node === 'object' && node.hasOwnProperty(subPath[0])) {
-        return getSubNode(object, entityId, node[subPath[0]], subPath.slice(1));
+        return getSubNode(node[subPath[0]], subPath.slice(1));
     } else {
         return null; // unmodified
     }

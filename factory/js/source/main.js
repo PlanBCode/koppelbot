@@ -16,6 +16,8 @@ function XYZ() {
     this.setVariables(web.getQueryParameters());
 
     this.isAutoIncremented = entityClassName => entity.isAutoIncremented(entityClasses, entityClassName);
+    this.getTitlePropertyPath = entityClassName => entity.getTitlePropertyPath(entityClasses, entityClassName);
+    this.getDisplayName = (entityClassName, propertyPath) => entity.getDisplayName(entityClasses, entityClassName, propertyPath);
 
     this.on = (uri, eventName, callback) => on(this, entityClasses, uri, eventName, callback);
 

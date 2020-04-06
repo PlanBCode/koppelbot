@@ -1,10 +1,10 @@
 /*
 options:
 
-- showHeader
+- showTitle
 - showLabels
 - showDeleteButton
-
+- showEditbutton
  */
 
 const list = require('./list.js');
@@ -38,15 +38,47 @@ exports.display = {
         TABLE_entity.className = 'xyz-item';
         TABLE_entity.entityId = entityId;
         const uri = '/' + entityClassName + '/' + entityId;
-        if (display.getOption('showHeader') !== false) {
+        const showTitle = display.getOption('showTitle') !== false;
+        const showEditButton = display.getOption('showEditButton') === true;
+        const showDeleteButton = display.getOption('showDeleteButton') === true;
+
+        let TD_header;
+        if (showTitle || showEditButton || showDeleteButton) {
             const TR_header = document.createElement('TR');
             TR_header.className = 'xyz-item-header';
-            const TD_header = document.createElement('TD');
-            TD_header.innerHTML = uri;
+            TD_header = document.createElement('TD');
             TD_header.setAttribute('colspan', display.getOption('showLabels') !== false ? '2' : '1');
             TR_header.appendChild(TD_header);
             TABLE_entity.appendChild(TR_header);
         }
+
+        if (showTitle) {
+            TD_header.innerHTML += display.getTitle();
+        }
+        if (showDeleteButton) {
+            const INPUT_deleteButton = document.createElement('INPUT');
+            INPUT_deleteButton.classList.add('xyz-delete');
+            INPUT_deleteButton.type = 'submit';
+            INPUT_deleteButton.style.float = 'right';
+            INPUT_deleteButton.value = 'Delete';
+            INPUT_deleteButton.onclick = () => {
+                display.xyz.delete(uri); //TODO encapsulate xyz
+            };
+            TD_header.appendChild(INPUT_deleteButton);
+        }
+
+        if (showEditButton) {
+            const INPUT_editButton = document.createElement('INPUT');
+            INPUT_editButton.classList.add('xyz-edit');
+            INPUT_editButton.type = 'submit';
+            INPUT_editButton.value = 'Edit';
+            INPUT_editButton.style.float = 'right';
+            INPUT_editButton.onclick = () => {
+                //  display.xyz.delete(uri); //TODO encapsulate xyz
+            };
+            TD_header.appendChild(INPUT_editButton);
+        }
+
         if (columns.constructor !== Object) {
             const node = columns;
             const TR_entity = document.createElement('TR');
@@ -63,7 +95,7 @@ exports.display = {
 
                 if (display.getOption('showLabels') !== false) {
                     const TD_flatPropertyName = document.createElement('TD');
-                    TD_flatPropertyName.innerHTML = flatPropertyName;
+                    TD_flatPropertyName.innerHTML = display.getDisplayName(flatPropertyName.split('.'));
                     TR_flatProperty.appendChild(TD_flatPropertyName);
                 }
                 const TD_flatPropertyContent = document.createElement('TD');
@@ -73,20 +105,6 @@ exports.display = {
                 TR_flatProperty.appendChild(TD_flatPropertyContent);
                 TABLE_entity.appendChild(TR_flatProperty);
             }
-        }
-        if (display.getOption('showDeleteButton') === true) {
-            const TR_deleteButton = document.createElement('TR');
-            const TD_deleteButton = document.createElement('TD');
-            TD_deleteButton.setAttribute('colspan', 2);
-            const INPUT_deleteButton = document.createElement('INPUT');
-            INPUT_deleteButton.type = 'submit';
-            INPUT_deleteButton.value = 'Delete';
-            INPUT_deleteButton.onclick = () => {
-                display.xyz.delete(uri); //TODO encapsulate xyz
-            };
-            TD_deleteButton.appendChild(INPUT_deleteButton);
-            TR_deleteButton.appendChild(TD_deleteButton);
-            TABLE_entity.appendChild(TR_deleteButton);
         }
         WRAPPER.appendChild(TABLE_entity);
     },

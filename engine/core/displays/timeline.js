@@ -10,7 +10,6 @@ TODO
  */
 
 const list = require('./list.js');
-const response = require('../../../factory/js/source/entity/response'); //TODO better solution
 
 function parseDateString(string) {
     const parts = string.split("-"); //TODO use formats.json function or a type.toNumber
@@ -153,9 +152,9 @@ exports.display = {
             DIV_line.style.width = '2px';
             DIV_line.style.height = '100%';
         }
-
         DIV.appendChild(DIV_line);
         WRAPPER.appendChild(DIV);
+        list.showCreateButton(display);
     },
     entity: display => {
         const content = display.getContent();
@@ -188,7 +187,7 @@ exports.display = {
         LABEL.date = date;
 
         LABEL.onclick = () => {
-            list.select(display.xyz, display.getOption('select'), entityClassName, entityId);
+            list.select(display.xyz, display, entityClassName, entityId);
             for (let NODE of DIV.childNodes) {
                 if (NODE.classList.contains('xyz-timeline-label') ){
                     NODE.classList[NODE===LABEL?'add':'remove']('xyz-list-selected')
@@ -204,7 +203,6 @@ exports.display = {
         CONNECTOR.NODE = NODE;
         DIV.appendChild(CONNECTOR);
         //TODO add a listener for changes on this node
-
         drawNodes(DIV, display);
     },
     remove: display => {

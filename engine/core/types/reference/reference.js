@@ -5,15 +5,16 @@ exports.actions = {
             display: 'select',
             select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId),
             initialValue: item.getContent(),
-            addCreateButton: item.getOption('addCreateButton') || false
+            showCreateButton: item.getOption('showCreateButton') || false
         });
         //TODO onchange : how to?
         return TAG;
     },
     view: function (item) {
         const DIV = document.createElement('DIV');
+        DIV.innerHTML=item.getContent();
         if (typeof item.getContent() !== 'undefined') {
-            item.ui({uri: item.getContent(), display: 'item'}, DIV);
+        //    item.ui({uri: item.getContent(), display: 'item'}, DIV);
         }
         //TODO onchange : how to? redo the ui definition
         return DIV;

@@ -23,7 +23,7 @@ function ListenerHandler() {
                 if (typeof subUri === 'undefined') { // if no subUri is specified, call all subUri's
                     for (let subUri in listenersPerSubUri) {
                         const subPath = subUri === '' ? [] : subUri.split('/');
-                        const subNode = response.getSubNode(this, entityId, node, subPath);
+                        const subNode = response.getSubNode(node, subPath);
                         console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
                         if (subNode) {
                             const listeners = listenersPerSubUri[subUri];
@@ -32,7 +32,7 @@ function ListenerHandler() {
                     }
                 } else if (listenersPerSubUri.hasOwnProperty(subUri)) {
                     const subPath = subUri === '' ? [] : subUri.split('/');
-                    const subNode = response.getSubNode(this, entityId, node, subPath);
+                    const subNode = response.getSubNode(node, subPath);
                     console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
                     if (subNode) {
                         const listeners = listenersPerSubUri[subUri];
