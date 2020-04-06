@@ -5,14 +5,15 @@
   "main": "source/main.js",
   "scripts": {
     "test": "sh ../test.sh",
-    "build": "sh ../build.sh"
+    "build": "sh ../build.sh",
+    "audit": "sh ../audit.sh force"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "gulp": "^4.0.2",
-    "jsdom": "^16.0.1",
+    "jsdom": "^16.2.2",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
   }

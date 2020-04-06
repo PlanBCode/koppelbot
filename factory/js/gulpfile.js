@@ -59,7 +59,7 @@ const generateRequiresFile = (name, component) => cb => {
     })
 };
 
-const build = execute(`sh ../build.sh`);
+const build = execute(`sh ../audit.sh; sh ../build.sh`);
 
 const generateTypesFile = generateRequiresFile('types', 'actions');
 const generateDisplaysFile = generateRequiresFile('displays', 'display');

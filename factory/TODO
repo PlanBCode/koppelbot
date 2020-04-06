@@ -1,8 +1,29 @@
 TODO
 
-BUG: ./xyz "/source/*/note" does not return an object for all results
+test using "de bevoegde instanties" data
+
+creator: error feedback when create failed
+
+fix sign-up flow
+- show message "you've logged in"
+- show message "account x created"
+- auto fill in username after sign up
+- make sure session is visible after sign in
+
+"datumprikker" for date type
 
 timeline : ensure labels do not overlap and do not go outside wrapper
+- constraints
+- - no overlap
+- - div width/height (or stretch to fit)
+- - minimize distance to node
+
+- options:
+- - move along line
+- - move to other side of line
+- - move away from line
+
+
 
 type toString function for sorting
 
@@ -74,9 +95,7 @@ custom view html definition:
 "label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
 
-readOnly for property
-
-ui: non dynamic editing : pass submit button  {submit:id, action:edit|delete}
+auto/readOnly for property
 
 proper file locks
 

@@ -56,13 +56,12 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         A_logout.style.display = 'inline-block';
     });
     xyz.on('/session/*', 'removed', (entityClassName, entityId, subNode, eventName) => {
-        //TODO only if all sessions gone
-        //TODO show logout message
         A_signin.style.display = 'inline-block';
         A_signup.style.display = 'inline-block';
         A_logout.style.display = 'none';
-        DIV_listSession.style.display = 'none'; // TODO Only if all sessions have been removed
-        //TODO message "You've been succesfully logged out."
+        //TODO only if all sessions gone
+        //TODO show logout message "You've been successfully logged out."
+        DIV_listSession.style.display = 'none';
     });
     WRAPPER.appendChild(DIV_createSession);
 
