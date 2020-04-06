@@ -334,6 +334,7 @@ class Property
     {
         if (count($propertyPath) === 0) return $this;
         $subPropertyName = $propertyPath[0];
+        if($this->typeClass::validateSubPropertyPath($propertyPath,$this->settings)) return $this;
         if (!is_string($subPropertyName)) return null;
         $subProperty = array_get($this->subProperties, $subPropertyName);
         if (!$subProperty) return null;

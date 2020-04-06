@@ -46,6 +46,7 @@ exports.actions = {
         const addRow = (key, subContent) => {
             ++length;
             const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
+            TAG.style.display = 'inline-block';
             const DIV_sub = document.createElement('DIV');
             const INPUT_remove = document.createElement('INPUT');
             INPUT_remove.type = 'submit';
@@ -100,15 +101,12 @@ exports.actions = {
     },
     validateContent: function (item) {
         const content = item.getContent();
-        if (content === null || typeof content !== 'object') {
-            return false;
-        }
+        if (content === null || typeof content !== 'object') return false;
+
         const subSettings = item.getSetting('subType');
         for (let key in content) {
             const subContent = content[key];
-            if (!item.validateContent(subContent, subSettings)) {
-                return false;
-            }
+            if (!item.validateContent(subContent, subSettings)) return false;
         }
         return true;
     },

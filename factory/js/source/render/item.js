@@ -23,6 +23,7 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
     this.patch = (newContent, additionalSubPropertyPath) => {
         additionalSubPropertyPath = additionalSubPropertyPath || [];
         const data = json.set({}, additionalSubPropertyPath, newContent);
+        //TODO these callbacks are done without validation
         const node = new response.Node({}, '?', 200, data, [], 'PATCH'); // not defining object and entityId
         for (let callback of callbacks) {
             callback(node);
@@ -57,13 +58,14 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
 
     this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit);
 
-    this.validate = xyz.validate;
     this.ui = xyz.ui;
+
     // callback = (status,content)=>{...}
     this.onChange = callback => {
+        if (typeof callback !== 'function') throw new TypeError("callback is not a function.");
+
         callbacks.push(callback);
         if (options.display !== 'create') {
-            if (typeof callback !== 'function') throw new TypeError("callback is not a function.");
             const fullUri = subPropertyPath.length > 0
                 ? baseUri + '/' + subPropertyPath.join('/')
                 : baseUri;

@@ -4,7 +4,8 @@ exports.actions = {
             uri: item.getSetting('uri'),
             display: 'select',
             select: (entityClass, entityId) => item.patch('/' + entityClass + '/' + entityId),
-            initialValue: item.getContent()
+            initialValue: item.getContent(),
+            addCreateButton: item.getOption('addCreateButton') || false
         });
         //TODO onchange : how to?
         return TAG;

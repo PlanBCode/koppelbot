@@ -30,7 +30,7 @@ exports.display = {
         if (!display.getOption('initialValue')) {
             const OPTION = document.createElement('OPTION');
             OPTION.innerText = 'Select...';
-            OPTION.setAttribute('disabled' ,'true');
+            OPTION.setAttribute('disabled', 'true');
             SELECT.appendChild(OPTION)
         }
         WRAPPER.appendChild(SELECT);
@@ -56,8 +56,8 @@ exports.display = {
         if (typeof display.getOption('select') === 'string' && display.xyz.getVariable() === display.getOption('select')) { //TODO encapsulate xyz
             OPTION.selected = true;
         }
-        if (display.getOption('initialValue') === entityId) {
-            list.select(display.xyz,  display.getOptions(), entityClassName, entityId);  //TODO encapsulate xyz
+        if (display.getOption('initialValue') ===  OPTION.value) {
+            list.select(display.xyz, display.getOptions(), entityClassName, entityId);  //TODO encapsulate xyz
             OPTION.selected = true;
         }
         if (columns.constructor !== Object) {

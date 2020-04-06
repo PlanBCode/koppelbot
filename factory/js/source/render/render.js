@@ -91,7 +91,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
     const validate = item => {
 
         const uri = item.getUri();
-        if (type.validateContent(item)) {
+        if (item.validateContent()) {
             TAG.classList.remove('xyz-invalid-content');
             if (INPUT_submit) {
                 INPUT_submit.validUris[uri] = true;
@@ -111,7 +111,18 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
 
     let onChange, onDelete;
     onChange = (content, additionalSubPropertyPath) => {
-        const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
+
+        /*  fix for patching  sub data
+        suppose current your current data data = {myArray: ['value1']}
+        and your patching a (content='value2', additionalSubPropertyPath=[1])
+        then construct tmpContent {myArray: ['value1','value2']} to validate the contents
+        */
+
+        const mainContent = json.get(data,subPropertyPath);
+        let tmpContent = JSON.parse(JSON.stringify(mainContent));
+        tmpContent = json.set(tmpContent, additionalSubPropertyPath, content);
+
+        const item = new Item(xyz, uri, subPropertyPath, 200, tmpContent, settings, options, onChange, onDelete, data);
         if (validate(item)) {
             const keyPath = typeof additionalSubPropertyPath === 'undefined'
                 ? subPropertyPath

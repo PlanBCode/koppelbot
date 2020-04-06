@@ -5,11 +5,7 @@ function json_set(object, keyPath, content) {
             return content;
         }
         if (typeof object !== 'object' || object === null) {
-            if (typeof fallBack !== 'undefined') {
-                return null
-            } else {
-                throw new TypeError('object not an object');
-            }
+            throw new TypeError('object not an object');
         } else if (object.hasOwnProperty(keyPath[0])) {
             if (length === 1) {
                 object[keyPath[0]] = content;
