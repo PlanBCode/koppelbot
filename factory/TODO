@@ -1,12 +1,19 @@
 TODO
 
-- item display: maak edit knop werkend
-
+list.select naar display
 - maak references klikbaar -> select as variable
+- - reference gebruik laten maken van list.select
+
+item display
+- edit: cancel knop
+
+deleteButton -> get a popup to confirm
 
 test using "de bevoegde instanties" data
 
-creator: error feedback when create failed
+creator
+- message when create succeeded
+- error feedback when create failed
 
 fix sign-up flow
 - show message "you've logged in"
@@ -21,6 +28,9 @@ timeline : ensure labels do not overlap and do not go outside wrapper
 - - no overlap
 - - div width/height (or stretch to fit)
 - - minimize distance to node
+
+timeline
+- create new item by clicking on the line (display date on hover)
 
 - options:
 - - move along line

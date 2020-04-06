@@ -61,9 +61,8 @@ exports.actions = {
         const INPUT = document.createElement('INPUT');
         INPUT.type = 'file';
         const content = item.getContent();
-        if (content) {
-            INPUT.value = content;
-        }
+        // if (content) { TODO   this is an invalid action for a file input INPUT.value = content;
+
         if (item.patch) {
             INPUT.addEventListener('change', event => {
                 prepareContent(event.target.files, item.patch);

@@ -39,8 +39,8 @@ exports.display = {
         TABLE_entity.entityId = entityId;
         const uri = '/' + entityClassName + '/' + entityId;
         const showTitle = display.getOption('showTitle') !== false;
-        const showEditButton = display.getOption('showEditButton') === true;
-        const showDeleteButton = display.getOption('showDeleteButton') === true;
+        const showEditButton = display.getOption('showEditButton') === true && display.getAction() !== 'edit';
+        const showDeleteButton = display.getOption('showDeleteButton') === true && display.getAction() !== 'delete';
 
         let TD_header;
         if (showTitle || showEditButton || showDeleteButton) {
@@ -68,13 +68,26 @@ exports.display = {
         }
 
         if (showEditButton) {
+            const DIV_edit = document.createElement('DIV');
+            DIV_edit.style.display = 'none';
+            WRAPPER.appendChild(DIV_edit);
+
+            display.xyz.ui({
+                display: 'item',
+                action: 'edit',
+                uri: display.getRequestUri(),
+                showLabels: true,
+                showDeleteButton
+            }, DIV_edit);
+
             const INPUT_editButton = document.createElement('INPUT');
             INPUT_editButton.classList.add('xyz-edit');
             INPUT_editButton.type = 'submit';
             INPUT_editButton.value = 'Edit';
             INPUT_editButton.style.float = 'right';
             INPUT_editButton.onclick = () => {
-                //  display.xyz.delete(uri); //TODO encapsulate xyz
+                DIV_edit.style.display = 'block';
+                TABLE_entity.style.display = 'none';
             };
             TD_header.appendChild(INPUT_editButton);
         }
@@ -92,7 +105,6 @@ exports.display = {
 
             for (let flatPropertyName in columns) {
                 const TR_flatProperty = document.createElement('TR');
-
                 if (display.getOption('showLabels') !== false) {
                     const TD_flatPropertyName = document.createElement('TD');
                     TD_flatPropertyName.innerHTML = display.getDisplayName(flatPropertyName.split('.'));
