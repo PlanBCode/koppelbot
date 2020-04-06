@@ -58,6 +58,10 @@ table.xyz-list tr.xyz-list-selected {
     background-color: yellow;
 }
 
+/* ====================================================================================================
+TIMELINE
+==================================================================================================== */
+
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -74,6 +78,7 @@ div.xyz-timeline-node {
 }
 
 div.xyz-timeline-connector {
+    z-index:1;
     position: absolute;
     width: 100px;
     height: 4px;
@@ -81,12 +86,24 @@ div.xyz-timeline-connector {
 }
 
 div.xyz-timeline-label {
+    z-index:2;
     position: absolute;
     padding:10px;
     color:white;
     border-radius: 10px;
     background-color: green;
 }
+
+div.xyz-timeline-label:hover {
+    cursor: pointer;
+    background-color: rgb(0,200,0);
+}
+div.xyz-timeline-label.xyz-list-selected {
+    color:black;
+    background-color: yellow;
+}
+
+
 
 div.xyz-timeline-line {
     transform: translate(-50%,-50%);

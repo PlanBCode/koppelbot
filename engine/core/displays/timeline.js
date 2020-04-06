@@ -58,7 +58,7 @@ function drawNodes(DIV, display) {
         if (NODE.classList.contains('xyz-timeline-node')) {
             const time = parseDateString(NODE.date);
             const ratio = (time - minTime) / (maxTime - minTime);
-            NODE.style[top] = Q+'%';
+            NODE.style[top] = Q + '%';
             NODE.style[left] = (ratio * 100) + '%';
         }
     }
@@ -164,21 +164,37 @@ exports.display = {
 
         const labelProperty = display.getOption('label') || 'title'; //TOOD
         const label = content.getContent()[labelProperty];
+        const entityId = display.getEntityId();
+        const entityClassName = display.getEntityClassName();
+        const uri = '/' + entityClassName + '/' + entityId;
 
         const WRAPPER = display.getWRAPPER();
         const DIV = WRAPPER.firstChild;
         const NODE = document.createElement('DIV');
         NODE.className = 'xyz-timeline-node';
-        NODE.entityId = display.getEntityId();
+        NODE.entityId = entityId;
         NODE.date = date;
         //NODE.innerHTML  = '  hello';
         DIV.appendChild(NODE);
 
         const LABEL = document.createElement('DIV');
-        LABEL.className = 'xyz-timeline-label';
-        LABEL.entityId = display.getEntityId();
+        LABEL.classList.add('xyz-timeline-label');
+        if (display.xyz.getVariable(display.getOption('select')) === uri || display.getOption('default') === entityId) { // TODO encapsulate xyz
+            LABEL.classList.add('xyz-list-selected');
+        }
+
+        LABEL.entityId = entityId;
         LABEL.innerHTML = `<SPAN style="font-size:0.5em;">${date}</SPAN><br/>${label}`;
         LABEL.date = date;
+
+        LABEL.onclick = () => {
+            list.select(display.xyz, display.getOption('select'), entityClassName, entityId);
+            for (let NODE of DIV.childNodes) {
+                if (NODE.classList.contains('xyz-timeline-label') ){
+                    NODE.classList[NODE===LABEL?'add':'remove']('xyz-list-selected')
+                }
+            }
+        };
         DIV.appendChild(LABEL);
 
         const CONNECTOR = document.createElement('DIV');

@@ -47,8 +47,8 @@ exports.display = {
         const SELECT = WRAPPER.firstChild;
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
-        if (SELECT.childElementCount === 0 && !display.getOption('initialValue')) { // select the first option as default TODO unless other default is defined
-            list.select(display.xyz, display.getOptions(), entityClassName, entityId); //TODO encapsulate xyz
+        if (SELECT.childElementCount === 0 && !display.getOption('initialValue')) { // select the first option as default
+            list.select(display.xyz, display.getOption('select'), entityClassName, entityId); //TODO encapsulate xyz
         }
 
         const OPTION = document.createElement('OPTION');
@@ -57,7 +57,7 @@ exports.display = {
             OPTION.selected = true;
         }
         if (display.getOption('initialValue') ===  OPTION.value) {
-            list.select(display.xyz, display.getOptions(), entityClassName, entityId);  //TODO encapsulate xyz
+            list.select(display.xyz, display.getOption('select'), entityClassName, entityId);  //TODO encapsulate xyz
             OPTION.selected = true;
         }
         if (columns.constructor !== Object) {
