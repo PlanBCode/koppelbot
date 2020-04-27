@@ -11,6 +11,9 @@ function createTmpContentToValidate(data, content, subPropertyPath, additionalSu
     and your patching a (content='value2', additionalSubPropertyPath=[1])
     then construct tmpContent {myArray: ['value1','value2']} to validate the contents
     */
+    if (typeof subPropertyPath === 'undefined') subPropertyPath = [];
+    if (typeof additionalSubPropertyPath === 'undefined') additionalSubPropertyPath = [];
+
     const mainContent = json.get(data, subPropertyPath);
     let tmpContent = JSON.parse(JSON.stringify(mainContent));
     tmpContent = json.set(tmpContent, additionalSubPropertyPath, content);

@@ -2,7 +2,6 @@ const displays = require('../../build/displays');
 const uriTools = require('../uri/uri.js');
 const response = require('../entity/response.js');
 const variables = require('../variables/variables.js');
-const json = require('../web/json.js');
 
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';

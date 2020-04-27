@@ -259,7 +259,7 @@ before getting the actual data
     {
         $count = count($requestResponses);
         if ($count === 0) {
-            return null;
+            return [];
         } else { //TODO handle multi requests
             /** @var RequestResponse */
             $requestResponse = array_values($requestResponses)[0]; // TODO because non multi request
