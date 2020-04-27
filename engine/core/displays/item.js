@@ -41,9 +41,10 @@ exports.display = {
         const showTitle = display.getOption('showTitle') !== false;
         const showEditButton = display.getOption('showEditButton') === true && display.getAction() !== 'edit';
         const showDeleteButton = display.getOption('showDeleteButton') === true && display.getAction() !== 'delete';
+        const showCancelButton = display.getOption('cancel') && display.getAction() === 'edit';
 
         let TD_header;
-        if (showTitle || showEditButton || showDeleteButton) {
+        if (showTitle || showEditButton || showDeleteButton || showCancelButton) {
             const TR_header = document.createElement('TR');
             TR_header.className = 'xyz-item-header';
             TD_header = document.createElement('TD');
@@ -66,6 +67,16 @@ exports.display = {
             };
             TD_header.appendChild(INPUT_deleteButton);
         }
+        if (showCancelButton) {
+            const INPUT_cancelButton = document.createElement('INPUT');
+            INPUT_cancelButton.classList.add('xyz-edit');
+            INPUT_cancelButton.type = 'submit';
+            INPUT_cancelButton.value = 'Cancel';
+            INPUT_cancelButton.style.float = 'right';
+            const onCancel = display.getOption('cancel');
+            if (typeof onCancel === 'function') INPUT_cancelButton.onclick = onCancel;
+            TD_header.appendChild(INPUT_cancelButton);
+        }
 
         if (showEditButton) {
             const DIV_edit = document.createElement('DIV');
@@ -77,7 +88,11 @@ exports.display = {
                 action: 'edit',
                 uri: display.getRequestUri(),
                 showLabels: true,
-                showDeleteButton
+                showDeleteButton,
+                cancel: () => {
+                    DIV_edit.style.display = 'none';
+                    TABLE_entity.style.display = 'block';
+                }
             }, DIV_edit);
 
             const INPUT_editButton = document.createElement('INPUT');
@@ -89,6 +104,7 @@ exports.display = {
                 DIV_edit.style.display = 'block';
                 TABLE_entity.style.display = 'none';
             };
+
             TD_header.appendChild(INPUT_editButton);
         }
 
