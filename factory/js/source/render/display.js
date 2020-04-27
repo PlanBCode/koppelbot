@@ -20,9 +20,9 @@ function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entit
     this.getDisplayName = propertyPath => xyz.getDisplayName(entityClassName, propertyPath);
 
     this.getTitle = () => {
-        const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
-
         const fallback = '/' + entityClassName + '/' + entityId;
+        const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
+        if (titlePropertyPath === null) return fallback;
         const titleResponse = response.getSubNode(node, titlePropertyPath);
         const title = titleResponse && !titleResponse.hasErrors()
             ? titleResponse.getContent()
