@@ -1,5 +1,6 @@
 <?php
 require './engine/entities/property.php';
+require './engine/access/access.php';
 
 class EntityClass
 {
@@ -12,14 +13,19 @@ class EntityClass
             return self::$entityClasses[$entityClassName];
         } else {
 
-            $fileName = './custom/main/entities/' . $entityClassName . '.json'; // TODO or lib/datamodel
-            if (!file_exists($fileName)) {
-                return null;
-            }
+            $fileName = './custom/main/entities/' . $entityClassName . '.json';
+            if (!file_exists($fileName)) return null;
+
             $fileContent = file_get_contents($fileName); //TODO make safe
             //TODO check if this goes well
             $meta = json_decode($fileContent, true);
             //TODO maybe resolve inheritance
+
+            // Check if any of current sessions has access to this entity
+            if (array_key_exists('_', $meta)) {
+                $accessSettings = array_get($meta['_'], 'access', []);
+                if (!AccessControl::check('HEAD', $accessSettings)) return null;
+            }
 
             $entityClass = new EntityClass($entityClassName, $meta);
             self::$entityClasses[$entityClassName] = $entityClass;

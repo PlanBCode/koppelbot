@@ -5,6 +5,9 @@
       "parse": "json",
       "path": "data/facts/",
       "extension": "json"
+    },
+    "access" : {
+      "write" : ["guest"]
     }
   },
   "id": {

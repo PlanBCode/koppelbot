@@ -5,6 +5,9 @@
       "parse": "json",
       "path": "custom/main/entities/",
       "extension": "json"
+    },
+    "access" : {
+      "read" : ["guest"]
     }
   },
   "id": {

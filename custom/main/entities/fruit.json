@@ -4,6 +4,9 @@
       "type": "file",
       "parse": "json",
       "path": "data/fruits.json"
+    },
+    "access" : {
+      "write" : ["guest"]
     }
   },
   "color": {

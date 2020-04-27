@@ -5,6 +5,9 @@
       "parse": "none",
       "path": "data/sample/files/",
       "extension": "*"
+    },
+    "access" : {
+      "read" : ["guest"]
     }
   },
   "file": {

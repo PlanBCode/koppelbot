@@ -5,6 +5,9 @@
       "parse": "json",
       "path": "engine/core/types/",
       "extension": "json"
+    },
+    "access" : {
+      "read" : ["guest"]
     }
   },
   "name": {

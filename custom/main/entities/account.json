@@ -12,6 +12,9 @@
     "default": "hello@default.com",
     "connector": {
       "key": "key"
+    },
+    "access" : {
+      "read" : ["guest"]
     }
   },
   "password": {
@@ -20,5 +23,13 @@
   "username": {
     "type": "string",
     "minLength": 3
+  },
+  "groups" : {
+    "type" : "array",
+    "default" : ["guest"],
+    "subType" : {
+      "type" : "reference",
+      "uri": "/group/*/name"
+    }
   }
 }

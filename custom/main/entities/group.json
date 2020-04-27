@@ -1,0 +1,16 @@
+{
+  "_": {
+    "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/groups.json"
+    }
+  },
+  "name": {
+    "type": "string",
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+}

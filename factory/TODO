@@ -1,5 +1,10 @@
 TODO
 
+- per property access control
+
+auto/readOnly for property
+- add session groups property hidden/auto to session
+
 list.select naar display
 - maak references klikbaar -> select as variable
 - - reference gebruik laten maken van list.select
@@ -42,7 +47,6 @@ timeline
 replace createTmpContentToValidate in render.js with ability to validate subData for types
 - validateContent(content, settings, subPropertyPath)
 
-
 validate @ Item.patch to set status to faulty
 
 type toString function for sorting
@@ -74,13 +78,6 @@ Put @ Backend default values properties gebruiken voor niet toegevoegde props
 werkend maken:
 - xyz.ui({uri:'/source?content==default',display:'create'});
 - xyz.ui({uri:'$type',display:'create'});
-
-EntityClass
-- "collapse" all entity classes, ids and properties that have active listeners into a multi GET request ?modified_after=x
-- - polling made easy :)
-- - ?modified_after=$timestamp
-- - only additions, modifications and removals
-- - HTTP status code xxx : object has been removed
 
 provide display settings schema in json form
 - - generate auto documentation for displays
@@ -114,8 +111,6 @@ file type: viewer
 custom view html definition:
 "label": {"signature":{"id":"id","color":"color","title":"title"}},"view":"<span style='color:$color;'>$title</span>"}
 "url": {"type":"string","view":"<a href='$'>$</a>}
-
-auto/readOnly for property
 
 proper file locks
 

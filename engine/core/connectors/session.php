@@ -7,7 +7,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
 
     if (!is_array($submittedPasswordArray) || !array_key_exists('password', $submittedPasswordArray)) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
 
-    $accountsMatchingUserName = request('/account/*/password?email==' . $userName)->getResultsById();
+    $accountsMatchingUserName = request('/account/*/password,groups?email==' . $userName)->getResultsById();
     if (count($accountsMatchingUserName) === 0) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
 
     /** @var InternalEntityResponse */
@@ -24,7 +24,11 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
         return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
     }
     if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
-    $_SESSION['content'][$userName] = [];
+    $groupsResponse = $account->get('groups');
+    $groups = $groupsResponse->getStatus() !== 200 ? [] : $groupsResponse->getContent();
+    $_SESSION['content'][$userName] = ['groups' => $groups];
+
+    var_dump($_SESSION['content']);
     return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'login successful;'
 
 }
@@ -108,14 +112,14 @@ class Connector_session extends Connector
             return $connectorResponse->add(404, $propertyRequest, $userName, 'Not found.');
         }
         unset($_SESSION['content'][$userName]);
-        if (empty($_SESSION['content'])) {
-            session_destroy();
-        }
+        if (empty($_SESSION['content'])) session_destroy();
+
         return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'Successfully logged out.'
     }
 
     protected function getSession(PropertyRequest &$propertyRequest): connectorResponse
     {
+        var_dump($_SESSION['content']);
         $connectorResponse = new connectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
         $userNameList = $propertyRequest->getEntityId();

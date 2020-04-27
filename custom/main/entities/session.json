@@ -2,6 +2,9 @@
   "_": {
     "connector": {
       "type": "session"
+    },
+    "access" : {
+      "write" : ["guest"]
     }
   },
   "login": {
