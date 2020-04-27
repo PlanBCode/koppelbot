@@ -27,10 +27,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
     $groupsResponse = $account->get('groups');
     $groups = $groupsResponse->getStatus() !== 200 ? [] : $groupsResponse->getContent();
     $_SESSION['content'][$userName] = ['groups' => $groups];
-
-    var_dump($_SESSION['content']);
     return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'login successful;'
-
 }
 
 class Connector_session extends Connector
@@ -119,7 +116,6 @@ class Connector_session extends Connector
 
     protected function getSession(PropertyRequest &$propertyRequest): connectorResponse
     {
-        var_dump($_SESSION['content']);
         $connectorResponse = new connectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
         $userNameList = $propertyRequest->getEntityId();
