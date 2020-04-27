@@ -11,13 +11,14 @@ exports.actions = {
         return TAG;
     },
     view: function (item) {
-        const DIV = document.createElement('DIV');
-        DIV.innerHTML=item.getContent();
+        const SPAN = document.createElement('SPAN');
+        SPAN.innerHTML=item.getContent();
+        SPAN.classList.add('xyz-reference')
         if (typeof item.getContent() !== 'undefined') {
         //    item.ui({uri: item.getContent(), display: 'item'}, DIV);
         }
         //TODO onchange : how to? redo the ui definition
-        return DIV;
+        return SPAN;
     },
     validateContent: function (item) {
         // content should be "/$entityClassName/$entityId"

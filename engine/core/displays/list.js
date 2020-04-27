@@ -13,20 +13,6 @@ options
 - TODO add multiselect tools
  */
 
-function select(xyz, display, entityClassName, entityId) {
-    const variableNameOrCallback = display.getOption('select');
-    if (typeof variableNameOrCallback === 'string') {
-        if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
-            xyz.clearVariable(variableNameOrCallback);
-        } else {
-            const uriPostfix = display.hasOption('selectUri') ? display.getOption('selectUri') : '';
-            xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId + uriPostfix);
-        }
-    } else if (typeof variableNameOrCallback === 'function') {
-        variableNameOrCallback(entityClassName, entityId);
-    }
-}
-
 function getUrisFromVariable(xyz, variableName, entityClassName) {
     if (!xyz.hasVariable(variableName)) {
         return [];
@@ -165,9 +151,9 @@ exports.display = {
                     .filter(path => path[0] === entityClassName)
                     .map(path => path[1]);
                 if (entityIds.length === 0) {
-                    select(display.xyz, display, undefined, undefined)// TODO encapsulate xyz
+                    display.select(undefined, undefined);
                 } else {
-                    select(display.xyz, display, entityClassName, entityIds.join(','))// TODO encapsulate xyz
+                    display.select(entityClassName, entityIds.join(','));
                 }
                 event.stopPropagation();
             };
@@ -197,7 +183,7 @@ exports.display = {
                 TR_entity.classList.add('xyz-list-selected');
             }
             TR_entity.onclick = () => {
-                select(display.xyz, display, entityClassName, entityId); // TODO encapsulate xyz
+                display.select(entityClassName, entityId);
                 for (let row of TABLE.childNodes) {
                     if (row === TR_entity) {
                         row.classList.add('xyz-list-selected');
@@ -223,4 +209,3 @@ exports.display = {
 
 exports.showCreateButton = showCreateButton;
 exports.flatten = flatten;
-exports.select = select;

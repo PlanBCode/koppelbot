@@ -187,7 +187,7 @@ exports.display = {
         LABEL.date = date;
 
         LABEL.onclick = () => {
-            list.select(display.xyz, display, entityClassName, entityId);
+            display.select(entityClassName, entityId);
             for (let NODE of DIV.childNodes) {
                 if (NODE.classList.contains('xyz-timeline-label') ){
                     NODE.classList[NODE===LABEL?'add':'remove']('xyz-list-selected')

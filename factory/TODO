@@ -5,9 +5,8 @@ TODO
 auto/readOnly for property
 - add session groups property hidden/auto to session
 
-list.select naar display
 - maak references klikbaar -> select as variable
-- - reference gebruik laten maken van list.select
+- - reference gebruik laten maken van display.select
 
 item display
 - edit: cancel knop

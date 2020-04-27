@@ -25,7 +25,7 @@ exports.display = {
             const selectedUri = SELECT.options[SELECT.selectedIndex].value;
             const path = selectedUri.substr(1).split('/');
             const [entityClassName, entityId] = path;
-            list.select(display.xyz, display, entityClassName, entityId); // TODO encapsulate xyz
+            display.select(entityClassName, entityId);
         };
         if (!display.getOption('initialValue')) {
             const OPTION = document.createElement('OPTION');
@@ -48,7 +48,7 @@ exports.display = {
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
         if (SELECT.childElementCount === 0 && !display.getOption('initialValue')) { // select the first option as default
-            list.select(display.xyz, display, entityClassName, entityId); //TODO encapsulate xyz
+            display.select(entityClassName, entityId);
         }
 
         const OPTION = document.createElement('OPTION');
@@ -57,7 +57,7 @@ exports.display = {
             OPTION.selected = true;
         }
         if (display.getOption('initialValue') ===  OPTION.value) {
-            list.select(display.xyz, display, entityClassName, entityId);  //TODO encapsulate xyz
+            display.select(entityClassName, entityId);
             OPTION.selected = true;
         }
         if (columns.constructor !== Object) {

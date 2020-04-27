@@ -29,6 +29,21 @@ function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entit
             : fallback;
         return title;
     };
+
+    this.select = (entityClassName, entityId) => {
+        const variableNameOrCallback = this.getOption('select');
+        if (typeof variableNameOrCallback === 'string') {
+            if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
+                xyz.clearVariable(variableNameOrCallback);
+            } else {
+                const uriPostfix = this.hasOption('selectUri') ? this.getOption('selectUri') : '';
+                xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId + uriPostfix);
+            }
+        } else if (typeof variableNameOrCallback === 'function') {
+            variableNameOrCallback(entityClassName, entityId);
+        }
+    }
+
     this.xyz = xyz; // TODO encapsulate
 }
 
