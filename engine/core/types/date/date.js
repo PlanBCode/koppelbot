@@ -1,37 +1,49 @@
-//https://www.php.net/manual/en/function.date.php
 const formats = require('./formats.json');
+const Pikaday = require('pikaday');
+const moment = require('moment').default
+
+function phpDateFormatToMomentFormat(format){
+    let momentFormat = '';
+    for (let index = 0; index < format.length; ++index) {
+        const c = format.charAt(index);
+        if (formats.hasOwnProperty(c)) {
+            const format = formats[c];
+            momentFormat += format.settings.moment;
+        } else {
+            momentFormat += c;
+        }
+    }
+    return momentFormat;
+}
+
+function phpDateFormatToPlaceholder(format){
+    let placeholder = '';
+    for (let index = 0; index < format.length; ++index) {
+        const c = format.charAt(index);
+        if (formats.hasOwnProperty(c)) {
+            const format = formats[c];
+            placeholder += format.settings.default;
+        } else {
+            placeholder += c;
+        }
+    }
+    return placeholder;
+}
 
 exports.actions = {
     edit: function (item) {
         const format = item.getSetting('format');
 
-
-        //TODO const DIV = document.createElement('DIV');
-        let placeholder = '';
-        for (let index = 0; index < format.length; ++index) {
-            const c = format.charAt(index);
-            if (formats.hasOwnProperty(c)) {
-                const format = formats[c];
-                placeholder += format.settings.default;
-                /* const subStatus = 200;//TODO
-                 const subContent = null;//TODO
-                 const data = {date: {[index]:null}};
-                 const TAG = item.renderSubElement(
-                     'create',
-                     [index]
-                     , subStatus,
-                     subContent,
-                     format.settings,
-                     {label: format.label, data}
-                 );
-                 DIV.appendChild(TAG);*/
-            } else {
-                placeholder += c;
-            }
-        }
-
         const INPUT = document.createElement('INPUT');
-        INPUT.placeholder = placeholder;
+        INPUT.placeholder = phpDateFormatToPlaceholder(format);
+
+        const picker = new Pikaday({ field: INPUT ,
+            toString(date) {
+             return new moment(date).format(phpDateFormatToMomentFormat(format))
+           }
+        });
+        console.log('format',phpDateFormatToMomentFormat(format));
+
         if (item.patch) {
             INPUT.oninput = () => {
                 item.patch(INPUT.value)
@@ -46,7 +58,6 @@ exports.actions = {
         };
         item.onChange(onChangeHandler);
         onChangeHandler(item);
-
         return INPUT;
     },
     view: function (item) {

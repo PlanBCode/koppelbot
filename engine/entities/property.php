@@ -21,7 +21,7 @@ function getSingleSetting($name, $settings, $rootSettings)
     } elseif (array_key_exists($name, $rootSettings)) {
         return $rootSettings[$name];
     } else {
-        return [];
+        return null;
     }
 }
 
@@ -262,10 +262,15 @@ class Property
         $this->depth = $depth;
 
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
+        if(!is_string($this->typeName )) {
+            echo "ERROR: invalid typename";
+            //TODO error
+        }
         $this->settings['type'] = $this->typeName;
 
         $this->typeClass = Type::get($this->typeName);
         if ($this->typeClass === null) {
+            echo "ERROR: invalid typeclass";
             //TODO error
         }
 

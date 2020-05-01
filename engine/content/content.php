@@ -12,11 +12,19 @@ function replaceXyzTag($fileContent): string
             $count = count($attributeMatches[0]);
             $attributeNames = $attributeMatches[1];
             $attributeValues = $attributeMatches[2];
-            $attributes = [];
+            $options = [];
             for ($i = 0; $i < $count; ++$i) {
-                $attributes[$attributeNames[$i]] = $attributeValues [$i];
+                $attributeName = $attributeNames[$i];
+                $attributeValue = $attributeValues [$i];
+                $attributePath = explode('-', $attributeName); // "property-option" -> ["property","option"]
+                //if (count($attributePath) === 1) { // optionName="value" -> options[optionName]="value"
+                    $options[$attributeName] = $attributeValue;
+                /*} else {  // propertyName-optionName="value" -> options[subOptions][propertyName][optionName]="value"
+                    if (!array_key_exists('subOptions', $options)) $options['subOptions'] = [];
+                    json_set($options['subOptions'], $attributePath, $attributeValue);
+                }*/
             }
-            return '<script>xyz.ui('.json_encode($attributes,JSON_UNESCAPED_SLASHES).');</script>';
+            return '<script>xyz.ui(' . json_encode($options, JSON_UNESCAPED_SLASHES) . ');</script>';
         },
         $fileContent
     );

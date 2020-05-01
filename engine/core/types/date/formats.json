@@ -6,7 +6,8 @@
       "type": "number",
       "min" : 1,
       "max" : 31,
-      "default": "01"
+      "default": "01",
+      "moment": "DD"
     }
   },
   "m" : {
@@ -17,7 +18,8 @@
       "min" : 1,
       "max" : 12,
       "default": "01",
-      "leadingZeroes": true
+      "leadingZeroes": true,
+      "moment": "MM"
     }
   },
   "Y": {
@@ -28,7 +30,8 @@
       "min" : 0,
       "max" : 9999,
       "default": 2020,
-      "leadingZeroes": true
+      "leadingZeroes": true,
+      "moment": "YYYY"
     }
   }
 }

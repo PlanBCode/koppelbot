@@ -3,8 +3,10 @@
     "connector": {
       "type": "session"
     },
-    "access" : {
-      "write" : ["guest"]
+    "access": {
+      "write": [
+        "guest"
+      ]
     }
   },
   "login": {

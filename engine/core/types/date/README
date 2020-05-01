@@ -1,0 +1,6 @@
+
+Php date formats:
+https://www.php.net/manual/en/function.date.php
+
+moment js data formats: (used by pikaday datepicker)
+https://momentjs.com/docs/#/displaying/format/
