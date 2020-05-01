@@ -42,7 +42,6 @@ exports.actions = {
              return new moment(date).format(phpDateFormatToMomentFormat(format))
            }
         });
-        console.log('format',phpDateFormatToMomentFormat(format));
 
         if (item.patch) {
             INPUT.oninput = () => {
@@ -103,5 +102,13 @@ exports.actions = {
             }
         }
         return true;
+    },
+    toNumber: function(content, item){
+        const format = item.getSetting('format');
+        return new moment(item.getContent(),phpDateFormatToMomentFormat(format)).unix();
+    },
+    fromNumber: function(content, item){
+        const format = item.getSetting('format');
+        return new moment(content).format(phpDateFormatToMomentFormat(format))
     }
 };
