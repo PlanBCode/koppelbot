@@ -2,7 +2,7 @@ const formats = require('./formats.json');
 const Pikaday = require('pikaday');
 const moment = require('moment').default
 
-function phpDateFormatToMomentFormat(format){
+function phpDateFormatToMomentFormat(format) {
     let momentFormat = '';
     for (let index = 0; index < format.length; ++index) {
         const c = format.charAt(index);
@@ -16,7 +16,7 @@ function phpDateFormatToMomentFormat(format){
     return momentFormat;
 }
 
-function phpDateFormatToPlaceholder(format){
+function phpDateFormatToPlaceholder(format) {
     let placeholder = '';
     for (let index = 0; index < format.length; ++index) {
         const c = format.charAt(index);
@@ -36,11 +36,10 @@ exports.actions = {
 
         const INPUT = document.createElement('INPUT');
         INPUT.placeholder = phpDateFormatToPlaceholder(format);
-
-        const picker = new Pikaday({ field: INPUT ,
-            toString(date) {
-             return new moment(date).format(phpDateFormatToMomentFormat(format))
-           }
+        const picker = new Pikaday({
+            field: INPUT,
+            toString: date => new moment(date).format(phpDateFormatToMomentFormat(format)),
+            onSelect: () => item.patch(INPUT.value)
         });
 
         if (item.patch) {
@@ -103,11 +102,11 @@ exports.actions = {
         }
         return true;
     },
-    toNumber: function(content, item){
+    toNumber: function (content, item) {
         const format = item.getSetting('format');
-        return new moment(item.getContent(),phpDateFormatToMomentFormat(format)).unix();
+        return new moment(item.getContent(), phpDateFormatToMomentFormat(format)).unix();
     },
-    fromNumber: function(content, item){
+    fromNumber: function (content, item) {
         const format = item.getSetting('format');
         return new moment(content).format(phpDateFormatToMomentFormat(format))
     }

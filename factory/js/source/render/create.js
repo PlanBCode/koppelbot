@@ -18,6 +18,9 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         INPUT_submit.type = 'submit';
         INPUT_submit.value = options.createButtonText || 'Create ' + entityClassName;
         INPUT_submit.validUris = {};
+
+        const TABLE = entityClass.createCreator(options, data, INPUT_submit);
+
         INPUT_submit.onclick = () => {
             if (entityClass.isAutoIncremented()) {
                 xyz.post(uri, {[entityClassName]: {'new': data}},);
@@ -28,8 +31,12 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
             if (typeof options.onSubmit === 'function') {
                 options.onSubmit(data);
             }
+            const newData = {};
+            const newTABLE = entityClass.createCreator(options, newData, INPUT_submit);
+            TAG.insertBefore(newTABLE, TABLE);
+            TAG.removeChild(TABLE);
         };
-        const TABLE = entityClass.createCreator(options, data, INPUT_submit);
+
         TAG.appendChild(TABLE);
         TAG.appendChild(INPUT_submit);
     });
