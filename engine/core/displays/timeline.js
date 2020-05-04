@@ -155,6 +155,8 @@ exports.display = {
         DIV.appendChild(DIV_line);
         WRAPPER.appendChild(DIV);
         list.showCreateButton(display);
+
+        window.addEventListener("resize", () => drawNodes(DIV, display));
     },
     entity: display => {
         const content = display.getContent();
@@ -189,8 +191,8 @@ exports.display = {
         LABEL.onclick = () => {
             display.select(entityClassName, entityId);
             for (let NODE of DIV.childNodes) {
-                if (NODE.classList.contains('xyz-timeline-label') ){
-                    NODE.classList[NODE===LABEL?'add':'remove']('xyz-list-selected')
+                if (NODE.classList.contains('xyz-timeline-label')) {
+                    NODE.classList[NODE === LABEL ? 'add' : 'remove']('xyz-list-selected')
                 }
             }
         };
