@@ -1,4 +1,4 @@
-const list = require('./list.js');
+const list = require('../list/list.js');
 
 /*
 TODO add radio flavor to provide radio box

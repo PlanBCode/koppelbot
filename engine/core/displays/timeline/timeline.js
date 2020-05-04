@@ -9,7 +9,7 @@ TODO
 - year/month/day labels
  */
 
-const list = require('./list.js');
+const list = require('../list/list.js');
 
 function parseDateString(string) {
     const parts = string.split("-"); //TODO use formats.json function or a type.toNumber

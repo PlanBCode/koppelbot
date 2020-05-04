@@ -7,8 +7,8 @@ options:
 - showEditbutton
  */
 
-const list = require('./list.js');
-const response = require('../../../factory/js/source/entity/response'); //TODO better solution
+const list = require('../list/list.js');
+const response = require('../../../../factory/js/source/entity/response'); //TODO better solution
 
 exports.display = {
     waitingForInput: display => {

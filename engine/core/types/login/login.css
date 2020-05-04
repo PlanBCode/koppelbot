@@ -1,0 +1,9 @@
+.xyz-login a {
+    color: blue;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.xyz-login a:hover {
+    text-decoration: underline;
+}

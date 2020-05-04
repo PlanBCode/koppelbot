@@ -1,0 +1,31 @@
+table.xyz-create, table.xyz-item, table.xyz-list {
+    /*border: 1px solid lightgrey;
+    margin-bottom: 5px;*/
+    padding: 0;
+    border-collapse: collapse;
+}
+
+table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
+    background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-create-header, .xyz-list-header, .xyz-item-header {
+    background-color: darkslateblue;
+    color: white;
+}
+
+.xyz-list, .xyz-item {
+    width: 100%;
+}
+
+.xyz-list-item {
+    cursor: pointer;
+}
+
+table.xyz-list tr.xyz-list-item:hover {
+    background-color: lightblue;
+}
+
+table.xyz-list tr.xyz-list-selected {
+    background-color: yellow;
+}

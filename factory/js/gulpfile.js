@@ -49,7 +49,7 @@ const write = (path, content) => cb => {
 const generateRequiresFile = (name, component) => cb => {
     let js = name === 'types'
         ? `// This file is created by gulpfile.js using the type definitions of engine/core/${name}/*/*.js. \n\n`
-        : `// This file is created by gulpfile.js using the type definitions of engine/core/${name}/*.js. \n\n`;
+        : `// This file is created by gulpfile.js using the type definitions of engine/core/${name}/*/*.js. \n\n`;
     forEachFile(`../../engine/core/${name}/*`,
         file => cb => {
             const id = baseName(file.path);
@@ -57,7 +57,7 @@ const generateRequiresFile = (name, component) => cb => {
                 js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}/${id}.js').${component};\n`;
                 js += `exports.${baseName(file.path)}.json = require('../../../engine/core/${name}/${id}/${id}.json');\n\n`;
             } else {
-                js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}.js').${component};\n`;
+                js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}/${id}.js').${component};\n`;
             }
             cb();
         }
