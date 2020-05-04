@@ -25,14 +25,21 @@ const mkDir = path => execute(`mkdir -p ${path};`);
 
 // action = file => cb => {}
 const forEachFile = (pattern, action) => (cb) => {
-    gulp.src(pattern)
-        .pipe(through.obj(function (file, enc, cb1) {
-            // file.path
-            // file.content
-            action(file)(cb1);
-        })).on('finish', function () {
-        cb();
-    });
+    const subPatterns = pattern.split(':'); // "/a/b/c:/d/e/f"->
+    let count = 0;
+    const mergeCb = () => {
+        ++count;
+        if (count === subPatterns.length) cb();
+    }
+    for (let subPattern of subPatterns) {
+        gulp.src(subPattern)
+            .pipe(through.obj(function (file, enc, cb1) {
+                // file.path, file.contents
+                action(file)(cb1);
+            })).on('finish', function () {
+            mergeCb();
+        });
+    }
 };
 
 const write = (path, content) => cb => {
@@ -59,13 +66,27 @@ const generateRequiresFile = (name, component) => cb => {
     })
 };
 
+const generateCssFile = cb => {
+    let css = `/* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */\n\n`;
+    forEachFile(`../../engine/core/*/*/*.css:../css/*.css`,
+        file => cb => {
+            css += file.contents;
+            cb();
+        }
+    )(() => {
+        write(`../../engine/ui/style.css`, css)(cb);
+    })
+};
+
 const build = execute(`sh ../audit.sh; sh ../build.sh`);
 
 const generateTypesFile = generateRequiresFile('types', 'actions');
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 
+gulp.watch([`../../engine/core/*/*/*.css`], gulp.series(generateCssFile, build));
+
 gulp.watch([`../../engine/core/types/**/*.js`], gulp.series(generateTypesFile, build));
 gulp.watch([`../../engine/core/displays/**/*.js`], gulp.series(generateDisplaysFile, build));
 gulp.watch([`./source/**/*.js`], build);
 
-exports.default = gulp.series(generateTypesFile, generateDisplaysFile, build);
+exports.default = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, build);

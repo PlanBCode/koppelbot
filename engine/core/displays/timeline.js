@@ -61,13 +61,14 @@ function drawNodes(DIV, display) {
             NODE.style[left] = (ratio * 100) + '%';
         }
     }
-
+    const rectDIV = DIV.getBoundingClientRect();
+    const sizeDIV = rectDIV[width];
+    const labelMargin = 5;
     for (let i = 0; i < LABELS.length; ++i) {
         const LABEL = LABELS[i];
         const time = parseDateString(LABEL.date);
         const ratio = (time - minTime) / (maxTime - minTime);
 
-        const sizeDIV = DIV.getBoundingClientRect()[width];
         let rectLABEL = LABEL.getBoundingClientRect();
         const sizeLABEL = rectLABEL[width];
         let position = ratio * sizeDIV;
@@ -76,14 +77,13 @@ function drawNodes(DIV, display) {
         LABEL.style[left] = position + 'px';
         rectLABEL = LABEL.getBoundingClientRect();
 
-        let defaultTop = 40;
         if (i > 0) { // ensure labels do not overlap with previous
             const prevRectLABEL = LABELS[i - 1].getBoundingClientRect();
-            if (prevRectLABEL[right] > rectLABEL[left]) {
-                defaultTop = prevRectLABEL[bottom] + 20;
+            if (prevRectLABEL[right] + labelMargin > rectLABEL[left]) {
+                LABEL.style[left] = (prevRectLABEL[right] - rectDIV[left] + labelMargin) + 'px'
             }
         }
-
+        let defaultTop = 40;
         if (Q === 100) {
             LABEL.style[bottom] = `${defaultTop}px`;
             LABEL.style[top] = null;
