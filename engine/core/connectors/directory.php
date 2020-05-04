@@ -57,7 +57,7 @@ class Connector_directory extends BasicConnector
     {
         $entityIds = [];
         foreach (glob($this->createFilePath('*')) as $filePath) {
-            if(!is_dir($filePath)){
+            if (!is_dir($filePath)) {
                 $entityIds[] = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
             }
         }
@@ -151,6 +151,13 @@ class Connector_directory extends BasicConnector
             }
             //TODO unlock file
         }
+        // check for deleted files
+        foreach ($this->meta as $entityId => $meta) {
+            if(!array_key_exists($entityId,$this->data)){
+                unlink($this->createFilePath($entityId));
+            }
+        }
+
         return new connectorResponse(200);
     }
 

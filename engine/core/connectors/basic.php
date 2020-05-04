@@ -200,10 +200,11 @@ abstract class BasicConnector extends Connector
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (array_key_exists($entityId, $this->data)) {
-                $entity =& $this->data[$entityId];
                 if ($key === 'basename' || $key === 'key') {
-                    $connectorResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
+                    unset($this->data[$entityId]);
+                    $connectorResponse->add(200, $propertyRequest, $entityId, null);
                 } else {
+                    $entity =& $this->data[$entityId];
                     if ($key === 'content') {
                         $connectorResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
                         continue;
