@@ -4,6 +4,9 @@
       "type": "file",
       "parse": "json",
       "path": "data/accounts.json"
+    },
+    "access" : {
+      "write" : ["guest"]
     }
   },
   "email": {
@@ -12,9 +15,6 @@
     "default": "hello@default.com",
     "connector": {
       "key": "key"
-    },
-    "access" : {
-      "read" : ["guest"]
     }
   },
   "password": {
