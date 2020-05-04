@@ -3,6 +3,7 @@ table.xyz-create, table.xyz-item, table.xyz-list {
     margin-bottom: 5px;*/
     padding: 0;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {

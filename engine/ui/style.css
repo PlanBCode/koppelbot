@@ -109,6 +109,7 @@ table.xyz-create, table.xyz-item, table.xyz-list {
     margin-bottom: 5px;*/
     padding: 0;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
@@ -193,29 +194,7 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}
-.xyz-login a {
-    color: blue;
-    cursor: pointer;
-    margin: 5px;
-}
-
-.xyz-login a:hover {
-    text-decoration: underline;
-}
-@charset "UTF-8";
+}@charset "UTF-8";
 
 /*!
  * Pikaday
@@ -454,6 +433,33 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}.xyz-login a {
+    color: blue;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.xyz-login a:hover {
+    text-decoration: underline;
+}
 
 .xyz-reference {
     cursor: pointer;
