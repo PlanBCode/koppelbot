@@ -143,6 +143,7 @@ exports.display = {
         DIV.className = 'xyz-timeline-wrapper';
         const DIV_line = document.createElement('DIV');
         DIV_line.className = 'xyz-timeline-line';
+
         if (horizontal) {
             DIV_line.style.top = Q;
             DIV_line.style.width = '100%';
@@ -155,6 +156,25 @@ exports.display = {
         DIV.appendChild(DIV_line);
         WRAPPER.appendChild(DIV);
         list.showCreateButton(display);
+
+        /*WIP
+                const DIV_lineCreator = document.createElement('DIV');
+        DIV_lineCreator.className = 'xyz-timeline-line-creator';
+        DIV_lineCreator.innerText = '+';
+
+                DIV.appendChild(DIV_lineCreator);
+
+            DIV.addEventListener('mousemove', event => {
+            const rectDIV = DIV.getBoundingClientRect();
+            const offset = event.clientY - rectDIV.top;
+
+            const timestamp = offset / (rectDIV.bottom - rectDIV.top)
+
+            DIV_lineCreator.innerText = '+';
+            DIV_lineCreator.style.top = offset + 'px';
+            console.log(timestamp)
+
+        })*/
 
         window.addEventListener("resize", () => drawNodes(DIV, display));
     },

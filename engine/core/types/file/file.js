@@ -33,6 +33,7 @@ const encodeContent = (data, item, file) => evt => {
     } else {
         key = file.name;
     }
+    key = key.replace(/ /g, '_'); // remove spaces from filename
     data['id'] = key;
     item.patch(data);
 };
@@ -47,13 +48,14 @@ exports.actions = {
             } else if (files.length === 0) {
                 //TODO
             } else {
+                const fileName = files[0];
                 const reader = new FileReader();
-                reader.onload = encodeContent(data, item, files[0]);
+                reader.onload = encodeContent(data, item, fileName);
                 reader.onerror = evt => {
                     //TODO
                 };
-                reader.readAsDataURL(files[0]);
-                const url = window.URL.createObjectURL(files[0]);
+                reader.readAsDataURL(fileName);
+                const url = window.URL.createObjectURL(fileName);
             }
         };
 

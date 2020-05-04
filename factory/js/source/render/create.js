@@ -19,7 +19,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         INPUT_submit.value = options.createButtonText || 'Create ' + entityClassName;
         INPUT_submit.validUris = {};
 
-        const TABLE = entityClass.createCreator(options, data, INPUT_submit);
+        let TABLE = entityClass.createCreator(options, data, INPUT_submit);
 
         INPUT_submit.onclick = () => {
             if (entityClass.isAutoIncremented()) {
@@ -35,6 +35,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
             const newTABLE = entityClass.createCreator(options, newData, INPUT_submit);
             TAG.insertBefore(newTABLE, TABLE);
             TAG.removeChild(TABLE);
+            TABLE = newTABLE;
         };
 
         TAG.appendChild(TABLE);

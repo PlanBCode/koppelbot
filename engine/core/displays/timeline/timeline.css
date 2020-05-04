@@ -39,6 +39,14 @@ div.xyz-timeline-label.xyz-list-selected {
     background-color: yellow;
 }
 
+div.xyz-timeline-line-creator {
+    position: absolute;
+    width:10px;
+    height:10px;
+    pointer-events: none;
+    cursor: none;
+    /*display: none;*/
+}
 
 
 div.xyz-timeline-line {
