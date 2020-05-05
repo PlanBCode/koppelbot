@@ -148,8 +148,9 @@ class EntityClass
             /** @var PropertyHandle[] */
             $propertyHandles = [new PropertyHandle(400, 'POST method expects uri of the form /' . $this->entityClassName . '', [$this->entityClassName])];
         } else {
+            $query = $requestObject->getQuery();
             /** @var PropertyHandle[] */
-            $propertyHandles = $this->expand($propertyPath, $requestObject->getQuery());
+            $propertyHandles = $this->expand($propertyPath, $query);
         }
         /** @var PropertyRequest[] */
         $propertyRequests = [];
