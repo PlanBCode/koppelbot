@@ -16,6 +16,7 @@ class AccessControl
     ];
 
     public const defaultGroups = ['guest'];
+
     static private function subCheck(string $method, array $userGroups, array &$accessSettings): bool
     {
         foreach ($accessSettings as $verb => $accessGroups) {
@@ -30,14 +31,12 @@ class AccessControl
 
     static public function check(string $method, array &$accessSettings): bool
     {
-        if (!array_key_exists('content', $_SESSION)) {
-            return self::subcheck($method, self::defaultGroups, $accessSettings);
-        } else {
+        if (array_key_exists('content', $_SESSION)) {
             foreach ($_SESSION['content'] as $userName => $session) {
                 if (self::subcheck($method, $session['groups'], $accessSettings)) return true;
             }
         }
-        return false;
+        return self::subcheck($method, self::defaultGroups, $accessSettings);
     }
 }
 

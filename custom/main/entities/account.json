@@ -6,7 +6,8 @@
       "path": "data/accounts.json"
     },
     "access" : {
-      "write" : ["guest"]
+      "create" : ["guest"],
+      "delete" : ["admin"]
     }
   },
   "email": {
@@ -30,6 +31,9 @@
     "subType" : {
       "type" : "reference",
       "uri": "/group/*/name"
+    },
+    "access" : {
+      "read" : ["guest"]
     }
   }
 }

@@ -262,7 +262,7 @@ class Property
         $this->depth = $depth;
 
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
-        if(!is_string($this->typeName )) {
+        if (!is_string($this->typeName)) {
             echo "ERROR: invalid typename";
             //TODO error
         }
@@ -339,7 +339,7 @@ class Property
     {
         if (count($propertyPath) === 0) return $this;
         $subPropertyName = $propertyPath[0];
-        if($this->typeClass::validateSubPropertyPath($propertyPath,$this->settings)) return $this;
+        if ($this->typeClass::validateSubPropertyPath($propertyPath, $this->settings)) return $this;
         if (!is_string($subPropertyName)) return null;
         $subProperty = array_get($this->subProperties, $subPropertyName);
         if (!$subProperty) return null;
@@ -446,6 +446,11 @@ class Property
 
     public function processAfterConnector(string $method, &$content)
     {
+        $accessSettings = array_get($this->settings, 'access', []);
+        if (!AccessControl::check($method, $accessSettings)) {
+            $message = 'Forbidden';
+            return new ProcessResponse(403, $message);
+        }
         return $this->typeClass::processAfterConnector($method, $content, $this->settings);
     }
 
