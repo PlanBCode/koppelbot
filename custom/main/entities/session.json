@@ -4,7 +4,7 @@
       "type": "session"
     },
     "access": {
-      "write": [
+      "create": [
         "guest"
       ]
     }

@@ -6,8 +6,10 @@
       "path": "custom/main/entities/",
       "extension": "json"
     },
-    "access" : {
-      "read" : ["guest"]
+    "access": {
+      "read": [
+        "guest"
+      ]
     }
   },
   "id": {

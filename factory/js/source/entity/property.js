@@ -4,6 +4,18 @@ const response = require('./response.js');
 const render = require('../render/render.js');
 const input = require('../request/input.js');
 
+const permissionVerbsToMethods = { //TODO single source of truth with access.php
+    'head': ['HEAD'],
+    'get': ['GET'],
+    'patch': ['PATCH'],
+    'put': ['PUT'],
+    'post': ['POST'],
+    'delete': ['DELETE'],
+    'read': ['HEAD', 'GET'],
+    'write': ['HEAD', 'GET', 'PATCH', 'PUT', 'POST'],
+    'create': ['HEAD', 'GET', 'PUT', 'POST'],
+};
+
 const validateSubPropertyPath = (types) => (type, subPropertyPath) => {
     if (!types.hasOwnProperty(type)) return false;
     if (typeof types[type].validateSubPropertyPath !== 'function') return false;
@@ -204,7 +216,6 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         }
     };
 
-
     this.render = (action, options, entityId) => {
         const hasRenderMethod = types.hasOwnProperty(type) && types[type].hasOwnProperty(action);
         if (isPrimitive || hasRenderMethod) {
@@ -222,4 +233,18 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
             return DIV;
         }
     };
+
+    this.checkAccess = (subPropertyPath, method, groups) => {
+        if (!settings.hasOwnProperty('access')) return false;
+        for(let verb in settings.access){
+            if(permissionVerbsToMethods.hasOwnProperty(verb)){
+                if (permissionVerbsToMethods[verb].includes(method)) {
+                    for(let group of groups){
+                        if (settings.access[verb].includes(group)) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 };

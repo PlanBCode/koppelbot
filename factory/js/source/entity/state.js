@@ -32,7 +32,7 @@ function State(method_) {
         error = true;
         errors.push({status, message})
     };
-    this.isChanged = () => changed && !created;
+    this.isChanged = () => (changed && !created) || removed;
     this.isRemoved = () => removed;
     this.isCreated = () => created;
     this.isError = () => error;

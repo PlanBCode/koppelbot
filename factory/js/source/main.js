@@ -20,7 +20,7 @@ function XYZ() {
     this.getDisplayName = (entityClassName, propertyPath) => entity.getDisplayName(entityClasses, entityClassName, propertyPath);
 
     this.on = (uri, eventName, callback) => on(this, entityClasses, uri, eventName, callback);
-
+    this.checkAccess = (uri, method) => entity.checkAccess(entityClasses, uri, method);
     this.ui = (options, WRAPPER) => ui(this, entityClasses, options, WRAPPER);
 
     this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);

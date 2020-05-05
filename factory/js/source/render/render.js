@@ -78,12 +78,12 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
 }
 
 function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submit) {
-   /* TODO WIP
-       xyz.on('/session/*', 'checked', (a, b) => {
-        console.log('>>>', a, b);
-    })*/
+    if (settings.auto) return []; // do not show creator for automatic values
 
-    const accessSettings = settings.access || {};
+    // detect access changes
+    xyz.on(uri, 'access:put', access => {
+        //TODO if access = true: show creator, otherwise block it
+    });
 
     const typeName = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(typeName)) {

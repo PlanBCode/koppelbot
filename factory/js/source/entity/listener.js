@@ -54,9 +54,11 @@ function ListenerHandler() {
         if (!state instanceof State) throw new TypeError("state is not a State.");
 
         if (state.isRemoved()) {
+            callAllListeners('changed', entityId, node, subUri);
             callAllListeners('removed', entityId, node, subUri);
         } else if (state.isCreated()) {
             callAllListeners('created', entityId, node, subUri);
+            callAllListeners('changed', entityId, node, subUri);
             //TODO }else if(state.isError()){
             //   callAllListeners('error', entityId, node, subUri);
         } else if (state.isChanged()) {

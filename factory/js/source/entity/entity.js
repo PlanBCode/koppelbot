@@ -241,8 +241,26 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         }
         return DIV;
     };
-}
 
+    this.checkAccess = (propertyPath, method, groups) => {
+        if (propertyPath.length === 0) {
+            const idPropertyName = this.getIdProperty();
+            if (idPropertyName) return properties[idPropertyName].checkAccess([], method, groups);
+            return false;
+        } else {
+            const subPropertyPath = propertyPath.slice(1);
+            const propertyNames = propertyPath[0] === '*' ? Object.keys(properties) : propertyPath[0].split(',');
+            for (let propertyName of propertyNames) {
+                if (!properties.hasOwnProperty(propertyName)) {
+                    return false;
+                } else if (!properties[propertyName].checkAccess(subPropertyPath, method, groups)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
 
 const handleInput = (method, uri, status, responseContent, requestContent, entityClasses) => {
     const state = new State(method);
@@ -334,9 +352,38 @@ const getDisplayName = (entityClasses, entityClassName, propertyPath) => {
         : 'Unknown';
 };
 
+// checks if user has access to given method and uri
+const checkAccess = (entityClasses, uri, method) => {
+    const groups = ['guest'];
+    if (entityClasses.hasOwnProperty('session')) {
+        const response = getResponse('/session/*/groups', entityClasses, 'GET');
+        if (response.hasOwnProperty('session')) {
+            for (let sessionId in response.session) {
+                const session = response.session[sessionId];
+                const sessionGroups = session.groups;
+                if (!sessionGroups.hasErrors()) {
+                    const g = sessionGroups.getContent();
+                    if (g instanceof Array) {
+                        groups.push.apply(groups, sessionGroups.getContent());
+                    }
+                }
+            }
+        }
+        //TODO make groups unique
+    }
+    const entityClassNames = uriTools.getEntityClassNames(uri, entityClasses);
+    const subPath = uriTools.pathFromUri(uri).slice(2);
+    for (let entityClassName of entityClassNames) {
+        if (!entityClasses.hasOwnProperty(entityClassName) ||
+            !entityClasses[entityClassName].checkAccess(subPath, method, groups)) return false;
+    }
+    return true;
+}
+
 exports.isAutoIncremented = isAutoIncremented;
 exports.getTitlePropertyPath = getTitlePropertyPath;
 exports.getDisplayName = getDisplayName;
+exports.checkAccess = checkAccess;
 
 exports.getResponse = getResponse;
 exports.Class = EntityClass;
