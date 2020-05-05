@@ -11,7 +11,7 @@ class AccessControl
         'delete' => ['DELETE'],
 
         'read' => ['HEAD', 'GET'],
-        'write' => ['HEAD', 'GET', 'PATCH', 'PUT', 'POST'],
+        'write' => ['HEAD', 'GET', 'PATCH', 'PUT', 'POST', 'DELETE'],
         'create' => ['HEAD', 'GET', 'PUT', 'POST'],
     ];
 

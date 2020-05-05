@@ -57,6 +57,11 @@ function showCreateButton(display) {
                 DIV.style.display = 'none';
             }
         };
+
+        display.xyz.on(display.getRequestUri(), 'access:put', access => { // detect access changes // TODO encapsulate xyz
+            INPUT.disabled = !access;
+        });
+
         const WRAPPER = display.getWRAPPER();
         WRAPPER.appendChild(INPUT);
         const DIV = document.createElement('DIV');

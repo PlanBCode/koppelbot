@@ -65,6 +65,10 @@ exports.display = {
             INPUT_deleteButton.onclick = () => {
                 display.xyz.delete(uri); //TODO encapsulate xyz
             };
+            display.xyz.on(uri, 'access:delete', access => {  //TODO encapsulate xyz   // detect access changes
+                INPUT_deleteButton.disabled = !access;
+            });
+
             TD_header.appendChild(INPUT_deleteButton);
         }
         if (showCancelButton) {
@@ -104,7 +108,9 @@ exports.display = {
                 DIV_edit.style.display = 'block';
                 TABLE_entity.style.display = 'none';
             };
-
+            display.xyz.on(uri, 'access:patch', access => {  //TODO encapsulate xyz   // detect access changes
+                INPUT_editButton.disabled = !access;
+            });
             TD_header.appendChild(INPUT_editButton);
         }
 

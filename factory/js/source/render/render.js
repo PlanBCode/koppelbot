@@ -80,11 +80,6 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
 function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submit) {
     if (settings.auto) return []; // do not show creator for automatic values
 
-    // detect access changes
-    xyz.on(uri, 'access:put', access => {
-        //TODO if access = true: show creator, otherwise block it
-    });
-
     const typeName = settings.type || DEFAULT_TYPE;
     if (!types.hasOwnProperty(typeName)) {
         console.error('problem1'); //TODO return a TR containing the error
@@ -101,7 +96,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
         console.error('problem1');
         return []; //TODO return a TR containing the error
     }
-    const TRs = [];
+
     // TODO html label for gebruiken
     const TR = document.createElement('TR');
     if (options.showLabels !== false) {
@@ -181,7 +176,11 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
     const TD_content = document.createElement('TD');
     TD_content.appendChild(TAG);
     TR.appendChild(TD_content);
+    const TRs = [];
     TRs.push(TR);
+    xyz.on(uri, 'access:put', access => { // detect access changes
+        TR.style.display = access ? 'table-row' : 'none';
+    });
     return TRs;
 }
 

@@ -1,10 +1,10 @@
 TODO
 
 per property access control
-- creator: deactivate/hide edit rows for properties you're not allowed to creat
+
+- display: deactivate/hide edit rows for properties you're not allowed to see
 - edit: deactivate/hide rows for properties you're not allowed to edit
 - view: deactivate/hide rows for properties you're not allowed to read
-- deactivate/hide edit/delete button if you do not have permission
 
 
 permissionVerbsToMethods: single source of truth with access.php

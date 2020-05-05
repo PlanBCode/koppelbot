@@ -12,7 +12,7 @@ const permissionVerbsToMethods = { //TODO single source of truth with access.php
     'post': ['POST'],
     'delete': ['DELETE'],
     'read': ['HEAD', 'GET'],
-    'write': ['HEAD', 'GET', 'PATCH', 'PUT', 'POST'],
+    'write': ['HEAD', 'GET', 'PATCH', 'PUT', 'POST', 'DELETE'],
     'create': ['HEAD', 'GET', 'PUT', 'POST'],
 };
 
@@ -218,6 +218,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.render = (action, options, entityId) => {
         const hasRenderMethod = types.hasOwnProperty(type) && types[type].hasOwnProperty(action);
+
+
         if (isPrimitive || hasRenderMethod) {
             const uri = this.getUri(entityId);
             const content = this.getContent(entityId);
@@ -236,10 +238,10 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.checkAccess = (subPropertyPath, method, groups) => {
         if (!settings.hasOwnProperty('access')) return false;
-        for(let verb in settings.access){
-            if(permissionVerbsToMethods.hasOwnProperty(verb)){
+        for (let verb in settings.access) {
+            if (permissionVerbsToMethods.hasOwnProperty(verb)) {
                 if (permissionVerbsToMethods[verb].includes(method)) {
-                    for(let group of groups){
+                    for (let group of groups) {
                         if (settings.access[verb].includes(group)) return true;
                     }
                 }
