@@ -33,7 +33,7 @@ class AccessControl
     {
         if (array_key_exists('content', $_SESSION)) {
             foreach ($_SESSION['content'] as $userName => $session) {
-                if (self::subcheck($method, $session['groups'], $accessSettings)) return true;
+                if (is_array($session['groups']) && self::subcheck($method, $session['groups'], $accessSettings)) return true;
             }
         }
         return self::subcheck($method, self::defaultGroups, $accessSettings);
