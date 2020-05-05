@@ -73,7 +73,14 @@ class Connector_session extends Connector
         } elseif ($propertyName === 'login') { //TODO should not rely on name but should use type instead
             return handleLogin($propertyRequest, $connectorResponse);
         } else if (array_key_exists('content', $_SESSION) && array_key_exists($userName, $_SESSION['content'])) {
-            $keyPath = array_merge(['content', $userName], $propertyRequest->getPropertyPath());
+            $propertyPath = $propertyRequest->getPropertyPath();
+
+            if (count($propertyPath) === 1 && $propertyPath[0] === 'groups') {
+                // groups are handled automatically
+                return $connectorResponse->add(200, $propertyRequest, $userName, null);
+            }
+
+            $keyPath = array_merge(['content', $userName], $propertyPath);
             $newContent = $propertyRequest->getContent();
 
             $jsonActionResponseGet = json_get($_SESSION, $keyPath);

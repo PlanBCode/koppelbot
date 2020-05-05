@@ -128,6 +128,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     this.createCreator = (options, data, INPUT_submit) => {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
+            if (settings.auto) return [];
             const uri = this.getUri('$new');
             return render.creator(xyz, options, uri, settings, [propertyName], data, INPUT_submit);
         } else if (!isPrimitive) {

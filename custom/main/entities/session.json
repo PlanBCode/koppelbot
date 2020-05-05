@@ -13,6 +13,7 @@
     "type": "login"
   },
   "groups": {
+    "auto" : true,
     "type": "array",
     "subType" : {"type": "string"},
     "access": {
