@@ -38,6 +38,7 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         style: 'display:none;',
         uri: options.uri,
         display: 'create',
+        showHeader: false,
         createButtonText: options.loginButtonText || 'Log in',
         onSubmit: data => {
             DIV_listSession.style.display = 'inline-block';
