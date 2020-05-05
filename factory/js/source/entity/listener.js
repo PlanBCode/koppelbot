@@ -55,10 +55,10 @@ function ListenerHandler() {
 
         if (state.isRemoved()) {
             callAllListeners('removed', entityId, node, subUri);
-        }else if (state.isCreated()) {
+        } else if (state.isCreated()) {
             callAllListeners('created', entityId, node, subUri);
             //TODO }else if(state.isError()){
-         //   callAllListeners('error', entityId, node, subUri);
+            //   callAllListeners('error', entityId, node, subUri);
         } else if (state.isChanged()) {
             callAllListeners('changed', entityId, node, subUri);
         } else {
@@ -67,18 +67,18 @@ function ListenerHandler() {
     };
 
     // used for touched event, to immediately return current available data
-    const callListenerWithCurrentEntities = (entityId, callback, subUri, contents) =>{
+    const callListenerWithCurrentEntities = (entityId, callback, subUri, contents) => {
         const eventName = 'touched';
         const subPath = subUri === '' ? [] : subUri.split('/');
         const entityClassName = this.getEntityClassName();
 
-        console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':'+eventName);
-        if(entityId === '*'){
-            for(let entityId in contents){
+        console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
+        if (entityId === '*') {
+            for (let entityId in contents) {
                 const node = this.getResponse(subPath, entityId, 'GET');
                 callback(entityClassName, entityId, node, eventName);
             }
-        }else{
+        } else {
             const node = this.getResponse(subPath, entityId, 'GET');
             callback(entityClassName, entityId, node, eventName);
         }
@@ -93,7 +93,7 @@ function ListenerHandler() {
         if (eventNames.indexOf(eventName) === -1) throw new Error('Listener eventName "' + eventName + '"  is not in allowed event names: ' + eventNames.join(', ') + '.');
 
         // if touched then fire the listeners for existing items
-        if(eventName === 'touched'){
+        if (eventName === 'touched') {
             callListenerWithCurrentEntities(entityId, callback, subUri, contents)
             eventName = 'changed';
         }
