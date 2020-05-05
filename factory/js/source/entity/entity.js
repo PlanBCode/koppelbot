@@ -354,7 +354,7 @@ const getDisplayName = (entityClasses, entityClassName, propertyPath) => {
 
 // checks if user has access to given method and uri
 const checkAccess = (entityClasses, uri, method) => {
-    const groups = ['guest'];
+    const groups = ['/group/guest'];
     if (entityClasses.hasOwnProperty('session')) {
         const response = getResponse('/session/*/groups', entityClasses, 'GET');
         if (response.hasOwnProperty('session')) {

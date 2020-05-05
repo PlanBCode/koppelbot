@@ -7,7 +7,7 @@
       "extension": "*"
     },
     "access" : {
-      "read" : ["guest"]
+      "write" : ["/group/member"]
     }
   },
   "file": {

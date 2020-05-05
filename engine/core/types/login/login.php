@@ -9,7 +9,7 @@ class Type_login extends Type
         if (!array_key_exists('password', $content)) return false;
         if (!is_string($content['username'])) return false;
         if (!is_string($content['password'])) return false;
-        if ($content['username'] === $content['password']) return false;
+        //if ($content['username'] === $content['password']) return false; TODO reinstate after testing
         return true;  // TODO min/max length, allow chars, regex
     }
 

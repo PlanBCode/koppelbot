@@ -6,7 +6,7 @@
       "path": "data/groups.json"
     },
     "access": {
-      "read": ["guest"]
+      "read": ["/group/guest"]
     }
   },
   "name": {

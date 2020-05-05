@@ -7,7 +7,7 @@
       "extension": "json"
     },
     "access" : {
-      "write" : ["guest"]
+      "write" : ["/group/member"]
     }
   },
   "id": {

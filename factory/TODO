@@ -1,11 +1,10 @@
 TODO
 
-per property access control
+- refresh state
 
 - display: deactivate/hide edit rows for properties you're not allowed to see
 - edit: deactivate/hide rows for properties you're not allowed to edit
 - view: deactivate/hide rows for properties you're not allowed to read
-
 
 permissionVerbsToMethods: single source of truth with access.php
 

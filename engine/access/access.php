@@ -15,7 +15,7 @@ class AccessControl
         'create' => ['HEAD', 'GET', 'PUT', 'POST'],
     ];
 
-    public const defaultGroups = ['guest'];
+    public const defaultGroups = ['/group/guest'];
 
     static private function subCheck(string $method, array $userGroups, array &$accessSettings): bool
     {

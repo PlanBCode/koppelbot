@@ -6,8 +6,8 @@
       "path": "data/accounts.json"
     },
     "access" : {
-      "create" : ["guest"],
-      "delete" : ["admin"]
+      "write" : ["/group/guest"],
+      "delete" : ["/group/admin"]
     }
   },
   "email": {
@@ -27,13 +27,13 @@
   },
   "groups" : {
     "type" : "array",
-    "default" : ["guest"],
+    "default" : ["/group/guest"],
     "subType" : {
       "type" : "reference",
       "uri": "/group/*/name"
     },
     "access" : {
-      "read" : ["guest"]
+      "read" : ["/group/guest"]
     }
   }
 }
