@@ -11,5 +11,12 @@
   },
   "login": {
     "type": "login"
+  },
+  "groups": {
+    "type": "array",
+    "subType" : {"type": "string"},
+    "access": {
+      "read": ["guest"]
+    }
   }
 }

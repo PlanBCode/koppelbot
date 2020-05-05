@@ -1,5 +1,5 @@
 const State = require('./state.js').State;
-const eventNames = ['changed', 'created', 'removed']; //TODO , 'error'
+const eventNames = ['changed', 'created', 'removed', 'touched']; //TODO , 'error'
 const response = require('./response.js');
 
 function Listener(listenerHandler, eventName, entityId, subUri) {
@@ -66,13 +66,37 @@ function ListenerHandler() {
         }
     };
 
-    this.addAtomicListener = (entityId, eventName, callback, subUri) => {
+    // used for touched event, to immediately return current available data
+    const callListenerWithCurrentEntities = (entityId, callback, subUri, contents) =>{
+        const eventName = 'touched';
+        const subPath = subUri === '' ? [] : subUri.split('/');
+        const entityClassName = this.getEntityClassName();
+
+        console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':'+eventName);
+        if(entityId === '*'){
+            for(let entityId in contents){
+                const node = this.getResponse(subPath, entityId, 'GET');
+                callback(entityClassName, entityId, node, eventName);
+            }
+        }else{
+            const node = this.getResponse(subPath, entityId, 'GET');
+            callback(entityClassName, entityId, node, eventName);
+        }
+    };
+
+    this.addAtomicListener = (entityId, eventName, callback, subUri, contents) => {
         if (typeof subUri === 'undefined') subUri = '';
         if (typeof subUri !== 'string') throw new TypeError("Listener subUri is not a string.");
         if (typeof callback !== 'function') throw new TypeError("Listener callback is not a function.");
         if (typeof entityId !== 'string') throw new TypeError("Listener entityId is not a string.");
         if (typeof eventName !== 'string') throw new TypeError("Listener eventName is not a string.");
         if (eventNames.indexOf(eventName) === -1) throw new Error('Listener eventName "' + eventName + '"  is not in allowed event names: ' + eventNames.join(', ') + '.');
+
+        // if touched then fire the listeners for existing items
+        if(eventName === 'touched'){
+            callListenerWithCurrentEntities(entityId, callback, subUri, contents)
+            eventName = 'changed';
+        }
 
         if (!listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(entityId)) {
             listenersPerEntityIdPerEventNamePerSubUri[entityId] = {};

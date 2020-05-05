@@ -92,14 +92,13 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     this.addPropertyListener = (entityId, subPropertyPath, eventName, callback) => {
         const listeners = [];
         if (subPropertyPath.length === 0) {
-            const listener = this.addAtomicListener(entityId, eventName, callback);
+            const listener = this.addAtomicListener(entityId, eventName, callback, '', contents);
             listeners.push(listener);
         } else if (isPrimitive) {
             if (types.hasOwnProperty(type) && types[type].hasOwnProperty('validateSubPropertyPath')) {
-
                 if (types[type].validateSubPropertyPath(subPropertyPath, settings, validateSubPropertyPath)) {
                     const subUri = subPropertyPath.join('/');
-                    const listener = this.addAtomicListener(entityId, eventName, callback, subUri);
+                    const listener = this.addAtomicListener(entityId, eventName, callback, subUri, contents);
                     listeners.push(listener);
                 } else {
                     console.error('Invalid sub property path: ' + this.getUri(entityId) + '/' + subPropertyPath.join('/') + ' for type ' + type + '.');

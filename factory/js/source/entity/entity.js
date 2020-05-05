@@ -52,7 +52,7 @@ function EntityClass(xyz, entityClassName, rawSettings) {
     const addEntityListener = (entityId, path, eventName, callback) => {
         const listeners = [];
         if (path.length === 0) {
-            const listener = this.addAtomicListener(entityId, eventName, callback);
+            const listener = this.addAtomicListener(entityId, eventName, callback, '', entities);
             listeners.push(listener);
         } else {
             const propertNameList = path[0];
@@ -124,13 +124,15 @@ function EntityClass(xyz, entityClassName, rawSettings) {
     this.createCreator = (options, data, INPUT_submit) => {
         const TABLE = document.createElement('TABLE');
         TABLE.classList.add('xyz-create');
-        const TR_header = document.createElement('TR');
-        TR_header.classList.add('xyz-create-header');
-        const TD_header = document.createElement('TD');
-        TD_header.setAttribute('colspan', '2');
-        TR_header.appendChild(TD_header);
-        TABLE.appendChild(TR_header);
-        TD_header.innerText = 'New ' + entityClassName;
+        if (options.showHeader !== false) {
+            const TR_header = document.createElement('TR');
+            TR_header.classList.add('xyz-create-header');
+            const TD_header = document.createElement('TD');
+            TD_header.setAttribute('colspan', '2');
+            TR_header.appendChild(TD_header);
+            TABLE.appendChild(TR_header);
+            TD_header.innerText = 'New ' + entityClassName;
+        }
         for (let propertyName in properties) {
             for (let TR of properties[propertyName].createCreator(options, data, INPUT_submit)) {
                 TABLE.appendChild(TR);
@@ -148,13 +150,13 @@ function EntityClass(xyz, entityClassName, rawSettings) {
     };
 
     this.getDisplayName = propertyPath => {
-      if(!(propertyPath instanceof Array) || propertyPath.length === 0 ){
-          return entityClassName; //TODO also add option to $entity.json for a display name
-      } else if(properties.hasOwnProperty(propertyPath[0])){
-          return properties[propertyPath[0]].getDisplayName(propertyPath.slice(1));
-      } else{
-          return 'Unknown';
-      }
+        if (!(propertyPath instanceof Array) || propertyPath.length === 0) {
+            return entityClassName; //TODO also add option to $entity.json for a display name
+        } else if (properties.hasOwnProperty(propertyPath[0])) {
+            return properties[propertyPath[0]].getDisplayName(propertyPath.slice(1));
+        } else {
+            return 'Unknown';
+        }
     };
 
     this.isAutoIncremented = () => {
