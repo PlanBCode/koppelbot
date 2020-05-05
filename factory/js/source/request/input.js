@@ -34,46 +34,53 @@ function changed(a, b) {
     }
 }
 
+function updateContents(path, state, method, responseStatus, responseContent, contents, entityId) {
+    const prevPropertyContent = contents[entityId];
+    switch (responseStatus) {
+        case 200:
+            if ((method === 'PATCH' || method === 'PUT' || method === 'POST') && responseContent === null) {
+                const content = json.get(responseContent, path, null);
+                contents[entityId] = json.set(contents[entityId], path, content, null);
+            } else if (method === 'GET') {
+                contents[entityId] = responseContent;
+            } else if (method === 'DELETE') {
+                state.setRemoved();
+                json.unset(contents[entityId], path, null);
+                if (path.length === 0) delete contents[entityId];
+            }
+            //console.log('UPDATE', responseContent, requestContent, path);
+
+            /*
+            if (changed(prevPropertyContent, responseContent) && typeof responseContent !== 'undefined') {
+                state.setChanged();
+            }
+
+                contents[entityId] = requestContent;
+            } else {
+                contents[entityId] = responseContent;
+            }*/
+            break;
+        case 404:
+            //TODO use message frop source if available
+            //TODO check if error is new eg compare with current error in errors
+            state.setError(404, 'Not found');
+            break;
+        default:
+            //state.setError(); // TODO compare with current error in errors
+            throw new Error('Unsupported status ' + responseStatus);
+    }
+}
+
 
 exports.handlePrimitive = (element, contents, statusses) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
     if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
     if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
-
     const state = new State(method);
     if (contents.hasOwnProperty(entityId)) {
-        const prevPropertyContent = contents[entityId];
-        switch (responseStatus) {
-            case 200:
-                if ((method === 'PATCH' || method === 'PUT' || method === 'POST') && responseContent === null) {
-                    const content = json.get(responseContent, path, null);
-                    contents[entityId] = json.set(contents[entityId], path, content, null);
-                } else if (method === 'GET') {
-                    contents[entityId] = responseContent;
-                } else if (method === 'DELETE') {
-//                    state.setChanged();
-
-                    json.unset(contents[entityId], path, null);
-                }
-                //console.log('UPDATE', responseContent, requestContent, path);
-
-                /*
-                if (changed(prevPropertyContent, responseContent) && typeof responseContent !== 'undefined') {
-                    state.setChanged();
-                }
-
-                    contents[entityId] = requestContent;
-                } else {
-                    contents[entityId] = responseContent;
-                }*/
-                break;
-            case 404:
-                //TODO use message frop source if available
-                //TODO check if error is new eg compare with current error in errors
-                state.setError(404, 'Not found');
-                break;
-            default:
-                //state.setError(); // TODO compare with current error in errors
-                throw new Error('Unsupported status ' + responseStatus);
+        updateContents(path, state, method, responseStatus, responseContent, contents, entityId);
+    } else if (entityId === '*') {
+        for (let entityId in contents) {
+            updateContents(path, state, method, responseStatus, responseContent, contents, entityId);
         }
     } else { // if 200 then changed else error
         switch (responseStatus) {
