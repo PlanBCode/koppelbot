@@ -1,17 +1,19 @@
 {
-  "banaan@jungle.com": {
-    "username": "Aap",
+  "admin": {
+    "password": "$2y$10$CY0V.1v7eBrDZiUFfl1Y3uLhqMy4jvQxxSEnJFCAeQLfULSKoIuPO",
+    "username": "admin",
     "groups": [
-      "guest",
-      "member",
-      "admin"
-    ],
-    "email": "banaan@jungle.com",
-    "password": "$2y$10$QNAFDJit/m.X3hkv.CJW1e4kimSBsU8veKHDKykgn74/HeFwUtT6y"
+      "/group/guest",
+      "/group/member",
+      "/group/admin"
+    ]
   },
-  "info@cashew.com": {
-    "username": "Noot",
-    "email": "info@cashew.com",
-    "password": "$2y$10$QNAFDJit/m.X3hkv.CJW1e4kimSBsU8veKHDKykgn74/HeFwUtT6y"
+  "member": {
+    "password": "$2y$10$2nh1SsMoigJAT2DYOBvCY.QwAStfOxFMMykpQRsoatIG02BiMnIL2",
+    "username": "member",
+    "groups": [
+      "/group/guest",
+      "/group/member"
+    ]
   }
 }
