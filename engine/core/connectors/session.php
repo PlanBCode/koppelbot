@@ -75,10 +75,8 @@ class Connector_session extends Connector
         } else if (array_key_exists('content', $_SESSION) && array_key_exists($userName, $_SESSION['content'])) {
             $propertyPath = $propertyRequest->getPropertyPath();
 
-            if (count($propertyPath) === 1 && $propertyPath[0] === 'groups') {
-                // groups are handled automatically
-                return $connectorResponse->add(200, $propertyRequest, $userName, null);
-            }
+            // groups are handled automatically
+            if (count($propertyPath) === 1 && $propertyPath[0] === 'groups') return $connectorResponse;
 
             $keyPath = array_merge(['content', $userName], $propertyPath);
             $newContent = $propertyRequest->getContent();
@@ -109,14 +107,15 @@ class Connector_session extends Connector
         $userName = $propertyRequest->getEntityId();
         if ($userName === '*') {
             $_SESSION['content'] = [];
-            session_destroy();
+            if (!session_id()) session_destroy();
+
             return $connectorResponse->add(200, $propertyRequest, '*', null);//TODO 'Successfully logged out.'
         }
         if (!array_key_exists($userName, $_SESSION['content'])) {
             return $connectorResponse->add(404, $propertyRequest, $userName, 'Not found.');
         }
         unset($_SESSION['content'][$userName]);
-        if (empty($_SESSION['content'])) session_destroy();
+        if (empty($_SESSION['content']) && !session_id()) session_destroy();
 
         return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'Successfully logged out.'
     }
