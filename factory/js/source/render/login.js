@@ -17,7 +17,7 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
 
     xyz.ui({
         style: 'display:none;',
-        uri: options.uri,
+        uri: options.uri + '/*/login', //TODO parametrize
         display: 'list',
         showHeader: false
     }, DIV_listSession);
