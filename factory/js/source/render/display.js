@@ -167,7 +167,7 @@ const renderUiElement = (xyz, options, WRAPPER) => {
 
     uiElementWaitingForData(display, displayParameters);
 
-    variables.registerUri(uri, uri => {
+    variables.registerUri(xyz, uri, uri => {
             //TODO this can be called multiple times on variable changes,
             uiElementEmpty(display, displayParameters);
             xyz.get(uri, node => { //TODO this should be handled by having an available instead of created listener

@@ -54,8 +54,15 @@ function handleUri(uri, callbacks) {
     }
 }
 
-const registerUri = (uri, readyCallback, waitCallback) => {
-    const callbacks = {ready: readyCallback, wait: waitCallback};
+function refresh(){
+    for(let uri in uriCallbacks){
+        const xyz = uriCallbacks[uri][0].xyz;
+        xyz.get(uri);
+    }
+}
+
+const registerUri = (xyz, uri, readyCallback, waitCallback) => {
+    const callbacks = {xyz, ready: readyCallback, wait: waitCallback};
     if (!uriCallbacks.hasOwnProperty(uri)) {
         uriCallbacks[uri] = [callbacks];
     } else {
@@ -63,6 +70,8 @@ const registerUri = (uri, readyCallback, waitCallback) => {
     }
     handleUri(uri, callbacks);
 };
+
+setInterval(refresh,1000);
 
 exports.getVariable = getVariable;
 exports.hasVariable = hasVariable;
