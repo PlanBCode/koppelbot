@@ -7,3 +7,18 @@
 .xyz-login a:hover {
     text-decoration: underline;
 }
+
+.xyz-login-message {
+    background-color: khaki;
+    color: black;
+    border-radius: 5px;
+    text-align: center;
+    animation-iteration-count: 1;
+    animation-duration: 10s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes xyz-login-hide {
+    from {opacity:1.0;}
+    to {opacity:0.0;}
+}
