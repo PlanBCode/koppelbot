@@ -9,7 +9,7 @@ TODO
 
 permissionVerbsToMethods: single source of truth with access.php
 
-
+- add xyz stop to stop
 
 - maak references klikbaar -> select as variable
 - - reference gebruik laten maken van display.select
@@ -23,10 +23,7 @@ creator
 - error feedback when create failed
 
 fix sign-up flow
-- show message "you've logged in"
-- show message "account x created"
 - auto fill in username after sign up
-- make sure session is visible after sign in
 
 timeline : ensure labels do not overlap and do not go outside wrapper
 - constraints
