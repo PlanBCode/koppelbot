@@ -35,29 +35,32 @@ const setVariables = (variableObject) => {
     }
 };
 
-function handleUri(uri, callbacks) {
-    let complete = true;
+function resolveVariablesInUri(uri) {
     //TODO find ${variableName}
-    uri = uri.replace(/\$(\w+)/, (_, variableName) => {
+    return uri.replace(/\$(\w+)/, (_, variableName) => {
         if (variables.hasOwnProperty(variableName)) {
             return variables[variableName];
         } else {
-            complete = false;
             return '$' + variableName;
         }
     });
-    if (typeof callbacks.wait === 'function') {
-        callbacks.wait(uri);
-    }
-    if (complete) {
-        callbacks.ready(uri);
-    }
 }
 
-function refresh(){
-    for(let uri in uriCallbacks){
+function uriHasUnresolvedVariables(uri) {
+    return uri.includes('$');
+}
+
+function handleUri(uri, callbacks) {
+    uri = resolveVariablesInUri(uri);
+    if (typeof callbacks.wait === 'function') callbacks.wait(uri);
+    if (!uriHasUnresolvedVariables(uri)) callbacks.ready(uri);
+}
+
+function refresh() {
+    for (let uri in uriCallbacks) {
         const xyz = uriCallbacks[uri][0].xyz;
-        xyz.get(uri);
+        uri = resolveVariablesInUri(uri);
+        if (!uriHasUnresolvedVariables(uri)) xyz.get(uri);
     }
 }
 
@@ -71,7 +74,7 @@ const registerUri = (xyz, uri, readyCallback, waitCallback) => {
     handleUri(uri, callbacks);
 };
 
-setInterval(refresh,1000);
+setInterval(refresh, 1000);
 
 exports.getVariable = getVariable;
 exports.hasVariable = hasVariable;

@@ -1,5 +1,6 @@
 TODO
 
+- access not merged, but overwritten for properties
 - hide passwords from api get (system only)
 
 - display: deactivate/hide edit rows for properties you're not allowed to see
@@ -7,6 +8,8 @@ TODO
 - view: deactivate/hide rows for properties you're not allowed to read
 
 permissionVerbsToMethods: single source of truth with access.php
+
+
 
 - maak references klikbaar -> select as variable
 - - reference gebruik laten maken van display.select
