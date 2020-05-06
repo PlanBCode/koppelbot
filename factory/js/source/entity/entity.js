@@ -174,6 +174,15 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         return null;
     };
 
+    this.getIdPropertyPath = () => {
+        for (let propertyName in properties) {
+            const possibleIdProperty = properties[propertyName].getIdPropertyPath();
+            if (possibleIdProperty instanceof Array) return possibleIdProperty;
+        }
+        return null;
+    };
+
+
     this.getIdFromContent = data => {
         if (typeof data !== 'object' || data === null) {//TODO is_object
             return null;
@@ -195,7 +204,6 @@ function EntityClass(xyz, entityClassName, rawSettings) {
 
     this.handleInput = (path, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
         const state = new State(method);
-        const idProperty = this.getIdProperty();
         if (entityClassStatus === 207) {
             for (let entityId of entityIds) {
                 const entity207Wrapper = entityClassContent[entityId];
@@ -244,8 +252,10 @@ function EntityClass(xyz, entityClassName, rawSettings) {
 
     this.checkAccess = (propertyPath, method, groups) => {
         if (propertyPath.length === 0) {
-            const idPropertyName = this.getIdProperty();
-            if (idPropertyName) return properties[idPropertyName].checkAccess([], method, groups);
+            const idPropertyPath = this.getIdPropertyPath();
+            if (idPropertyPath instanceof Array && idPropertyPath.length > 0) {
+                return properties[idPropertyPath[0]].checkAccess([], method, groups);
+            }
             return false;
         } else {
             const subPropertyPath = propertyPath.slice(1);

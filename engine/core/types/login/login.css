@@ -19,6 +19,12 @@
 }
 
 @keyframes xyz-login-hide {
-    from {opacity:1.0;}
-    to {opacity:0.0;}
+    from {
+        visibility: visible;
+        opacity:1.0;
+    }
+    to {
+        visibility: hidden;
+        opacity:0.0;
+    }
 }

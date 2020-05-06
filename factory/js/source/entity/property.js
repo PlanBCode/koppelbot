@@ -196,6 +196,15 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return false;
     };
 
+    this.getIdPropertyPath = () => {
+        if (isPrimitive) return this.isId() ? [propertyName] : null;
+        for (let subPropertyName in subProperties) {
+            const possibleIdProperty = subProperties[subPropertyName].getIdPropertyPath();
+            if (possibleIdProperty instanceof Array) return [propertyName].concat(possibleIdProperty);
+        }
+        return null;
+    };
+
     this.getIdFromContent = data => {
         if (isPrimitive) {
             if (types.hasOwnProperty(type) && typeof types[type].getIdFromContent === 'function') {
@@ -218,8 +227,6 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.render = (action, options, entityId) => {
         const hasRenderMethod = types.hasOwnProperty(type) && types[type].hasOwnProperty(action);
-
-
         if (isPrimitive || hasRenderMethod) {
             const uri = this.getUri(entityId);
             const content = this.getContent(entityId);

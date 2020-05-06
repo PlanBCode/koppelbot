@@ -4,6 +4,21 @@ XYZ is a server side application that provides API and UI interfaces to your dat
 
 Using data models and html templates you can quickly build your web based applications.
 
+## Getting started
+
+For a full introduction check tutorial.md
+
+### Web server
+To install for Apache web server: copy the repo to the server folder. the `.htaccess` file 
+will rout all requests to index.php;  
+
+### Local test server
+
+A local (php) test server can be started using:
+
+`$ ./xyz start`
+
+
 ## API
 
 The API provides a json interface to the data. 
