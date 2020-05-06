@@ -2,12 +2,39 @@
 SCRIPTDIR=$(dirname "$0")
 XYZ_HOME=$(cd "$SCRIPTDIR" && pwd)
 
-if [ "$1" = "-S" ]; then
-  if [ -z "$2" ]; then
-    php -S localhost:8000 "$XYZ_HOME/index.php"
+getPid() {
+  echo $(ps | grep "php -S $1" | grep -v "grep" | cut -d' ' -f1)
+}
+
+if [ "$1" = "stop" ]; then
+
+  pid=$(getPid "");
+  if [ -z "$pid" ]; then
+    echo "No server to stop"
   else
-    php -S "$2" "$XYZ_HOME/index.php"
+    echo  "Killing sever at pid $pid"
+    kill $pid
   fi
+
+elif [ "$1" = "-S" ] || [ "$1" = "start" ]; then
+
+  if [ -z "$2" ]; then
+    hostName="localhost:8000"
+  else
+    hostName="$2"
+  fi
+
+  pid=$(getPid "$hostName");
+
+  if [ -z "$pid" ]; then
+    echo "Starting server on $hostName"
+    php -S "$hostName" "$XYZ_HOME/index.php"
+  else
+    echo "Server already running under pid $pid."
+    echo "Use 'xyz stop' to stop."
+  fi
+
+
 else
   php -f "$XYZ_HOME/index.php" -- $@
 fi
