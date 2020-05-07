@@ -45,7 +45,7 @@ exports.actions = {
             const TR_submit = document.createElement('TR');
             const TD_submit = document.createElement('TD');
             const INPUT_submit = document.createElement('INPUT');
-            INPUT_submit.setAttribute('colspan', '2');
+            //TODO huh?  INPUT_submit.setAttribute('colspan', '2');
             INPUT_submit.type = 'Submit';
             INPUT_submit.value = 'Update';
             TD_submit.appendChild(INPUT_submit);

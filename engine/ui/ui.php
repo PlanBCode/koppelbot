@@ -14,7 +14,7 @@ class UiRequest extends HttpRequest2
         $rootUri = 'http://localhost:8000/';//TODO proper location
 
         $menuItems = [];
-        foreach (glob('./engine/core/displays/*.js') as $file) {
+        foreach (glob('{./engine/core,./custom/main}/displays/*', GLOB_BRACE) as $file) {
             $displayName = basename($file, '.js');
             $menuItems['ui/' . $displayName] = $displayName;
         }
@@ -23,7 +23,7 @@ class UiRequest extends HttpRequest2
         $menuItems['ui/delete'] = 'delete';
         if ($display === '') {
             $body = '<h3>Choose an interaction method:</h3><ul>';
-            foreach (glob('./engine/core/displays/*.js') as $file) {
+            foreach (glob('{./engine/core,./engine/main}/displays/*', GLOB_BRACE) as $file) {
                 $displayName = basename($file, '.js');
                 $menuItems['ui/' . $displayName] = $displayName;
                 $body .= '<li><a href="' . $rootUri . 'ui/' . $displayName . '">' . $displayName . '</a></li>';
@@ -36,7 +36,7 @@ class UiRequest extends HttpRequest2
             $menuItems['ui/create'] = 'create';
         } elseif ($entityClassName === '') {
             $body = '<h3>Choose an entity class:</h3><ul>';
-            foreach (glob('./custom/main/entities/*.json') as $file) {
+            foreach (glob('{./engine/core,./custom/*}/entities/*.json',GLOB_BRACE) as $file) {
                 $entityClassName = basename($file, '.json');
                 $body .= '<li><a href="' . $rootUri . 'ui/' . $display . '/' . $entityClassName . '">' . $entityClassName . '</a></li>';
             }

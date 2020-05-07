@@ -19,6 +19,13 @@ function array_null_get(?array &$array, $key)
     }
 }
 
+function endsWith($haystack, $needle)
+{
+    $length = strlen($needle);
+    if ($length == 0) return true;
+    return (substr($haystack, -$length) === $needle);
+}
+
 function array_startsWith(array &$a, array &$b)
 {
     $countA = count($a);

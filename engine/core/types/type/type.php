@@ -1,6 +1,6 @@
 <?php
 
-Class ProcessResponse
+class ProcessResponse
 {
     /** @var int */
     protected $status;
@@ -46,16 +46,15 @@ abstract class Type
         if (array_key_exists($typeName, self::$types)) {
             return self::$types[$typeName];
         } else {
-            // TODO an instance of Type_xxx should not be needed, we only use static functions
-
             if ($typeName === 'type') {
                 $typeClass = Type_type::class;
             } else {
-                $fileName = './engine/core/types/' . $typeName . '/' . $typeName . '.php'; // TODO or custom/types
-                if (!file_exists($fileName)) {
+                $fileNames = glob('{./engine/core,./custom/*}/types/' . $typeName . '/' . $typeName . '.php', GLOB_BRACE);
+                if (count($fileNames) === 0) {
                     echo 'ERROR Type ' . $typeName . ' : file does not exist!';
                     return null;
                 }
+                $fileName = $fileNames[0];
 
                 require_once $fileName;
 

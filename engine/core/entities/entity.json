@@ -3,7 +3,7 @@
     "connector": {
       "type": "directory",
       "parse": "json",
-      "path": "custom/main/entities/",
+      "path": "custom/main/entities/:engine/core/entities/",
       "extension": "json"
     },
     "access": {

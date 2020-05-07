@@ -81,16 +81,12 @@ provide display settings schema in json form
 
 Connector_path : een hele directory als entity met subproperties zien
 
-Connector_directory: split directory on spaces,comma's or (semi)colons
-- - - to browse multiple directories
-
 hide private connector settings or better only expose specified ones
 
 "_" -> root is labeled as string (because no type)	: string(connector:{....},...)
         would be nice to give this a root type :)
 
-use the plugin structure
-/custom/$PLUGINNAME/
+improve the plugin structure
 - package.json
 - sandbox plugin access
 - ini_set("open_basedir", "/mag/alleen/hier/bij/komen:/of/tot/hier/");

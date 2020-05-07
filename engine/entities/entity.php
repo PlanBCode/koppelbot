@@ -12,10 +12,9 @@ class EntityClass
         if (array_key_exists($entityClassName, self::$entityClasses)) {
             return self::$entityClasses[$entityClassName];
         } else {
-
-            $fileName = './custom/main/entities/' . $entityClassName . '.json';
-            if (!file_exists($fileName)) return null;
-
+            $fileNames = glob('{./engine/core,./custom/*}/entities/' . $entityClassName . '.json',GLOB_BRACE);
+            if (count($fileNames)===0) return null;
+            $fileName = $fileNames[0];
             $fileContent = file_get_contents($fileName); //TODO make safe
             //TODO check if this goes well
             $meta = json_decode($fileContent, true);
