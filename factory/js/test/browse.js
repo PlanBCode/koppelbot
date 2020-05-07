@@ -1,15 +1,20 @@
 const child_process = require('child_process');
 const jsdom = require("jsdom");
 const {JSDOM} = jsdom;
+let xyz;
 
 const host = 'http://localhost:8000';
 
 function request(url, method, data, callback) {
-    url = url.substr(host.length); // 'http://localhost:8000/api/abc' -> /api/abc'
-    child_process.exec(`./xyz '${url}' '${data}' --method ${method} --prefix /`,
-        {cwd: `${__dirname}/../../..`},
-        callback // (error, stdout, stderr) => {...}
-    );
+    if (url === 'http://localhost:8000/xyz-ui.js') {
+        callback(null, '', '');
+    } else {
+        url = url.substr(host.length); // 'http://localhost:8000/api/abc' -> /api/abc'
+        child_process.exec(`./xyz '${url}' '${data}' --method ${method} --prefix /`,
+            {cwd: `${__dirname}/../../..`},
+            callback // (error, stdout, stderr) => {...}
+        );
+    }
 }
 
 function requestSync(url, method, data) {
@@ -64,9 +69,15 @@ function HtmlPage(url) {
             resources: resourceLoader
 
         });
+        window = dom.window;
+        document = dom.window.document;
+        const main = require('../source/main').xyz;
+        xyz = main;
+        dom.window.xyz = main;
 
         dom.window.XMLHttpRequest = XMLHttpRequest; // Inject mock XMLHttpRequest implementation
-        dom.window.console.log = ()=>{};
+        dom.window.console.log = () => {
+        };
 
         dom.window.onModulesLoaded = () => {
             console.log("ready to roll!");

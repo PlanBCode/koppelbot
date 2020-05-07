@@ -7,7 +7,7 @@ function request(method, uri, data, callback) {
     //TODO allow for multiple hosts by prepending http(s)://..
     const location = 'http://localhost:8000/'; //TODO determine dynamically
 
-    const xhr = new XMLHttpRequest();
+    const xhr = new window.XMLHttpRequest();
     xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
 
     xhr.onreadystatechange = () => {

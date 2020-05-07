@@ -22,7 +22,7 @@ exports.getCookie = function () {
 
 function getQueryParameters() {
     const queryParameters = {};
-    location.search
+    window.location.search
         .substr(1) // '?a=1&b=2' -> 'a=1&b=2'
         .split('&') // ['a=1','b=2']
         .filter(x => x !== '')

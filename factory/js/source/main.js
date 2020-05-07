@@ -34,7 +34,7 @@ function XYZ() {
 const xyz = new XYZ();
 exports.ui = xyz.ui;
 exports.on = xyz.on;
-
+exports.xyz = xyz;
 //TODO get(Variable)
 //TODO set(Variable(s))
 //TODO globals()

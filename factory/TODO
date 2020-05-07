@@ -9,8 +9,6 @@ TODO
 
 permissionVerbsToMethods: single source of truth with access.php
 
-- add xyz stop to stop
-
 - maak references klikbaar -> select as variable
 - - reference gebruik laten maken van display.select
 
