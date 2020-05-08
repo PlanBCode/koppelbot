@@ -122,12 +122,13 @@ it won't be available through the internet for other users.
 
  ```
    $ ./xyz -S
+   Starting server on localhost:8000
    PHP 7.3.11 Development Server started at Mon Feb 17 11:10:20 2020
    Listening on http://localhost:8000
    Document root is /your/local/server/path/
    Press Ctrl-C to quit.
    ```
-If you close terminal or press Control + C the server will be stopped.
+If you close the terminal or press Control + C the server will be stopped.
 
 8. Browse to the following - probably familiar looking - places:
 
@@ -137,8 +138,8 @@ If you close terminal or press Control + C the server will be stopped.
 
 ## Templates
 
-9. With your a text editor open the file `./custom/main/content/tutorial.html`
-(or run `cat ./custom/main/content/tutorial.html` in your terminal to view it.)
+9. With your a text editor open the file `./custom/tutorial/content/index.html`
+(or run `cat ./custom/tutorial/content/index.html` in your terminal to view it.)
 
 ```
 <html>
@@ -188,11 +189,11 @@ This retrieves all fruit names and displays them in a list. If you select one. T
 
 When the `myFruit` variable is not empty this will retrieve the specified fruit and display it.
 
-10. Now browse to http://localhost:8000/tutorial.html
+10. Now browse to http://localhost:8000/tutorial
 
 11. Press the `+` Button below the list to unfold the creation interface. Try to add a fruit.
 
-12. Open the `./custom/main/content/tutorial.html` file in your text editor and change the 
+12. Open the `./custom/tutorial/content/index.html` file in your text editor and change the 
 
 ```
     <xyz uri="$myFruit" display="item"/>
@@ -204,7 +205,7 @@ Into:
     <xyz uri="$myFruit" display="edit"/>
 ```
 
-This will display an editor instead of an item viewer. Browse to http://localhost:8000/tutorial.html again to edit 
+This will display an editor instead of an item viewer. Browse to http://localhost:8000/tutorial again to edit 
 the selected piece of fruit.
 
 13. Now view `./custom/main/entities/fruit.json` in your text editor.
@@ -285,8 +286,8 @@ The size of a fruit is one of the choices in the list small, medium or large.
 
 The name is used as the key by the connector.
 
-14. Now view `./custom/data/fruits.json` in your text editor.
-(or run `cat ./custom/data/fruits.json` in your terminal to view it.)
+14. Now view `./data/fruits.json` in your text editor.
+(or run `cat ./data/fruits.json` in your terminal to view it.)
 
 ```
 {"grape":{"color":"green","size":"small"},"melon":{"color":"green","size":"large"},"apple":{"color":"red","size":"medium"},"orange":{"color":"orange","size":"medium"}}

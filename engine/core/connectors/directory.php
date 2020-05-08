@@ -11,6 +11,7 @@ require_once './engine/core/connectors/basic.php';
       key: "content"
       key: "basename"
       key: "filename"
+      key: "path"
       key: "extension"
       key: "content.a.b"
    TODO modified/created = timestamps
@@ -21,11 +22,9 @@ TODO recursive
 
 class Connector_directory extends BasicConnector
 {
-    /*
-    create directories if required
 
-     */
-    protected $path;
+
+    protected $paths;  // : separated paths
     protected $extension;
     protected $data;
     protected $meta;
@@ -36,14 +35,16 @@ class Connector_directory extends BasicConnector
 
     public function __construct(array &$settings)
     {
-        $this->path = array_get($settings, 'path');
+        // TODO create directories if required
+        $this->paths = explode(':', array_get($settings, 'path'));
         $this->extension = array_get($settings, 'extension', '*');
         $this->settings = $settings;
     }
 
-    protected function createFilePath(string $entityId)
+    protected function createFilePath(string $entityId, string $path = null)
     {
-        return $this->path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
+        if (is_null($path)) $path = $this->paths[0]; //TODO check if length >0
+        return $path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
     }
 
     static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
@@ -56,9 +57,12 @@ class Connector_directory extends BasicConnector
     protected function getAllEntityIds(): array
     {
         $entityIds = [];
-        foreach (glob($this->createFilePath('*')) as $filePath) {
-            if (!is_dir($filePath)) {
-                $entityIds[] = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
+        foreach ($this->paths as $path) {
+            foreach (glob($this->createFilePath('*', $path)) as $filePath) {// TODO use glob('{a,b}', GLOB_BRACE)
+                if (!is_dir($filePath)) {
+                    $entityId = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
+                    $entityIds[$entityId] = $filePath;
+                }
             }
         }
         return $entityIds;
@@ -71,7 +75,7 @@ class Connector_directory extends BasicConnector
         }
         if (empty($this->autoIncrementLookup)) {
             //TODO error if extension === '*'  no way to decide then
-            $allExistingEntityIds = $this->getAllEntityIds();
+            $allExistingEntityIds = array_keys($this->getAllEntityIds());
             if (empty($allExistingEntityIds)) {
                 $this->maxAutoIncrementedId = 0;
             } else {
@@ -90,7 +94,8 @@ class Connector_directory extends BasicConnector
     {
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
         $propertyRequest = $connectorRequest->getFirstPropertyRequest();
-
+        $this->data = [];
+        $this->meta = [];
         $entityIds = [];
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
             $entityIdList = $propertyRequest->getEntityId();
@@ -98,21 +103,22 @@ class Connector_directory extends BasicConnector
                 $entityIds = $this->getAllEntityIds();
                 break;
             } else {
-                array_push($entityIds, ...explode(',', $entityIdList));
-                $entityIds = array_unique($entityIds);
+                $moreEntityIds = explode(',', $entityIdList);
+                foreach ($moreEntityIds as $entityId) {
+                    $paths = array_map(function ($path) use ($entityId) {
+                        return $this->createFilePath($entityId, $path);
+                    }, $this->paths);
+
+                    $filePaths = glob('{' . implode(',', $paths) . '}', GLOB_BRACE);
+                    if (count($filePaths) === 0) new connectorResponse(404); // TODO pass an error message?
+                    $filePath = $filePaths[0];
+                    $entityIds[$entityId] = $filePath;
+                }
             }
         }
-
-        $this->data = [];
-        $this->meta = [];
         $parse = $propertyRequest->getProperty()->getConnectorSetting('parse', 'none');
-        foreach ($entityIds as $entityId) {
-            $filePath = $this->createFilePath($entityId);
-
+        foreach ($entityIds as $entityId => $filePath) {
             //TODO lock file
-            if (!file_exists($filePath)) {// TODO pass an error message?
-                return new connectorResponse(404);
-            }
             $fileContent = file_get_contents($filePath);
             //TODO error if fails
             if ($parse === 'json') {
@@ -124,6 +130,7 @@ class Connector_directory extends BasicConnector
             $this->meta[$entityId]['extension'] = pathinfo($filePath, PATHINFO_EXTENSION);
             $this->meta[$entityId]['mime'] = mime_content_type($filePath);
             $this->meta[$entityId]['size'] = filesize($filePath);
+            $this->meta[$entityId]['path'] = $filePath;
             //TODO creation timestamp, modification timestamp
         }
         return new connectorResponse(200);
@@ -146,16 +153,19 @@ class Connector_directory extends BasicConnector
                     $fileContent = $data;
                 }
                 if ($fileContent) {
-                    file_put_contents($this->createFilePath($entityId), $fileContent);
+                    if ($this->meta[$entityId]['path']) {
+                        $filePath = $this->meta[$entityId]['path'];
+                    } else {
+                        $filePath = $this->createFilePath($entityId);
+                    }
+                    file_put_contents($filePath, $fileContent);
                 }
             }
             //TODO unlock file
         }
         // check for deleted files
         foreach ($this->meta as $entityId => $meta) {
-            if(!array_key_exists($entityId,$this->data)){
-                unlink($this->createFilePath($entityId));
-            }
+            if (!array_key_exists($entityId, $this->data)) unlink($this->meta[$entityId]['path']);
         }
 
         return new connectorResponse(200);

@@ -29,7 +29,7 @@ The uri's for API endpoints are structured as:
 
 Examples
 
-`http://localhost:8080/api/car?color=red`
+`http://localhost:8000/api/car?color=red`
 Get all red cars.
 
 `https://www.site.com/api/fruit/apple/color`
@@ -38,7 +38,7 @@ Get the color of the fruit apple.
 `https://www.site.com/api/fruit/*/color`
 Get the colors of all fruits.
 
-`http://localhost:8080/api/car/*/color,model`
+`http://localhost:8000/api/car/*/color,model`
 Get the color and model for all cars.
 
 `https://www.site.com/api/fruit/banana,grape/color`

@@ -46,18 +46,20 @@ const write = (path, content) => cb => {
     fs.writeFile(path, content, handleError(cb));
 };
 
+// generate a requires file for types|displays
 const generateRequiresFile = (name, component) => cb => {
     let js = name === 'types'
-        ? `// This file is created by gulpfile.js using the type definitions of engine/core/${name}/*/*.js. \n\n`
-        : `// This file is created by gulpfile.js using the type definitions of engine/core/${name}/*/*.js. \n\n`;
-    forEachFile(`../../engine/core/${name}/*`,
+        ? `// This file is created by gulpfile.js using the definitions of engine/core/${name}/*/*.js:custom/*/${name}/*/*.js. \n\n`
+        : `// This file is created by gulpfile.js using the definitions of engine/core/${name}/*/*.js:custom/*/${name}/*/*.js. \n\n`;
+    forEachFile(`../../engine/core/${name}/*:../../custom/*/${name}/*`,
         file => cb => {
             const id = baseName(file.path);
+            const folder = '../../../engine/core'; //TODO could also be custom/something
             if (name === 'types') {
-                js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}/${id}.js').${component};\n`;
-                js += `exports.${baseName(file.path)}.json = require('../../../engine/core/${name}/${id}/${id}.json');\n\n`;
+                js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
+                js += `exports.${baseName(file.path)}.json = require('${folder}/${name}/${id}/${id}.json');\n\n`;
             } else {
-                js += `exports.${baseName(file.path)} = require('../../../engine/core/${name}/${id}/${id}.js').${component};\n`;
+                js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
             }
             cb();
         }
@@ -68,7 +70,12 @@ const generateRequiresFile = (name, component) => cb => {
 
 const generateCssFile = cb => {
     let css = `/* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */\n\n`;
-    forEachFile(`../../engine/core/*/*/*.css:../css/*.css`,
+    forEachFile([
+            '../../engine/core/*/*/*.css',
+            '../../custom/*/types/*/*.css',
+            '../../custom/*/displays/*/*.css',
+            '../css/*.css'
+        ].join(':'),
         file => cb => {
             css += file.contents;
             cb();
@@ -84,9 +91,15 @@ const generateTypesFile = generateRequiresFile('types', 'actions');
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 
 gulp.watch([`../../engine/core/*/*/*.css`], gulp.series(generateCssFile, build));
+gulp.watch([`../../custom/*/types/*/*.css`], gulp.series(generateCssFile, build));
+gulp.watch([`../../custom/*/displays/*/*.css`], gulp.series(generateCssFile, build));
 
 gulp.watch([`../../engine/core/types/**/*.js`], gulp.series(generateTypesFile, build));
+gulp.watch([`../../custom/*/types/**/*.js`], gulp.series(generateTypesFile, build));
+
 gulp.watch([`../../engine/core/displays/**/*.js`], gulp.series(generateDisplaysFile, build));
+gulp.watch([`../../custom/*/displays/**/*.js`], gulp.series(generateDisplaysFile, build));
+
 gulp.watch([`./source/**/*.js`], build);
 
 exports.default = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, build);

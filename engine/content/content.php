@@ -18,7 +18,7 @@ function replaceXyzTag($fileContent): string
                 $attributeValue = $attributeValues [$i];
                 $attributePath = explode('-', $attributeName); // "property-option" -> ["property","option"]
                 //if (count($attributePath) === 1) { // optionName="value" -> options[optionName]="value"
-                    $options[$attributeName] = $attributeValue;
+                $options[$attributeName] = $attributeValue;
                 /*} else {  // propertyName-optionName="value" -> options[subOptions][propertyName][optionName]="value"
                     if (!array_key_exists('subOptions', $options)) $options['subOptions'] = [];
                     json_set($options['subOptions'], $attributePath, $attributeValue);
@@ -31,6 +31,19 @@ function replaceXyzTag($fileContent): string
     return $fileContent;
 }
 
+function isCustomContent(string $uri)
+{
+    $path = explode('/', $uri);
+    if (count($path) <= 1) return '';
+    $plugin = $path[1];
+    if (count($path) === 2) {
+        $fileName = 'custom/' . $plugin . '/content/index.html';
+    } else {
+        $subUri = array_slice($path, 2);
+        $fileName = 'custom/' . $plugin . '/content/' . implode('/', $subUri);
+    }
+    return file_exists($fileName) ? $fileName : '';
+}
 
 class ContentRequest extends HttpRequest2
 {
@@ -43,11 +56,17 @@ class ContentRequest extends HttpRequest2
             } else {
                 return new ContentResponse(200, 'Hello World');
             }
-        } elseif ($this->uri == '/xyz-style.css') {
+        } elseif (endsWith($this->uri, '/xyz-style.css')) {
             $fileContent = file_get_contents('engine/ui/style.css');
             return new ContentResponse(200, $fileContent);
-        } elseif ($this->uri == '/xyz-ui.js') {
+        } elseif (endsWith($this->uri, '/xyz-ui.js')) {
             $fileContent = file_get_contents('engine/ui/xyz-ui.webpacked.js');
+            return new ContentResponse(200, $fileContent);
+        } elseif ($fileName = isCustomContent($this->uri)) {
+            $fileContent = file_get_contents($fileName);//TODO make safe!
+            if (pathinfo($fileName, PATHINFO_EXTENSION) === 'html') {
+                $fileContent = replaceXyzTag($fileContent);
+            }
             return new ContentResponse(200, $fileContent);
         } elseif (file_exists('custom/main/content' . $this->uri)) {
             $fileContent = file_get_contents('custom/main/content' . $this->uri);//TODO make safe!
