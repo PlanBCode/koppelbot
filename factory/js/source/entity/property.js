@@ -98,7 +98,7 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     };
 
     this.handleInput = isPrimitive
-        ? input.handlePrimitive(this, contents, statusses, subProperties)
+        ? input.handlePrimitive(this, contents, statusses)
         : input.handle(this, statusses, subProperties);
 
     this.addPropertyListener = (entityId, subPropertyPath, eventName, callback) => {

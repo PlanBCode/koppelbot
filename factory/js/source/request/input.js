@@ -42,7 +42,7 @@ function updateContents(path, state, method, responseStatus, responseContent, co
                 const content = json.get(responseContent, path, null);
                 contents[entityId] = json.set(contents[entityId], path, content, null);
             } else if (method === 'GET') {
-                contents[entityId] = responseContent;
+                if (typeof responseContent !== 'undefined') contents[entityId] = responseContent;
             } else if (method === 'DELETE') {
                 state.setRemoved();
                 json.unset(contents[entityId], path, null);
