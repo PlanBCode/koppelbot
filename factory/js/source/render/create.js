@@ -18,28 +18,36 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         INPUT_submit.type = 'submit';
         INPUT_submit.value = options.createButtonText || 'Create ' + entityClassName;
         INPUT_submit.validUris = {};
+        const SPAN_message = document.createElement('SPAN');
 
-        let TABLE = entityClass.createCreator(options, data, INPUT_submit);
+        const displayMessage = message => {
+            SPAN_message.innerText = typeof message === 'undefined' ? '' : message;
+        };
+
+        let TABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
 
         INPUT_submit.onclick = () => {
             if (entityClass.isAutoIncremented()) {
-                xyz.post(uri, {[entityClassName]: {'new': data}},);
+                xyz.post(uri, {[entityClassName]: {'new': data}});
             } else {
                 const entityId = entityClass.getIdFromContent(data);
-                xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}},);
+                xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}});
             }
             if (typeof options.onSubmit === 'function') {
                 options.onSubmit(data);
             }
             const newData = {};
-            const newTABLE = entityClass.createCreator(options, newData, INPUT_submit);
+            const newTABLE = entityClass.createCreator(options, newData, INPUT_submit, displayMessage);
             TAG.insertBefore(newTABLE, TABLE);
             TAG.removeChild(TABLE);
             TABLE = newTABLE;
+            displayMessage('Creating..');
         };
 
         TAG.appendChild(TABLE);
         TAG.appendChild(INPUT_submit);
+        TAG.appendChild(SPAN_message);
+
     });
     return TAG;
 };

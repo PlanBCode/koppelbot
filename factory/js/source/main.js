@@ -24,11 +24,11 @@ function XYZ() {
     this.ui = (options, WRAPPER) => ui(this, entityClasses, options, WRAPPER);
 
     this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);
-    this.head = (uri) => request.head(entityClasses, uri);
-    this.post = (uri, content) => request.post(entityClasses, uri, content);
-    this.patch = (uri, content) => request.patch(entityClasses, uri, content);
-    this.put = (uri, content) => request.put(entityClasses, uri, content);
-    this.delete = uri => request.delete(entityClasses, uri);
+    this.head = (uri, callback) => request.head(entityClasses, uri, callback);
+    this.post = (uri, content, callback) => request.post(entityClasses, uri, content, callback);
+    this.patch = (uri, content, callback) => request.patch(entityClasses, uri, content, callback);
+    this.put = (uri, content, callback) => request.put(entityClasses, uri, content, callback);
+    this.delete = (uri, callback) => request.delete(entityClasses, uri, callback);
 }
 
 const xyz = new XYZ();

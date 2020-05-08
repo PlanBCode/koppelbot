@@ -20,14 +20,10 @@ function changed(a, b) {
                 for (let key in a) {
                     if (b.hasOwnProperty(key)) {
                         if (changed(a[key], b[key])) return true
-                    } else {
-                        return true;
-                    }
+                    } else return true;
                 }
                 for (let key in b) {
-                    if (!a.hasOwnProperty(key)) {
-                        return true;
-                    }
+                    if (!a.hasOwnProperty(key)) return true;
                 }
                 return false;
             }
@@ -35,7 +31,7 @@ function changed(a, b) {
 }
 
 function updateContents(path, state, method, responseStatus, responseContent, contents, entityId) {
-    const prevPropertyContent = contents[entityId];
+    //TODO use to determine state.setChanged? const prevPropertyContent = contents[entityId];
     switch (responseStatus) {
         case 200:
             if ((method === 'PATCH' || method === 'PUT' || method === 'POST') && responseContent === null) {
@@ -122,9 +118,7 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
     const state = new State(method);
 
     if (entities) { // only for entity
-        if (!entities.hasOwnProperty(entityId)) {
-            state.setCreated();
-        }
+        if (!entities.hasOwnProperty(entityId)) state.setCreated();
         entities[entityId] = true; //TODO hier moet meer mee
     }
 

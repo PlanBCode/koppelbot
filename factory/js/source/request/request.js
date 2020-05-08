@@ -48,33 +48,37 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     }
 };
 
-exports.delete = (entityClasses, uri) => {
+exports.delete = (entityClasses, uri, callback) => {
     request('DELETE', uri, null, (status, response) => {
         console.log('delete response: ' + uri + ' ' + response);
         const responseContent = JSON.parse(response);
         entity.handleInput('DELETE', uri, status, responseContent, null, entityClasses);
+        if (typeof callback === 'function') callback();
     });
 };
 
-exports.head = uri => {
+exports.head = (uri, callback) => {
     request('HEAD', uri, null, (status, response) => {
         console.log('head response: ' + uri + ' ' + response);
+        if (typeof callback === 'function') callback();
+
     });
 };
 
-const handleModifyRequest = (entityClasses, method, uri, requestObjectContent) => {
+const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, callback) => {
     console.log(method + ' request', uri, requestObjectContent);
     const requestStringContent = JSON.stringify(requestObjectContent);
     request(method, uri, requestStringContent, (status, responseStringContent) => {
         console.log(method + ' response:' + responseStringContent, uri);
         const responseObjectContent = JSON.parse(responseStringContent);
         entity.handleInput(method, uri, status, responseObjectContent, requestObjectContent, entityClasses);
+        if (typeof callback === 'function') callback();
     });
 };
 
-exports.post = (entityClasses, uri, content) => handleModifyRequest(entityClasses, 'POST', uri, content);
-exports.patch = (entityClasses, uri, content) => handleModifyRequest(entityClasses, 'PATCH', uri, content);
-exports.put = (entityClasses, uri, content) => handleModifyRequest(entityClasses, 'PUT', uri, content);
+exports.post = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'POST', uri, content, callback);
+exports.patch = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PATCH', uri, content, callback);
+exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PUT', uri, content, callback);
 
 // callback = Response =>{}
 // get the requested uri from cache or request it from server

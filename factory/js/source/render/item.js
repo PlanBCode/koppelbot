@@ -56,7 +56,7 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
         }
     };
 
-    this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit);
+    this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit, displayMessage) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit, displayMessage);
 
     this.ui = xyz.ui;
 

@@ -139,16 +139,16 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getSubObject = subPropertyName => subProperties[subPropertyName];
 
-    this.createCreator = (options, data, INPUT_submit) => {
+    this.createCreator = (options, data, INPUT_submit, displayMessage) => {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {
             if (settings.auto) return [];
             const uri = this.getUri('$new');
-            return render.creator(xyz, options, uri, settings, [propertyName], data, INPUT_submit);
+            return render.creator(xyz, options, uri, settings, [propertyName], data, INPUT_submit, displayMessage);
         } else if (!isPrimitive) {
             for (let propertyName in subProperties) {
                 data[propertyName] = {};
-                TRs.push(...subProperties[propertyName].createCreator(options, data[propertyName], INPUT_submit));
+                TRs.push(...subProperties[propertyName].createCreator(options, data[propertyName], INPUT_submit, displayMessage));
             }
         } else {
             console.error('No available rendering method for edit ' + type);
