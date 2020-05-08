@@ -27,11 +27,12 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         let TABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
 
         INPUT_submit.onclick = () => {
+            const displayCreatedMessage = () => displayMessage('Created');
             if (entityClass.isAutoIncremented()) {
-                xyz.post(uri, {[entityClassName]: {'new': data}});
+                xyz.post(uri, {[entityClassName]: {'new': data}}, displayCreatedMessage);
             } else {
                 const entityId = entityClass.getIdFromContent(data);
-                xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}});
+                xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
             }
             if (typeof options.onSubmit === 'function') {
                 options.onSubmit(data);
