@@ -38,7 +38,7 @@ function isCustomContent(string $uri)
     $plugin = $path[1];
     if (count($path) === 2) {
         $fileName = 'custom/' . $plugin . '/content/index.html';
-    }else {
+    } else {
         $subUri = array_slice($path, 2);
         $fileName = 'custom/' . $plugin . '/content/' . implode('/', $subUri);
     }
@@ -56,14 +56,17 @@ class ContentRequest extends HttpRequest2
             } else {
                 return new ContentResponse(200, 'Hello World');
             }
-        } elseif (endsWith($this->uri , '/xyz-style.css')) {
+        } elseif (endsWith($this->uri, '/xyz-style.css')) {
             $fileContent = file_get_contents('engine/ui/style.css');
             return new ContentResponse(200, $fileContent);
-        } elseif (endsWith($this->uri , '/xyz-ui.js')) {
+        } elseif (endsWith($this->uri, '/xyz-ui.js')) {
             $fileContent = file_get_contents('engine/ui/xyz-ui.webpacked.js');
             return new ContentResponse(200, $fileContent);
         } elseif ($fileName = isCustomContent($this->uri)) {
             $fileContent = file_get_contents($fileName);//TODO make safe!
+            if (pathinfo($fileName, PATHINFO_EXTENSION) === 'html') {
+                $fileContent = replaceXyzTag($fileContent);
+            }
             return new ContentResponse(200, $fileContent);
         } elseif (file_exists('custom/main/content' . $this->uri)) {
             $fileContent = file_get_contents('custom/main/content' . $this->uri);//TODO make safe!

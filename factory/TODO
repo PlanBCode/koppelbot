@@ -87,7 +87,7 @@ hide private connector settings or better only expose specified ones
         would be nice to give this a root type :)
 
 improve the plugin structure
-- package.json
+- package.json to define a plugin
 - sandbox plugin access
 - ini_set("open_basedir", "/mag/alleen/hier/bij/komen:/of/tot/hier/");
 - https://stackoverflow.com/questions/44854059/php-ini-set-open-basedir-has-no-effect

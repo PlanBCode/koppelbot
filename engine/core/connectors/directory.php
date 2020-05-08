@@ -105,16 +105,14 @@ class Connector_directory extends BasicConnector
             } else {
                 $moreEntityIds = explode(',', $entityIdList);
                 foreach ($moreEntityIds as $entityId) {
-                    $found = false;
-                    foreach ($this->paths as $path) {
-                        $filePath = $this->createFilePath($entityId, $path);
-                        if (file_exists($filePath)) {
-                            $entityIds[$entityId] = $filePath;
-                            $found = true;
-                            break;
-                        }
-                    }
-                    if (!$found) return new connectorResponse(404); // TODO pass an error message?
+                    $paths = array_map(function ($path) use ($entityId) {
+                        return $this->createFilePath($entityId, $path);
+                    }, $this->paths);
+
+                    $filePaths = glob('{' . implode(',', $paths) . '}', GLOB_BRACE);
+                    if (count($filePaths) === 0) new connectorResponse(404); // TODO pass an error message?
+                    $filePath = $filePaths[0];
+                    $entityIds[$entityId] = $filePath;
                 }
             }
         }
