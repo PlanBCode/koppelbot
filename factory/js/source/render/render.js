@@ -77,7 +77,7 @@ function element(xyz, action, uri, subPropertyPath, status, content, settings, o
     }
 }
 
-function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submit) {
+function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submit, displayMessage) {
     if (settings.auto) return []; // do not show creator for automatic values
 
     const typeName = settings.type || DEFAULT_TYPE;
@@ -109,9 +109,9 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
     let TAG;
 
     const validate = item => {
-
         const uri = item.getUri();
         if (item.validateContent()) {
+            if (typeof displayMessage === 'function') displayMessage();
             TAG.classList.remove('xyz-invalid-content');
             if (INPUT_submit) {
                 INPUT_submit.validUris[uri] = true;
@@ -120,6 +120,11 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
             }
             return true;
         } else {
+            if (typeof displayMessage === 'function') {
+                const path = uri.split('/');
+                const propertyName = path[path.length - 1];
+                displayMessage(`Invalid content for '${propertyName}'`);
+            }
             TAG.classList.add('xyz-invalid-content');
             if (INPUT_submit) {
                 INPUT_submit.validUris[uri] = false;

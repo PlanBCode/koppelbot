@@ -7,6 +7,8 @@ TODO
 - edit: deactivate/hide rows for properties you're not allowed to edit
 - view: deactivate/hide rows for properties you're not allowed to read
 
+remove/change facts in timeline dynamically
+
 permissionVerbsToMethods: single source of truth with access.php
 
 - maak references klikbaar -> select as variable
@@ -15,10 +17,6 @@ permissionVerbsToMethods: single source of truth with access.php
 deleteButton -> get a popup to confirm
 
 test using "de bevoegde instanties" data
-
-creator
-- message when create succeeded
-- error feedback when create failed
 
 fix sign-up flow
 - auto fill in username after sign up
