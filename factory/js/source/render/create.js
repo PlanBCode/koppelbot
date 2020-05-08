@@ -20,14 +20,21 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         INPUT_submit.validUris = {};
         const SPAN_message = document.createElement('SPAN');
 
-        const displayMessage = message => {
+        const displayMessage = (message, error) => {
+            //TODO use error to change styling of message
             SPAN_message.innerText = typeof message === 'undefined' ? '' : message;
         };
 
         let TABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
 
         INPUT_submit.onclick = () => {
-            const displayCreatedMessage = () => displayMessage('Created');
+            const displayCreatedMessage = state => {
+                if (state.hasErrors()) {
+                    displayMessage('Failed to create', true);
+                }else{
+                    displayMessage('Created');
+                }
+            }
             if (entityClass.isAutoIncremented()) {
                 xyz.post(uri, {[entityClassName]: {'new': data}}, displayCreatedMessage);
             } else {

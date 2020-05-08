@@ -52,15 +52,15 @@ exports.delete = (entityClasses, uri, callback) => {
     request('DELETE', uri, null, (status, response) => {
         console.log('delete response: ' + uri + ' ' + response);
         const responseContent = JSON.parse(response);
-        entity.handleInput('DELETE', uri, status, responseContent, null, entityClasses);
-        if (typeof callback === 'function') callback();
+        const state = entity.handleInput('DELETE', uri, status, responseContent, null, entityClasses);
+        if (typeof callback === 'function') callback(state);
     });
 };
 
 exports.head = (uri, callback) => {
     request('HEAD', uri, null, (status, response) => {
         console.log('head response: ' + uri + ' ' + response);
-        if (typeof callback === 'function') callback();
+        if (typeof callback === 'function') callback(); //TODO pass state
 
     });
 };
@@ -71,8 +71,8 @@ const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, c
     request(method, uri, requestStringContent, (status, responseStringContent) => {
         console.log(method + ' response:' + responseStringContent, uri);
         const responseObjectContent = JSON.parse(responseStringContent);
-        entity.handleInput(method, uri, status, responseObjectContent, requestObjectContent, entityClasses);
-        if (typeof callback === 'function') callback();
+        const state = entity.handleInput(method, uri, status, responseObjectContent, requestObjectContent, entityClasses);
+        if (typeof callback === 'function') callback(state);
     });
 };
 

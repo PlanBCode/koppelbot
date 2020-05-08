@@ -91,6 +91,10 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
                     }
                 }
                 break;
+            case 400:
+                //TODO use message frop source if available
+                // TODO check if error is new eg compare with current error in errors
+                state.setError(403, 'Bad Request');
             case 403:
                 //TODO use message frop source if available
                 // TODO check if error is new eg compare with current error in errors
