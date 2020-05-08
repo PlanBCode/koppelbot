@@ -1,4 +1,4 @@
-// This file is created by gulpfile.js using the type definitions of engine/core/types/*/*.js. 
+// This file is created by gulpfile.js using the definitions of engine/core/types/*/*.js:custom/*/types/*/*.js. 
 
 exports.array = require('../../../engine/core/types/array/array.js').actions;
 exports.array.json = require('../../../engine/core/types/array/array.json');
