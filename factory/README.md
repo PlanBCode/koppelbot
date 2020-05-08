@@ -16,10 +16,13 @@ The code is separated into four distinct parts:
 
 ## Plugins (WIP)
 
-The code will be structered in plugins (directories). Currenlty there are only two
-(hardcoded) plugins:
+Custom code is structured using plugins (directories)
 
-`custom/main` : containing all work in progress, tests, tutorials and entities
+`custom/*` : containing definitions and sub endpoints.
+For example: `https://$hostname/tutorial` will serve `custom/tutorial/content/index.html`
+
+Where `custom/main` contains main definitions and the root endpoint. 
+For example: `https://$hostname` will serve `custom/main/content/index.html` 
 
 `engine/core` : containing all elements required out of the box.
 
@@ -48,7 +51,7 @@ EntityClass and can be queried using `/$EntityClassName/$EntityId`
 
 The EntityClass definition / json file contains specifications for
 
-- properties types : which type, which defaults,
+- properties : which type, which defaults,
 - connectors : how to store the data (per property)
 - access : who has what kind of access to this entity (or property)
 
