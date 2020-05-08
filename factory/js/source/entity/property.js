@@ -137,6 +137,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         return listeners;
     };
 
+    this.getSubObject = subPropertyName => subProperties[subPropertyName];
+
     this.createCreator = (options, data, INPUT_submit) => {
         const TRs = [];
         if (types.hasOwnProperty(type) && types[type].hasOwnProperty('edit')) {

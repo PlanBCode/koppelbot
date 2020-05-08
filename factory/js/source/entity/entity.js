@@ -240,12 +240,23 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         return state;
     };
 
-    this.render = (action, options, entityId) => {
-        //TODO get xyz here
+    this.getSubObject = propertyName => properties[propertyName];
+
+    this.render = (action, options, entityId, subPath) => {
+        let propertyNames;
+        if (typeof subPath === 'undefined' || subPath[0] === '*') {
+            propertyNames = Object.keys(properties)
+        } else {
+            propertyNames = subPath[0].split(',');
+        }
         const DIV = document.createElement('DIV');
-        for (let propertyName in properties) {
-            const TAG = properties[propertyName].render(action, options, entityId);
-            DIV.appendChild(TAG);
+        for (let propertyName of propertyNames) {
+            if(properties.hasOwnProperty(propertyName)) {
+                const TAG = properties[propertyName].render(action, options, entityId);
+                DIV.appendChild(TAG);
+            }else{
+                //TODO error?
+            }
         }
         return DIV;
     };

@@ -180,11 +180,13 @@ exports.display = {
     },
     entity: display => {
         const content = display.getContent();
-        const key = display.getOption('key') || 'date'; // TODO
-        const date = content.getContent()[key];
 
-        const labelProperty = display.getOption('label') || 'title'; //TOOD
-        const label = content.getContent()[labelProperty];
+
+        const datePropertyName = display.getOption('key') || 'date'; // TODO
+        const labelPropertyName = display.getOption('label') || 'title'; //TODO
+
+        const date = content.getContent()[datePropertyName];
+
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
         const uri = '/' + entityClassName + '/' + entityId;
@@ -195,7 +197,7 @@ exports.display = {
         NODE.className = 'xyz-timeline-node';
         NODE.entityId = entityId;
         NODE.date = date;
-        //NODE.innerHTML  = '  hello';
+
         DIV.appendChild(NODE);
 
         const LABEL = document.createElement('DIV');
@@ -203,11 +205,18 @@ exports.display = {
         if (display.xyz.getVariable(display.getOption('select')) === uri || display.getOption('default') === entityId) { // TODO encapsulate xyz
             LABEL.classList.add('xyz-list-selected');
         }
+        const dateNode = content.getSubNode([datePropertyName]);
+        const labelNode = content.getSubNode([labelPropertyName]);
 
         LABEL.entityId = entityId;
-        LABEL.innerHTML = `<SPAN style="font-size:0.5em;">${date}</SPAN><br/>${label}`;
+        const TAG_date = dateNode.render(display.getAction(), display.getOptions());
+        const TAG_label = labelNode.render(display.getAction(), display.getOptions());
+        const DIV_date = document.createElement('DIV');
+        DIV_date.style.fontSize = '0.5em';
+        DIV_date.appendChild(TAG_date);
+        LABEL.appendChild(DIV_date);
+        LABEL.appendChild(TAG_label);
         LABEL.date = date;
-
         LABEL.onclick = () => {
             display.select(entityClassName, entityId);
             for (let NODE of DIV.childNodes) {

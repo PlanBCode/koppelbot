@@ -69,7 +69,12 @@ function getSubNodeFromNode(subPath, object, entityId, status, content, errors, 
     if (subPath.length === 0) { //TODO or has errors?
         return new Node(object, entityId, status, content, errors, method)
     } else if (content !== null && typeof content === 'object' && content.hasOwnProperty(subPath[0])) {
-        return getSubNodeFromNode(subPath.slice(1), object, entityId, status, content[subPath[0]], errors, method);
+        const subObject = object.getSubObject(subPath[0]);
+        if (subObject) {
+            return getSubNodeFromNode(subPath.slice(1), subObject, entityId, status, content[subPath[0]], errors, method);
+        } else {
+            return new Node(object, entityId, 404, null, ['Not found'], method);
+        }
     } else {
         return null; // unmodified
     }
@@ -93,7 +98,7 @@ function Node(object, entityId, status_, content_, errors_, method_) {
     this.getContent = () => content;
     this.hasErrors = () => !((status >= 200 && status <= 299) || status === 304) || (errors instanceof Array && errors.length > 0)
     this.getErrors = () => errors;
-    this.render = (action, options) => object.render(action, options, entityId);
+    this.render = (action, options, subPath) => object.render(action, options, entityId, subPath);
     this.getSubNode = subPath => getSubNodeFromNode(subPath, object, entityId, status, content, errors);
 }
 
