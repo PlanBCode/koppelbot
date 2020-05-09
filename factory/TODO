@@ -9,8 +9,6 @@ TODO
 
 remove/change facts in timeline dynamically
 
-permissionVerbsToMethods: single source of truth with access.php
-
 - maak references klikbaar -> select as variable
 - - reference gebruik laten maken van display.select
 

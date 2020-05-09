@@ -3,18 +3,7 @@ const listener = require('./listener.js');
 const response = require('./response.js');
 const render = require('../render/render.js');
 const input = require('../request/input.js');
-
-const permissionVerbsToMethods = { //TODO single source of truth with access.php
-    'head': ['HEAD'],
-    'get': ['GET'],
-    'patch': ['PATCH'],
-    'put': ['PUT'],
-    'post': ['POST'],
-    'delete': ['DELETE'],
-    'read': ['HEAD', 'GET'],
-    'write': ['HEAD', 'GET', 'PATCH', 'PUT', 'POST', 'DELETE'],
-    'create': ['HEAD', 'GET', 'PUT', 'POST'],
-};
+const accessVerbsToMethods = require('../../../../engine/const/constants.json').accessVerbsToMethods;
 
 const validateSubPropertyPath = (types) => (type, subPropertyPath) => {
     if (!types.hasOwnProperty(type)) return false;
@@ -248,8 +237,8 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
     this.checkAccess = (subPropertyPath, method, groups) => {
         if (!settings.hasOwnProperty('access')) return false;
         for (let verb in settings.access) {
-            if (permissionVerbsToMethods.hasOwnProperty(verb)) {
-                if (permissionVerbsToMethods[verb].includes(method)) {
+            if (accessVerbsToMethods.hasOwnProperty(verb)) {
+                if (accessVerbsToMethods[verb].includes(method)) {
                     for (let group of groups) {
                         if (settings.access[verb].includes(group)) return true;
                     }
