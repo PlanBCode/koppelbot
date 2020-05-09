@@ -448,8 +448,9 @@ class Property
     {
         $accessSettings = array_get($this->settings, 'access', []);
         if (!AccessControl::check($method, $accessSettings)) {
-            $message = 'Forbidden';
-            return new ProcessResponse(403, $message);
+            $content = null;
+            $errorMessage = 'Forbidden';
+            return new ProcessResponse(403, $content, $errorMessage);
         }
         return $this->typeClass::processAfterConnector($method, $content, $this->settings);
     }
