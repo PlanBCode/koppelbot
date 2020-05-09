@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['constants'] = json_decode(file_get_contents('./engine/const/constants.json'), true);
+
 require './engine/helpers/helpers.php';
 require './engine/router/response.php';
 require './engine/connectors/connector.php';
@@ -12,7 +14,9 @@ require './engine/ui/ui.php';
 
 session_start();
 
-if (PHP_SAPI === 'cli') {
+$isCli = PHP_SAPI === 'cli';
+
+if ($isCli) {
     require './engine/cli/cli.php';
 
     $cliOptions = [
@@ -30,9 +34,8 @@ if (PHP_SAPI === 'cli') {
    }*/
 
     $options = getCliOptions($cliOptions, $argc, $argv);
-    if ($options['help']) {
-        exit(0);
-    }
+    if ($options['help']) exit(0);
+
     $headers = [];//TODO from cliOptions
     $requestUri = createCliRequestUri($options);
 
@@ -42,10 +45,12 @@ if (PHP_SAPI === 'cli') {
     $queryString = array_get($uriQueryString, 1, '');
     $method = array_get($options, 'method', 'GET');
     if (array_get($options, 'verbose', false)) {
+        echo 'Request:' . PHP_EOL;
         echo ' - method      : ' . $method . PHP_EOL;
         echo ' - uri         : ' . $uri . PHP_EOL;
         echo ' - queryString : ' . $queryString . PHP_EOL;
         echo ' - content     : ' . json_encode($content) . PHP_EOL;
+        //TODO headers
     }
     if ($uri === '') {
         showHelp($cliOptions);
@@ -100,8 +105,13 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
 }
 
 $response = $request->createResponse();
-$status = $response->echo();
-
-if (PHP_SAPI === 'cli' && $status !== 200) {
-    exit($status); // Nb: exit code is 0-255 so 404 becomes 404%256 = 148
+$status = $response->getStatus();
+if ($isCli && array_get($options, 'verbose', false)) {
+    echo 'Response:' . PHP_EOL;
+    echo ' - status      : ' . $status . PHP_EOL;
+    //TODO headers
 }
+
+$response->echo();
+
+if ($isCli && $status !== 200) exit($status); // Nb: exit code is 0-255 so 404 becomes 404%256 = 148

@@ -1,0 +1,54 @@
+{
+  "accessVerbsToMethods": {
+    "head": [
+      "HEAD"
+    ],
+    "get": [
+      "GET"
+    ],
+    "patch": [
+      "PATCH"
+    ],
+    "put": [
+      "PUT"
+    ],
+    "post": [
+      "POST"
+    ],
+    "delete": [
+      "DELETE"
+    ],
+    "read": [
+      "HEAD",
+      "GET"
+    ],
+    "write": [
+      "HEAD",
+      "GET",
+      "PATCH",
+      "PUT",
+      "POST",
+      "DELETE"
+    ],
+    "create": [
+      "HEAD",
+      "GET",
+      "PUT",
+      "POST"
+    ],
+    "createBlind": [
+      "HEAD",
+      "PUT",
+      "POST"
+    ],
+    "writeBlind": [
+      "HEAD",
+      "PATCH",
+      "PUT",
+      "POST"
+    ]
+  },
+  "defaultGroups": [
+    "/group/guest"
+  ]
+}
