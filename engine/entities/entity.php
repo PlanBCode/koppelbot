@@ -227,23 +227,6 @@ function cleanWrapping(&$wrapper, int $status): void
     }
 }
 
-/*class PropertyResponseNode
-{
-
-    protected $status;
-    protected $content;
-    protected $leaf;
-
-    public function __construct(int $status, $content, bool $leaf)
-    {
-        $this->status = $status;
-        $this->content = $content;
-        $this->leaf = $leaf;
-    }
-
-
-}*/
-
 class EntityResponse extends Response
 {
     /** @var  EntityClass */
@@ -265,9 +248,10 @@ class EntityResponse extends Response
 
     public function add(int $status, array $propertyPath, $content)
     {
-        $this->addStatus($status);
         $property = $this->entityClass->getProperty($propertyPath);
-        $this->propertyResponses[] = new PropertyResponse($property, $this->requestObject, $status, $propertyPath, $content);
+        $propertyResponse = new PropertyResponse($property, $this->requestObject, $status, $propertyPath, $content);
+        $this->addStatus($propertyResponse->getStatus());
+        $this->propertyResponses[] = $propertyResponse;
     }
 
     public function merge(EntityResponse $entityResponse)
