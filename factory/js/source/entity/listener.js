@@ -59,7 +59,7 @@ function ListenerHandler() {
         } else if (state.isCreated()) {
             callAllListeners('created', entityId, node, subUri);
             callAllListeners('changed', entityId, node, subUri);
-            //TODO }else if(state.isError()){
+            //TODO }else if(state.hasErrors()){
             //   callAllListeners('error', entityId, node, subUri);
         } else if (state.isChanged()) {
             callAllListeners('changed', entityId, node, subUri);

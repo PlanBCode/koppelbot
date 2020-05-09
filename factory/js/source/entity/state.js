@@ -32,14 +32,17 @@ function State(method_) {
         error = true;
         errors.push({status, message})
     };
+
+    this.getErrors = () => errors;
+
     this.isChanged = () => (changed && !created) || removed;
     this.isRemoved = () => removed;
     this.isCreated = () => created;
-    this.isError = () => error;
+    this.hasErrors = () => error;
 
     this.getStatus = () => {
         // TODO mixed?
-        if (this.isError()) return 404; //TODO support more errors etc
+        if (this.hasErrors()) return 404; //TODO support more errors etc
         if (this.isCreated()) return 201;
         if (this.isChanged()) return 201;
         if (this.isRemoved()) return 410;
@@ -48,7 +51,10 @@ function State(method_) {
 
     this.addSubState = subState => {
         const newSubStatus = subState.getStatus();
-
+        if (subState.hasErrors()) {
+            error = true;
+            errors.push.apply(errors, subState.getErrors());
+        }
         if (typeof subStatus === 'undefined') {
             subStatus = newSubStatus;
         } else if (newSubStatus !== subStatus) {

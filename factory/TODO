@@ -1,7 +1,13 @@
 TODO
 
+fix sign-up flow
+- show errors if create/login fails
+- auto fill in username after sign up
+
+RBAC
 - access not merged, but overwritten for properties
 - hide passwords from api get (system only)
+- hide groups field from sign up
 
 - display: deactivate/hide edit rows for properties you're not allowed to see
 - edit: deactivate/hide rows for properties you're not allowed to edit
@@ -15,9 +21,6 @@ remove/change facts in timeline dynamically
 deleteButton -> get a popup to confirm
 
 test using "de bevoegde instanties" data
-
-fix sign-up flow
-- auto fill in username after sign up
 
 timeline : ensure labels do not overlap and do not go outside wrapper
 - constraints

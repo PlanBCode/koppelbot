@@ -3,6 +3,7 @@
 options.signUpButtonText || 'Create account',
 options.loginButtonText || 'Log in',
  */
+const response = require('../entity/response');
 
 const renderUiLogin = (xyz, options, WRAPPER) => {
     WRAPPER.classList.add('xyz-login');
@@ -24,7 +25,6 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         }
         DIV_message.style.animationName = 'none';
         DIV_message.offsetHeight; //trigger reflow
-        //${this.class}_stand_sprite 1s step-end 1
         DIV_message.style.animationName = 'xyz-login-hide';
     }
     WRAPPER.appendChild(DIV_message);
@@ -57,21 +57,29 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         showHeader: false,
         createButtonText: options.loginButtonText || 'Log in',
         onSubmit: data => {
+             DIV_createSession.style.display = 'none';
+             DIV_listSession.style.display = 'inline-block';
+             A_signin.style.display = 'none';
+             A_signup.style.display = 'none';
+             A_logout.style.display = 'inline-block';
+        }
+    }, DIV_createSession);
+
+    xyz.on('/session/*', 'created', (entityClassName, entityId, subNode, eventName) => {
+        const success = !subNode.login.hasErrors();
+        if (success) {
+            showMessage('Successfully signed in.');
             DIV_listSession.style.display = 'inline-block';
             DIV_createSession.style.display = 'none';
             A_signin.style.display = 'none';
             A_signup.style.display = 'none';
             A_logout.style.display = 'inline-block';
+        } else {
+            A_logout.style.display = 'none';
+            DIV_listSession.style.display = 'none';
+            DIV_createSession.style.display = 'block';
+            showMessage('Sign in failed');
         }
-    }, DIV_createSession);
-
-    xyz.on('/session/*', 'created', (entityClassName, entityId, subNode, eventName) => {
-        showMessage('Successfully signed in.');
-        DIV_listSession.style.display = 'inline-block';
-        DIV_createSession.style.display = 'none';
-        A_signin.style.display = 'none';
-        A_signup.style.display = 'none';
-        A_logout.style.display = 'inline-block';
     });
     xyz.on('/session/*', 'removed', (entityClassName, entityId, subNode, eventName) => {
         showMessage('Successfully logged out.');
@@ -79,7 +87,6 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         A_signup.style.display = 'inline-block';
         A_logout.style.display = 'none';
         //TODO only if all sessions gone
-        //TODO show logout message "You've been successfully logged out."
         DIV_listSession.style.display = 'none';
     });
     WRAPPER.appendChild(DIV_createSession);
@@ -91,11 +98,9 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
         display: 'create',
         createButtonText: options.signUpButtonText || 'Create account',
         onSubmit: data => {
+            //TODO check for error
             showMessage('Account successfully created, please log in to continue. Please note that the admin will need to set your permissions.');
-
-            //TODO Message "account x has been created"
-            //TODO use date to fill in username
-            //console.log('create Account', data);
+            //TODO use data to fill in username
             DIV_createSession.style.display = 'block';
             DIV_account.style.display = 'none';
         }
