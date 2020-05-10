@@ -36,7 +36,7 @@ curl('GET', '/fruit/*/color')
         "apple": "red",
         "orange": "orange"
     })
-    .run('Fruit : get color');
+    .run('Fruit: get color');
 
 curl('GET', '/fruit/*?color==green')
     .statusShouldMatch(200)
@@ -94,9 +94,23 @@ curl('PATCH', '/fruit/melon/size?expand','{brokenJson')
     .contentShouldMatch('Could not parse JSON: Syntax error.')
     .run('Fruit: Patch melon ?expand broken JSON');
 
-browse('sample.html')
-    .run('Test browse');
+curl('PUT', '/session/member ','{"login":{"username":"member","password":"member"}}')
+    .statusShouldMatch(200)
+    .contentShouldMatch({login:null})
+    .run('Session: Member login');
 
+curl('PUT', '/session/member ','{"login":{"username":"member","password":"wrongpassword"}}')
+    .shouldFail()
+    .contentShouldMatch({
+        "login": "Incorrect user-password combination.",
+        "groups": "Forbidden"
+    })
+    .run('Session: Member login faulty password');
+
+
+/*browse('sample.html')
+    .run('Test browse');
+*/
 
 exports.curl = curl;
 exports.file = require('./file');
