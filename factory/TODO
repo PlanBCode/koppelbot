@@ -1,9 +1,9 @@
 TODO
 
 search/display
-- add search to test  ./xyz "/fruit?search=green"
 - fix this: http://localhost:8000/ui/item/fact?search=jaar
 - fix this: http://localhost:8000/ui/item/fact?search=$search
+- fix this: ./xyz "/fruit/*/name?search=abc"   {"": "Not found"}
 
 fix sign-up flow
 - show errors if create/login fails

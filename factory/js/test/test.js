@@ -81,6 +81,12 @@ curl('GET', '/fruit/*/name?sortBy=color&offset=1&limit=2')
     })
     .run('Fruit: Limit and offset');
 
+curl('GET', '/fruit/*/name?search=range')
+    .contentShouldMatch({
+        "orange": "orange"
+    })
+    .run('Fruit: Search');
+
 curl('PATCH', '/fruit/melon/size','small')
     .contentShouldMatch(null)
     .run('Fruit: Patch melon');
