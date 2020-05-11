@@ -8,9 +8,9 @@ function pathFromUri(string $uri): ?array
     return explode('/', substr($uri, 1));
 }
 
-function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query): array
+function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query, array &$accessGroups): array
 {
-    $requestObject = new RequestObject($method, null, $requestUri, $query);
+    $requestObject = new RequestObject($method, null, $requestUri, $query, $accessGroups);
 
     $connectorRequests = [];
     if ($method === 'GET' || $method === 'DELETE' || $method === 'HEAD') {
@@ -57,7 +57,7 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
 {
     $entityClassNames = explode(',', $entityClassNameList);
     foreach ($entityClassNames as $entityClassName) {
-        $entityClass = EntityClass::get($entityClassName);
+        $entityClass = EntityClass::get($entityClassName, $requestObject->getAccessGroups());
         if (is_null($entityClass)) {
             if ($entityClassName === '*') {
                 $apiRequest->addError(400, 'Illegal full wildcard * request. Please specify entities.');
@@ -101,13 +101,15 @@ class RequestObject
     protected $requestId;
     protected $requestUri;
     protected $query;
+    protected $accessGroups;
 
-    public function __construct(string $method, $requestId, string $requestUri, Query &$query)
+    public function __construct(string $method, $requestId, string $requestUri, Query &$query, array &$accessGroups)
     {
         $this->method = $method;
         $this->requestId = $requestId;
         $this->requestUri = $requestUri;
         $this->query = $query;
+        $this->accessGroups = $accessGroups;
     }
 
     public function getId()
@@ -139,6 +141,12 @@ class RequestObject
     {
         return array_slice(explode('/', $this->requestUri), 1);
     }
+
+    public function getAccessGroups(): array
+    {
+        return $this->accessGroups;
+    }
+
 }
 
 function isSingularPath(array $path): bool
@@ -190,13 +198,16 @@ class ApiRequest extends HttpRequest2
 
     /** @var ApiError[] */
     protected $errors;
+    /** @var string[] */
+    protected $accessGroups;
 
-    public function __construct(string $method, string $uri, string $queryString, array $headers, string $content)
+    public function __construct(string $method, string $uri, string $queryString, array $headers, string $content, array $accessGroups)
     {
         $this->query = new Query($queryString);
         if (substr($uri, -1, 1) === '/') $uri = substr($uri, 0, -1); // '/a/b/c/' -> '/a/b/c'
         $this->path = array_slice(explode('/', $uri), 1); // '/a/b/c' -> ['a','b','c']
         $this->errors = [];
+        $this->accessGroups = $accessGroups;
         parent::__construct($method, $uri, $queryString, $headers, $content);
     }
 
@@ -224,7 +235,7 @@ class ApiRequest extends HttpRequest2
         $requestURi = '/' . $entityClassList . '/' . $entityIdList . '/' . $propertyNames[0]; //TODO tree
         $queryString = $this->queryString . '&expand'; //TODO add better
         $otherQuery = new Query($queryString);
-        return getConnectorRequests($this, 'GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery);
+        return getConnectorRequests($this, 'GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
     }
 
     protected function getRequestResponses()
@@ -233,16 +244,16 @@ class ApiRequest extends HttpRequest2
         $entityIdList = count($this->path) > 1 ? $this->path[1] : '*';
         $propertyPath = count($this->path) > 2 ? array_slice($this->path, 2) : [];
         $requestURi = $this->uri;
-
         $queryConnectorRequests = $this->getQueryConnectorRequests($this->query);
         $queryRequestResponses = getRequestResponses($queryConnectorRequests);
 
         if (count($queryRequestResponses) > 0) {
+
             /** @var RequestResponse */
             $requestResponse = array_values($queryRequestResponses)[0];
             $data = $requestResponse->getContent();
             //TODO handle failure
-            $entityIds = $this->query->getMatchingEntityIds($data);
+            $entityIds = $this->query->getMatchingEntityIds($data, $this->accessGroups);
 
             $entityIdList = implode(',', $entityIds);
         }
@@ -250,7 +261,7 @@ class ApiRequest extends HttpRequest2
 then decide to first get the query id's and update the $connectorRequests
 before getting the actual data
 */
-        $connectorRequests = getConnectorRequests($this, $this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query);
+        $connectorRequests = getConnectorRequests($this, $this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query, $this->accessGroups);
         return getRequestResponses($connectorRequests);
     }
 
@@ -321,7 +332,7 @@ before getting the actual data
 
         if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
             $entityClassName = $this->path[0];
-            $entityClass = EntityClass::get($entityClassName);
+            $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
             $propertyPath = array_slice($this->path, 2);
             /** @var Property */
             $property = $entityClass->getProperty($propertyPath);

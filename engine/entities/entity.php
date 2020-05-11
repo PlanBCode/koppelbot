@@ -7,13 +7,13 @@ class EntityClass
     /** @var EntityClass[] */
     static $entityClasses = [];
 
-    static public function get(string $entityClassName): ?EntityClass
+    static public function get(string $entityClassName, array &$accessGroups): ?EntityClass
     {
         if (array_key_exists($entityClassName, self::$entityClasses)) {
             return self::$entityClasses[$entityClassName];
         } else {
-            $fileNames = glob('{./engine/core,./custom/*}/entities/' . $entityClassName . '.json',GLOB_BRACE);
-            if (count($fileNames)===0) return null;
+            $fileNames = glob('{./engine/core,./custom/*}/entities/' . $entityClassName . '.json', GLOB_BRACE);
+            if (count($fileNames) === 0) return null;
             $fileName = $fileNames[0];
             $fileContent = file_get_contents($fileName); //TODO make safe
             //TODO check if this goes well
@@ -23,7 +23,7 @@ class EntityClass
             // Check if any of current sessions has access to this entity
             if (array_key_exists('_', $meta)) {
                 $accessSettings = array_get($meta['_'], 'access', []);
-                if (!AccessControl::check('HEAD', $accessSettings)) return null;
+                if (!AccessControl::check('HEAD', $accessSettings,  $accessGroups)) return null;
             }
 
             $entityClass = new EntityClass($entityClassName, $meta);
@@ -63,10 +63,8 @@ class EntityClass
         return '/' . $this->entityClassName . '/' . (is_null($entityId) ? '*' : $entityId);
     }
 
-    protected function expand(array $propertyPath, Query &$query): array
+    protected function expand(array $propertyPath, Query &$query, RequestObject &$requestObject): array
     {
-        // TODO account for meta calls
-
         /** @var string */
         $propertyList = array_get($propertyPath, 0, '*');
         if ($propertyList === '*') {
@@ -149,7 +147,7 @@ class EntityClass
         } else {
             $query = $requestObject->getQuery();
             /** @var PropertyHandle[] */
-            $propertyHandles = $this->expand($propertyPath, $query);
+            $propertyHandles = $this->expand($propertyPath, $query, $requestObject);
         }
         /** @var PropertyRequest[] */
         $propertyRequests = [];
@@ -183,7 +181,6 @@ class EntityClass
 
         //TODO only when adding new : check if entity exists
         //TODO check if required properties are handled
-
 
         /** @var ConnectorRequest[] */
         $connectorRequests = [];
@@ -343,7 +340,7 @@ class EntityClassResponse extends Response
 
     public function __construct($entityClassName, RequestObject &$requestObject)
     {
-        $this->entityClass = EntityClass::get($entityClassName);
+        $this->entityClass = EntityClass::get($entityClassName, $requestObject->getAccessGroups());
         $this->requestObject = $requestObject;
     }
 

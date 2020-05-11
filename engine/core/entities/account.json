@@ -5,9 +5,8 @@
       "parse": "json",
       "path": "data/accounts.json"
     },
-    "access" : {
-      "write" : ["/group/guest"],
-      "delete" : ["/group/admin"]
+    "access": {
+      "head" : ["/group/guest","/group/system"]
     }
   },
   "email": {
@@ -16,16 +15,34 @@
     "default": "hello@default.com",
     "connector": {
       "key": "key"
+    },
+    "access" : {
+      "read" : ["/group/system"],
+      "create" : ["/group/guest"],
+      "delete" : ["/group/admin"]
     }
   },
   "password": {
-    "type": "password"
+    "type": "password",
+    "access" : {
+      "read" : ["/group/system"],
+      "createBlind" : ["/group/guest"],
+      "writeBlind" : ["/account/$email"],
+      "delete" : ["/group/admin"]
+    }
   },
   "username": {
     "type": "string",
-    "minLength": 3
+    "minLength": 3,
+    "access" : {
+      "read" : ["/group/guest"],
+      "createBlind" : ["/group/guest"],
+      "writeBlind" : ["/account/$email"],
+      "delete" : ["/group/admin"]
+    }
   },
   "groups" : {
+    "auto" : true,
     "type" : "array",
     "default" : ["/group/guest"],
     "subType" : {
@@ -33,7 +50,8 @@
       "uri": "/group/*/name"
     },
     "access" : {
-      "read" : ["/group/guest"]
+      "read" : ["/group/user:$username","/group/system"],
+      "delete" : ["/group/admin"]
     }
   }
 }

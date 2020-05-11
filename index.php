@@ -39,7 +39,8 @@ if ($isCli) {
     $headers = [];//TODO from cliOptions
     $requestUri = createCliRequestUri($options);
 
-    $content = array_get($options['args'], 2, '');
+    //Note: php does not parse 'a b' into a single argument ['a b'], instead it passed ['a','b']
+    $content = implode(' ', array_slice($options['args'], 2));
     $uriQueryString = explode('?', $requestUri);
     $uri = array_get($uriQueryString, 0, '');
     $queryString = array_get($uriQueryString, 1, '');
@@ -71,12 +72,19 @@ if ($isCli) {
 }
 
 if (strpos($uri, '/api/') === 0 || $uri === '/api') {
+    $accessGroups = $GLOBALS['constants']['defaultGroups'];
+    if (array_key_exists('content', $_SESSION)) {
+        foreach ($_SESSION['content'] as $userName => $session) {
+            $accessGroups = array_merge($accessGroups, $session['groups']);
+        }
+    }
     $request = new ApiRequest(
         $method,
         substr($uri, 4),
         $queryString,
         $headers,
-        $content
+        $content,
+        $accessGroups
     );
 } elseif (strpos($uri, '/ui/') === 0 || $uri === '/ui') {
     $request = new UiRequest(

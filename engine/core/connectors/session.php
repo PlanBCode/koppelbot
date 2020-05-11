@@ -7,18 +7,19 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
 
     if (!is_array($submittedPasswordArray) || !array_key_exists('password', $submittedPasswordArray)) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
 
-    $accountsMatchingUserName = request('/account/*/password,groups?email==' . $userName)->getResultsById();
-    if (count($accountsMatchingUserName) === 0) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+    $accessGroups = ['/group/system'];
+    $headers = [];
+    $accountsMatchingUserName = request('/account/*/password,groups?email==' . $userName, 'GET', '', $headers, $accessGroups)->getResultsById();
+    if (count($accountsMatchingUserName) === 0) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination1.');
 
     /** @var InternalEntityResponse */
     $account = array_values($accountsMatchingUserName)[0];
-
     /** @var InternalPropertyResponse */
     $passwordResponse = $account->get('password');
-    if ($passwordResponse->getStatus() !== 200) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+    if ($passwordResponse->getStatus() !== 200) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.'.$passwordResponse->getStatus().' '.$userName );
 
-    $storedPasswordHash = $passwordResponse->getContent();
     $submittedPassword = $submittedPasswordArray['password'];
+    $storedPasswordHash = $passwordResponse->getContent();
 
     if (!password_verify($submittedPassword, $storedPasswordHash)) {
         return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
@@ -26,6 +27,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
     if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
     $groupsResponse = $account->get('groups');
     $groups = $groupsResponse->getStatus() !== 200 ? [] : $groupsResponse->getContent();
+    $groups[] = '/group/user:' . $userName;
     $_SESSION['content'][$userName] = ['groups' => $groups];
     return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'login successful;'
 }

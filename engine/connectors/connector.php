@@ -84,8 +84,9 @@ abstract class Connector
     public
     static function getConnectorResponse(connectorRequest $connectorRequest): connectorResponse
     {
+        $propertyRequests = $connectorRequest->getPropertyRequests();
         /** @var PropertyRequest|null $propertyRequest */
-        $propertyRequest = array_get($connectorRequest->getPropertyRequests(), 0);
+        $propertyRequest = array_get($propertyRequests, 0);
         if (!$propertyRequest instanceof PropertyRequest) {
             return Connector::createErrorResponse($connectorRequest);
         }

@@ -131,13 +131,15 @@ class InternalApiResponse
  * @param string $method The http request method (GET|PUT|POST|DELETE|PATCH)
  * @param $content
  * @param array $headers =[]
+ * @param array $accessGroups =[]
  * @return InternalApiResponse
  * @example
  * for(request('/car/*?color==red').getResultsById() as $id => $car){
  *   echo $car->getContent('licensePlate').PHP_EOL;
  * }
  */
-function request(string $url, string $method = 'GET', $content = '', $headers = []): InternalApiResponse
+function request(string $url, string $method = 'GET', $content = '', array &$headers = [], array &$accessGroups = []): InternalApiResponse
+
 {
     //todo pass content as object, parse to string
     $splitUriOnQuestionMark = explode('?', $url);
@@ -148,7 +150,8 @@ function request(string $url, string $method = 'GET', $content = '', $headers = 
         $uri,
         $queryString,
         $headers,
-        $content
+        $content,
+        $accessGroups
     );
     return $request->getInternalApiResponse();
 }

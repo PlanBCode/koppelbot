@@ -158,7 +158,7 @@ class  PropertyRequest
 
     public function processBeforeConnector(&$newContent, &$currentContent)
     {
-        return $this->property->processBeforeConnector($this->requestObject->getMethod(), $newContent, $currentContent);
+        return $this->property->processBeforeConnector($this->requestObject, $newContent, $currentContent);
     }
 }
 
@@ -174,7 +174,7 @@ class PropertyResponse extends Response
     {
         $this->propertyPath = $propertyPath;
         $this->property = $property;
-        $processResponse = $property->processAfterConnector($requestObject->getMethod(), $content);
+        $processResponse = $property->processAfterConnector($requestObject, $content);
         if ($processResponse->succeeded()) {
             $this->addStatus($status);
             $this->content = $processResponse->getContent();
@@ -434,20 +434,28 @@ class Property
         return $this->typeClass::validateContent($content, $this->settings);
     }
 
+    public function getAccessSettings(): array
+    {
+        return array_get($this->settings, 'access', []);
+    }
+
     public function getConnectorSetting($settingName, $default = null)
     {
         return array_get($this->settings['connector'], $settingName, $default);
     }
 
-    public function processBeforeConnector(string $method, &$newContent, &$currentContent)
+    public function processBeforeConnector(RequestObject &$requestObject, &$newContent, &$currentContent)
     {
+        $method = $requestObject->getMethod();
         return $this->typeClass::processBeforeConnector($method, $newContent, $currentContent, $this->settings);
     }
 
-    public function processAfterConnector(string $method, &$content)
+    public function processAfterConnector(RequestObject &$requestObject, &$content)
     {
+        $method = $requestObject->getMethod();
+        $accessGroups = $requestObject->getAccessGroups();
         $accessSettings = array_get($this->settings, 'access', []);
-        if (!AccessControl::check($method, $accessSettings)) {
+        if (!AccessControl::check($method, $accessSettings, $accessGroups)) {
             $content = null;
             $errorMessage = 'Forbidden';
             return new ProcessResponse(403, $content, $errorMessage);

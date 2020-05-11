@@ -195,7 +195,7 @@ class Query
         return array_unique($propertyNames);
     }
 
-    public function getMatchingEntityIds(&$content): array
+    public function getMatchingEntityIds(&$content, array $accessGroups): array
     {
         $entityIds = [];
         //TODO handle multi class requests
@@ -214,7 +214,7 @@ class Query
         if ($this->hasOption('sortBy')) {
             //TODO handle multi class requests
             $entityClassName = array_keys($content)[0];
-            $entityClass = EntityClass::get($entityClassName);
+            $entityClass = EntityClass::get($entityClassName, $accessGroups);
 
             $sortPath = explode('.', $this->getOption('sortBy'));
 
