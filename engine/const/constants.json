@@ -30,6 +30,12 @@
       "POST",
       "DELETE"
     ],
+    "moderate": [
+      "HEAD",
+      "GET",
+      "PATCH",
+      "DELETE"
+    ],
     "create": [
       "HEAD",
       "GET",

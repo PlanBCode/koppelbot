@@ -18,7 +18,8 @@
     },
     "access" : {
       "read" : ["/group/system"],
-      "create" : ["/group/guest"],
+      "createBlind" : ["/group/guest"],
+      "write" : ["/group/user:$username"],
       "delete" : ["/group/admin"]
     }
   },
@@ -27,7 +28,7 @@
     "access" : {
       "read" : ["/group/system"],
       "createBlind" : ["/group/guest"],
-      "writeBlind" : ["/account/$email"],
+      "writeBlind" : ["/group/user:$username"],
       "delete" : ["/group/admin"]
     }
   },
@@ -37,7 +38,6 @@
     "access" : {
       "read" : ["/group/guest"],
       "createBlind" : ["/group/guest"],
-      "writeBlind" : ["/account/$email"],
       "delete" : ["/group/admin"]
     }
   },
@@ -51,7 +51,7 @@
     },
     "access" : {
       "read" : ["/group/user:$username","/group/system"],
-      "delete" : ["/group/admin"]
+      "moderate" : ["/group/admin"]
     }
   }
 }
