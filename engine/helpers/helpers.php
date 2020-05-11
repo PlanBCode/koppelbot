@@ -1,4 +1,22 @@
 <?php
+function addQueryString(string $uri, string $queryString): string
+{
+    if ($queryString === '') {
+        return $uri;
+    } else if (strpos($uri, '?') !== false) {
+        return $uri . '&' . $queryString;
+    } else {
+        return $uri . '?' . $queryString;
+    }
+}
+
+function mergeQueryStrings(string $queryString1, string $queryString2): string
+{
+    if ($queryString1 === '') return $queryString2;
+    if ($queryString2 === '') return $queryString1;
+    return $queryString1 . '&' . $queryString2;
+}
+
 
 function array_get(array &$array, $key, $default = null)
 {
@@ -50,7 +68,7 @@ function json_simpleEncode(&$content): string
     }
 }
 
-Class JsonActionResponse
+class JsonActionResponse
 {
     /** @var bool */
     protected $success;
