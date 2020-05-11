@@ -145,3 +145,15 @@ function json_unset(&$object, array $keyPath): JsonActionResponse
         return new JsonActionResponse(false); //TODO add error message
     }
 }
+
+function json_search($object, string $needle): bool
+{
+    if (is_array($object)) {
+        foreach ($object as $subObject) {
+            if (json_search($subObject, $needle)) return true;
+        }
+        return false;
+    } else {
+        return strpos(strval($object), $needle) !== false;
+    }
+}

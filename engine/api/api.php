@@ -226,8 +226,9 @@ class ApiRequest extends HttpRequest2
         if ($query->hasOption('sortBy')) {
             $propertyNames[] = $query->getOption('sortBy');
         }
-        if (count($propertyNames) === 0) return [];
-        else if ($query->hasOption('search')) $propertyNames = ['*'];
+
+        if ($query->hasOption('search')) $propertyNames = ['*'];
+        else if (count($propertyNames) === 0) return [];
 
         if (count($propertyNames) !== 1) {
             $this->addError(500, 'multi property query not yet supported');
@@ -264,7 +265,7 @@ class ApiRequest extends HttpRequest2
                 $entityClassData = array_values($data)[0]; // TODO implement or error for multi class
                 // filter entity ids that do not contain the search string
                 $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
-                    return strpos(json_encode($entityClassData[$entityId]), $search) !== false;
+                    return json_search($entityClassData[$entityId], $search);;
                 });
             }
 

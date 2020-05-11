@@ -1,7 +1,6 @@
 TODO
 
 search/display
-- update search so it only searches content, not propertynames
 - add search to test  ./xyz "/fruit?search=green"
 - fix this: http://localhost:8000/ui/item/fact?search=jaar
 - fix this: http://localhost:8000/ui/item/fact?search=$search
