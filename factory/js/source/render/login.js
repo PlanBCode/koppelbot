@@ -9,10 +9,16 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
     WRAPPER.classList.add('xyz-login');
     const A_signin = document.createElement('A');
     A_signin.innerText = 'sign in'; //TODO parametrize
+    WRAPPER.appendChild(A_signin);
+
     const A_signup = document.createElement('A');
     A_signup.innerText = 'sign up';//TODO parametrize
-    WRAPPER.appendChild(A_signin);
     WRAPPER.appendChild(A_signup);
+
+    const A_cancel = document.createElement('A');
+    A_cancel.innerText = 'cancel';//TODO parametrize
+    A_cancel.style.display = 'none';
+    WRAPPER.appendChild(A_cancel);
 
     const DIV_message = document.createElement('DIV');
     DIV_message.classList.add('xyz-login-message');
@@ -73,6 +79,7 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
             DIV_createSession.style.display = 'none';
             A_signin.style.display = 'none';
             A_signup.style.display = 'none';
+            A_cancel.style.display = 'none';
             A_logout.style.display = 'inline-block';
         } else {
             A_logout.style.display = 'none';
@@ -103,18 +110,28 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
             //TODO use data to fill in username
             DIV_createSession.style.display = 'block';
             DIV_account.style.display = 'none';
+            DIV_account.style.display = 'none';
         }
     }, DIV_account); //TODO retrieve /account from session metadata?
     WRAPPER.appendChild(DIV_account);
 
+
     A_signin.onclick = () => {
         DIV_createSession.style.display = 'block';
         DIV_account.style.display = 'none';
+        A_cancel.style.display = 'inline-block';
     };
     A_signup.onclick = () => {
         DIV_account.style.display = 'block';
         DIV_createSession.style.display = 'none';
+        A_cancel.style.display = 'inline-block';
     };
+
+    A_cancel.onclick = ()=>{
+        DIV_account.style.display = 'none';
+        DIV_createSession.style.display = 'none';
+        A_cancel.style.display = 'none';
+    }
 };
 
 exports.renderUiLogin = renderUiLogin;
