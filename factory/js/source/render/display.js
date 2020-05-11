@@ -12,6 +12,11 @@ function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entit
     this.hasOption = optionName => options.hasOwnProperty(optionName);
     this.getOptions = () => options;
     this.getOption = optionName => options[optionName];
+    this.getSubOptions = propertyName => {
+        return options.hasOwnProperty('subOptions') && options.subOptions.hasOwnProperty(propertyName)
+            ? options.subOptions[propertyName]
+            : options;
+    }
     this.getWRAPPER = () => WRAPPER;
     this.getEntityClassName = () => entityClassName;
     this.getEntityId = () => entityId;
@@ -29,19 +34,7 @@ function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entit
         return title;
     };
 
-    this.select = (entityClassName, entityId) => {
-        const variableNameOrCallback = this.getOption('select');
-        if (typeof variableNameOrCallback === 'string') {
-            if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
-                xyz.clearVariable(variableNameOrCallback);
-            } else {
-                const uriPostfix = this.hasOption('selectUri') ? this.getOption('selectUri') : '';
-                xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId + uriPostfix);
-            }
-        } else if (typeof variableNameOrCallback === 'function') {
-            variableNameOrCallback(entityClassName, entityId);
-        }
-    }
+    this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
 
     this.xyz = xyz; // TODO encapsulate
 }

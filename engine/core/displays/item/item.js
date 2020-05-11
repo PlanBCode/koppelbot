@@ -134,7 +134,7 @@ exports.display = {
                 }
                 const TD_flatPropertyContent = document.createElement('TD');
                 const node = columns[flatPropertyName];
-                const TAG = node.render(display.getAction(), display.getOptions());
+                const TAG = node.render(display.getAction(),display.getSubOptions(flatPropertyName) );
                 TD_flatPropertyContent.appendChild(TAG);
                 TR_flatProperty.appendChild(TD_flatPropertyContent);
                 TABLE_entity.appendChild(TR_flatProperty);

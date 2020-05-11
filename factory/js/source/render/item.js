@@ -82,6 +82,8 @@ function Item(xyz, baseUri, subPropertyPath, status, content, settings, options,
         const item = new Item(xyz, baseUri, subPropertyPath, status, content_, settings_, options);
         return types[typeName].validateContent(item);
     };
+    this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+
 }
 
 exports.constructor = Item;

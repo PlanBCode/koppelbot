@@ -81,7 +81,6 @@ function getSubNodeFromNode(subPath, object, entityId, status, content, errors, 
 }
 
 function Node(object, entityId, status_, content_, errors_, method_) {
-
     const status = status_;
     const content = content_;
     const errors = errors_;
@@ -98,7 +97,16 @@ function Node(object, entityId, status_, content_, errors_, method_) {
     this.getContent = () => content;
     this.hasErrors = () => !((status >= 200 && status <= 299) || status === 304) || (errors instanceof Array && errors.length > 0)
     this.getErrors = () => errors;
-    this.render = (action, options, subPath) => object.render(action, options, entityId, subPath);
+    this.render = (action, options, subPath) => {
+        let subOptions = options;
+        if(typeof options === 'object' && options !== null
+            && subPath instanceof Array && subPath.length>0
+            && options.hasOwnProperty('subOptions')
+            && options.subOptions.hasOwnProperty(subPath[0])){
+            subOptions =  options.subOptions[subPath[0]];
+        }
+        return object.render(action, subOptions, entityId, subPath);
+    }
     this.getSubNode = subPath => getSubNodeFromNode(subPath, object, entityId, status, content, errors);
 }
 

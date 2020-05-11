@@ -16,13 +16,21 @@ function replaceXyzTag($fileContent): string
             for ($i = 0; $i < $count; ++$i) {
                 $attributeName = $attributeNames[$i];
                 $attributeValue = $attributeValues [$i];
-                $attributePath = explode('-', $attributeName); // "property-option" -> ["property","option"]
-                //if (count($attributePath) === 1) { // optionName="value" -> options[optionName]="value"
-                $options[$attributeName] = $attributeValue;
-                /*} else {  // propertyName-optionName="value" -> options[subOptions][propertyName][optionName]="value"
-                    if (!array_key_exists('subOptions', $options)) $options['subOptions'] = [];
-                    json_set($options['subOptions'], $attributePath, $attributeValue);
-                }*/
+                $attributePath = explode('_', $attributeName); // "property_subOption" -> ["property","subOption"]
+                $attributePathLength = count($attributePath);
+                if ($attributePathLength === 1) { // optionName="value" -> options[optionName]="value"
+                    $options[$attributeName] = $attributeValue;
+                } else {  // propertyName_optionName="value" -> options[subOptions][propertyName][optionName]="value"
+                    $optionIterator =& $options;
+                    for ($depth = 0; $depth < $attributePathLength - 1; ++$depth) {
+                        $propertyName = $attributePath[$depth];
+                        if (!array_key_exists('subOptions', $optionIterator)) $optionIterator['subOptions'] = [];
+                        if (!array_key_exists($propertyName, $optionIterator['subOptions'])) $optionIterator['subOptions'][$propertyName] = [];
+                        $optionIterator =& $optionIterator['subOptions'][$propertyName];
+                    }
+                    $optionName = $attributePath[$attributePathLength - 1];
+                    json_set($optionIterator, [$optionName], $attributeValue);
+                }
             }
             return '<script>xyz.ui(' . json_encode($options, JSON_UNESCAPED_SLASHES) . ');</script>';
         },

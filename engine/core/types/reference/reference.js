@@ -12,12 +12,16 @@ exports.actions = {
     },
     view: function (item) {
         const SPAN = document.createElement('SPAN');
-        SPAN.innerHTML=item.getContent();
-        SPAN.classList.add('xyz-reference')
-        if (typeof item.getContent() !== 'undefined') {
-        //    item.ui({uri: item.getContent(), display: 'item'}, DIV);
+        SPAN.classList.add('xyz-reference');
+
+        const changeHandler = node => {
+            SPAN.innerHTML = node.getContent();
+            SPAN.onclick = () => {
+                const [entityClassName, entityId] = node.getContent().substr(1).split('/')
+                item.select(entityClassName, entityId);
+            }
         }
-        //TODO onchange : how to? redo the ui definition
+        changeHandler(item);
         return SPAN;
     },
     validateContent: function (item) {

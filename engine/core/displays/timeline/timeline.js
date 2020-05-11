@@ -209,8 +209,8 @@ exports.display = {
         const labelNode = content.getSubNode([labelPropertyName]);
 
         LABEL.entityId = entityId;
-        const TAG_date = dateNode.render(display.getAction(), display.getOptions());
-        const TAG_label = labelNode.render(display.getAction(), display.getOptions());
+        const TAG_date = dateNode.render(display.getAction(), display.getSubOptions(datePropertyName));
+        const TAG_label = labelNode.render(display.getAction(),  display.getSubOptions(labelPropertyName));
         const DIV_date = document.createElement('DIV');
         DIV_date.style.fontSize = '0.5em';
         DIV_date.appendChild(TAG_date);

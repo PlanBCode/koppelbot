@@ -67,7 +67,7 @@ exports.display = {
         } else {
             for (let flatPropertyName in columns) {
                 const node = columns[flatPropertyName];
-                const TAG = node.render(display.getAction(), display.getOptions());
+                const TAG = node.render(display.getAction(), display.getSubOptions(flatPropertyName));
                 OPTION.appendChild(TAG);
             }
         }

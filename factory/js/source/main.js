@@ -14,6 +14,7 @@ function XYZ() {
     this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
     this.setVariables = variableObject => variables.setVariables(variableObject);
     this.setVariables(web.getQueryParameters());
+    this.select = (entityClassName, entityId, select, selectUri) => variables.selectVariable(this, entityClassName, entityId, select, selectUri);
 
     this.isAutoIncremented = entityClassName => entity.isAutoIncremented(entityClasses, entityClassName);
     this.getTitlePropertyPath = entityClassName => entity.getTitlePropertyPath(entityClasses, entityClassName);

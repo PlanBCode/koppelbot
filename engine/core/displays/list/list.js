@@ -175,7 +175,7 @@ exports.display = {
             for (let flatPropertyName in columns) {
                 const TD_flatProperty = document.createElement('TD');
                 const node = columns[flatPropertyName];
-                const TAG = node.render(display.getAction(), display.getOptions());
+                const TAG = node.render(display.getAction(), display.getSubOptions(flatPropertyName));
                 TD_flatProperty.appendChild(TAG);
                 TR_entity.appendChild(TD_flatProperty);
             }

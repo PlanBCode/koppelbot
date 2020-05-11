@@ -74,8 +74,24 @@ const registerUri = (xyz, uri, readyCallback, waitCallback) => {
     handleUri(uri, callbacks);
 };
 
+const selectVariable = (xyz, entityClassName, entityId, select, selectUri) => {
+    const variableNameOrCallback = select;
+    if (typeof variableNameOrCallback === 'string') {
+        if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
+            xyz.clearVariable(variableNameOrCallback);
+        } else {
+            const uriPostfix = selectUri || '';
+            xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId + uriPostfix);
+        }
+    } else if (typeof variableNameOrCallback === 'function') {
+        variableNameOrCallback(entityClassName, entityId);
+    }
+
+}
+
 setInterval(refresh, 1000);
 
+exports.selectVariable = selectVariable;
 exports.getVariable = getVariable;
 exports.hasVariable = hasVariable;
 exports.setVariable = setVariable;
