@@ -1,6 +1,7 @@
 const renderUiCreate = require('./create').renderUiCreate;
 const renderUiLogin = require('./login').renderUiLogin;
 const renderUiElement = require('./display').renderUiElement;
+const renderUiInput = require('../variables/input').renderUiInput;
 
 const DEFAULT_TAG = 'DIV';
 
@@ -33,7 +34,9 @@ const ui = (xyz, entityClasses, options, WRAPPER) => {
         SCRIPT.parentNode.insertBefore(WRAPPER, SCRIPT);
         SCRIPT.parentNode.removeChild(SCRIPT);
     }
-    if (options.display === 'create') {
+    if (options.display === 'input') {
+        renderUiInput(xyz, options, WRAPPER);
+    }else if (options.display === 'create') {
         renderUiCreate(xyz, entityClasses, options, WRAPPER);
     } else if (options.display === 'login') {
         renderUiLogin(xyz, options, WRAPPER);

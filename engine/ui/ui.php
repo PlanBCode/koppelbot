@@ -1,4 +1,21 @@
 <?php
+function renderInputs(string $uri)
+{
+    $variableNameMatches = [];
+
+    preg_match_all('/\$(\w+)/', rawurldecode($uri), $variableNameMatches); //TODO match ${variableName}
+
+    $variableNames = $variableNameMatches[1];
+    $body = '';
+    foreach ($variableNames as $variableName) {
+        $options = [
+            'display' => 'input',
+            'name' => $variableName
+        ];
+        $body .= '<script>xyz.ui(' . json_encode($options) . ');</script>';
+    }
+    return $body;
+}
 
 class UiRequest extends HttpRequest2
 {
@@ -36,31 +53,34 @@ class UiRequest extends HttpRequest2
             $menuItems['ui/create'] = 'create';
         } elseif ($entityClassName === '') {
             $body = '<h3>Choose an entity class:</h3><ul>';
-            foreach (glob('{./engine/core,./custom/*}/entities/*.json',GLOB_BRACE) as $file) {
+            foreach (glob('{./engine/core,./custom/*}/entities/*.json', GLOB_BRACE) as $file) {
                 $entityClassName = basename($file, '.json');
                 $body .= '<li><a href="' . $rootUri . 'ui/' . $display . '/' . $entityClassName . '">' . $entityClassName . '</a></li>';
             }
             $body .= '</ul> ';
         } else {
             if ($display === 'create') {
-                $uri = '/' . $entityClassName;// TODO merge this properly. //'?' . $this->queryString;
+                $uri = addQueryString('/' . $entityClassName , $this->queryString);
             } else {
                 $propertyUri = count($propertyPath) > 0
                     ? '/' . implode('/', $propertyPath)
                     : '';
-                $uri = '/' . $entityClassName . '/' . $entityId . $propertyUri;//. '?' . $this->queryString; //TODO proper merge
+                $uri = addQueryString('/' . $entityClassName . '/' . $entityId . $propertyUri , $this->queryString); //TODO proper merge
             }
             $query = new Query($this->queryString);
             $options = array_merge([
                 'uri' => $uri,
                 'display' => $display
             ], $query->getOptions());
-            foreach ($options as $optionName => $option){
-                if($option === 'false') $options[$optionName] = false;
-                if($option === 'true') $options[$optionName] = true;
+            foreach ($options as $optionName => $option) {
+                if ($option === 'false') $options[$optionName] = false;
+                if ($option === 'true') $options[$optionName] = true;
             }
-
-            $body = '<script>xyz.ui(' . json_encode($options) . ');</script>';
+            $body = '';
+            $body .= renderInputs($this->uri);
+            $body .= renderInputs($this->queryString);
+            if ($body !== '') $body .= '<br/>';
+            $body .= '<script>xyz.ui(' . json_encode($options) . ');</script>';
         }
         return new DocResponse('ui' . $this->uri, $body, $menuItems);
     }

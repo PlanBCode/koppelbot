@@ -60,7 +60,8 @@ function refresh() {
     for (let uri in uriCallbacks) {
         const xyz = uriCallbacks[uri][0].xyz;
         uri = resolveVariablesInUri(uri);
-        if (!uriHasUnresolvedVariables(uri)) xyz.get(uri);
+        // uri starting without '/' are input variables
+        if (!uriHasUnresolvedVariables(uri) && uri.startsWith('/')) xyz.get(uri);
     }
 }
 
