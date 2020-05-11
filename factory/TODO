@@ -2,7 +2,7 @@ TODO
 
 search/display
 - update search so it only searches content, not propertynames
-- add search to  ./xyz "/fruit?search=green"
+- add search to test  ./xyz "/fruit?search=green"
 - fix this: http://localhost:8000/ui/item/fact?search=jaar
 - fix this: http://localhost:8000/ui/item/fact?search=$search
 
@@ -70,6 +70,8 @@ Put @ Backend default values properties gebruiken voor niet toegevoegde props
 werkend maken:
 - xyz.ui({uri:'/source?content==default',display:'create'});
 - xyz.ui({uri:'$type',display:'create'});
+
+cli: read inputs if searching for /fruit/$id
 
 provide display settings schema in json form
 - - generate auto documentation for displays

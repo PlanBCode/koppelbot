@@ -37,7 +37,7 @@ const setVariables = (variableObject) => {
 
 function resolveVariablesInUri(uri) {
     //TODO find ${variableName}
-    return uri.replace(/\$(\w+)/, (_, variableName) => {
+    return uri.replace(/\$(\w+)/g, (_, variableName) => {
         if (variables.hasOwnProperty(variableName)) {
             return variables[variableName];
         } else {
