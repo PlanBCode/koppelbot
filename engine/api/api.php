@@ -222,10 +222,13 @@ class ApiRequest extends HttpRequest2
         $entityClassList = count($path) > 1 ? $path[1] : '*';
         $entityIdList = count($path) > 2 ? $path[2] : '*';
         $propertyNames = $query->getAllUsedPropertyNames();
+
         if ($query->hasOption('sortBy')) {
             $propertyNames[] = $query->getOption('sortBy');
         }
         if (count($propertyNames) === 0) return [];
+        else if ($query->hasOption('search')) $propertyNames = ['*'];
+
         if (count($propertyNames) !== 1) {
             $this->addError(500, 'multi property query not yet supported');
             //TODO transform into propertyTree
@@ -233,7 +236,7 @@ class ApiRequest extends HttpRequest2
         }
         $propertyPath = explode('.', $propertyNames[0]);
         $requestURi = '/' . $entityClassList . '/' . $entityIdList . '/' . $propertyNames[0]; //TODO tree
-        $queryString = $this->queryString . '&expand'; //TODO add better
+        $queryString = mergeQueryStrings($this->queryString, 'expand');
         $otherQuery = new Query($queryString);
         return getConnectorRequests($this, 'GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
     }
@@ -252,15 +255,25 @@ class ApiRequest extends HttpRequest2
             /** @var RequestResponse */
             $requestResponse = array_values($queryRequestResponses)[0];
             $data = $requestResponse->getContent();
+
             //TODO handle failure
             $entityIds = $this->query->getMatchingEntityIds($data, $this->accessGroups);
+
+            if ($this->query->hasOption('search')) {
+                $search = $this->query->getOption('search');
+                $entityClassData = array_values($data)[0]; // TODO implement or error for multi class
+                // filter entity ids that do not contain the search string
+                $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
+                    return strpos(json_encode($entityClassData[$entityId]), $search) !== false;
+                });
+            }
 
             $entityIdList = implode(',', $entityIds);
         }
         /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.
-then decide to first get the query id's and update the $connectorRequests
-before getting the actual data
-*/
+    then decide to first get the query id's and update the $connectorRequests
+    before getting the actual data
+    */
         $connectorRequests = getConnectorRequests($this, $this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query, $this->accessGroups);
         return getRequestResponses($connectorRequests);
     }
