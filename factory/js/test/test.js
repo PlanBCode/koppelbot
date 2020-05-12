@@ -1,6 +1,24 @@
 const curl = require('./curl').curl;
 const browse = require('./browse').browse;
 
+curl('DELETE', '/fruit/apple')
+    .statusShouldMatch(200)
+    .contentShouldMatch({
+        "color": null,
+        "size": null,
+        "name": null
+    })
+    .runSync('Fruit DELETE');
+
+curl('PUT', '/fruit/apple','{"color":"red","name":"apple","size":"medium"}')
+    .statusShouldMatch(200)
+    .contentShouldMatch({
+        "color": null,
+        "size": null,
+        "name": "apple"
+    })
+    .runSync('Fruit PUT');
+
 curl('GET', '/fruit/banana')
     .statusShouldMatch(404)
     .run('Fruit: GET 404');
@@ -89,11 +107,11 @@ curl('GET', '/fruit/*/name?search=range')
 
 curl('PATCH', '/fruit/melon/size','small')
     .contentShouldMatch(null)
-    .run('Fruit: Patch melon');
+    .runSync('Fruit: Patch melon');
 
 curl('PATCH', '/fruit/melon/size?expand','{"fruit":{"melon":{"size":"small"}}}')
     .contentShouldMatch({fruit:{melon:{size:null}}})
-    .run('Fruit: Patch melon ?expand');
+    .runSync('Fruit: Patch melon ?expand');
 
 curl('PATCH', '/fruit/melon/size?expand','{brokenJson')
     .shouldFail()

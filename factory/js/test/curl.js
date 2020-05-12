@@ -51,7 +51,8 @@ function ApiRequest(method, uri, data) {
     };
 
     this.runSync = name => {
-        let status, content;
+        let status = 200
+        let content;
         try {
             content = child_process.execSync(`./xyz --method ${method} '${uri}' '${data}'`, {cwd: `${__dirname}/../../..`});
         } catch (e) {
