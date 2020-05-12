@@ -105,7 +105,7 @@ exports.display = {
                 uri: display.getRequestUri(),
                 showLabels: true,
                 showDeleteButton,
-                done: () => {
+                onDone: () => {
                     DIV_edit.style.display = 'none';
                     TABLE_entity.style.display = 'block';
                 }
