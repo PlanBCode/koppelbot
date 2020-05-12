@@ -2,7 +2,7 @@
 
 abstract class BasicConnector extends Connector
 {
-    public function createResponse(connectorRequest $connectorRequest): connectorResponse
+    public function createResponse(connectorRequest $connectorRequest): ConnectorResponse
     {
         $connectorResponse = $this->open($connectorRequest);
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
@@ -14,7 +14,7 @@ abstract class BasicConnector extends Connector
     /**
      * @param PropertyRequest $propertyRequest
      *
-     * @return connectorResponse|void
+     * @return ConnectorResponse|void
      */
     protected function createPropertyResponse(PropertyRequest $propertyRequest)
     {
@@ -35,13 +35,13 @@ abstract class BasicConnector extends Connector
         }
     }
 
-    abstract protected function open(connectorRequest $connectorRequest): connectorResponse;
+    abstract protected function open(connectorRequest $connectorRequest): ConnectorResponse;
 
-    abstract protected function close(connectorRequest $connectorRequest): connectorResponse;
+    abstract protected function close(connectorRequest $connectorRequest): ConnectorResponse;
 
-    protected function get(PropertyRequest $propertyRequest): connectorResponse
+    protected function get(PropertyRequest $propertyRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
 
         /*$modified_after = $propertyRequest->getQuery()->get('modified_after');
         $modified_after = is_string($modified_after)?intval($modified_after):null;
@@ -109,9 +109,9 @@ abstract class BasicConnector extends Connector
         return $connectorResponse;
     }
 
-    protected function patch(PropertyRequest $propertyRequest): connectorResponse
+    protected function patch(PropertyRequest $propertyRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
@@ -187,9 +187,9 @@ abstract class BasicConnector extends Connector
         return $connectorResponse;
     }
 
-    protected function delete(PropertyRequest $propertyRequest): connectorResponse
+    protected function delete(PropertyRequest $propertyRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
@@ -206,10 +206,12 @@ abstract class BasicConnector extends Connector
                 } else {
                     $entity =& $this->data[$entityId];
                     if ($key === 'content') {
-                        $connectorResponse->add(400, $propertyRequest, $entityId, 'Illegal delete request');
-                        continue;
+                        $keyPath = [];
+                        $connectorResponse->add(200, $propertyRequest, $entityId, null);
                     } elseif (is_string($key) && substr($key, 0, 1) === '.') {
                         $keyPath = explode('.', substr($key, 1));
+                    } else if ($key === 'mime' || $key === 'extension' || $key === 'size') {
+                        $connectorResponse->add(200, $propertyRequest, $entityId, null);
                     } else {
                         $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
                         continue;
@@ -238,6 +240,6 @@ abstract class BasicConnector extends Connector
         abstract protected function post(PropertyRequest $propertyRequest): ConnectorResponse;
     */
 
-    abstract protected function head(PropertyRequest $propertyRequest): connectorResponse;
+    abstract protected function head(PropertyRequest $propertyRequest): ConnectorResponse;
 
 }

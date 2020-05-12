@@ -30,11 +30,11 @@ class Connector_file extends BasicConnector
         return array_get($settings, 'path');
     }
 
-    protected function open(connectorRequest $connectorRequest): connectorResponse
+    protected function open(connectorRequest $connectorRequest): ConnectorResponse
     {
         if (!file_exists($this->path)) {// TODO pass an error message?
             if ($connectorRequest->isReadOnly()) {
-                return new connectorResponse(404);
+                return new ConnectorResponse(404);
             } else { // create the file
                 $this->data = [];
             }
@@ -46,20 +46,20 @@ class Connector_file extends BasicConnector
                 //TODO error if parsing fails
                 $this->data = json_decode($fileContent, true);
             } else { //TODO xml, yaml,csv,tsv
-                return new connectorResponse(500);
+                return new ConnectorResponse(500);
             }
         }
-        return new connectorResponse(200);
+        return new ConnectorResponse(200);
     }
 
-    protected function close(connectorRequest $connectorRequest): connectorResponse
+    protected function close(connectorRequest $connectorRequest): ConnectorResponse
     {
         if (!$connectorRequest->isReadOnly()) {
             $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getConnectorSetting('parse');
             if ($parse === 'json') {
                 $fileContent = json_encode($this->data);
             } else { //TODO xml, yaml,csv,tsv
-                return new connectorResponse(500);
+                return new ConnectorResponse(500);
             }
 
             if ($fileContent) {
@@ -67,11 +67,11 @@ class Connector_file extends BasicConnector
             }
         }
         //TODO unlock file
-        return new connectorResponse(200);
+        return new ConnectorResponse(200);
     }
 
-    protected function head(PropertyRequest $propertyRequest): connectorResponse
+    protected function head(PropertyRequest $propertyRequest): ConnectorResponse
     {
-        return new connectorResponse();
+        return new ConnectorResponse();
     }
 }

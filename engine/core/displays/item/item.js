@@ -11,6 +11,15 @@ options:
 const list = require('../list/list.js');
 const response = require('../../../../factory/js/source/entity/response'); //TODO better solution
 
+// check if uri is '/$class/$id' or '/$class/$id/*/.../*' but not '/$class/$id/$property'
+function isFullEntity(uri) {
+    const path = uri.substr(1).split('/');
+    for (let i = 2; i < path.length; ++i) {
+        if (path[i] !== '*') return false
+    }
+    return true;
+}
+
 exports.display = {
     waitingForInput: display => {
         display.getWRAPPER().innerHTML = 'Waiting for input...';
@@ -41,7 +50,9 @@ exports.display = {
         const uri = '/' + entityClassName + '/' + entityId;
         const showTitle = display.getOption('showTitle') !== false;
         const showEditButton = display.getOption('showEditButton') === true && display.getAction() !== 'edit';
-        const showDeleteButton = display.getOption('showDeleteButton') === true && display.getAction() !== 'delete';
+
+
+        const showDeleteButton = display.getOption('showDeleteButton') === true && display.getAction() !== 'delete' && isFullEntity(display.getRequestUri());
         const showDoneButton = display.getOption('onDone') && display.getAction() === 'edit';
 
         let TD_header;
@@ -135,7 +146,7 @@ exports.display = {
                 }
                 const TD_flatPropertyContent = document.createElement('TD');
                 const node = columns[flatPropertyName];
-                const TAG = node.render(display.getAction(),display.getSubOptions(flatPropertyName) );
+                const TAG = node.render(display.getAction(), display.getSubOptions(flatPropertyName));
                 TD_flatPropertyContent.appendChild(TAG);
                 TR_flatProperty.appendChild(TD_flatPropertyContent);
                 TABLE_entity.appendChild(TR_flatProperty);

@@ -90,8 +90,9 @@ class Connector_directory extends BasicConnector
         return $max;
     }
 
-    protected function open(connectorRequest $connectorRequest): connectorResponse
+    protected function open(connectorRequest $connectorRequest): ConnectorResponse
     {
+        $connectorResponse = new ConnectorResponse(200);
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
         $propertyRequest = $connectorRequest->getFirstPropertyRequest();
         $this->data = [];
@@ -112,9 +113,12 @@ class Connector_directory extends BasicConnector
                     }, $this->paths);
 
                     $filePaths = glob('{' . implode(',', $paths) . '}', GLOB_BRACE);
-                    if (count($filePaths) === 0) new connectorResponse(404); // TODO pass an error message?
-                    $filePath = $filePaths[0];
-                    $entityIds[$entityId] = $filePath;
+                    if (count($filePaths) === 0) {
+                        $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                    } else {
+                        $filePath = $filePaths[0];
+                        $entityIds[$entityId] = $filePath;
+                    }
                 }
             }
         }
@@ -135,15 +139,15 @@ class Connector_directory extends BasicConnector
             $this->meta[$entityId]['path'] = $filePath;
             //TODO creation timestamp, modification timestamp
         }
-        return new connectorResponse(200);
+        return $connectorResponse;
     }
 
-    protected function close(ConnectorRequest $connectorRequest): connectorResponse
+    protected function close(ConnectorRequest $connectorRequest): ConnectorResponse
     {
         $propertyRequest = $connectorRequest->getFirstPropertyRequest();
 
         if (!$propertyRequest) {
-            return new connectorResponse(500);
+            return new ConnectorResponse(500);
         }
         $parse = $propertyRequest->getProperty()->getConnectorSetting('parse', 'none');
 
@@ -170,12 +174,12 @@ class Connector_directory extends BasicConnector
             if (!array_key_exists($entityId, $this->data)) unlink($this->meta[$entityId]['path']);
         }
 
-        return new connectorResponse(200);
+        return new ConnectorResponse(200);
     }
 
-    protected function head(PropertyRequest $propertyRequest): connectorResponse
+    protected function head(PropertyRequest $propertyRequest): ConnectorResponse
     {
         //TODO
-        return new connectorResponse();
+        return new ConnectorResponse();
     }
 }

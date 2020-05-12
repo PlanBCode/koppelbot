@@ -39,16 +39,16 @@ class Connector_session extends Connector
         return $method;
     }
 
-    public function createResponse(connectorRequest $connectorRequest): connectorResponse
+    public function createResponse(connectorRequest $connectorRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
             $connectorResponse->merge($this->createPropertyResponse($propertyRequest));
         }
         return $connectorResponse;
     }
 
-    protected function createPropertyResponse(PropertyRequest &$propertyRequest): connectorResponse
+    protected function createPropertyResponse(PropertyRequest &$propertyRequest): ConnectorResponse
     {
         switch ($propertyRequest->getMethod()) {
             case 'PUT':
@@ -59,14 +59,14 @@ class Connector_session extends Connector
                 return $this->getSession($propertyRequest);
             default:
         }
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         $connectorResponse->add(400, $propertyRequest, '*', 'Illegal session method');
         return $connectorResponse;
     }
 
-    protected function login(PropertyRequest &$propertyRequest): connectorResponse
+    protected function login(PropertyRequest &$propertyRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
         $userName = $propertyRequest->getEntityId();
 
@@ -103,9 +103,9 @@ class Connector_session extends Connector
         }
     }
 
-    protected function logout(PropertyRequest &$propertyRequest): connectorResponse
+    protected function logout(PropertyRequest &$propertyRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         $userName = $propertyRequest->getEntityId();
         if ($userName === '*') {
             $_SESSION['content'] = [];
@@ -122,9 +122,9 @@ class Connector_session extends Connector
         return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'Successfully logged out.'
     }
 
-    protected function getSession(PropertyRequest &$propertyRequest): connectorResponse
+    protected function getSession(PropertyRequest &$propertyRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
         $userNameList = $propertyRequest->getEntityId();
         if (!array_key_exists('content', $_SESSION)) {

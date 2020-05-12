@@ -1,6 +1,6 @@
 <?php
 
-class connectorResponse extends Response
+class ConnectorResponse extends Response
 {
     /** @var RequestResponse[] */
     protected $requestResponses = [];
@@ -10,7 +10,7 @@ class connectorResponse extends Response
         $this->addStatus($status);
     }
 
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): connectorResponse
+    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): ConnectorResponse
     {
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
@@ -22,7 +22,7 @@ class connectorResponse extends Response
         return $this;
     }
 
-    public function merge(connectorResponse $connectorResponse): connectorResponse
+    public function merge(ConnectorResponse $connectorResponse): ConnectorResponse
     {
         $this->addStatus($connectorResponse->getStatus());
         foreach ($connectorResponse->requestResponses as $requestId => $requestResponse) {

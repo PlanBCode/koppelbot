@@ -53,9 +53,9 @@ abstract class Connector
      */
 
     public
-    static function createErrorResponse(connectorRequest $connectorRequest): connectorResponse
+    static function createErrorResponse(connectorRequest $connectorRequest): ConnectorResponse
     {
-        $connectorResponse = new connectorResponse();
+        $connectorResponse = new ConnectorResponse();
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
             $connectorResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyRequest->getContent());
         }
@@ -82,7 +82,7 @@ abstract class Connector
     }
 
     public
-    static function getConnectorResponse(connectorRequest $connectorRequest): connectorResponse
+    static function getConnectorResponse(connectorRequest $connectorRequest): ConnectorResponse
     {
         $propertyRequests = $connectorRequest->getPropertyRequests();
         /** @var PropertyRequest|null $propertyRequest */
@@ -102,5 +102,5 @@ abstract class Connector
 
     abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
 
-    abstract public function createResponse(connectorRequest $connectorRequest): connectorResponse;
+    abstract public function createResponse(connectorRequest $connectorRequest): ConnectorResponse;
 }
