@@ -3,10 +3,10 @@ TODO
 bij add fact blijft het laatst gekozen bestand geselecteerd waardoor onduidelijk is of je een bestand hebt geselecteerd of niet.
 
 onderliggende sources aanpassen kan nog helemaal niet.
+array/object - edit / delete values
 
 Inloggen in firefox lukt wel maar geeft geen actieve interface, d.w.z. source-list en timeline worden niet geladen, upload source is inactief. In chromium werkt t wel.
 
-je kunt maar één keer een bron toevoegen, een tweede keer lukt niet, daarvoor moet je eerst de pagina herladen.
 twee keer een bestand met dezelfde naam uploaden geeft geen foutmelding.
 
 edit source werkt niet.
@@ -14,9 +14,6 @@ edit source werkt niet.
 in de layout is verwarrend dat source view en fact view onder elkaar staan alsof ze wat met elkaar te maken hebben terwijl de link eigenlijk is tussen selected source en source view resp selected fact en fact view.
 
 change facts in timeline dynamically
-
-array/object
-- delete values
 
 
 

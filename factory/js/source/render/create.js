@@ -13,7 +13,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
     request.retrieveMeta(xyz, entityClasses, uri, () => {
         const entityClassName = uriTools.pathFromUri(uri)[0];
         const entityClass = entityClasses[entityClassName];
-        const data = {};
+        const data = {}; //TODO add defaults (also below for reset data)  /fruit/*?color==green
         const INPUT_submit = document.createElement('INPUT');
         INPUT_submit.type = 'submit';
         INPUT_submit.value = options.createButtonText || 'Add ' + entityClassName;
@@ -44,8 +44,10 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
             if (typeof options.onSubmit === 'function') {
                 options.onSubmit(data);
             }
-            const newData = {};
-            const newTABLE = entityClass.createCreator(options, newData, INPUT_submit, displayMessage);
+
+            for(let key in data) delete data[key]; // reset data  //TODO add defaults
+
+            const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
             TAG.insertBefore(newTABLE, TABLE);
             TAG.removeChild(TABLE);
             TABLE = newTABLE;
