@@ -5,6 +5,7 @@ options:
 - showLabels
 - showDeleteButton
 - showEditbutton
+- onDone -> action to execute on done (show done button)
  */
 
 const list = require('../list/list.js');
@@ -41,10 +42,10 @@ exports.display = {
         const showTitle = display.getOption('showTitle') !== false;
         const showEditButton = display.getOption('showEditButton') === true && display.getAction() !== 'edit';
         const showDeleteButton = display.getOption('showDeleteButton') === true && display.getAction() !== 'delete';
-        const showCancelButton = display.getOption('cancel') && display.getAction() === 'edit';
+        const showDoneButton = display.getOption('onDone') && display.getAction() === 'edit';
 
         let TD_header;
-        if (showTitle || showEditButton || showDeleteButton || showCancelButton) {
+        if (showTitle || showEditButton || showDeleteButton || showDoneButton) {
             const TR_header = document.createElement('TR');
             TR_header.className = 'xyz-item-header';
             TD_header = document.createElement('TD');
@@ -71,15 +72,15 @@ exports.display = {
 
             TD_header.appendChild(INPUT_deleteButton);
         }
-        if (showCancelButton) {
-            const INPUT_cancelButton = document.createElement('INPUT');
-            INPUT_cancelButton.classList.add('xyz-edit');
-            INPUT_cancelButton.type = 'submit';
-            INPUT_cancelButton.value = 'Cancel';
-            INPUT_cancelButton.style.float = 'right';
-            const onCancel = display.getOption('cancel');
-            if (typeof onCancel === 'function') INPUT_cancelButton.onclick = onCancel;
-            TD_header.appendChild(INPUT_cancelButton);
+        if (showDoneButton) {
+            const INPUT_doneButton = document.createElement('INPUT');
+            INPUT_doneButton.classList.add('xyz-edit');
+            INPUT_doneButton.type = 'submit';
+            INPUT_doneButton.value = 'Done';
+            INPUT_doneButton.style.float = 'right';
+            const onDone = display.getOption('onDone');
+            if (typeof onDone === 'function') INPUT_doneButton.onclick = onDone;
+            TD_header.appendChild(INPUT_doneButton);
         }
 
         if (showEditButton) {
@@ -93,7 +94,7 @@ exports.display = {
                 uri: display.getRequestUri(),
                 showLabels: true,
                 showDeleteButton,
-                cancel: () => {
+                done: () => {
                     DIV_edit.style.display = 'none';
                     TABLE_entity.style.display = 'block';
                 }

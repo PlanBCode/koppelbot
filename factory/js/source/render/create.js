@@ -16,7 +16,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         const data = {};
         const INPUT_submit = document.createElement('INPUT');
         INPUT_submit.type = 'submit';
-        INPUT_submit.value = options.createButtonText || 'Create ' + entityClassName;
+        INPUT_submit.value = options.createButtonText || 'Add ' + entityClassName;
         INPUT_submit.validUris = {};
         const SPAN_message = document.createElement('SPAN');
 

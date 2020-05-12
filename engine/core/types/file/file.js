@@ -84,7 +84,7 @@ exports.actions = {
             DIV_container.innerHTML = '';
             const content = item.getContent();
             //TODO use mime
-            const extension = content.extension;
+            const extension = content.extension.toLowerCase();
             const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
                 ? extension : 'txt';
             const DIV_fileContent = viewers[fallbackExtension].view(item);

@@ -41,15 +41,5 @@
       }
     },
     "type": "file"
-  },
-  "note" : {
-    "type": "string",
-    "connector": {
-      "type": "directory",
-      "parse": "none",
-      "path": "data/sources/meta/",
-      "extension": "meta",
-      "key": "content"
-    }
   }
 }
