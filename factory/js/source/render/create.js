@@ -33,6 +33,12 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
                     displayMessage('Failed to create', true);
                 }else{
                     displayMessage('Created');
+                    for (let key in data) delete data[key]; // reset data  //TODO add defaults
+
+                    const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
+                    TAG.insertBefore(newTABLE, TABLE);
+                    TAG.removeChild(TABLE);
+                    TABLE = newTABLE;
                 }
             }
             if (entityClass.isAutoIncremented()) {
@@ -45,12 +51,6 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
                 options.onSubmit(data);
             }
 
-            for(let key in data) delete data[key]; // reset data  //TODO add defaults
-
-            const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
-            TAG.insertBefore(newTABLE, TABLE);
-            TAG.removeChild(TABLE);
-            TABLE = newTABLE;
             displayMessage('Creating..');
         };
 
