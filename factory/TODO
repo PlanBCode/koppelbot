@@ -1,9 +1,9 @@
 TODO
 
+
 bij add fact blijft het laatst gekozen bestand geselecteerd waardoor onduidelijk is of je een bestand hebt geselecteerd of niet.
 
-onderliggende sources aanpassen kan nog helemaal niet.
-array/object - edit / delete values
+array/object - delete values
 
 Inloggen in firefox lukt wel maar geeft geen actieve interface, d.w.z. source-list en timeline worden niet geladen, upload source is inactief. In chromium werkt t wel.
 

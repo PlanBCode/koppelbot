@@ -28,7 +28,6 @@ exports.actions = {
         //TODO check if content is array
         const content = item.getContent();
         const subSettings = item.getSetting('subType');
-        const subOptions = {showLabels: false, display: item.getOption('display')};
         const TABLE = document.createElement('TABLE');
         const TR_add = document.createElement('TR');
         const TD_key = document.createElement('TD');
@@ -41,7 +40,8 @@ exports.actions = {
         INPUT_create.validUris = {};
         INPUT_create.value = "Add";
         const data = {};
-        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, ['new'], data, INPUT_create);
+        const addOptions = {showLabels: false, display: item.getOption('display')};
+        const TRs = item.renderCreator(addOptions, item.getUri(), subSettings, ['new'], data, INPUT_create);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
         INPUT_create.onclick = () => {
@@ -75,7 +75,12 @@ exports.actions = {
             TD_key.appendChild(INPUT_remove);
             const TEXT_key = document.createTextNode(key);
             TD_key.appendChild(TEXT_key);
-
+            const subOptions = {
+                showLabels: false, display: item.getOption('display'),
+                onChange: (newContent,additionalSubPropertyPath)=> {
+                    item.patch(newContent,[key].concat(additionalSubPropertyPath))
+                }
+            };
             const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
             TD_value.appendChild(TAG);
 

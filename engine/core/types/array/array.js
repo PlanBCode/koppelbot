@@ -25,7 +25,7 @@ exports.actions = {
         const content = makeArray(item.getContent());
 
         const subSettings = item.getSetting('subType');
-        const subOptions = {showLabels: false, display: item.getOption('display')};
+
         const DIV_CREATE = document.createElement('DIV');
         const INPUT_create = document.createElement('INPUT');
         INPUT_create.type = "submit";
@@ -33,8 +33,11 @@ exports.actions = {
         INPUT_create.validUris = {};
         INPUT_create.value = "Add";
         const data = {};
-
-        const TRs = item.renderCreator(subOptions, item.getUri(), subSettings, [0], data, INPUT_create);
+        const addOptions = {
+            showLabels: false,
+            display: item.getOption('display'),
+        };
+        const TRs = item.renderCreator(addOptions, item.getUri(), subSettings, [0], data, INPUT_create);
         const TABLE_create = document.createElement('TABLE');
         TRs.forEach(TR => TABLE_create.appendChild(TR));
 
@@ -44,8 +47,14 @@ exports.actions = {
         let length = content.length;
         const rows = [];
         const addRow = (key, subContent) => {
+            const subOptions = {
+                showLabels: false, display: item.getOption('display'),
+                onChange: (newContent,additionalSubPropertyPath)=> {
+                    item.patch(newContent,[key].concat(additionalSubPropertyPath))
+                }
+            };
             ++length;
-            const TAG = item.renderSubElement('edit', [key], item.getStatus(), subContent, subSettings, subOptions);
+            const TAG = item.renderSubElement('edit', [], item.getStatus(), subContent, subSettings, subOptions);
             TAG.style.display = 'inline-block';
             const DIV_sub = document.createElement('DIV');
             const INPUT_remove = document.createElement('INPUT');
