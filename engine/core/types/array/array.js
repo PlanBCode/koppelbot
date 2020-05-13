@@ -7,9 +7,7 @@ function makeArray(content) {
         return content;
     } else if (typeof content === 'object') { // if data is an object, reshape to array
         const tmp = [];
-        for (let key in content) {
-            tmp[key] = content[key];
-        }
+        for (let key in content) tmp[key] = content[key];
         return tmp;
     } else {
         //TODO problem
@@ -69,6 +67,7 @@ exports.actions = {
             SPAN.insertBefore(DIV_sub, DIV_CREATE);
         };
         const deleteRow = key => {
+            --length;
             const TAG_row = rows[key];
             rows.splice(key, 1);
             SPAN.removeChild(TAG_row);

@@ -57,6 +57,10 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
 
     this.getUri = entityId => parent.getUri(entityId) + '/' + propertyName;
 
+    this.getPath = entityId => [...parent.getPath(entityId), propertyName];
+    this.getPropertyPath = () => this.getPath('*').slice(2);
+    this.getSubUri = () => this.getPath('*').slice(2).join('/');
+
     this.getEntityClassName = () => parent.getEntityClassName();
 
     this.getParent = () => parent;
@@ -81,8 +85,12 @@ exports.constructor = function Property(xyz, parent, propertyName, meta) {
         }
     };
 
-    this.callListeners = (state, entityId) => {
-        this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()));
+    this.callListeners = (state, entityId, method) => {
+        const propertyPath = this.getPropertyPath();
+        for(let depth = propertyPath.length-1; depth>=0;--depth) { // call all depths of the property path
+            const subUri = propertyPath.slice(depth).join('/');
+            this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()));
+        }
         parent.callListeners(state.getParentState(), entityId);
     };
 

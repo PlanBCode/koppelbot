@@ -40,7 +40,8 @@ function updateContents(path, state, method, responseStatus, responseContent, co
             } else if (method === 'GET') {
                 if (typeof responseContent !== 'undefined') contents[entityId] = responseContent;
             } else if (method === 'DELETE') {
-                state.setRemoved();
+                if (path.length === 0) state.setRemoved();
+                else state.setChanged();
                 json.unset(contents[entityId], path, null);
                 if (path.length === 0) delete contents[entityId];
             }
@@ -71,7 +72,9 @@ function updateContents(path, state, method, responseStatus, responseContent, co
 exports.handlePrimitive = (element, contents, statusses) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
     if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
     if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
+
     const state = new State(method);
+
     if (contents.hasOwnProperty(entityId)) {
         updateContents(path, state, method, responseStatus, responseContent, contents, entityId);
     } else if (entityId === '*') {
@@ -89,12 +92,17 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
                     } else {
                         contents[entityId] = responseContent;
                     }
+                    if (method === 'DELETE') {
+                        if (path.length === 0) state.setRemoved();
+                        else state.setChanged();
+                    }
                 }
                 break;
             case 400:
                 //TODO use message frop source if available
                 // TODO check if error is new eg compare with current error in errors
-                state.setError(403, 'Bad Request');
+                state.setError(400, 'Bad Request');
+                break;
             case 403:
                 //TODO use message frop source if available
                 // TODO check if error is new eg compare with current error in errors
@@ -111,7 +119,7 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
         }
     }
     statusses[entityId] = state.getStatus();
-    element.callListeners(state, entityId);
+    element.callListeners(state, entityId, method);
     return state;
 };
 
@@ -128,33 +136,36 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
 
     if (responseStatus === 207) {
         for (let subPropertyName in subProperties) {
-            const subProperty207Wrapper = responseContent[subPropertyName];
-            if (subProperty207Wrapper === null || typeof subProperty207Wrapper !== 'object'
-                || !subProperty207Wrapper.hasOwnProperty('status')
-                || !subProperty207Wrapper.hasOwnProperty('content')
-            ) {
-                //TODO reponse is in error
-                console.error('error response in wrong format');
-            } else {
-                const subProperty = subProperties[subPropertyName];
-                const subStatus = subProperty207Wrapper.status;
-                const subResponseContent = subProperty207Wrapper.content;
-                const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
-                const subPath = path.slice(1);
-                const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent);
-                state.addSubState(subState);
+            if (responseContent.hasOwnProperty(subPropertyName)) {
+                const subProperty207Wrapper = responseContent[subPropertyName];
+                if (subProperty207Wrapper === null || typeof subProperty207Wrapper !== 'object'
+                    || !subProperty207Wrapper.hasOwnProperty('status')
+                    || !subProperty207Wrapper.hasOwnProperty('content')
+                ) {
+                    //TODO reponse is in error
+                    console.error('error response in wrong format');
+                } else {
+                    const subStatus = subProperty207Wrapper.status;
+                    const subResponseContent = subProperty207Wrapper.content;
+
+                    const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
+                    const subPath = path.slice(1);
+                    const subProperty = subProperties[subPropertyName];
+                    const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent);
+                    state.addSubState(subState);
+                }
             }
         }
     } else {
         for (let subPropertyName in subProperties) {
-            const subProperty = subProperties[subPropertyName];
-            const subResponseContent = (responseContent === null || typeof responseContent !== 'object')
-                ? null
-                : responseContent[subPropertyName];
-            const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
-            const subPath = path.slice(1);
-            const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent);
-            state.addSubState(subState);
+            if (responseContent !== null && typeof responseContent === 'object' && responseContent.hasOwnProperty(subPropertyName)) {
+                const subResponseContent = responseContent[subPropertyName];
+                const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
+                const subPath = path.slice(1);
+                const subProperty = subProperties[subPropertyName];
+                const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent);
+                state.addSubState(subState);
+            }
         }
     }
     statusses[entityId] = state.getStatus();

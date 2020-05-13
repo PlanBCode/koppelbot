@@ -3,7 +3,7 @@ function State(method_) {
     let method = method_;
     let created = false;
     let changed = false;
-    let removed = method === 'DELETE';
+    let removed = false;
     let error = false;
     const errors = [];
 

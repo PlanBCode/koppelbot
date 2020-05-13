@@ -122,6 +122,12 @@ function json_set(&$object, array $keyPath, &$content): JsonActionResponse
     }
 }
 
+function isAssociativeArray(array $arr)
+{
+    if (array() === $arr) return false;
+    return array_keys($arr) !== range(0, count($arr) - 1);
+}
+
 function json_unset(&$object, array $keyPath): JsonActionResponse
 {
     if (empty($keyPath)) {
@@ -129,17 +135,14 @@ function json_unset(&$object, array $keyPath): JsonActionResponse
     }
     if (array_key_exists($keyPath[0], $object)) {
         if (count($keyPath) === 1) {
-            unset($object[$keyPath[0]]);
+            if (isAssociativeArray($object)) {  // ["a"=>1,"c"=>"a"]
+                unset($object[$keyPath[0]]);
+            } else {  // [1,2,3]
+                array_splice($object, intval($keyPath[0]), 1);
+            }
             return new JsonActionResponse(true);
         } else {
             return json_unset($object[$keyPath[0]], array_slice($keyPath, 1));
-        }
-    } elseif (is_array($object)) {
-        if (count($keyPath) === 1) {
-            unset($object[$keyPath[0]]);
-            return new JsonActionResponse(true);
-        } else {
-            return new JsonActionResponse(false); //TODO add error message
         }
     } else {
         return new JsonActionResponse(false); //TODO add error message

@@ -2,12 +2,8 @@ const setupOnChange = (item, TAGs_row, addRow, deleteRow) => item.onChange(item 
     const content = item.getContent();
     //TODO use   const status = item.getStatus();
     if (item.getMethod() === 'DELETE') {
-        for (let key in content) {
-            if (TAGs_row instanceof Array && key >= 0 && key < TAGs_row.length) {
-            } else if (!(TAGs_row instanceof Array) && TAGs_row.hasOwnProperty(key)) {
-
-            }
-            deleteRow(key);
+        for (let key in TAGs_row) {
+            if(! (key in content)) deleteRow(key);
         }
     } else if (item.getMethod() === 'PUT' || item.getMethod() === 'POST' || item.getMethod() === 'PATCH') {
         for (let key in content) {

@@ -48,6 +48,7 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
         return '/' + entityClassName + '/' + entityId;
     };
+    this.getPath = entityId => [entityClassName, entityId];
 
     const addEntityListener = (entityId, path, eventName, callback) => {
         const listeners = [];
@@ -251,10 +252,10 @@ function EntityClass(xyz, entityClassName, rawSettings) {
         }
         const DIV = document.createElement('DIV');
         for (let propertyName of propertyNames) {
-            if(properties.hasOwnProperty(propertyName)) {
+            if (properties.hasOwnProperty(propertyName)) {
                 const TAG = properties[propertyName].render(action, options, entityId);
                 DIV.appendChild(TAG);
-            }else{
+            } else {
                 //TODO error?
             }
         }
