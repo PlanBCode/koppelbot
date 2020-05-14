@@ -16,11 +16,11 @@ abstract class BasicConnector extends Connector
      *
      * @return ConnectorResponse|void
      */
-    protected function createPropertyResponse(PropertyRequest $propertyRequest)
+    protected function createPropertyResponse(PropertyRequest $propertyRequest): ConnectorResponse
     {
         switch ($propertyRequest->getMethod()) {
             case 'GET':
-                return $this->get($propertyRequest);
+                return $this->get($propertyRequest, false);
             case 'PATCH':
                 return $this->patch($propertyRequest);//TODO use $this->put
             case 'POST':
@@ -28,7 +28,7 @@ abstract class BasicConnector extends Connector
             case 'PUT':
                 return $this->patch($propertyRequest);
             case 'HEAD':
-                return $this->head($propertyRequest);
+                return $this->get($propertyRequest, true);
             case 'DELETE':
                 return $this->delete($propertyRequest);
             default: //TODO error
@@ -39,9 +39,8 @@ abstract class BasicConnector extends Connector
 
     abstract protected function close(connectorRequest $connectorRequest): ConnectorResponse;
 
-    protected function get(PropertyRequest $propertyRequest): ConnectorResponse
+    protected function get(PropertyRequest $propertyRequest, bool $head): ConnectorResponse
     {
-        $connectorResponse = new ConnectorResponse();
 
         /*$modified_after = $propertyRequest->getQuery()->get('modified_after');
         $modified_after = is_string($modified_after)?intval($modified_after):null;
@@ -64,6 +63,7 @@ abstract class BasicConnector extends Connector
         }else{
             $returnStatus = 200;
         }*/
+        $connectorResponse = new ConnectorResponse();
 
         $entityIdList = $propertyRequest->getEntityId();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
@@ -93,9 +93,10 @@ abstract class BasicConnector extends Connector
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
+
                     $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
                     if ($jsonActionResponse->succeeded()) {
-                        $connectorResponse->add(200, $propertyRequest, $entityId, $jsonActionResponse->content);
+                        $connectorResponse->add(200, $propertyRequest, $entityId, $head ? null : $jsonActionResponse->content);
                     } else {
                         //TODO use $jsonActionResponse->getErrorMessage()
                         //TODO might result in 404 or 500
@@ -105,6 +106,7 @@ abstract class BasicConnector extends Connector
             } else {
                 $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
             }
+
         }
         return $connectorResponse;
     }
@@ -239,7 +241,5 @@ abstract class BasicConnector extends Connector
        abstract protected function put(PropertyRequest $propertyRequest): ConnectorResponse;
         abstract protected function post(PropertyRequest $propertyRequest): ConnectorResponse;
     */
-
-    abstract protected function head(PropertyRequest $propertyRequest): ConnectorResponse;
 
 }

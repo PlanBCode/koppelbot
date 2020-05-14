@@ -96,6 +96,12 @@ class  PropertyRequest
         return $this->requestObject->getMethod() === 'DELETE';
     }
 
+    public function isEntityCreation(): bool
+    {
+        return ($this->requestObject->getMethod() === 'PUT' || $this->requestObject->getMethod() === 'POST')
+            && count($this->propertyPath) === 0;
+    }
+
     public function getPropertyPath(): array
     {
         return $this->propertyPath;

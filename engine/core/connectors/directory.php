@@ -92,7 +92,7 @@ class Connector_directory extends BasicConnector
 
     protected function open(connectorRequest $connectorRequest): ConnectorResponse
     {
-        $connectorResponse = new ConnectorResponse(200);
+        $connectorResponse = new ConnectorResponse();
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
         $propertyRequest = $connectorRequest->getFirstPropertyRequest();
         $this->data = [];
@@ -100,8 +100,9 @@ class Connector_directory extends BasicConnector
         $entityIds = [];
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
             $entityIdList = $propertyRequest->getEntityId();
-            if ($propertyRequest->getMethod() === 'POST' || $propertyRequest->getMethod() === 'PUT') {
-                // do nothing. No file yet to write to, this file will be created
+
+            if ($propertyRequest->isEntityCreation()) {
+              // do nothing. No file yet to write to, this file will be created
             } else if ($entityIdList === '*') {
                 $entityIds = $this->getAllEntityIds();
                 break;

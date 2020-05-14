@@ -320,40 +320,45 @@ class ApiRequest extends HttpRequest2
         }
 
         $requestResponses = $this->getRequestResponses();
-        $content = $this->createNonSingularContent($requestResponses);
         $status = $this->getStatus($requestResponses);
 
-        if (count($this->errors)) {
-            $stringContent = '';
-            foreach ($this->errors as $error) {
-                $path = $error->getPath();
-                if (count($path) === 0) {
-                    $stringContent .= $error->getErrorMessage();
-                } else {
-                    if ($content === null) {
-                        $content = [];
-                        json_set($content, $path, $error->getErrorMessage());
-                        $status = $error->getStatus();
+        if ($this->method === 'HEAD') {
+            return new HttpResponse2($status, '', []);
+        } else {
+            $content = $this->createNonSingularContent($requestResponses);
 
-                    } else {  //TODO add error properly
-                        echo $status . '<br/>';
-                        echo implode('/', $path) . ' ' . $error->getErrorMessage() . '<br/>';;
+            if (count($this->errors)) {
+                $stringContent = '';
+                foreach ($this->errors as $error) {
+                    $path = $error->getPath();
+                    if (count($path) === 0) {
+                        $stringContent .= $error->getErrorMessage();
+                    } else {
+                        if ($content === null) {
+                            $content = [];
+                            json_set($content, $path, $error->getErrorMessage());
+                            $status = $error->getStatus();
+
+                        } else {  //TODO add error properly
+                            echo $status . '<br/>';
+                            echo implode('/', $path) . ' ' . $error->getErrorMessage() . '<br/>';;
+                        }
                     }
                 }
+                if ($stringContent !== '') return new HttpResponse2(400, $stringContent, []);
             }
-            if ($stringContent !== '') return new HttpResponse2(400, $stringContent, []);
-        }
 
-        if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
-            $entityClassName = $this->path[0];
-            $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
-            $propertyPath = array_slice($this->path, 2);
-            /** @var Property */
-            $property = $entityClass->getProperty($propertyPath);
-            return $property->serveContent($status, $content);
-        } else {
-            $stringContent = $this->stringifyContent($content);
-            return new HttpResponse2($status, $stringContent, []);
+            if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
+                $entityClassName = $this->path[0];
+                $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
+                $propertyPath = array_slice($this->path, 2);
+                /** @var Property */
+                $property = $entityClass->getProperty($propertyPath);
+                return $property->serveContent($status, $content);
+            } else {
+                $stringContent = $this->stringifyContent($content);
+                return new HttpResponse2($status, $stringContent, []);
+            }
         }
     }
 
