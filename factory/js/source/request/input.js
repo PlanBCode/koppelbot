@@ -57,10 +57,17 @@ function updateContents(path, state, method, responseStatus, responseContent, co
                 contents[entityId] = responseContent;
             }*/
             break;
-        case 404:
-            //TODO use message frop source if available
+        case 400:
             //TODO check if error is new eg compare with current error in errors
-            state.setError(404, 'Not found');
+            state.setError(400, responseContent || 'Bad request');
+            break;
+        case 403:
+            //TODO check if error is new eg compare with current error in errors
+            state.setError(403, responseContent || 'Forbidden');
+            break;
+        case 404:
+            //TODO check if error is new eg compare with current error in errors
+            state.setError(404, responseContent || 'Not found');
             break;
         default:
             //state.setError(); // TODO compare with current error in errors

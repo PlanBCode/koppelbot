@@ -30,8 +30,10 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         INPUT_submit.onclick = () => {
             const displayCreatedMessage = state => {
                 if (state.hasErrors()) {
-                    displayMessage('Failed to create', true);
-                }else{
+                    const errorMessages = state.getErrors().map(error => error.message);
+                    const errorString = [...new Set(errorMessages)]; // make unique
+                    displayMessage('Failed to create: ' + errorString, true);
+                } else {
                     displayMessage('Created');
                     for (let key in data) delete data[key]; // reset data  //TODO add defaults
 
