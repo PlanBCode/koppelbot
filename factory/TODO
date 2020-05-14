@@ -1,11 +1,13 @@
 TODO
 
+> don't block PUT, but do a HEAD call in the UI before submit to check availability
+twee keer een bestand met dezelfde naam uploaden geeft geen foutmelding.
+
 
 bij add fact blijft het laatst gekozen bestand geselecteerd waardoor onduidelijk is of je een bestand hebt geselecteerd of niet.
 
 Inloggen in firefox lukt wel maar geeft geen actieve interface, d.w.z. source-list en timeline worden niet geladen, upload source is inactief. In chromium werkt t wel.
 
-twee keer een bestand met dezelfde naam uploaden geeft geen foutmelding.
 
 edit source werkt niet.
 

@@ -53,8 +53,10 @@ function ApiRequest(method, uri, data) {
     this.runSync = name => {
         let status = 200
         let content;
+        const command = `./xyz --method ${method} '${uri}' '${data}'`;
+        const options = {cwd: `${__dirname}/../../..`};
         try {
-            content = child_process.execSync(`./xyz --method ${method} '${uri}' '${data}'`, {cwd: `${__dirname}/../../..`});
+            content = child_process.execSync(command, options).toString();
         } catch (e) {
             status = e.status;
             content = e.stdout.toString();

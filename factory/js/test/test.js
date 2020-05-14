@@ -19,6 +19,17 @@ curl('PUT', '/fruit/apple','{"color":"red","name":"apple","size":"medium"}')
     })
     .runSync('Fruit PUT');
 
+curl('HEAD', '/fruit/apple')
+    .statusShouldMatch(200)
+    .contentShouldMatch('')
+    .runSync('Fruit HEAD');
+
+curl('HEAD', '/fruit/cucumber')
+    .shouldFail(200)
+    .contentShouldMatch('')
+    .runSync('Fruit HEAD fail');
+
+
 curl('GET', '/fruit/banana')
     .statusShouldMatch(404)
     .run('Fruit: GET 404');
