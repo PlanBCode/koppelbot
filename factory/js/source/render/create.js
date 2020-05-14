@@ -43,17 +43,20 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
                     TABLE = newTABLE;
                 }
             }
-            if (entityClass.isAutoIncremented()) {
+            if (entityClass.isAutoIncremented()) { // POST
                 xyz.post(uri, {[entityClassName]: {'new': data}}, displayCreatedMessage);
-            } else {
+            } else { // PUT
                 const entityId = entityClass.getIdFromContent(data);
-                xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
+                xyz.head(uri + '/' + entityId, status => {
+                    if (status === 404) {
+                        xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
+                    } else {
+                        displayMessage('Failed: ' + entityId + ' already exists.');
+                    }
+                })
             }
-            if (typeof options.onSubmit === 'function') {
-                options.onSubmit(data);
-            }
-
             displayMessage('Creating..');
+            if (typeof options.onSubmit === 'function') options.onSubmit(data);
         };
 
         TAG.appendChild(TABLE);

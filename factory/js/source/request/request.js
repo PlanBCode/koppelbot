@@ -59,9 +59,8 @@ exports.delete = (entityClasses, uri, callback) => {
 
 exports.head = (uri, callback) => {
     request('HEAD', uri, null, (status, response) => {
-        console.log('head response: ' + uri + ' ' + response);
-        if (typeof callback === 'function') callback(); //TODO pass state
-
+        console.log('head response: ' + uri + ' ' + status+' '+ response);
+        if (typeof callback === 'function') callback(status); //TODO pass state
     });
 };
 
