@@ -48,7 +48,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
             } else { // PUT
                 const entityId = entityClass.getIdFromContent(data);
                 xyz.head(uri + '/' + entityId, status => {
-                    if (status === 404) {
+                    if (status !== 200) {
                         xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
                     } else {
                         displayMessage('Failed: ' + entityId + ' already exists.');
