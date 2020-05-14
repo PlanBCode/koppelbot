@@ -56,6 +56,7 @@ class Connector_session extends Connector
             case 'DELETE':
                 return $this->logout($propertyRequest);
             case 'GET':
+            case 'HEAD':
                 return $this->getSession($propertyRequest);
             default:
         }
