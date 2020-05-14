@@ -18,7 +18,7 @@ class Response
 
     public function getStatus(): int
     {
-        return $this->status;
+        return isset($this->status) ? $this->status : 200;
     }
 }
 

@@ -5,9 +5,9 @@ class ConnectorResponse extends Response
     /** @var RequestResponse[] */
     protected $requestResponses = [];
 
-    public function __construct(int $status = 200)
+    public function __construct(int $status = null)
     {
-        $this->addStatus($status);
+        if(!is_null($status)) $this->addStatus($status);
     }
 
     public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): ConnectorResponse
