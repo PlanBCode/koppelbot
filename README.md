@@ -9,7 +9,7 @@ Using data models and html templates you can quickly build your web based applic
 For a full introduction check tutorial.md
 
 ### Web server
-To install for Apache web server: copy the repo to the server folder. the `.htaccess` file 
+To install for Apache web server: copy the repo to the server folder. the `.htaccess` file
 will rout all requests to index.php;  
 
 ### Local test server
@@ -21,7 +21,7 @@ A local (php) test server can be started using:
 
 ## API
 
-The API provides a json interface to the data. 
+The API provides a json interface to the data.
 
 The uri's for API endpoints are structured as:
 
@@ -29,7 +29,7 @@ The uri's for API endpoints are structured as:
 
 Examples
 
-`http://localhost:8000/api/car?color=red`
+`http://localhost:8000/api/car?color==red`
 Get all red cars.
 
 `https://www.site.com/api/fruit/apple/color`
@@ -48,7 +48,7 @@ More API documentation can be found at `http(s)://$HOST:$PORT/doc/api`
 
 ## UI
 
-The User Interface (UI) provides a html+js user interface to the data. 
+The User Interface (UI) provides a html+js user interface to the data.
 
 The uri's for UI endpoints are structured as:
 
@@ -69,4 +69,3 @@ More UI documentation can be found at `http(s)://$HOST:$PORT/doc/ui`
 Documentation can be found at:
 
 `http(s)://$HOST:$PORT/doc`
-
