@@ -7,6 +7,8 @@ class Type_string extends Type
     public static function validateContent($content, array &$settings): bool
     {
         if (is_string($content)) {
+            if (strlen($content) < array_get($settings, 'minLength', 0)) return false;
+            if (array_key_exists('maxLength',$settings) && strlen($content) > array_get($settings, 'minLength', 0)) return false;
             return true;//TODO  min, max length, regex
         } elseif (is_array($content) && array_get($settings, 'binary', false)) {
             if (!array_key_exists('encoding', $content)) return false;

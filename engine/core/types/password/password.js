@@ -74,6 +74,9 @@ exports.actions = {
         if (typeof content !== 'object' || content === null) return false;
         if (typeof content.new !== 'string') return false;
         if (typeof content.confirm !== 'string') return false;
+        if (item.hasSetting('maxLength') && content.confirm.length > item.getSetting('maxLength')) return false;
+        if (item.hasSetting('minLength') && content.confirm.length < item.getSetting('minLength')) return false;
+
         return content.confirm === content.new; // TODO min/max length, allow chars, regex
     }
 };

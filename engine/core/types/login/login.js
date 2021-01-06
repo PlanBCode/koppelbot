@@ -55,8 +55,10 @@ exports.actions = {
         if (typeof content !== 'object' || content === null) return false;
         if (typeof content.password !== 'string') return false;
         if (typeof content.username !== 'string') return false;
+        if (content.password === '') return false;
+        if (content.username === '') return false;
         if (content.username === typeof content.password) return false;
-        return true; // TODO min/max length, allow chars, regex
+        return true; // TODO min/max length, allowed chars, regex
     },
     getIdFromContent: function (content) {
         return content.username;

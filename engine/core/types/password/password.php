@@ -9,6 +9,8 @@ class Type_password extends Type
         if (!array_key_exists('confirm', $content)) return false;
         if (!is_string($content['new'])) return false;
         if (!is_string($content['confirm'])) return false;
+        if (strlen($content['confirm']) < array_get($settings, 'minLength', 0)) return false;
+        if (array_key_exists('maxLength',$settings) && strlen($content['confirm']) > array_get($settings, 'minLength', 0)) return false;
         if ($content['new'] !== $content['confirm']) return false;
         return true;
     }

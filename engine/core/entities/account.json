@@ -25,6 +25,7 @@
   },
   "password": {
     "type": "password",
+    "minLength":"5",
     "access" : {
       "read" : ["/group/system"],
       "createBlind" : ["/group/guest"],
