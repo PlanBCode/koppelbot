@@ -171,22 +171,24 @@ class  PropertyRequest
 class PropertyResponse extends Response
 {
     protected $content;
-    /** @var Property */
-    protected $property;
     /** @var string[] */
     protected $propertyPath;
 
-    public function __construct(Property &$property, RequestObject &$requestObject, int $status, array $propertyPath, $content = null)
+    public function __construct(?Property &$property, RequestObject &$requestObject, int $status, array $propertyPath, $content = null)
     {
         $this->propertyPath = $propertyPath;
-        $this->property = $property;
-        $processResponse = $property->processAfterConnector($requestObject, $content);
-        if ($processResponse->succeeded()) {
-            $this->addStatus($status);
-            $this->content = $processResponse->getContent();
-        } else {
-            $this->status = $processResponse->getStatus();
-            $this->content = $processResponse->getError();
+        if(is_null($property)){
+          $this->addStatus(400);
+          $this->content = 'Illegal property '.$propertyPath[0].'.';
+        }else{
+            $processResponse = $property->processAfterConnector($requestObject, $content);
+            if ($processResponse->succeeded()) {
+                $this->addStatus($status);
+                $this->content = $processResponse->getContent();
+            } else {
+                $this->status = $processResponse->getStatus();
+                $this->content = $processResponse->getError();
+            }
         }
     }
 
