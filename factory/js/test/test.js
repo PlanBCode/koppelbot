@@ -81,7 +81,7 @@ curl('GET', '/fruit/*?color==green')
             "name": "melon"
         }
     })
-    .run('Fruit: filter on color=green');
+    .run('Fruit: filter on color==green');
 
 curl('GET', '/fruit/*/name')
     .statusShouldMatch(200)
@@ -115,6 +115,10 @@ curl('GET', '/fruit/*/name?search=range')
         "orange": "orange"
     })
     .run('Fruit: Search');
+
+curl('GET', '/fruit/*/name?search=non_existing_string')
+    .contentShouldMatch([])
+    .run('Fruit: Search without result');
 
 curl('PATCH', '/fruit/melon/size','small')
     .contentShouldMatch(null)

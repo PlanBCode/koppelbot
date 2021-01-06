@@ -268,7 +268,7 @@ class ApiRequest extends HttpRequest2
                     return json_search($entityClassData[$entityId], $search);;
                 });
             }
-
+            if(empty($entityIds)) return [];            
             $entityIdList = implode(',', $entityIds);
         }
         /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.

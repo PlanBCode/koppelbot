@@ -10,11 +10,6 @@ in de layout is verwarrend dat source view en fact view onder elkaar staan alsof
 
 change facts in timeline dynamically
 
-
-
-search/display
-- fix this: ./xyz "/fruit/*/name?search=abc"   {"": "Not found"}
-
 fix sign-up flow
 - show errors if create/login fails
 - auto fill in username after sign up
