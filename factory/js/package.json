@@ -14,7 +14,7 @@
   "devDependencies": {
     "gulp": "^4.0.2",
     "jsdom": "^16.2.2",
-    "webpack": "^4.41.5",
+    "webpack": "^5.11.1",
     "webpack-cli": "^3.3.10"
   }
 }
