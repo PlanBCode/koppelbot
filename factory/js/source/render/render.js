@@ -108,7 +108,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
     }
     let TAG;
 
-    const validate = item => {
+    const validate = (item, firstTime = false) => {
         const uri = item.getUri();
         if (item.validateContent()) {
             if (typeof displayMessage === 'function') displayMessage();
@@ -123,7 +123,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
             if (typeof displayMessage === 'function') {
                 const path = uri.split('/');
                 const propertyName = path[path.length - 1];
-                displayMessage(`Invalid content for '${propertyName}'`);
+                if(!firstTime) displayMessage(`Invalid content for '${propertyName}'`);
             }
             TAG.classList.add('xyz-invalid-content');
             if (INPUT_submit) {
@@ -175,7 +175,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
 
     const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
     TAG = type.edit(item);
-    validate(item);
+    validate(item, true);
     // TODO add id from options (also for label for)
     // TODO add class from options
     const TD_content = document.createElement('TD');
