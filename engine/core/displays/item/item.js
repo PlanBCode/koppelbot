@@ -10,12 +10,13 @@ options:
 
 const list = require('../list/list.js');
 const response = require('../../../../factory/js/source/entity/response'); //TODO better solution
+const {pathFromUri} = require('../../../../factory/js/source/uri/uri.js'); //TODO better solution
 
 // check if uri is '/$class/$id' or '/$class/$id/*/.../*' but not '/$class/$id/$property'
 function isFullEntity(uri) {
-    const path = uri.substr(1).split('/');
+    const path = pathFromUri(uri);
     for (let i = 2; i < path.length; ++i) {
-        if (path[i] !== '*') return false
+        if (path[i] !== '*' && !path[i].startsWith('?')) return false
     }
     return true;
 }
@@ -34,6 +35,7 @@ exports.display = {
         display.getWRAPPER().innerHTML = '';
     },
     entity: display => {
+
         const WRAPPER = display.getWRAPPER();
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
@@ -164,4 +166,3 @@ exports.display = {
         }
     }
 };
-

@@ -13,8 +13,6 @@ change facts in timeline dynamically
 
 
 search/display
-- fix this: http://localhost:8000/ui/item/fact?search=jaar
-- fix this: http://localhost:8000/ui/item/fact?search=$search
 - fix this: ./xyz "/fruit/*/name?search=abc"   {"": "Not found"}
 
 fix sign-up flow

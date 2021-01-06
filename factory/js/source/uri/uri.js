@@ -1,4 +1,5 @@
 const pathFromUri = uri => {
+    uri = uri.split('?')[0]; //remove querystring
     if (uri.startsWith('/')) {
         uri = uri.substr(1);
     }

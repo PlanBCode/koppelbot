@@ -28,10 +28,9 @@ function DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entit
         const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
         if (titlePropertyPath === null) return fallback;
         const titleResponse = response.getSubNode(node, titlePropertyPath);
-        const title = titleResponse && !titleResponse.hasErrors()
-            ? titleResponse.getContent()
-            : fallback;
-        return title;
+        if (!titleResponse || titleResponse.hasErrors()) return fallback;
+        const titleContent = titleResponse.getContent();
+        return typeof titleContent === 'undefined' ? fallback : titleContent;
     };
 
     this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
@@ -137,7 +136,6 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
             displayListenersPerWrapper.delete(WRAPPER);
         }
     });
-
     const baseUri = uriTools.getBaseUri(uri);
     const createdListeners = xyz.on(baseUri, 'created', renderDisplay(xyz, uri, options, WRAPPER));
     const removedListeners = xyz.on(baseUri, 'removed', removeDisplay(xyz, uri, options, WRAPPER));
@@ -153,7 +151,7 @@ const renderUiElement = (xyz, options, WRAPPER) => {
     const display = displays[displayName]; //TODO check?
     const action = options.action || DEFAULT_ACTION;
 
-    const path = uri.substr(1).split('/'); //TODO better
+    const path = uriTools.pathFromUri(uri);
     const entityId = path[1] || '*';
     const entityClass = path[0];
     const displayParameters = new DisplayParameters(xyz, action, options, WRAPPER, entityClass, entityId, null, uri);

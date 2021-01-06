@@ -121,7 +121,7 @@ function creator(xyz, options, uri, settings, subPropertyPath, data, INPUT_submi
             return true;
         } else {
             if (typeof displayMessage === 'function') {
-                const path = uri.split('/');
+                const path = uriTools.pathFromUri(uri);
                 const propertyName = path[path.length - 1];
                 if(!firstTime) displayMessage(`Invalid content for '${propertyName}'`);
             }

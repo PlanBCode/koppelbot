@@ -1,5 +1,5 @@
 const entity = require('../entity/entity.js');
-const addQueryString = require('../uri/uri.js').addQueryString;
+const {addQueryString, pathFromUri} = require('../uri/uri.js');
 
 function request(method, uri, data, callback) {
 
@@ -21,7 +21,7 @@ function request(method, uri, data, callback) {
 }
 
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
-    const path = uri.substr(1).split('/');
+    const path = pathFromUri(uri);
     const entityClassNameList = path[0]; // TODO error if no entityClass
 
     const entityClassNames = entityClassNameList.split(',').filter(entityClass => !entityClasses.hasOwnProperty((entityClass)));
