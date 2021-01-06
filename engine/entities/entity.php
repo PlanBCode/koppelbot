@@ -48,6 +48,14 @@ class EntityClass
         }
     }
 
+    public function getIdPropertyName(): ?string
+    {
+      foreach ($this->properties as $property){
+        if($property->isId()) return $property->getName();
+      }
+      return null;
+    }
+
     public function getProperty(array &$propertyPath): ?Property
     {
         if (count($propertyPath) === 0) return null;
@@ -100,7 +108,7 @@ class EntityClass
                 $propertyPath = [$propertyName];
                 if (!is_null($propertyContent)) {
                     if ($property->getTypeName() === 'id' && $method === 'POST') {
-                        $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not bu supplied.';
+                        $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not be supplied.';
                         $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     } else if (!$property->validateContent($propertyContent)) {
@@ -122,12 +130,11 @@ class EntityClass
     {
 
         $method = $requestObject->getMethod();
-
         /** @var string[] */
         $entityIds = [];
         if ($entityIdList === '*') {
             if ($method === 'POST') {
-                $entityIds = array_keys($entityClassContent);
+               $entityIds = is_array($entityClassContent) ? array_keys($entityClassContent) : []; // these will be temporary ids
             } elseif ($method === 'HEAD') {
                 //TODO this is tautology requesting the existance of all existing entities
             } elseif ($method === 'PUT') {
@@ -167,9 +174,8 @@ class EntityClass
                 $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityId, $entityIdContent);
             }
         }
-        if (!empty($errorPropertyRequests)) {
-            return $errorPropertyRequests;
-        }
+        if (!empty($errorPropertyRequests)) return $errorPropertyRequests;
+
         return $propertyRequests;
     }
 

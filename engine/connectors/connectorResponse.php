@@ -7,7 +7,7 @@ class ConnectorResponse extends Response
 
     public function __construct(int $status = null)
     {
-        if(!is_null($status)) $this->addStatus($status);
+        if (!is_null($status)) $this->addStatus($status);
     }
 
     public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): ConnectorResponse
@@ -15,10 +15,12 @@ class ConnectorResponse extends Response
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
         if (!array_key_exists($requestId, $this->requestResponses)) {
-            $this->requestResponses[$requestId] = new RequestResponse($propertyRequest->getRequestObject());
+            $requestObject = $propertyRequest->getRequestObject();
+            $this->requestResponses[$requestId] = new RequestResponse($requestObject);
         }
         $method = $propertyRequest->getMethod();
-        $this->requestResponses[$requestId]->add($method, $status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
+        if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
+        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
         return $this;
     }
 

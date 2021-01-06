@@ -12,6 +12,7 @@ TODO
 const list = require('../list/list.js');
 
 function parseDateString(string) {
+    if(typeof string !== 'string') return new Date().getTime();
     const parts = string.split("-"); //TODO use formats.json function or a type.toNumber
     return new Date(parseInt(parts[2], 10),
         parseInt(parts[1], 10) - 1,
@@ -248,4 +249,3 @@ exports.display = {
         drawNodes(DIV, display);
     }
 };
-

@@ -2,13 +2,12 @@ TODO
 
 bij add fact blijft het laatst gekozen bestand geselecteerd waardoor onduidelijk is of je een bestand hebt geselecteerd of niet.
 
-Inloggen in firefox lukt wel maar geeft geen actieve interface, d.w.z. source-list en timeline worden niet geladen, upload source is inactief. In chromium werkt t wel.
-
-edit source werkt niet.
-
-in de layout is verwarrend dat source view en fact view onder elkaar staan alsof ze wat met elkaar te maken hebben terwijl de link eigenlijk is tussen selected source en source view resp selected fact en fact view.
+oplossing bedenken en werkend maken voor editen van id veld
 
 change facts in timeline dynamically
+
+
+should fail: ./xyz --method PUT /fruit/kiwi '{"color":"red","name":"apple","size":"medium"}'
 
 fix sign-up flow
 - show errors if create/login fails
@@ -109,3 +108,5 @@ $variable usage in /ui endpoints (generate inputs to update)
 navigation in /ui endpoints for (sub) property names
 
 maybe entity inheritance
+
+in de layout is verwarrend dat source view en fact view onder elkaar staan alsof ze wat met elkaar te maken hebben terwijl de link eigenlijk is tussen selected source en source view resp selected fact en fact view.

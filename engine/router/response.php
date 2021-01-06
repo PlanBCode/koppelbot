@@ -37,13 +37,13 @@ class RequestResponse extends Response
         $this->requestObject = $requestObject;
     }
 
-    public function add(string $method, int $status, string $entityClassName, string $entityId, array $propertyPath, $content): void
+    public function add(int $status, string $entityClassName, string $entityId, array $propertyPath, $content): void
     {
-
         $this->addStatus($status);
         if (!array_key_exists($entityClassName, $this->entityClassResponses)) {
             $this->entityClassResponses[$entityClassName] = new EntityClassResponse($entityClassName, $this->requestObject);
         }
+
         $this->entityClassResponses[$entityClassName]->add($status, $entityId, $propertyPath, $content);
     }
 

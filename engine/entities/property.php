@@ -58,7 +58,6 @@ class  PropertyRequest
     public function __construct(int $status, RequestObject &$requestObject, string $entityClass, string $entityId, $propertyOrError, array $propertyPath, $propertyContent)
     {
         $this->requestObject = $requestObject;
-
         $this->entityId = $entityId;
         $this->entityClass = $entityClass;
         $this->propertyPath = $propertyPath;
@@ -333,7 +332,7 @@ class Property
         return $this->depth;
     }
 
-    protected function isId(): bool
+    public function isId(): bool
     {
         return (array_get($this->settings['connector'], 'key', false));
     }
