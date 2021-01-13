@@ -1,0 +1,34 @@
+{
+  "_": {
+    "connector": {
+      "type": "directory",
+      "parse": "json",
+      "path": "data/locations/",
+      "extension": "json"
+    },
+    "access" : {
+      "write" : ["/group/guest"]
+    }
+  },
+  "id": {
+    "type": "id",
+    "autoIncrement": true,
+    "connector": {
+      "key": "basename"
+    }
+  },
+  "title" : {
+    "displayName": "Title",
+    "title": true,
+    "type": "string",
+    "minLength": 1
+  },
+  "date": {
+    "displayName": "Date",
+    "type": "date",
+    "format": "d-m-Y"
+  },
+  "geojson" : {
+    "type": "geojson"
+  }
+}
