@@ -51,6 +51,7 @@ exports.display = {
         // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
         // TODO maybe pass label to svg entity?
         const SVG_entity = content[locationPropertyName].render(display.getAction(), {svg: true, ...display.getSubOptions(locationPropertyName)});
+        SVG_entity.entityId = entityId;
         SVG_entity.onclick = event => {
           display.select(entityClassName, entityId);
           event.stopPropagation();
@@ -66,10 +67,9 @@ exports.display = {
     remove: display => {
         const WRAPPER = display.getWRAPPER();
         const entityId = display.getEntityId();
-        const DIV = WRAPPER.firstChild;
-        for (let NODE of DIV.childNodes) {
-            if (typeof NODE.entityId === 'string' && (NODE.entityId === entityId || entityId === '*')) DIV.removeChild(NODE);
+        const SVG_map  = WRAPPER.firstChild;
+        for (let SVG_entity of SVG_map.childNodes) {
+            if (typeof SVG_entity.entityId === 'string' && (SVG_entity.entityId === entityId || entityId === '*')) SVG_map.removeChild(SVG_entity);
         }
-        drawNodes(DIV, display);
     }
 };
