@@ -26,7 +26,16 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         };
 
         let TABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
+        const patch = newData => {
+          //TODO check newData
+          for (let key in data) delete data[key]; // reset data  //TODO add defaults
+          for( let key in newData) data[key] = newData[key];
 
+          const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
+          TAG.insertBefore(newTABLE, TABLE);
+          TAG.removeChild(TABLE);
+          TABLE = newTABLE;
+        }
         INPUT_submit.onclick = () => {
             const displayCreatedMessage = state => {
                 if (state.hasErrors()) {
@@ -35,12 +44,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
                     displayMessage('Failed to create: ' + errorString, true);
                 } else {
                     displayMessage('Created');
-                    for (let key in data) delete data[key]; // reset data  //TODO add defaults
-
-                    const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
-                    TAG.insertBefore(newTABLE, TABLE);
-                    TAG.removeChild(TABLE);
-                    TABLE = newTABLE;
+                    patch({});
                 }
             }
             if (entityClass.isAutoIncremented()) { // POST
@@ -58,7 +62,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
             displayMessage('Creating..');
             if (typeof options.onSubmit === 'function') options.onSubmit(data);
         };
-
+        TAG.patch = patch;
         TAG.appendChild(TABLE);
         TAG.appendChild(INPUT_submit);
         TAG.appendChild(SPAN_message);

@@ -69,7 +69,8 @@ function showCreateButton(display) {
         const entityClassName = display.getEntityClassName();
         display.xyz.ui({uri: '/' + entityClassName, display: 'create'}, DIV); // TODO encapsulate xyz
         WRAPPER.appendChild(DIV);
-    }
+        return DIV;
+    } else return null;
 }
 
 exports.display = {
