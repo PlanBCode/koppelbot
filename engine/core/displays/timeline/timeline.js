@@ -242,9 +242,7 @@ exports.display = {
         const entityId = display.getEntityId();
         const DIV = WRAPPER.firstChild;
         for (let NODE of DIV.childNodes) {
-            if (typeof NODE.entityId === 'string' && (NODE.entityId === entityId || entityId === '*')) {
-                DIV.removeChild(NODE);
-            }
+            if (typeof NODE.entityId === 'string' && (NODE.entityId === entityId || entityId === '*')) DIV.removeChild(NODE);
         }
         drawNodes(DIV, display);
     }
