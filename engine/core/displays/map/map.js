@@ -27,7 +27,7 @@ exports.display = {
           SVG_map.onclick = event => {
             const rect = SVG_map.getBoundingClientRect();
             const x = event.clientX - rect.left;
-            const y = event.clientX - rect.top;
+            const y = event.clientY - rect.top;
             //TODO use transformation
             DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
             DIV_create.style.display = 'block';
