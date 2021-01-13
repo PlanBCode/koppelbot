@@ -67,7 +67,7 @@ exports.actions = {
       } else return json.actions.edit(item);
     },
     view: item => {
-      if(item.getOptions('svg')){
+      if(item.getOption('svg')){
         const SVG = document.createElementNS(xmlns,'circle');
 
         const onChangeHandler = item => {

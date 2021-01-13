@@ -26,6 +26,7 @@ exports.display = {
     entity: display => {
         const content = display.getContent();
         const locationPropertyName = display.getOption('location') || 'geojson';
+        // TODO maybe const labelPropertyName = display.getOption('label')||'title'; //TODO
 
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
@@ -34,9 +35,17 @@ exports.display = {
         const SVG_map = WRAPPER.firstChild;
 
         if(typeof content !== 'object' || content === null || !content.hasOwnProperty(locationPropertyName)) return;
+        // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
+        // TODO maybe pass label to svg entity?
+        const SVG_entity = content[locationPropertyName].render(display.getAction(), {svg: true, ...display.getSubOptions(locationPropertyName)});
+        SVG_entity.onclick = () => display.select(entityClassName, entityId);
+        if(display.hasOption('select')){
+          SVG_entity.style.cursor='pointer';
+        }
 
-        const SVG_entity = content[locationPropertyName].render(display.getAction(), {svg: true,...display.getSubOptions(locationPropertyName)});
         SVG_map.appendChild(SVG_entity);
+
+        // TODO Maybe SVG_map.appendChild(SPAN_label);
 
     },
     remove: display => {
