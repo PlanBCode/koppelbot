@@ -19,14 +19,33 @@ function parseDateString(string) {
         parseInt(parts[0], 10)).getTime();
 }
 
+
+
 function sortLabels(A, B) {
     const timeA = parseDateString(A.date);
     const timeB = parseDateString(B.date);
-    if (timeA === timeB) {
-        return 0;
-    } else {
-        return timeA < timeB ? -1 : 1;
-    }
+    if (timeA === timeB) return 0;
+    else return timeA < timeB ? -1 : 1;
+}
+
+function getDateFromRatio(DIV,ratio){
+  let minTime = Infinity;
+  let maxTime = -Infinity;
+  const LABELS = [];
+  for (let NODE of DIV.childNodes) {
+      if (NODE.classList.contains('xyz-timeline-node')) {
+          const time = parseDateString(NODE.date);
+          minTime = Math.min(minTime, time);
+          maxTime = Math.max(maxTime, time);
+      }
+  }
+  const timestamp = minTime + (maxTime - minTime) * ratio;
+  const date = new Date(timestamp); //TODO use formats.json function or a type.toNumber
+  let day = date.getDay() + 1;
+  if(day < 10) day = '0' + day;
+  let month = date.getMonth() + 1;
+  if(month < 10) month = '0' + month;
+  return day + '-' + month + '-' + date.getFullYear();
 }
 
 function drawNodes(DIV, display) {
@@ -136,6 +155,7 @@ exports.display = {
         display.getWRAPPER().innerHTML = 'No items to display.';
     },
     first: display => {
+        const datePropertyName = display.getOption('key') || 'date'; // TODO
         const horizontal = display.getOption('horizontal');
         const Q = (display.getOption('midLine') || '0') + '%';
         const WRAPPER = display.getWRAPPER();
@@ -156,7 +176,19 @@ exports.display = {
         }
         DIV.appendChild(DIV_line);
         WRAPPER.appendChild(DIV);
-        list.showCreateButton(display);
+        const DIV_create = list.showCreateButton(display);
+        if(DIV_create){
+          DIV_line.style.cursor = 'pointer';
+          DIV_line.onclick = event => {
+            DIV_create.style.display = 'block';
+            const rect = DIV_line.getBoundingClientRect();
+            const ratio = horizontal
+              ? (event.clientX - rect.left) / (rect.right -rect.left)
+              : (event.clientY - rect.top) / (rect.bottom -rect.top);
+            const date = getDateFromRatio(DIV,ratio);
+            DIV_create.patch({[datePropertyName]:date});
+          }
+        }
 
         /*WIP
                 const DIV_lineCreator = document.createElement('DIV');

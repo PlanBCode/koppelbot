@@ -1,7 +1,7 @@
 exports.actions = {
     edit: function (item) {
         const TEXTAREA = document.createElement('TEXTAREA');
-        TEXTAREA.value = item.getContent();
+        TEXTAREA.value = JSON.stringify(item.getContent());
         TEXTAREA.oninput = () => {
             let content;
             try {
@@ -10,11 +10,12 @@ exports.actions = {
                 //TODO
                 return;
             }
+            console.log('edit',content)
             item.patch(content);
         };
         item.onChange(item => {
             if (TEXTAREA !== document.activeElement) {
-                TEXTAREA.value = item.getContent();
+                TEXTAREA.value = JSON.stringify(item.getContent());
             }
         });
         return TEXTAREA;
@@ -28,12 +29,7 @@ exports.actions = {
         return DIV;
     },
     validateContent: function (item) {
-        try {
-            JSON.parse(item.getContent());
-            return true;
-        } catch (e) {
-            return false;
-        }
+        return true;
     },
     validateSubPropertyPath: function (subPropertyPath, settings) {
         return subPropertyPath instanceof Array;

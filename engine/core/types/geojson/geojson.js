@@ -24,7 +24,7 @@ function isValidGeometry(content){
   if(!content.hasOwnProperty('type')) return false;
   //TODO bbox
   //TODO crs
-  switch(type){
+  switch(content.type){
     case 'Point':
       return isValidCoordinate(content.coordinates);
     case 'MultiPoint':
@@ -50,7 +50,7 @@ function isValidFeature(content){
   if(!content.hasOwnProperty('type')) return false;
   //TODO bbox
   //TODO crs
-  switch(type){
+  switch(content.type){
   case 'FeatureCollection':
     return isValidArrayOfSubType(content.geometries, isValidFeature);
   case 'Feature':
@@ -62,8 +62,8 @@ function isValidFeature(content){
 
 exports.actions = {
     edit: item => {
-      if(item.getOptions('svg')){
-        // TODO create svg object and return
+      if(item.getOption('svg')){
+        return json.actions.edit(item); // TODO create svg object and return
       } else return json.actions.edit(item);
     },
     view: item => {

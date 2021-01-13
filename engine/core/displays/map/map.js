@@ -1,6 +1,6 @@
 const xmlns = "http://www.w3.org/2000/svg";
 
-//TODO const list = require('../list/list.js');
+const list = require('../list/list.js');
 
 exports.display = {
     waitingForInput: display => {
@@ -16,10 +16,23 @@ exports.display = {
     },
     first: display => {
         const WRAPPER = display.getWRAPPER();
-        const SVG_map =  document.createElementNS(xmlns,'SVG');
+        // Nb this does not seem to work const SVG_map =  document.createElementNS(xmlns,'SVG');
+        // using innerHTML instead
         WRAPPER.innerHTML='<svg class="xyz-map-wrapper" width="500" height="500"></svg>'; //TODO handle size
+        const SVG_map =  WRAPPER.firstChild;
+        const locationPropertyName = display.getOption('location') || 'geojson';
 
-        //TODO maybe list.showCreateButton(display);
+        const DIV_create = list.showCreateButton(display);
+        if(DIV_create){
+          SVG_map.onclick = event => {
+            const rect = SVG_map.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientX - rect.top;
+            //TODO use transformation
+            DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
+            DIV_create.style.display = 'block';
+          }
+        }
         //TODO window.addEventListener("resize", () => drawNodes(DIV, display));
     },
 
@@ -38,10 +51,12 @@ exports.display = {
         // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
         // TODO maybe pass label to svg entity?
         const SVG_entity = content[locationPropertyName].render(display.getAction(), {svg: true, ...display.getSubOptions(locationPropertyName)});
-        SVG_entity.onclick = () => display.select(entityClassName, entityId);
-        if(display.hasOption('select')){
-          SVG_entity.style.cursor='pointer';
+        SVG_entity.onclick = event => {
+          display.select(entityClassName, entityId);
+          event.stopPropagation();
+          return false;
         }
+        if(display.hasOption('select')) SVG_entity.style.cursor='pointer';
 
         SVG_map.appendChild(SVG_entity);
 
