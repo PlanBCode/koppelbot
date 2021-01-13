@@ -12,10 +12,15 @@ function changed(a, b) {
         case 'function':
             return false;
         case 'object':
-            if (a === null) {
-                return b !== null;
-            } else if (typeof b !== 'object' || b === null) {
-                return false
+            if (a === null) return b !== null;
+            else if (typeof b !== 'object' || b === null) return true
+            else if(a instanceof Array){
+              if(!(b instanceof Array)) return true;
+              if(a.length !== b.length) return true;
+              for(let i=0; i<a.length; ++i){
+                if(changed(a[i],b[i])) return true;
+              }
+              return false;
             } else {
                 for (let key in a) {
                     if (b.hasOwnProperty(key)) {
@@ -38,24 +43,16 @@ function updateContents(path, state, method, responseStatus, responseContent, co
                 const content = json.get(responseContent, path, null);
                 contents[entityId] = json.set(contents[entityId], path, content, null);
             } else if (method === 'GET') {
-                if (typeof responseContent !== 'undefined') contents[entityId] = responseContent;
+                if (typeof responseContent !== 'undefined'){
+                   if (changed(contents[entityId], responseContent)) state.setChanged();
+                   contents[entityId] = responseContent;
+                 }
             } else if (method === 'DELETE') {
                 if (path.length === 0) state.setRemoved();
                 else state.setChanged();
                 json.unset(contents[entityId], path, null);
                 if (path.length === 0) delete contents[entityId];
             }
-            //console.log('UPDATE', responseContent, requestContent, path);
-
-            /*
-            if (changed(prevPropertyContent, responseContent) && typeof responseContent !== 'undefined') {
-                state.setChanged();
-            }
-
-                contents[entityId] = requestContent;
-            } else {
-                contents[entityId] = responseContent;
-            }*/
             break;
         case 400:
             //TODO check if error is new eg compare with current error in errors
