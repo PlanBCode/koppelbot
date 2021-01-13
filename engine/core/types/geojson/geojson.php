@@ -1,6 +1,6 @@
 <?php
 
-class Type_json extends Type
+class Type_geojson extends Type
 {
     public static function validateContent($content, array &$settings): bool
     {
