@@ -52,7 +52,7 @@ The User Interface (UI) provides a html+js user interface to the data.
 
 The uri's for UI endpoints are structured as:
 
-`http(s)://$HOST:$PORT/api/$DISPLAY_NAME/$ENTITY_CLASS/$ENTITY_ID/$PROPERTY_NAME/...`
+`http(s)://$HOST:$PORT/ui/$DISPLAY_NAME/$ENTITY_CLASS/$ENTITY_ID/$PROPERTY_NAME/...`
 
 Examples:
 

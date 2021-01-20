@@ -4,7 +4,9 @@ class DocRequest extends HttpRequest2
 {
     public function createResponse(): DocResponse
     {
-        return new DocResponse($this->uri, 'Lorem ipsum');
+        $fileName = $this->uri === 'doc' ? './engine/doc/doc.html' : './engine/'.$this->uri.'.html';
+        $content = file_exists($fileName) ? file_get_contents($fileName) : 'Work in progress...';
+        return new DocResponse($this->uri, $content);
     }
 }
 
@@ -15,10 +17,12 @@ class DocResponse extends HttpResponse2
         'doc/api' => "API Reference",
         'doc/api/entities' => "Entities",
         'doc/api/types' => "Types",
+
         'doc/ui' => "UI Reference",
         'doc/ui/displays' => "Displays",
         'doc/ui/templates' => "HTML templates",
         'doc/ui/types' => "Types",
+
         'api' => "Rest API",
         'ui' => "User Interface"
     ];
@@ -68,13 +72,12 @@ class DocResponse extends HttpResponse2
                 <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
                 <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
             </head >
-            <body > 
+            <body >
             <div class="xyz-page-header">' . $title . '</div>
             <div class="xyz-page-navigation">' . $navigation . '</div>
             <div class="xyz-page-content">' . $content . '</div>
             </body >
         </html > ';
-        parent::__construct(200, $content);
+        parent::__construct(200, replaceXyzTag($content));
     }
 }
-

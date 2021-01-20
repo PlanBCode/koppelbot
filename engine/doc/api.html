@@ -1,0 +1,51 @@
+
+<p>The API provides a json interface to the data.</p>
+
+<h2>http</h2>
+
+<p>The uri's for http API endpoints are structured as:</p>
+
+
+<p>http(s)://$HOST:$PORT/api/$ENTITY_CLASS/$ENTITY_ID/$PROPERTY_NAME/...</p>
+
+<h3>Examples:</h3>
+
+<p><u>http://localhost:8000/api/car?color==red</u><br/>
+Get all red cars.</p>
+
+<p><u>https://www.site.com/api/fruit/apple/color</u><br/>
+Get the color of the fruit apple.</p>
+
+<p><u>https://www.site.com/api/fruit/*/color</u><br/>
+Get the colors of all fruits.</p>
+
+<p><u>http://localhost:8000/api/car/*/color,model</u><br/>
+Get the color and model for all cars.</p>
+
+<p><u>https://www.site.com/api/fruit/banana,grape/color</u><br/>
+Get the colors of the banana and grape fruit.</p>
+
+<h2>command line interface (cli)</h2>
+
+<p>It is also possible to access the dat using the shell. These requests are structured as:</p>
+
+<code><pre>$ ./xyz "/$ENTITY_CLASS/$ENTITY_ID/$PROPERTY_NAME/..."`</pre></code>
+
+<p>Nb. It is recommended to use quotes. Especially when using asterisks (*) or quotions marks (?).</p>
+
+<h3>Examples:</h3>
+
+<p><code><pre>$ ./xyz "/car?color==red"</pre></code><br/>
+Get all red cars.</p>
+
+<p><code><pre>$ ./xyz "fruit/apple/color"</pre></code><br/>
+Get the color of the fruit apple.</p>
+
+<p><code><pre>$ ./xyz "/fruit/*/color"</pre></code><br/>
+Get the colors of all fruits.</p>
+
+<p><code><pre>$ ./xyz "/car/*/color,model"</pre></code><br/>
+Get the color and model for all cars.</p>
+
+<p><code><pre>$ ./xyz "/fruit/banana,grape/color"</pre></code><br/>
+Get the colors of the banana and grape fruit.</p>

@@ -39,7 +39,7 @@ class UiRequest extends HttpRequest2
         $menuItems['ui/create'] = 'create';
         $menuItems['ui/delete'] = 'delete';
         if ($display === '') {
-            $body = '<h3>Choose an interaction method:</h3><ul>';
+            $body = '<h3>Choose an interaction/display method:</h3><ul>';
             foreach (glob('{./engine/core,./engine/main}/displays/*', GLOB_BRACE) as $file) {
                 $displayName = basename($file, '.js');
                 $menuItems['ui/' . $displayName] = $displayName;
@@ -85,6 +85,3 @@ class UiRequest extends HttpRequest2
         return new DocResponse('ui' . $this->uri, $body, $menuItems);
     }
 }
-
-
-

@@ -3,7 +3,7 @@
     "connector": {
       "type": "directory",
       "parse": "json",
-      "path": "engine/core/types/",
+      "path": "engine/core/types/*/",
       "extension": "json"
     },
     "access" : {
