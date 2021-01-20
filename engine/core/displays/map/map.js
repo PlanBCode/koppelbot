@@ -1,3 +1,10 @@
+/*
+ markUserLocation="true"
+ select
+ location
+ ?label
+ 
+ */
 const xmlns = "http://www.w3.org/2000/svg";
 
 const list = require('../list/list.js');
@@ -23,6 +30,33 @@ exports.display = {
         const locationPropertyName = display.getOption('location') || 'geojson';
 
         const DIV_create = list.showCreateButton(display);
+
+        const markUserLocation = locationResponse => {
+          const x = locationResponse.coords.latitude; //TODO transform
+          const y = locationResponse.coords.latitude; //TODO transform
+          const radius = locationResponse.coords.accuracy; //TODO transform
+          const SVG_userLocation = document.createElementNS(xmlns,'circle');
+          SVG_userLocation.setAttributeNS(null,'cx', x);
+          SVG_userLocation.setAttributeNS(null,'cy', y);
+          SVG_userLocation.setAttributeNS(null,'r', radius);
+          SVG_userLocation.setAttributeNS(null,'fill', 'blue');
+          SVG_userLocation.setAttributeNS(null,'stroke', 'white');
+          SVG_map.appendChild(SVG_userLocation);
+          if(DIV_create){
+            SVG_userLocation.onclick = event => {
+              DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
+              DIV_create.style.display = 'block';
+            }
+            SVG_userLocation.style.cursor = 'pointer';
+          }
+        };
+        if(display.getOption('markUserLocation')){
+          markUserLocation({coords:{accuracy:20, latitude: 352, longitude: 340}});
+          //TODO enable navigator.geolocation.getCurrentPosition(markUserLocation, error=>{
+            // console.error(error);//TOOD
+          //});
+        }
+
         if(DIV_create){
           SVG_map.onclick = event => {
             const rect = SVG_map.getBoundingClientRect();
@@ -33,7 +67,6 @@ exports.display = {
             DIV_create.style.display = 'block';
           }
         }
-        //TODO window.addEventListener("resize", () => drawNodes(DIV, display));
     },
 
     entity: display => {
