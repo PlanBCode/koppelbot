@@ -1,5 +1,5 @@
 /*
-?label  define a label property to use 
+?label  define a label property to use
 
  */
 const xmlns = "http://www.w3.org/2000/svg";
@@ -43,6 +43,8 @@ exports.display = {
             SVG_userLocation.onclick = event => {
               DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
               DIV_create.style.display = 'block';
+              event.stopPropagation();
+              return false;              
             }
             SVG_userLocation.style.cursor = 'pointer';
           }
