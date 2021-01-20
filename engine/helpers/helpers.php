@@ -107,7 +107,7 @@ function json_set(&$object, array $keyPath, &$content): JsonActionResponse
         $object = $content;
         return new JsonActionResponse(true);
     }
-    if (array_key_exists($keyPath[0], $object)) {
+    if (array_key_exists($keyPath[0], $object)) { // TODO first check if array?
         return json_set($object[$keyPath[0]], array_slice($keyPath, 1), $content);
     } elseif (is_array($object)) {
         if (count($keyPath) === 1) {

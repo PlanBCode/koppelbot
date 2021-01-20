@@ -3,6 +3,7 @@ require './engine/core/types/type/type.php';
 
 function getMergedSetting($name, $settings, $rootSettings)
 {
+    //TODO handle access and connector merges better
     if (array_key_exists($name, $settings)) {
         return $settings[$name];
     } elseif (array_key_exists($name, $rootSettings)) {
@@ -14,6 +15,7 @@ function getMergedSetting($name, $settings, $rootSettings)
 
 function getSingleSetting($name, $settings, $rootSettings)
 {
+    //TODO handle access and connector merges better
     if (array_key_exists($name, $settings) && array_key_exists($name, $rootSettings)) {
         return array_merge($rootSettings[$name], $settings[$name]);
     } elseif (array_key_exists($name, $settings)) {
@@ -27,6 +29,7 @@ function getSingleSetting($name, $settings, $rootSettings)
 
 function mergeSubSettings(array $customSubSettings, array &$defaultSubSettings): array
 {
+    //TODO handle access and connector merges better
     foreach ($defaultSubSettings as $subSettingName => $subSetting) {
         if (!array_key_exists($subSettingName, $customSubSettings)) {
             $customSubSettings[$subSettingName] = $subSetting;
@@ -289,8 +292,8 @@ class Property
 
         $settingConnector = array_get($settings, self::PROPERTY_CONNECTOR, []);
         $rootSettingConnector = array_get($rootSettings, self::PROPERTY_CONNECTOR, []);
-        $connector = array_merge($rootSettingConnector, $settingConnector);
-        $this->settings['connector'] = $connector;
+        $propertyConnector = array_merge($rootSettingConnector, $settingConnector);
+        $this->settings[self::PROPERTY_CONNECTOR] = $propertyConnector;
 
         $customSignatureSettings = array_get($this->settings, 'signature');
         if (is_array($customSignatureSettings)) {
@@ -301,11 +304,14 @@ class Property
                     echo 'ERROR Incorrect signature!';
                     //TODO error
                 } else {
+
                     $defaultSubSettings = $signature[$subPropertyName];
+                    $customSubConnector = array_get($customSubSettings, self::PROPERTY_CONNECTOR, []);
+                    $defaultSubConnector = array_get($defaultSubSettings, self::PROPERTY_CONNECTOR, []);
 
                     //TODO check if type matches and supports these customSubSettings
                     $subSettings = mergeSubSettings($customSubSettings, $defaultSubSettings);
-
+                    $subSettings[self::PROPERTY_CONNECTOR] = array_merge($propertyConnector, $defaultSubConnector, $customSubConnector);
                     //TODO use $this->settings instead or $rootSettings
                     $subProperty = new Property($this, $this->depth + 1, $subPropertyName, $subSettings, $rootSettings);
 
