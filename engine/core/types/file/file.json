@@ -1,6 +1,6 @@
 {
-  "accepts": {
-    "type": "array",
+  "accept": {
+    "type": "string",
     "TODO": "TODO"
   },
   "TODO": {}

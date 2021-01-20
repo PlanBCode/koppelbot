@@ -71,8 +71,8 @@ exports.actions = {
             });
         }
         INPUT.multiple = item.getSetting('multiple');
-        INPUT.accept = item.getSetting('accept');
-
+        if(item.hasSetting('accept')) INPUT.setAttribute('accept',item.getSetting('accept'));
+        if(item.hasSetting('capture')) INPUT.setAttribute('capture',item.getSetting('capture'));
         return INPUT;
     },
     view: function (item) {
@@ -83,12 +83,14 @@ exports.actions = {
         const onChangeHandler = node => {
             DIV_container.innerHTML = '';
             const content = item.getContent();
-            //TODO use mime
-            const extension = content.extension.toLowerCase();
-            const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
-                ? extension : 'txt';
-            const DIV_fileContent = viewers[fallbackExtension].view(item);
-            DIV_container.appendChild(DIV_fileContent);
+            if(typeof content === 'object' && content !== null){
+              //TODO use mime
+              const extension = content.extension.toLowerCase();
+              const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
+                  ? extension : 'txt';
+              const DIV_fileContent = viewers[fallbackExtension].view(item);
+              DIV_container.appendChild(DIV_fileContent);
+            }
         };
         item.onChange(onChangeHandler);
         onChangeHandler(item);

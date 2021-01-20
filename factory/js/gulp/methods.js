@@ -3,7 +3,7 @@ const gulp = require('gulp');
 const {forEachFile, baseName, write, execute} = require('./util.js');
 
 // generate a requires file for types|displays
-const generateRequiresFile = (name, component) => cb => {
+const generateRequiresFile = (name, component) => function generateRequiresFile (cb) {
   let js = name === 'types'
     ? `// This file is created by gulpfile.js using the definitions of engine/core/${name}/*/*.js:custom/*/${name}/*/*.js. \n\n`
     : `// This file is created by gulpfile.js using the definitions of engine/core/${name}/*/*.js:custom/*/${name}/*/*.js. \n\n`;
@@ -24,7 +24,7 @@ const generateRequiresFile = (name, component) => cb => {
   });
 };
 
-const generateCssFile = cb => {
+function generateCssFile (cb) {
   let css = `/* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */\n\n`;
   forEachFile([
     '../../engine/core/*/*/*.css',
@@ -39,7 +39,7 @@ const generateCssFile = cb => {
   )(() => {
     write(`../../engine/ui/style.css`, css)(cb);
   });
-};
+}
 
 exports.generateCssFile = generateCssFile;
 
