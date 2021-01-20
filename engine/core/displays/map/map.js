@@ -15,58 +15,55 @@ exports.display = {
        display.getWRAPPER().innerHTML = 'Waiting for data...';
     },
     empty: display => {
-       //TODO display map?
-        display.getWRAPPER().innerHTML = 'No items to display.';
+       const WRAPPER = display.getWRAPPER();
+       WRAPPER.innerHTML='<svg class="xyz-map-wrapper" width="500" height="500"></svg>'; //TODO handle size
+       // Nb this does not seem to work const SVG_map =  document.createElementNS(xmlns,'SVG');
+       // using innerHTML instead
+       const SVG_map =  WRAPPER.firstChild;
+       const locationPropertyName = display.getOption('location') || 'geojson';
+
+       const DIV_create = list.showCreateButton(display);
+
+       const markUserLocation = locationResponse => {
+         const x = locationResponse.coords.latitude; //TODO transform
+         const y = locationResponse.coords.latitude; //TODO transform
+         const radius = locationResponse.coords.accuracy; //TODO transform
+         const SVG_userLocation = document.createElementNS(xmlns,'circle');
+         SVG_userLocation.setAttributeNS(null,'cx', x);
+         SVG_userLocation.setAttributeNS(null,'cy', y);
+         SVG_userLocation.setAttributeNS(null,'r', radius);
+         SVG_userLocation.setAttributeNS(null,'fill', 'blue');
+         SVG_userLocation.setAttributeNS(null,'stroke', 'white');
+         SVG_map.appendChild(SVG_userLocation);
+         if(DIV_create){
+           SVG_userLocation.onclick = event => {
+             DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
+             DIV_create.style.display = 'block';
+             event.stopPropagation();
+             return false;
+           }
+           SVG_userLocation.style.cursor = 'pointer';
+         }
+       };
+       if(display.getOption('markUserLocation')){
+         markUserLocation({coords:{accuracy:20, latitude: 352, longitude: 340}});
+         //TODO enable navigator.geolocation.getCurrentPosition(markUserLocation, error=>{
+           // console.error(error);//TOOD
+         //});
+       }
+
+       if(DIV_create){
+         SVG_map.onclick = event => {
+           const rect = SVG_map.getBoundingClientRect();
+           const x = event.clientX - rect.left;
+           const y = event.clientY - rect.top;
+           //TODO use transformation
+           DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
+           DIV_create.style.display = 'block';
+         }
+       }
     },
-    first: display => {
-        const WRAPPER = display.getWRAPPER();
-        // Nb this does not seem to work const SVG_map =  document.createElementNS(xmlns,'SVG');
-        // using innerHTML instead
-        WRAPPER.innerHTML='<svg class="xyz-map-wrapper" width="500" height="500"></svg>'; //TODO handle size
-        const SVG_map =  WRAPPER.firstChild;
-        const locationPropertyName = display.getOption('location') || 'geojson';
-
-        const DIV_create = list.showCreateButton(display);
-
-        const markUserLocation = locationResponse => {
-          const x = locationResponse.coords.latitude; //TODO transform
-          const y = locationResponse.coords.latitude; //TODO transform
-          const radius = locationResponse.coords.accuracy; //TODO transform
-          const SVG_userLocation = document.createElementNS(xmlns,'circle');
-          SVG_userLocation.setAttributeNS(null,'cx', x);
-          SVG_userLocation.setAttributeNS(null,'cy', y);
-          SVG_userLocation.setAttributeNS(null,'r', radius);
-          SVG_userLocation.setAttributeNS(null,'fill', 'blue');
-          SVG_userLocation.setAttributeNS(null,'stroke', 'white');
-          SVG_map.appendChild(SVG_userLocation);
-          if(DIV_create){
-            SVG_userLocation.onclick = event => {
-              DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
-              DIV_create.style.display = 'block';
-              event.stopPropagation();
-              return false;              
-            }
-            SVG_userLocation.style.cursor = 'pointer';
-          }
-        };
-        if(display.getOption('markUserLocation')){
-          markUserLocation({coords:{accuracy:20, latitude: 352, longitude: 340}});
-          //TODO enable navigator.geolocation.getCurrentPosition(markUserLocation, error=>{
-            // console.error(error);//TOOD
-          //});
-        }
-
-        if(DIV_create){
-          SVG_map.onclick = event => {
-            const rect = SVG_map.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            //TODO use transformation
-            DIV_create.patch({[locationPropertyName]:{"type": "Point", "coordinates": [x, y]}})
-            DIV_create.style.display = 'block';
-          }
-        }
-    },
+    first: display => {},
 
     entity: display => {
         const content = display.getContent();
