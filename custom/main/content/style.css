@@ -3,7 +3,7 @@ html, body {
     margin: 0;
 }
 
-#main tr.header td {
+#main tr.header > td {
     font-weight: normal;
     color: black;
     padding: 15px;
