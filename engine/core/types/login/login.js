@@ -24,11 +24,25 @@ exports.actions = {
         const TD_passwordInput = document.createElement('TD');
         const INPUT_password = document.createElement('INPUT');
         INPUT_password.type = 'password';
-        TD_passwordLabel.innerText = 'Password';
+        TD_passwordLabel.innerText = 'Password';  // TODO parametrize
         TD_passwordInput.appendChild(INPUT_password);
         TR_password.appendChild(TD_passwordLabel);
         TR_password.appendChild(TD_passwordInput);
         TABLE.appendChild(TR_password);
+
+        const TR_capsLockNotifier =  document.createElement('TR');
+        const TD_capsLockNotifier = document.createElement('TD');
+        TD_capsLockNotifier.innerText = 'CAPS LOCK is on'; // TODO parametrize
+        TD_capsLockNotifier.setAttribute('colspan',2);
+        TD_capsLockNotifier.classList.add('xyz-login-capslock-notifier')
+        TR_capsLockNotifier.style.display = 'none';
+        TR_capsLockNotifier.appendChild(TD_capsLockNotifier);
+        TABLE.appendChild(TR_capsLockNotifier);
+
+        INPUT_password.addEventListener('keyup', function (e) {
+          TR_capsLockNotifier.style.display = e.getModifierState('CapsLock') ? 'table-row' : 'none';
+        });
+
 
         const onChangeHandler = () => {
             item.patch({
