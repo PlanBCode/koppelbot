@@ -165,6 +165,11 @@ class Connector_directory extends BasicConnector
                     } else {
                         $filePath = $this->createFilePath($entityId);
                     }
+                    $path = dirname($filePath);
+                    if(!is_dir($path)){
+                      $success = mkdir($path, 0777, true);
+                      //TODO error if no success
+                    }
                     file_put_contents($filePath, $fileContent);
                 }
             }
