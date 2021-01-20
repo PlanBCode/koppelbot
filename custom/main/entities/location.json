@@ -28,6 +28,43 @@
     "type": "date",
     "format": "d-m-Y"
   },
+  "photo": {
+    "connector": {
+      "type": "directory",
+      "parse": "none",
+      "path": "data/locations/photos/",
+      "extension": "*"
+    },
+    "signature":{
+      "content": {
+        "type": "string",
+        "binary": true,
+        "connector": {
+          "key": "content"
+        },
+        "accept": "TODO"
+      },
+      "id": {
+        "type": "string",
+        "connector": {
+          "key": "basename"
+        }
+      },
+      "extension": {
+        "type": "string",
+        "connector": {
+          "key": "extension"
+        }
+      },
+      "mime": {
+        "type": "string",
+        "connector": {
+          "key": "mime"
+        }
+      }
+    },
+    "type": "file"
+  },
   "geojson" : {
     "type": "geojson"
   }
