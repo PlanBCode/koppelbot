@@ -35,7 +35,6 @@ const encodeContent = (data, item, file) => evt => {
     }
     key = key.replace(/ /g, '_'); // remove spaces from filename
     data['id'] = key;
-    console.log('encodeContent',data)
     item.patch(data);
 };
 
