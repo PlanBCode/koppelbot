@@ -1,9 +1,6 @@
 /*
- markUserLocation="true"
- select
- location
- ?label
- 
+?label  define a label property to use 
+
  */
 const xmlns = "http://www.w3.org/2000/svg";
 
