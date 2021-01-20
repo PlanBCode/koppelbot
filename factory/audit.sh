@@ -4,6 +4,8 @@ WHEREAMI="$(pwd)";
 SCRIPTDIR=$(dirname "$0")
 XYZ_HOME=$(cd "$SCRIPTDIR/.." && pwd)
 
+echo "[i] Audit : start"
+
 AUDIT_MARK_FILE="$XYZ_HOME/factory/.audit.mark"
 
 NOW=$(date +%s)
@@ -22,9 +24,11 @@ else
 fi
 
 if [ "$AUDIT" = "true" ]; then
-    cd "$XYZ_HOME/factory/js"
+    cd "$XYZ_HOME/factory/js" || exit 1
     npm audit -fix
     echo "$NOW" > "$AUDIT_MARK_FILE"
 fi
 
-cd "$WHEREAMI"
+echo "[i] Audit : stop"
+
+cd "$WHEREAMI" || exit 0
