@@ -1,0 +1,9 @@
+{
+  "options":{
+  "showTitle" : {"info":"Whether to show the title bar.", "type":"boolean", "default":true},
+  "showLabels" : {"info":"Whether to show property labels", "type":"boolean", "default":true},
+  "showDeleteButton" : {"info":"Whether to show a button to a delete interface.", "type":"boolean", "default":false},
+  "showEditbutton" : {"info":"Whether to show a button to a edit interface.", "type":"boolean", "default":false},
+  "onDone" : {"info":"Action to execute on done (show done button)", "type":"function"}
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "options":{
+    "select" : {"info":"Define a variable that stores the selection of this list.", "type":"string"},
+    "multiSelect" : {"info":"Whether to allow multiple entities to be selected.", "type":"boolean", "default":false},
+    "showHeader" : {"info":"Whether to show the table header.", "type":"boolean", "default":true},
+    "showCreateButton" : {"info":"Whether to show a button to a create interface.", "type":"boolean", "default":false},
+    "createButtonText" : {"info":"Define a custom text for the create button.", "type":"string", "default":"+"}
+  }
+}

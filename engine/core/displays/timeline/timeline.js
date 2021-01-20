@@ -1,9 +1,5 @@
 /*
 options:
-- key property
-- label property
-- midLine (0-100) where the midline is located
-- horizontal : true|false
 TODO
 - view  left|right|bottom|top
 - year/month/day labels

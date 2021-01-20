@@ -1,12 +1,6 @@
 /*
 
 options
-- select
-- multiSelect
-- showHeader
-- showCreateButton
-- createButtonText
-
 - TODO default
 - TODO addDeleteButtons
 - TODO addEditButtons

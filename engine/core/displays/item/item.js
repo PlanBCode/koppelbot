@@ -1,13 +1,3 @@
-/*
-options:
-
-- showTitle
-- showLabels
-- showDeleteButton
-- showEditbutton
-- onDone -> action to execute on done (show done button)
- */
-
 const list = require('../list/list.js');
 const response = require('../../../../factory/js/source/entity/response'); //TODO better solution
 const {pathFromUri} = require('../../../../factory/js/source/uri/uri.js'); //TODO better solution

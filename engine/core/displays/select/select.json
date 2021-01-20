@@ -1,0 +1,6 @@
+{
+  "options":{
+    "select" : {"info":"Define a variable that stores the selection of this list.", "type":"string"},
+    "initialValue" : {"info":"The initial value to be used."}
+  }
+}

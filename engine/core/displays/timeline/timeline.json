@@ -1,0 +1,8 @@
+{
+  "options":{
+    "key" : {"info":"Define which property should be used for time key.", "type":"string", "default":"date"},
+    "label" : {"info":"Define which property should be used for label.", "type":"string", "default":"title"},
+    "horizontal" : {"info":"Whether to allow multiple entities to be selected.", "type":"boolean", "default":false},
+    "midLine" : {"info":"Where the midline is located.", "type":"number", "default":0}
+  }
+}
