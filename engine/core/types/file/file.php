@@ -22,8 +22,7 @@ class Type_file extends Type
 
     static function serve(int $status, &$content): HttpResponse2
     {
-        if (!is_array($content) || !array_key_exists('content', $content)
-        ) return new HttpResponse2(500, 'Invalid content', []);
+        if (!is_array($content) || !array_key_exists('content', $content)) return new HttpResponse2(500, 'Invalid content', []);
 
         if (is_string($content['content'])) {
             $stringContent = $content['content'];

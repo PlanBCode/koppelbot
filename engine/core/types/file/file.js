@@ -15,7 +15,7 @@ const encodeContent = (data, item, file) => evt => {
         .substr(5) // 'data:${mimeType};base64,${base64String}' -> '${mimeType};base64,${base64String}'
         .split(';base64,'); // '${mimeType};base64,${base64String}' -> ['${mimeType}','${base64String}']
 
-    if (item.getSetting('signature').content.binary) {
+    if (item.hasSetting('signature') && item.getSetting('signature').content.binary) { //TODO More checks
         data['content'] = {
             encoding: 'base64',
             content: base64String
@@ -25,7 +25,7 @@ const encodeContent = (data, item, file) => evt => {
     }
 
     data['mime'] = mimeType;
-    const extension = item.getSetting('signature').id.connector.extension;
+    const extension = item.hasSetting('signature') && item.getSetting('signature').id.connector.extension; // TODO more checks
     let key;
     //TODO or extension is mixed extensions for example "json|xml"
     if (extension && extension !== '*') {
@@ -35,6 +35,7 @@ const encodeContent = (data, item, file) => evt => {
     }
     key = key.replace(/ /g, '_'); // remove spaces from filename
     data['id'] = key;
+    console.log('encodeContent',data)
     item.patch(data);
 };
 
@@ -52,7 +53,7 @@ exports.actions = {
                 const reader = new FileReader();
                 reader.onload = encodeContent(data, item, fileName);
                 reader.onerror = evt => {
-                    //TODO
+                    console.error('Error reading file');
                 };
                 reader.readAsDataURL(fileName);
                 const url = window.URL.createObjectURL(fileName);
