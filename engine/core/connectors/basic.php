@@ -141,7 +141,8 @@ abstract class BasicConnector extends Connector
                 }
                 $connectorResponse->add(200, $propertyRequest, $newContent, $newContent);
             } else if ($key === 'mime' || $key === 'extension' || $key === 'size') {
-                //TODO error if they are supplied?
+                // TODO if mime or size provided?
+                $connectorResponse->add(200, $propertyRequest, $entityId, null);
             } else {
                 if ($key === "content") {
                     $keyPath = [];

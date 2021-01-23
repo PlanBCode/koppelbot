@@ -20,6 +20,7 @@
   "name": {
     "type": "string",
     "index": true,
+    "title": true,
     "required": true,
     "connector": {
       "key": "key"

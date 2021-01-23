@@ -28,6 +28,12 @@
         "connector": {
           "key": "basename"
         }
+      },
+      "extension": {
+        "type": "string",
+        "connector": {
+          "key": "extension"
+        }
       }
     },
     "type": "file"
