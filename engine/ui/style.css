@@ -104,102 +104,7 @@ li.xyz-page-navigation-depth-0 {
     display: inline-block;
     float: left;
 }
-table.xyz-create, table.xyz-item, table.xyz-list {
-    /*border: 1px solid lightgrey;
-    margin-bottom: 5px;*/
-    padding: 0;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
-    background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-create-header, .xyz-list-header, .xyz-item-header {
-    background-color: darkslateblue;
-    color: white;
-}
-
-.xyz-list, .xyz-item {
-    width: 100%;
-}
-
-.xyz-list-item {
-    cursor: pointer;
-}
-
-table.xyz-list tr.xyz-list-item:hover {
-    background-color: lightblue;
-}
-
-table.xyz-list tr.xyz-list-selected {
-    background-color: yellow;
-}.xyz-map-wrapper {
-  border-color: black;
-
-  /* b ackground-color: lightgreen; */
-}
-div.xyz-timeline-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-div.xyz-timeline-node {
-    transform: translate(-50%,-50%);
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
-    background-color: green;
-}
-
-div.xyz-timeline-connector {
-    z-index:1;
-    position: absolute;
-    width: 100px;
-    height: 4px;
-    background-color: green;
-}
-
-div.xyz-timeline-label {
-    z-index:2;
-    position: absolute;
-    padding:10px;
-    color:white;
-    border-radius: 10px;
-    background-color: green;
-}
-
-div.xyz-timeline-label:hover {
-    cursor: pointer;
-    background-color: rgb(0,200,0);
-}
-div.xyz-timeline-label.xyz-list-selected {
-    color:black;
-    background-color: yellow;
-}
-
-div.xyz-timeline-line-creator {
-    position: absolute;
-    width:10px;
-    height:10px;
-    pointer-events: none;
-    cursor: none;
-    /*display: none;*/
-}
-
-
-div.xyz-timeline-line {
-    transform: translate(-50%,-50%);
-    position: absolute;
-    top:50%;
-    left:50%;
-    height: 100%;
-    width:2px;
-    background-color: black;
-}@charset "UTF-8";
+@charset "UTF-8";
 
 /*!
  * Pikaday
@@ -498,4 +403,99 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
+}.xyz-map-wrapper {
+  border-color: black;
+
+  /* b ackground-color: lightgreen; */
+}
+div.xyz-timeline-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+div.xyz-timeline-node {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background-color: green;
+}
+
+div.xyz-timeline-connector {
+    z-index:1;
+    position: absolute;
+    width: 100px;
+    height: 4px;
+    background-color: green;
+}
+
+div.xyz-timeline-label {
+    z-index:2;
+    position: absolute;
+    padding:10px;
+    color:white;
+    border-radius: 10px;
+    background-color: green;
+}
+
+div.xyz-timeline-label:hover {
+    cursor: pointer;
+    background-color: rgb(0,200,0);
+}
+div.xyz-timeline-label.xyz-list-selected {
+    color:black;
+    background-color: yellow;
+}
+
+div.xyz-timeline-line-creator {
+    position: absolute;
+    width:10px;
+    height:10px;
+    pointer-events: none;
+    cursor: none;
+    /*display: none;*/
+}
+
+
+div.xyz-timeline-line {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top:50%;
+    left:50%;
+    height: 100%;
+    width:2px;
+    background-color: black;
+}table.xyz-create, table.xyz-item, table.xyz-list {
+    /*border: 1px solid lightgrey;
+    margin-bottom: 5px;*/
+    padding: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
+    background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-create-header, .xyz-list-header, .xyz-item-header {
+    background-color: darkslateblue;
+    color: white;
+}
+
+.xyz-list, .xyz-item {
+    width: 100%;
+}
+
+.xyz-list-item {
+    cursor: pointer;
+}
+
+table.xyz-list tr.xyz-list-item:hover {
+    background-color: lightblue;
+}
+
+table.xyz-list tr.xyz-list-selected {
+    background-color: yellow;
 }

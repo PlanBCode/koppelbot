@@ -215,7 +215,11 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
 };
 
 const renderUiElement = (xyz, options, WRAPPER) => {
-  const uri = options.uri;
+  const {uri, aggregations} = uriTools.parseAggregationFromUri(options.uri);
+
+  options.uri = uri;
+  options.aggregations = aggregations;
+
   const displayName = options.display || DEFAULT_DISPLAYNAME;
   if (!displays.hasOwnProperty(displayName)) throw new Error('Unrecognized displayName.');
 
