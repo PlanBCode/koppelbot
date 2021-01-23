@@ -5,8 +5,6 @@ TODO
 - year/month/day labels
  */
 
-const list = require('../list/list.js');
-
 function parseDateString(string) {
     if(typeof string !== 'string') return new Date().getTime();
     const parts = string.split("-"); //TODO use formats.json function or a type.toNumber
@@ -14,8 +12,6 @@ function parseDateString(string) {
         parseInt(parts[1], 10) - 1,
         parseInt(parts[0], 10)).getTime();
 }
-
-
 
 function sortLabels(A, B) {
     const timeA = parseDateString(A.date);
@@ -172,7 +168,7 @@ exports.display = {
         }
         DIV.appendChild(DIV_line);
         WRAPPER.appendChild(DIV);
-        const DIV_create = list.showCreateButton(display);
+        const DIV_create = display.showCreateButton();
         if(DIV_create){
           DIV_line.style.cursor = 'pointer';
           DIV_line.onclick = event => {

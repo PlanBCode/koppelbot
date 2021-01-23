@@ -1,6 +1,7 @@
 {
   "options":{
     "select" : {"info":"Define a variable that stores the selection of this list.", "type":"string"},
+    "flavor" : {"info":"The initial value to be used.","type":"enum","subType":"string","choices":["dropdown","radio"]},
     "initialValue" : {"info":"The initial value to be used."}
   }
 }

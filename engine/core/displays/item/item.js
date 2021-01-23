@@ -1,5 +1,3 @@
-const list = require('../list/list.js');
-const response = require('../../../../factory/js/source/entity/response'); //TODO better solution
 const {pathFromUri} = require('../../../../factory/js/source/uri/uri.js'); //TODO better solution
 
 // check if uri is '/$class/$id' or '/$class/$id/*/.../*' but not '/$class/$id/$property'
@@ -23,6 +21,7 @@ exports.display = {
     },
     first: display => {
         display.getWRAPPER().innerHTML = '';
+        display.showCreateButton();
     },
     entity: display => {
 
@@ -30,11 +29,7 @@ exports.display = {
         const entityId = display.getEntityId();
         const entityClassName = display.getEntityClassName();
 
-        let content = display.getContent();
-        const path = display.getRequestUri().substr(1).split('/').slice(2);
-        content = response.filter(content, path); //TODO move to before calling entity
-
-        const columns = list.flatten(content, display.getRequestUri());
+        const columns = display.getFlatContent();
 
         const TABLE_entity = document.createElement('TABLE');
         TABLE_entity.className = 'xyz-item';

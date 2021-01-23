@@ -135,7 +135,12 @@ table.xyz-list tr.xyz-list-item:hover {
 
 table.xyz-list tr.xyz-list-selected {
     background-color: yellow;
-}div.xyz-timeline-wrapper {
+}.xyz-map-wrapper {
+  border-color: black;
+
+  /* b ackground-color: lightgreen; */
+}
+div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -493,8 +498,4 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
-}.xyz-map-wrapper {
-  border-color: black;
-
-  /* b ackground-color: lightgreen; */
 }

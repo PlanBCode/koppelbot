@@ -22,7 +22,7 @@ exports.display = {
        const SVG_map =  WRAPPER.firstChild;
        const locationPropertyName = display.getOption('location') || 'geojson';
 
-       const DIV_create = list.showCreateButton(display);
+       const DIV_create = display.showCreateButton();
 
        const markUserLocation = locationResponse => {
          const x = locationResponse.coords.latitude; //TODO transform

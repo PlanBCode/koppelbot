@@ -7,64 +7,13 @@ options
 - TODO add multiselect tools
  */
 
-function getUrisFromVariable(xyz, variableName, entityClassName) {
+function getUrisFromVariable(xyz, variableName, entityClassName) { // TODO refactor to display
     if (!xyz.hasVariable(variableName)) {
         return [];
     }
     return xyz.getVariable(variableName).split(',')  // "/fruit/apple,pear" => ["/fruit/apple","/fruit/pear"]
         .map(uri => uri.split('/'))
         .map(path => ('/' + entityClassName + '/' + path[path.length - 1]));
-}
-
-function flatten2(source, target, prefix) {
-    if (source.constructor !== Object) return;
-    for (let key in source) {
-        const value = source[key];
-        if (value.constructor === Object) {
-            flatten2(value, target, prefix + key + '.');
-        } else {
-            target[prefix + key] = value;
-        }
-    }
-}
-
-function flatten(source) {
-    if (source.constructor !== Object) return source;
-    const target = {};
-    flatten2(source, target, '');
-    return target;
-}
-
-function showCreateButton(display) {
-    //TODO only if has the permissions to add
-    if (display.getOption('showCreateButton') !== false) {
-        const INPUT = document.createElement('INPUT');
-        INPUT.type = "submit";
-        //TODO add class
-        INPUT.value = display.getOption('createButtonText') || "+";
-        INPUT.onclick = () => {
-            if (DIV.style.display === 'none') {
-                DIV.style.display = 'block';
-                INPUT.value = "-";
-            } else {
-                INPUT.value = display.getOption('createButtonText') || "+";
-                DIV.style.display = 'none';
-            }
-        };
-
-        display.xyz.on(display.getRequestUri(), 'access:put', access => { // detect access changes // TODO encapsulate xyz
-            INPUT.disabled = !access;
-        });
-
-        const WRAPPER = display.getWRAPPER();
-        WRAPPER.appendChild(INPUT);
-        const DIV = document.createElement('DIV');
-        DIV.style.display = 'none';
-        const entityClassName = display.getEntityClassName();
-        display.xyz.ui({uri: '/' + entityClassName, display: 'create'}, DIV); // TODO encapsulate xyz
-        WRAPPER.appendChild(DIV);
-        return DIV;
-    } else return null;
 }
 
 exports.display = {
@@ -82,13 +31,12 @@ exports.display = {
         const TABLE = document.createElement('TABLE');
         TABLE.className = 'xyz-list';
         WRAPPER.appendChild(TABLE);
-        showCreateButton(display);
+        display.showCreateButton();
     },
     first: display => {
         if (display.getOption('showHeader') !== false) {
             const WRAPPER = display.getWRAPPER();
-            const content = display.getContent();
-            const columns = flatten(content);
+            const columns = display.getFlatContent();
             const TABLE = WRAPPER.firstChild;
             const TR_header = document.createElement('TR');
             TR_header.className = 'xyz-list-header';
@@ -113,9 +61,7 @@ exports.display = {
 
     entity: display => {
         const WRAPPER = display.getWRAPPER();
-        const content = display.getContent();
-
-        const columns = flatten(content);
+        const columns = display.getFlatContent();
         const TR_entity = document.createElement('TR');
         TR_entity.className = 'xyz-list-item';
         TR_entity.entityId = display.getEntityId();
@@ -160,7 +106,12 @@ exports.display = {
             TD_checkbox.appendChild(INPUT_checkbox);
             TR_entity.appendChild(TD_checkbox);
         }
-        if (columns.constructor !== Object) {
+        const propertyPath = display.getPropertyPath();
+        if(propertyPath.length === 0) {
+            const TD_entityContent = document.createElement('TD');
+            TD_entityContent.innerText = display.getTitle();
+            TR_entity.appendChild(TD_entityContent);            
+        }else if (columns.constructor !== Object) {
             const node = columns;
             const TD_entityContent = document.createElement('TD');
             const TAG = node.render(display.getAction(), display.getOptions());
@@ -206,6 +157,3 @@ exports.display = {
         }
     }
 };
-
-exports.showCreateButton = showCreateButton;
-exports.flatten = flatten;
