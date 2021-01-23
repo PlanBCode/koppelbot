@@ -23,6 +23,8 @@
       "id": {
         "title": true,
         "type": "string",
+        "index": true,
+        "autoIncrement": false,
         "connector": {
           "key": "basename"
         }

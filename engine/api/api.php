@@ -78,19 +78,44 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
     }
 }
 
-function getRequestResponses($connectorRequests): array
+function addRequestResponse(ConnectorRequest &$connectorRequest, array &$requestResponses): void
+{
+  $connectorResponse = Connector::getConnectorResponse($connectorRequest);
+  foreach ($connectorResponse->getRequestResponses() as $requestId => $requestResponse) {
+      if (!array_key_exists($requestId, $requestResponses)) {
+          $requestResponses[$requestId] = $requestResponse;
+      } else {
+          $requestResponses[$requestId]->merge($requestResponse);
+      }
+  }
+}
+
+function getRequestResponses(array &$connectorRequests): array
 {
     $requestResponses = [];
-    foreach ($connectorRequests as $connectorRequest) {
-        $connectorResponse = Connector::getConnectorResponse($connectorRequest);
+    $remainingConnectorRequests = [];
+    $remappedAutoIncrementedUris = [];
 
-        foreach ($connectorResponse->getRequestResponses() as $requestId => $requestResponse) {
-            if (!array_key_exists($requestId, $requestResponses)) {
-                $requestResponses[$requestId] = $requestResponse;
-            } else {
-                $requestResponses[$requestId]->merge($requestResponse);
-            }
-        }
+    // first handle all POST requests that contain the id property, the id value is required for remaining connector requests
+    foreach ($connectorRequests as $connectorRequest) {
+        $postIdPropertyRequests = $connectorRequest->getPostIdPropertyRequests();
+        if(!empty($postIdPropertyRequests)){
+          addRequestResponse($connectorRequest, $requestResponses); // need to track which id's have been added
+          foreach($postIdPropertyRequests as $postIdPropertyRequest){ // map '$entityClassName/$stub' to '$entityClassName/$maxAutoIncrementedId'
+            $entityClassName = $postIdPropertyRequest->getEntityClass();
+            $entityId = $postIdPropertyRequest->getEntityId();
+            $stubUri = $entityClassName . '/' . $entityId;
+            $requestId = $postIdPropertyRequest->getRequestId();
+            $requestResponse = $requestResponses[$requestId]; //TODO check
+            $remappedAutoIncrementedUri = $requestResponse->getRemappedAutoIncrementedUri($stubUri);
+            $remappedAutoIncrementedUris[$stubUri] = $remappedAutoIncrementedUri;  //TODO check
+          }
+        }else $remainingConnectorRequests[] = $connectorRequest;
+    }
+
+    foreach ($remainingConnectorRequests as $connectorRequest) {
+        $connectorRequest->updateAutoIncrementedUris($remappedAutoIncrementedUris);
+        addRequestResponse($connectorRequest, $requestResponses);
     }
     return $requestResponses;
 }
@@ -120,6 +145,11 @@ class RequestObject
     public function getMethod(): string
     {
         return $this->method;
+    }
+
+    public function setMethod(string $method): void
+    {
+      $this->method = $method;
     }
 
     public function getUri(): string
@@ -218,7 +248,7 @@ class ApiRequest extends HttpRequest2
 
     public function getQueryConnectorRequests(Query &$query): array
     {
-        $path = explode('/', $this->uri);
+        $path = explode('/', $this->uri); //TODO helper function to split uri properly
         $entityClassList = count($path) > 1 ? $path[1] : '*';
         $entityIdList = count($path) > 2 ? $path[2] : '*';
         $propertyNames = $query->getAllUsedPropertyNames();
@@ -244,7 +274,7 @@ class ApiRequest extends HttpRequest2
 
     protected function getRequestResponses()
     {
-        $entityClassList = count($this->path) > 0 ? $this->path[0] : '*';
+        $entityClassList = count($this->path) > 0 ? $this->path[0] : '*';  //TODO helper function to split uri properly
         $entityIdList = count($this->path) > 1 ? $this->path[1] : '*';
         $propertyPath = count($this->path) > 2 ? array_slice($this->path, 2) : [];
         $requestURi = $this->uri;
@@ -268,7 +298,7 @@ class ApiRequest extends HttpRequest2
                     return json_search($entityClassData[$entityId], $search);;
                 });
             }
-            if(empty($entityIds)) return [];            
+            if(empty($entityIds)) return [];
             $entityIdList = implode(',', $entityIds);
         }
         /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.

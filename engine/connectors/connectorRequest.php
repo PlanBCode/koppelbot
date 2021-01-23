@@ -28,9 +28,7 @@ class ConnectorRequest
     public function isReadOnly(string $entityId = ''): bool
     {
         foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->isReadOnly()) {
-                return false;
-            }
+            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->isReadOnly()) return false;
         }
         return true;
     }
@@ -38,10 +36,24 @@ class ConnectorRequest
     public function isDeletion(string $entityId = ''): bool
     {
         foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && $propertyRequest->isDeletion()) {
-                return true;
-            }
+            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && $propertyRequest->isDeletion()) return true;
         }
         return false;
+    }
+
+    public function getPostIdPropertyRequests(): array
+    {
+      $postIdPropertyRequests = [];
+      foreach ($this->propertyRequests as $propertyRequest) {
+          if ($propertyRequest->isPostId()) $postIdPropertyRequests[] =  $propertyRequest;
+      }
+      return $postIdPropertyRequests;
+    }
+
+    public function updateAutoIncrementedUris(array &$remappedAutoIncrementedUris): void
+    {
+        foreach ($this->propertyRequests as $propertyRequest) {
+          $propertyRequest->updateAutoIncrementedUri($remappedAutoIncrementedUris);
+        }
     }
 }

@@ -30,25 +30,31 @@ class RequestResponse extends Response
     /** @var EntityClassResponse[] */
     protected $entityClassResponses = [];
 
+    /** @var string[] */
+    protected $remappedAutoIncrementedUris = [];
+
     protected $query;
 
-    public function __construct(RequestObject &$requestObject)
+    public function __construct(RequestObject &$requestObject, array &$remappedAutoIncrementedUris)
     {
         $this->requestObject = $requestObject;
+        $this->remappedAutoIncrementedUris += $remappedAutoIncrementedUris;
     }
 
-    public function add(int $status, string $entityClassName, string $entityId, array $propertyPath, $content): void
+    public function add(int $status, string $entityClassName, string $entityId, array $propertyPath, $content, array $remappedAutoIncrementedUris): void
     {
         $this->addStatus($status);
         if (!array_key_exists($entityClassName, $this->entityClassResponses)) {
             $this->entityClassResponses[$entityClassName] = new EntityClassResponse($entityClassName, $this->requestObject);
         }
-
+        $this->remappedAutoIncrementedUris += $remappedAutoIncrementedUris;
         $this->entityClassResponses[$entityClassName]->add($status, $entityId, $propertyPath, $content);
     }
 
     public function merge(RequestResponse $requestResponse): void
     {
+        $this->remappedAutoIncrementedUris += $requestResponse->remappedAutoIncrementedUris;
+
         $this->addStatus($requestResponse->getStatus());
         foreach ($requestResponse->entityClassResponses as $entityClass => $entityClassResponse) {
             if (!array_key_exists($entityClass, $this->entityClassResponses)) {
@@ -57,6 +63,11 @@ class RequestResponse extends Response
                 $this->entityClassResponses[$entityClass]->merge($entityClassResponse);
             }
         }
+    }
+
+    public function getRemappedAutoIncrementedUri(string &$stubUri): ?string
+    {
+      return array_get($this->remappedAutoIncrementedUris, $stubUri, null);
     }
 
     public function getEntityClassResponses(): array

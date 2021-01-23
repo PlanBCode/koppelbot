@@ -5,8 +5,8 @@ class Type_file extends Type
     public static function signature(array &$settings): array
     {
         return [
-            'id' => ['type' => 'string'],
-            'content' => ['type' => 'string'],
+            'id' => ['type' => 'string', 'required' => false],
+            'content' => ['type' => 'string', 'required' => false],
             'extension' => ['type' => 'string', 'required' => false],
             'size' => ['type' => 'number', 'required' => false],
             'mime' => ['type' => 'string', 'required' => false]

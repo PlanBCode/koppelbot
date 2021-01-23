@@ -4,10 +4,19 @@ class ConnectorResponse extends Response
 {
     /** @var RequestResponse[] */
     protected $requestResponses = [];
+    /** @var string[] */
+    protected $remappedAutoIncrementedUris = [];
 
     public function __construct(int $status = null)
     {
         if (!is_null($status)) $this->addStatus($status);
+    }
+
+    public function remapAutoIncrementedUri(string &$entityClassName, string &$entityId, string &$autoIncrementedId): void
+    {
+      $stubUri = $entityClassName.'/'.$entityId;
+      $remappedUri = $entityClassName.'/'.$autoIncrementedId;
+      $this->remappedAutoIncrementedUris[$stubUri] = $remappedUri;
     }
 
     public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): ConnectorResponse
@@ -16,11 +25,11 @@ class ConnectorResponse extends Response
         $requestId = $propertyRequest->getRequestId();
         if (!array_key_exists($requestId, $this->requestResponses)) {
             $requestObject = $propertyRequest->getRequestObject();
-            $this->requestResponses[$requestId] = new RequestResponse($requestObject);
+            $this->requestResponses[$requestId] = new RequestResponse($requestObject, $this->remappedAutoIncrementedUris);
         }
         $method = $propertyRequest->getMethod();
         if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
-        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content);
+        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content, $this->remappedAutoIncrementedUris);
         return $this;
     }
 

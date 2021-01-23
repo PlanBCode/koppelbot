@@ -15,7 +15,7 @@ const encodeContent = (data, item, file) => evt => {
         .substr(5) // 'data:${mimeType};base64,${base64String}' -> '${mimeType};base64,${base64String}'
         .split(';base64,'); // '${mimeType};base64,${base64String}' -> ['${mimeType}','${base64String}']
 
-    if (item.hasSetting('signature') && item.getSetting('signature').content.binary) { //TODO More checks
+    if (item.getSetting('signature','content','binary') === true) {
         data['content'] = {
             encoding: 'base64',
             content: base64String
@@ -25,10 +25,10 @@ const encodeContent = (data, item, file) => evt => {
     }
 
     data['mime'] = mimeType;
-    const extension = item.hasSetting('signature') && item.getSetting('signature').id.connector.extension; // TODO more checks
+    const extension = item.getSetting('signature','id','connector','extension');
     let key;
     //TODO or extension is mixed extensions for example "json|xml"
-    if (extension && extension !== '*') {
+    if (extension && extension !== '*') { // determine whether the extension is part of the key
         key = file.name.split('.').slice(0, -1).join('.');
     } else {
         key = file.name;
@@ -85,7 +85,9 @@ exports.actions = {
             const content = item.getContent();
             if(typeof content === 'object' && content !== null){
               //TODO use mime
-              const extension = content.extension.toLowerCase();
+              const extension = content.hasOwnProperty('extension') && typeof content.extension === 'string'
+               ? content.extension.toLowerCase()
+               : null;
               const fallbackExtension = viewers.hasOwnProperty(extension) && typeof viewers[extension].view === 'function'
                   ? extension : 'txt';
               const DIV_fileContent = viewers[fallbackExtension].view(item);

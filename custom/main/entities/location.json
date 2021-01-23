@@ -43,24 +43,6 @@
           "key": "content"
         },
         "accept": "TODO"
-      },
-      "id": {
-        "type": "string",
-        "connector": {
-          "key": "basename"
-        }
-      },
-      "extension": {
-        "type": "string",
-        "connector": {
-          "key": "extension"
-        }
-      },
-      "mime": {
-        "type": "string",
-        "connector": {
-          "key": "mime"
-        }
       }
     },
     "type": "file"

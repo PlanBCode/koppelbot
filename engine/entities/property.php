@@ -104,6 +104,11 @@ class  PropertyRequest
             && count($this->propertyPath) === 0;
     }
 
+    public function isPostId(): bool
+    {
+      return $this->requestObject->getMethod() === 'POST' && $this->property && $this->property->isId();
+    }
+
     public function getPropertyPath(): array
     {
         return $this->propertyPath;
@@ -168,6 +173,19 @@ class  PropertyRequest
     {
         return $this->property->processBeforeConnector($this->requestObject, $newContent, $currentContent);
     }
+
+    public function updateAutoIncrementedUri(array &$remappedAutoIncrementedUris): void
+    {
+        if($this->getMethod() !== 'POST') return;
+        $this->requestObject->setMethod('PUT');
+        $stubUri = $this->entityClass.'/'.$this->entityId;
+        $autoIncrementedUri = array_get($remappedAutoIncrementedUris,$stubUri);
+        //TODO what if null?
+        $path = explode('/',$autoIncrementedUri);
+        // TODO what if not long enough?
+        $this->entityId = $path[1];
+    }
+
 }
 
 class PropertyResponse extends Response
@@ -298,6 +316,7 @@ class Property
         $customSignatureSettings = array_get($this->settings, 'signature');
         if (is_array($customSignatureSettings)) {
             $signature = $this->typeClass::signature($this->settings);
+            // TODO check if all required props for the signature are there
 
             foreach ($customSignatureSettings as $subPropertyName => $customSubSettings) {
                 if (!array_key_exists($subPropertyName, $signature)) {
@@ -310,6 +329,8 @@ class Property
                     $defaultSubConnector = array_get($defaultSubSettings, self::PROPERTY_CONNECTOR, []);
 
                     //TODO check if type matches and supports these customSubSettings
+                    //TODO allow for multi types "id|string"
+
                     $subSettings = mergeSubSettings($customSubSettings, $defaultSubSettings);
                     $subSettings[self::PROPERTY_CONNECTOR] = array_merge($propertyConnector, $defaultSubConnector, $customSubConnector);
                     //TODO use $this->settings instead or $rootSettings
@@ -340,7 +361,7 @@ class Property
 
     public function isId(): bool
     {
-        return (array_get($this->settings['connector'], 'key', false));
+        return $this->typeName === 'id' || array_get($this->settings,'index',false);
     }
 
     protected function isPrimitive(): bool

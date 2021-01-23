@@ -125,7 +125,11 @@ abstract class BasicConnector extends Connector
         foreach ($entityIds as $entityId) {
 
             if ($propertyRequest->getMethod() === 'POST') {
-                $entityId = $this->getAutoIncrementedId($entityId);
+                //TODO refactor in reusable function
+                $entityClassName = $propertyRequest->getEntityClass();
+                $autoIncrementedId = $this->getAutoIncrementedId($entityId);
+                $connectorResponse->remapAutoIncrementedUri($entityClassName, $entityId, $autoIncrementedId);
+                $entityId = $autoIncrementedId;
                 /*TODO if (is_null($entityId)) {
                     echo "failed to autoincrement";
                 }*/
