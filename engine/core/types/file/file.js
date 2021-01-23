@@ -58,12 +58,22 @@ exports.actions = {
                 const url = window.URL.createObjectURL(fileName);
             }
         };
+        const DIV = document.createElement('DIV');
+        const content = item.getContent();
+        if (content) {
+          const SPAN_value = document.createElement('SPAN'); // as we cannot set INPUT.value for security reasons we display current content here
+          let fileName = '[file]';
+          if(typeof content === 'object' && content !==null){
+            if(content.hasOwnProperty('id')) fileName = content.id;
+            else if(content.hasOwnProperty('extension') && content.extension!=='*') fileName = '[file].'+content.extension;
+          }
+          SPAN_value.innerHTML = fileName;
+          DIV.appendChild(SPAN_value);
+        }
 
         // TODO add id from options (for label for)
         const INPUT = document.createElement('INPUT');
         INPUT.type = 'file';
-        const content = item.getContent();
-        // if (content) { TODO   this is an invalid action for a file input INPUT.value = content;
 
         if (item.patch) {
             INPUT.addEventListener('change', event => {
@@ -73,7 +83,8 @@ exports.actions = {
         INPUT.multiple = item.getSetting('multiple');
         if(item.hasSetting('accept')) INPUT.setAttribute('accept',item.getSetting('accept'));
         if(item.hasSetting('capture')) INPUT.setAttribute('capture',item.getSetting('capture'));
-        return INPUT;
+        DIV.appendChild(INPUT);
+        return DIV;
     },
     view: function (item) {
         //TODO use a file viewer:   https://viewerjs.org/
@@ -83,7 +94,7 @@ exports.actions = {
         const onChangeHandler = node => {
             DIV_container.innerHTML = '';
             const content = item.getContent();
-            if(typeof content === 'object' && content !== null){
+            if (typeof content === 'object' && content !== null && content.hasOwnProperty('content') && content.content !== null && typeof content.content !== 'undefined') {
               //TODO use mime
               const extension = content.hasOwnProperty('extension') && typeof content.extension === 'string'
                ? content.extension.toLowerCase()
