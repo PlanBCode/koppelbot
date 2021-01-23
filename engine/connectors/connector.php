@@ -96,11 +96,35 @@ abstract class Connector
             case self::CONNECTOR_STRING_ERROR:
                 return Connector::createErrorResponse($connectorRequest);
             default:
-                return Connector::$connectors[$connectorString]->createResponse($connectorRequest);
+                $connector = Connector::$connectors[$connectorString];
+                $remappedAutoIncrementedUris = [];  // for POST request the sub ids need to be replaced with autoincremented ids.
+                foreach ($propertyRequests as $propertyRequest){
+                  if ($propertyRequest->getMethod() === 'POST') {
+                    $entityClassName = $propertyRequest->getEntityClass();
+                    $entityIdList = $propertyRequest->getEntityId(); // should not be '*'
+                    $entityIds = explode(',', $entityIdList);
+                    $newEntityIds = [];
+                    foreach ($entityIds as $entityId) {
+                      $autoIncrementedId = $connector->getAutoIncrementedId($entityId);
+                      $stubUri = $entityClassName.'/'.$entityId;
+                      $remappedUri = $entityClassName.'/'.$autoIncrementedId;
+                      $remappedAutoIncrementedUris[$stubUri] = $remappedUri;
+                      $newEntityIds[] = $autoIncrementedId;
+                    }
+                    $entityIdList = implode(',',$newEntityIds);
+                    $propertyRequest->setEntityId($entityIdList);
+                  }
+                }
+                //TODO if POST and id then first get autoincrement ids and update these
+                $connectorResponse = $connector->createResponse($connectorRequest);
+                $connectorResponse->remapAutoIncrementedUris($remappedAutoIncrementedUris);
+                return $connectorResponse;
         }
     }
 
     abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
 
     abstract public function createResponse(ConnectorRequest $connectorRequest): ConnectorResponse;
+
+    abstract protected function getAutoIncrementedId(string $entityId): ?string;
 }
