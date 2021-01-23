@@ -403,6 +403,37 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
+}table.xyz-create, table.xyz-item, table.xyz-list {
+    /*border: 1px solid lightgrey;
+    margin-bottom: 5px;*/
+    padding: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
+    background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-create-header, .xyz-list-header, .xyz-item-header {
+    background-color: darkslateblue;
+    color: white;
+}
+
+.xyz-list, .xyz-item {
+    width: 100%;
+}
+
+.xyz-list-item {
+    cursor: pointer;
+}
+
+table.xyz-list tr.xyz-list-item:hover {
+    background-color: lightblue;
+}
+
+table.xyz-list tr.xyz-list-selected {
+    background-color: yellow;
 }.xyz-map-wrapper {
   border-color: black;
 
@@ -467,35 +498,4 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}table.xyz-create, table.xyz-item, table.xyz-list {
-    /*border: 1px solid lightgrey;
-    margin-bottom: 5px;*/
-    padding: 0;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
-    background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-create-header, .xyz-list-header, .xyz-item-header {
-    background-color: darkslateblue;
-    color: white;
-}
-
-.xyz-list, .xyz-item {
-    width: 100%;
-}
-
-.xyz-list-item {
-    cursor: pointer;
-}
-
-table.xyz-list tr.xyz-list-item:hover {
-    background-color: lightblue;
-}
-
-table.xyz-list tr.xyz-list-selected {
-    background-color: yellow;
 }
