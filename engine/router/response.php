@@ -54,7 +54,6 @@ class RequestResponse extends Response
     public function merge(RequestResponse $requestResponse): void
     {
         $this->remappedAutoIncrementedUris += $requestResponse->remappedAutoIncrementedUris;
-
         $this->addStatus($requestResponse->getStatus());
         foreach ($requestResponse->entityClassResponses as $entityClass => $entityClassResponse) {
             if (!array_key_exists($entityClass, $this->entityClassResponses)) {
@@ -68,6 +67,16 @@ class RequestResponse extends Response
     public function getRemappedAutoIncrementedUri(string &$stubUri): ?string
     {
       return array_get($this->remappedAutoIncrementedUris, $stubUri, null);
+    }
+
+    public function getRemappedAutoIncrementedUris(): array
+    {
+      return $this->remappedAutoIncrementedUris;
+    }
+
+    public function addRemappedAutoIncrementedUris(array &$remappedAutoIncrementedUris): void
+    {
+      $this->remappedAutoIncrementedUris += $remappedAutoIncrementedUris;
     }
 
     public function getEntityClassResponses(): array

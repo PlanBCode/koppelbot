@@ -107,8 +107,7 @@ function getRequestResponses(array &$connectorRequests): array
             $stubUri = $entityClassName . '/' . $entityId;
             $requestId = $postIdPropertyRequest->getRequestId();
             $requestResponse = $requestResponses[$requestId]; //TODO check
-            $remappedAutoIncrementedUri = $requestResponse->getRemappedAutoIncrementedUri($stubUri);
-            $remappedAutoIncrementedUris[$stubUri] = $remappedAutoIncrementedUri;  //TODO check
+            $remappedAutoIncrementedUris += $requestResponse->getRemappedAutoIncrementedUris();
           }
         }else $remainingConnectorRequests[] = $connectorRequest;
     }

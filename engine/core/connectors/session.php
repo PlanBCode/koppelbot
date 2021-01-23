@@ -159,4 +159,9 @@ class Connector_session extends Connector
         }
         return $connectorResponse;
     }
+
+    protected function getAutoIncrementedId(string $entityId): ?string
+    {
+      return null;
+    }
 }

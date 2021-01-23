@@ -134,6 +134,11 @@ class  PropertyRequest
         return $this->entityId;
     }
 
+    public function setEntityId(string $entityId): void
+    {
+        $this->entityId = $entityId;
+    }
+
     public function getEntityClass(): string
     {
         return $this->entityClass;
