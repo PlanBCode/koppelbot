@@ -29,22 +29,23 @@
     "format": "d-m-Y"
   },
   "photo": {
-    "connector": {
-      "type": "directory",
-      "parse": "none",
-      "path": "data/locations/photos/",
-      "extension": "*"
-    },
     "signature":{
       "content": {
         "type": "string",
         "binary": true,
         "connector": {
+          "type": "directory",
+          "parse": "none",
+          "path": "data/locations/photos/",
+          "extension": "*",
           "key": "content"
-        },
-        "accept": "TODO"
+        }
+      },
+      "extension":{
+        "type": "string"
       }
     },
+    "accept": "image/*",
     "type": "file"
   },
   "geojson" : {

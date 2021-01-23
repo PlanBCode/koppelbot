@@ -10,32 +10,46 @@ const viewers = {
 };
 
 const encodeContent = (data, item, file) => evt => {
-    const mimeTypeAndBase64String = evt.target.result;
-    const [mimeType, base64String] = mimeTypeAndBase64String
-        .substr(5) // 'data:${mimeType};base64,${base64String}' -> '${mimeType};base64,${base64String}'
-        .split(';base64,'); // '${mimeType};base64,${base64String}' -> ['${mimeType}','${base64String}']
+  const mimeTypeAndBase64String = evt.target.result;
+  const [mimeType, base64String] = mimeTypeAndBase64String
+    .substr(5) // 'data:${mimeType};base64,${base64String}' -> '${mimeType};base64,${base64String}'
+    .split(';base64,'); // '${mimeType};base64,${base64String}' -> ['${mimeType}','${base64String}']
 
+  if(item.hasSetting('signature','content')){
     if (item.getSetting('signature','content','binary') === true) {
-        data['content'] = {
-            encoding: 'base64',
-            content: base64String
-        };
+      data['content'] = {
+          encoding: 'base64',
+          content: base64String
+      };
     } else {
-        data['content'] = atob(base64String);
+      data['content'] = atob(base64String);
     }
+  }
+  if(item.hasSetting('signature','size')) data['size'] = file.size;
+  if(item.hasSetting('signature','lastModified')) data['lastModified'] =  file.lastModified;
+  if(item.hasSetting('signature','mime')) data['mime'] = mimeType;
 
-    data['mime'] = mimeType;
+  const lastIndex = file.name.lastIndexOf('.');
+  if (lastIndex === -1){
+   if(item.hasSetting('signature','basename')) data['basename'] = file.name;
+   if(item.hasSetting('signature','extension')) data['extension'] = '';
+  } else {
+   if(item.hasSetting('signature','basename')) data['basename'] = file.name.substr(0,lastIndex);
+   if(item.hasSetting('signature','extension')) data['extension'] = file.name.substr(lastIndex + 1);
+  }
+  if(item.hasSetting('signature','id')){
     const extension = item.getSetting('signature','id','connector','extension');
     let key;
     //TODO or extension is mixed extensions for example "json|xml"
     if (extension && extension !== '*') { // determine whether the extension is part of the key
-        key = file.name.split('.').slice(0, -1).join('.');
+      key = file.name.split('.').slice(0, -1).join('.');
     } else {
-        key = file.name;
+      key = file.name;
     }
     key = key.replace(/ /g, '_'); // remove spaces from filename
     data['id'] = key;
-    item.patch(data);
+  }
+  item.patch(data);
 };
 
 exports.actions = {
@@ -60,13 +74,12 @@ exports.actions = {
         };
         const DIV = document.createElement('DIV');
         const content = item.getContent();
-        if (content) {
-          const SPAN_value = document.createElement('SPAN'); // as we cannot set INPUT.value for security reasons we display current content here
+        if (typeof content === 'object' && content !==null && (content.content || content.id)) {
           let fileName = '[file]';
-          if(typeof content === 'object' && content !==null){
-            if(content.hasOwnProperty('id')) fileName = content.id;
-            else if(content.hasOwnProperty('extension') && content.extension!=='*') fileName = '[file].'+content.extension;
-          }
+          if(content.hasOwnProperty('id')) fileName = content.id;
+          else if(content.hasOwnProperty('extension') && content.extension !== '*' && typeof content.extension === 'string') fileName = '[file].'+content.extension;
+
+          const SPAN_value = document.createElement('SPAN'); // as we cannot set INPUT.value for security reasons we display current content here
           SPAN_value.innerHTML = fileName;
           DIV.appendChild(SPAN_value);
         }
