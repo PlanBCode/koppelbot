@@ -1,17 +1,57 @@
+
 TODO
+
+this throws a FATAL error (because of missing ?expand)
+./xyz --method POST "/location" '{"location":{"new":{"geojson":{"type":"Point","coordinates":[352,352]},"title":"dsfsd","date":"26-01-2021","photo":{"content":{"encoding":"base64","content":"YWFw"},"mime":"text/plain","id":"test.txt"}}}}'
+
+
+this returns a 207, should be 200
+./xyz --method POST "/location?expand" '{"location":{"new":{"geojson":{"type":"Point","coordinates":[352,352]},"title":"dsfsd","date":"26-01-2021","photo":{"content":{"encoding":"base64","content":"YWFw"},"mime":"text/plain","id":"test.txt"}}}}'
+
+
+aggregation
+- charts -> use lib? delayed loading? register additional js files?
+
+use cases
+- bloemen spotter : https://meetjestad.net/static/flora/  (bloem+loc)
+- van wie is de stad  (loc+eigenaar+oppervlakte)
+- leegstandsmelder (loc+photo)
+- aanwezigheidsbord de War (datum+naam)
+
+calendar display
+- view=week|day|month|year
+- next/prev buttton
+- showNavigation
+- ShowCreateButton
+
+custom display?  js
+
+map display
+- allow edit by dragging point
+- geojson: only allow subset of data: only features, geometry, points, etc?
+- bounding box filtering
+- use plugin to handle crs projections, and actual map images
+- add label property for display
+- add color/icon properties for display?  (if not a color then map enums/strings to colors)
+
+check delete listener
+
+- view id as color (hash indexed)
+
+error if connector does not have getAutoIncrementedIds on POST
 
 bij add fact blijft het laatst gekozen bestand geselecteerd waardoor onduidelijk is of je een bestand hebt geselecteerd of niet.
 
-oplossing bedenken en werkend maken voor editen van id veld
+oplossing bedenken en werkend maken voor editen van index veld (of dit blokkeren)
 
-change facts in timeline dynamically
-
+change facts in timeline dynamically (dates)
 
 should fail: ./xyz --method PUT /fruit/kiwi '{"color":"red","name":"apple","size":"medium"}'
+- - id's don't match
 
 fix sign-up flow
 - show errors if create/login fails
-- auto fill in username after sign up
+- auto fill in username after sign up  (use creator.patch)
 
 RBAC
 - access not merged, but overwritten for properties
@@ -24,16 +64,13 @@ deleteButton -> get a popup to confirm
 
 test using "de bevoegde instanties" data
 
-cli : enable session using file connector
+cli : enable session using file connector (if user had view rights on folder-> give /group/admin permissions)
 
 timeline : ensure labels do not overlap and do not go outside wrapper
 - constraints
 - - no overlap
 - - div width/height (or stretch to fit)
 - - minimize distance to node
-
-timeline
-- create new item by clicking on the line (display date on hover)
 
 - add unique setting to array
 
@@ -42,7 +79,7 @@ replace createTmpContentToValidate in render.js with ability to validate subData
 
 validate @ Item.patch to set status to faulty
 
-type toString function for sorting
+type toString function for sorting and/or a sort function
 
 refresh state more efficiently: subscription
 
@@ -65,6 +102,8 @@ filtering & searching :
 - optimization: if the query connector requests match the actual requests get them together with the rest
 - - otherwise get them first, analyze and use to get the ids
 
+json schema validation?
+
 Put @ Backend default values properties gebruiken voor niet toegevoegde props
 
 werkend maken:
@@ -73,7 +112,7 @@ werkend maken:
 
 cli: read inputs if searching for /fruit/$id
 
-provide display settings schema in json form
+display
 - - generate auto documentation for displays
 - - create a ui interface to generate a ui interface
 
@@ -104,7 +143,6 @@ custom view html definition:
 
 proper file locks
 
-$variable usage in /ui endpoints (generate inputs to update)
 navigation in /ui endpoints for (sub) property names
 
 maybe entity inheritance

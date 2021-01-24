@@ -1,5 +1,7 @@
 {
   "title":"Onze Lieve Vrouwetoren",
   "date":"01-01-2020",
-  "geojson": {"type": "Point", "coordinates": [300.0, 280.5]}
+  "geojson": {"type": "Point", "coordinates": [300.0, 280.5]},
+  "owner":"Stichting Aap",
+  "extension":"png"
 }

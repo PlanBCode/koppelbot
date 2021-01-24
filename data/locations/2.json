@@ -1,0 +1,6 @@
+{
+  "title":"Iets",
+  "date":"01-01-2020",
+  "geojson": {"type": "Point", "coordinates": [200.0, 180.5]},
+  "owner":"Stichting Aap"
+}

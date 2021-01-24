@@ -21,7 +21,7 @@ exports.display = {
     },
     first: display => {
         display.getWRAPPER().innerHTML = '';
-        display.showCreateButton();
+        if(display.getOption('showCreateButton') === true) display.showCreateButton();
     },
     entity: display => {
 
