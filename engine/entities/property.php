@@ -185,9 +185,9 @@ class  PropertyRequest
         $this->requestObject->setMethod('PUT');
         $stubUri = $this->entityClass.'/'.$this->entityId;
         $autoIncrementedUri = array_get($remappedAutoIncrementedUris,$stubUri);
-        //TODO what if null?
+        if(is_null($autoIncrementedUri)) return;
         $path = explode('/',$autoIncrementedUri);
-        // TODO what if not long enough?
+        if(count($path)<2) return;
         $this->entityId = $path[1];
     }
 

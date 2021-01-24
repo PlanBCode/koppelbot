@@ -79,7 +79,8 @@ exports.display = {
         if(typeof content !== 'object' || content === null || !content.hasOwnProperty(locationPropertyName)) return;
         // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
         // TODO maybe pass label to svg entity?
-        const SVG_entity = content[locationPropertyName].render(display.getAction(), {svg: true, ...display.getSubOptions(locationPropertyName)});
+        const color = display.getColor();
+        const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName),color,svg:true});
         SVG_entity.entityId = entityId;
         SVG_entity.onclick = event => {
           display.select(entityClassName, entityId);

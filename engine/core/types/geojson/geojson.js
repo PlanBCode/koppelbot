@@ -69,6 +69,7 @@ exports.actions = {
     view: item => {
       if(item.getOption('svg')){
         const SVG = document.createElementNS(xmlns,'circle');
+        const color = item.getOption('color')||'red';
 
         const onChangeHandler = item => {
           const content = item.getContent();
@@ -78,8 +79,8 @@ exports.actions = {
             SVG.setAttributeNS(null,'cx', content.coordinates[0]);
             SVG.setAttributeNS(null,'cy', content.coordinates[1]);
             SVG.setAttributeNS(null,'r', '10');
-            SVG.setAttributeNS(null,'fill', 'red');
-            SVG.setAttributeNS(null,'stroke', 'black');
+            SVG.setAttributeNS(null,'fill', color);
+            SVG.setAttributeNS(null,'stroke', 'black'); //TODO parametrize
             SVG;
             //TODO other cases
           }

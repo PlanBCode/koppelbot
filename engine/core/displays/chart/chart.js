@@ -101,12 +101,17 @@ exports.display = {
           TABLE.className = 'xyz-list';
           const TR = document.createElement('TR');
           TR.className = 'xyz-list-header';
+          if(display.hasOption('color')){
+            const TD = document.createElement('TD');
+            TR.appendChild(TD);
+          }
           if(display.hasOption('groupby')){
             const groupBy = display.getOption('groupby');
             const TD = document.createElement('TD');
             TD.innerText = groupBy;
             TR.appendChild(TD);
           }
+
 
           const aggregations = display.getOption('aggregations');
           for(let aggregation of aggregations){
@@ -179,6 +184,7 @@ exports.display = {
         const flavor = display.getOption('flavor')|| 'bar';
         if(flavor === 'table'){
           const TABLE = WRAPPER.firstChild;
+          const offset = display.hasOption('color') ? 2 : 1;
           for(let groupId in groups){
             const group = groups[groupId];
             let found = false;
@@ -186,7 +192,7 @@ exports.display = {
               if(TR.groupId  === groupId){
                 for(let i = 0; i< aggregations.length;++i){
                   const aggregation = aggregations[i];
-                  const TD = TR.children[i+1];
+                  const TD = TR.children[i+offset];
                   const [aggregator, propertyName] = aggregation;
                   const label = aggregator+'('+propertyName+')';
                   TD.innerText = group[label];
@@ -197,6 +203,14 @@ exports.display = {
             if(!found){ // create new row
               const TR = document.createElement('TR');
               TR.groupId = groupId;
+
+              if( display.hasOption('color')){
+                const TD = document.createElement('TD');
+                const color = display.getColor();
+                TD.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>`
+                TR.appendChild(TD);
+              }
+
               if(display.hasOption('groupby')){
                 const TD = document.createElement('TD');
                 TD.innerText = groupId;
@@ -221,11 +235,15 @@ exports.display = {
           for(let aggregation of aggregations){
             const [aggregator, propertyName] = aggregation;
             const label = aggregator+'('+propertyName+')';
+            const data = Object.keys(groups).map(groupId => groups[groupId][label]);
+            const labels = entityClassName + ' ' +label + (groupBy ==='*'?'':' by '+groupBy); // TODO parametrize
+            const backgroundColor = Object.keys(groups).map(groupId => display.getColor(groupId));
             const dataset = {
-              data: Object.keys(groups).map(groupId => groups[groupId][label]),
-              label: entityClassName + ' ' +label + (groupBy ==='*'?'':' by '+groupBy),// TODO parametrize
-              ...COLOR
-              //TODO Colors
+              data,
+              label:labels,
+                borderWidth: 1, // TODO parametrize
+                backgroundColor
+              //TODO borderColors
             }
             WRAPPER.chart.data.datasets.push(dataset);
           }

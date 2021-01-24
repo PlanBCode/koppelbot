@@ -6,6 +6,11 @@ const variables = require('../variables/variables.js');
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';
 
+// string to int
+const hashCode = string => string.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+const colors = ['red', 'green', 'blue', 'yellow', 'pink', 'cyan', 'orange', 'purple'];
+const getColor = string => colors[Math.abs(hashCode(string)) % colors.length];
+
 function flatten2 (source, target, prefix) {
   if (source.constructor !== Object) return;
   for (let key in source) {
@@ -56,6 +61,17 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     const titleContent = titleResponse.getContent();
 
     return typeof titleContent === 'undefined' ? fallback : titleContent;
+  };
+
+  this.getColor = string => {
+    if (typeof string === 'string') {
+
+    } else if (this.hasOption('color')) {
+      const colorPropertyName = this.getOption('color');
+      string = this.getFlatContent()[colorPropertyName].getContent();// TODO check
+    } else string = entityClassName + '/' + entityId;
+    if (typeof string !== 'string') return 'black';
+    return getColor(string);
   };
 
   this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
