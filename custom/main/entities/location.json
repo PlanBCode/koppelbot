@@ -28,6 +28,12 @@
     "type": "date",
     "format": "d-m-Y"
   },
+  "owner" : {
+    "displayName": "Owner",
+    "title": true,
+    "type": "string",
+    "minLength": 1
+  },
   "photo": {
     "signature":{
       "content": {

@@ -1,5 +1,1 @@
-{
-  "title":"Station",
-  "date":"01-01-2020",
-  "geojson": {"type": "Point", "coordinates": [125.0, 170.5]}
-}
+{"title":"Station","date":"01-01-2020","geojson":{"type":"Point","coordinates":[125,170.5]},"owner":"Gemeente Amersfoort"}

@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>Van wie is de stad</title>
+    <link rel="stylesheet" type="text/css" href="./xyz-style.css"/>
+    <script type="text/javascript" src="./xyz-ui.js"></script>
+    <style>
+    body{
+      padding-top: 0.5cm;
+      padding-left: 1cm;
+      padding-right: 1cm;
+    }
+
+    </style>
+</head>
+<body>
+
+  <table width="100%">
+    <tr><td colspan="2"><h1>Van wie is de stad?</h1></td></tr>
+    <tr>
+      <td style="text-align:center;">
+        <xyz uri="/location/*/geojson" markUserLocation="true" select="location" display="map" style="background-image:url('./kaart.jpg'); background-repeat:no-repeat;"/>
+      </td>
+      <td valign="top" width="25%" style="background-color:#EFEFEF;">
+        <xyz uri="/location/*/count(owner)" groupby="owner" display="chart" flavor="table"/>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <xyz uri="$location/photo,owner" display="item"/>
+      </td>
+      <td width="25%" style="background-color:white;">
+        <xyz uri="/location/*/count(owner)" groupby="owner" display="chart" flavor="pie"/>
+      </td>
+    </tr>
+    <tr><td colspan="2"><i>Powered by Koppelbot</i></td></tr>
+  </table>
+</body>
+</html>
