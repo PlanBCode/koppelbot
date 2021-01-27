@@ -1,36 +1,36 @@
-//reference: https://geojson.org/geojson-spec.html
+// reference: https://geojson.org/geojson-spec.html
 const json = require('../json/json.js');
 
-const xmlns = "http://www.w3.org/2000/svg";
+const xmlns = 'http://www.w3.org/2000/svg';
 
-function isValidCoordinate(coordinate){
+function isValidCoordinate (coordinate) {
   return isValidArrayOfSubType(coordinate, x => typeof x === 'number') && coordinate.length >= 2;
 }
 
-function isValidArrayOfSubType(array, isValidSubFunction){
-  if(!(array instanceof Array)) return false;
-  for(let member of array){
-    if(!isValidSubFunction(member)) return false;
+function isValidArrayOfSubType (array, isValidSubFunction) {
+  if (!(array instanceof Array)) return false;
+  for (let member of array) {
+    if (!isValidSubFunction(member)) return false;
   }
   return true;
 }
 
-const isValidMultiPoint = minimumPoints => array => isValidArrayOfSubType(array,isValidCoordinate) && array.length >= minimumPoints;
+const isValidMultiPoint = minimumPoints => array => isValidArrayOfSubType(array, isValidCoordinate) && array.length >= minimumPoints;
 
 const isValidPolygon = array => isValidArrayOfSubType(array, isValidMultiPoint(3));
 
-function isValidGeometry(content){
-  if(typeof content !== 'object' || content === null) return false;
-  if(!content.hasOwnProperty('type')) return false;
-  //TODO bbox
-  //TODO crs
-  switch(content.type){
+function isValidGeometry (content) {
+  if (typeof content !== 'object' || content === null) return false;
+  if (!content.hasOwnProperty('type')) return false;
+  // TODO bbox
+  // TODO crs
+  switch (content.type) {
     case 'Point':
       return isValidCoordinate(content.coordinates);
     case 'MultiPoint':
       return isValidMultiPoint(content.coordinates);
     case 'LineString':
-      return isValidMultiPoint(2)(content.coordinates)
+      return isValidMultiPoint(2)(content.coordinates);
     case 'MultiLineString':
       return isValidArrayOfSubType(content.coordinates, isValidMultiPoint(0));
     case 'Polygon':
@@ -45,58 +45,58 @@ function isValidGeometry(content){
   }
 }
 
-function isValidFeature(content){
-  if(typeof content !== 'object' || content === null) return false;
-  if(!content.hasOwnProperty('type')) return false;
-  //TODO bbox
-  //TODO crs
-  switch(content.type){
-  case 'FeatureCollection':
-    return isValidArrayOfSubType(content.geometries, isValidFeature);
-  case 'Feature':
-    return content.geometry === null || isValidGeometry(content.geometry);
-  default:
-    return false;
+function isValidFeature (content) {
+  if (typeof content !== 'object' || content === null) return false;
+  if (!content.hasOwnProperty('type')) return false;
+  // TODO bbox
+  // TODO crs
+  switch (content.type) {
+    case 'FeatureCollection':
+      return isValidArrayOfSubType(content.geometries, isValidFeature);
+    case 'Feature':
+      return content.geometry === null || isValidGeometry(content.geometry);
+    default:
+      return false;
   }
 }
 
 exports.actions = {
-    edit: item => {
-      if(item.getOption('svg')){
-        return json.actions.edit(item); // TODO create svg object and return
-      } else return json.actions.edit(item);
-    },
-    view: item => {
-      if(item.getOption('svg')){
-        const SVG = document.createElementNS(xmlns,'circle');
-        const color = item.getOption('color')||'red';
+  edit: item => {
+    if (item.getOption('svg')) {
+      return json.actions.edit(item); // TODO create svg object and return
+    } else return json.actions.edit(item);
+  },
+  view: item => {
+    if (item.getOption('svg')) {
+      const SVG = document.createElementNS(xmlns, 'circle');
+      const color = item.getOption('color') || 'red';
 
-        const onChangeHandler = item => {
-          const content = item.getContent();
-          //TODO check
-          switch(content.type){
+      const onChangeHandler = item => {
+        const content = item.getContent();
+        if (typeof content === 'object' && content !== null) {
+          SVG.style.display = 'none'; // TODO more error handling?
+        } else {
+          SVG.style.display = 'inline';
+          switch (content.type) {
             case 'Point' :
-            SVG.setAttributeNS(null,'cx', content.coordinates[0]);
-            SVG.setAttributeNS(null,'cy', content.coordinates[1]);
-            SVG.setAttributeNS(null,'r', '10');
-            SVG.setAttributeNS(null,'fill', color);
-            SVG.setAttributeNS(null,'stroke', 'black'); //TODO parametrize
-            SVG;
-            //TODO other cases
+              SVG.setAttributeNS(null, 'cx', content.coordinates[0]);
+              SVG.setAttributeNS(null, 'cy', content.coordinates[1]);
+              SVG.setAttributeNS(null, 'r', '10');
+              SVG.setAttributeNS(null, 'fill', color);
+              SVG.setAttributeNS(null, 'stroke', 'black'); // TODO parametrize
+              SVG;
+              // TODO other cases
           }
         }
-        onChangeHandler(item);
-        item.onChange(onChangeHandler);
-        return SVG;
-        /*const PATH = document.createElementNS(xmlns,'path');
-        PATH.setAttributeNS(null,'d', 'M10 10 L20 20 L30 30');
-        PATH.setAttributeNS(null,'stroke', 'red');
-        return PATH;*/
-      } else return json.actions.view(item);
-    },
-    validateContent: function (item) {
-      if(!json.actions.validateContent(item)) return false; // check if valid json
-      const content = item.getContent();
-      return isValidGeometry(content) || isValidFeature(content)
-    }
+      };
+      onChangeHandler(item);
+      item.onChange(onChangeHandler);
+      return SVG;
+    } else return json.actions.view(item);
+  },
+  validateContent: function (item) {
+    if (!json.actions.validateContent(item)) return false; // check if valid json
+    const content = item.getContent();
+    return isValidGeometry(content) || isValidFeature(content);
+  }
 };
