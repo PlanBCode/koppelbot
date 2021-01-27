@@ -468,6 +468,11 @@ class Property
         return $this->settings;
     }
 
+    public function getDefault()
+    {
+        return array_get($this->settings,'default');
+    }
+
     public function validateContent($content): bool
     {
         return $this->typeClass::validateContent($content, $this->settings);
@@ -486,6 +491,11 @@ class Property
     public function processBeforeConnector(RequestObject &$requestObject, &$newContent, &$currentContent)
     {
         $method = $requestObject->getMethod();
+
+        if(($method === 'POST' || $method === 'PUT') && is_null($newContent)){ // insert default value
+          $newContent = $this->getDefault();
+        }
+
         return $this->typeClass::processBeforeConnector($method, $newContent, $currentContent, $this->settings);
     }
 
