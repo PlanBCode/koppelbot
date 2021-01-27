@@ -110,6 +110,10 @@ const renderUiLogin = (xyz, options, WRAPPER) => {
       DIV_createSession.style.display = 'block';
       DIV_account.style.display = 'none';
       DIV_account.style.display = 'none';
+      if (typeof data === 'object' && data !== null) {
+        const loginData = {login: {username: data.username, password: data.password.new}};
+        DIV_createSession.patch(loginData);
+      }
     }
   }, DIV_account); // TODO retrieve /account from session metadata?
   WRAPPER.appendChild(DIV_account);
