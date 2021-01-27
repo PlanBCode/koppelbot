@@ -73,7 +73,7 @@ exports.actions = {
 
       const onChangeHandler = item => {
         const content = item.getContent();
-        if (typeof content === 'object' && content !== null) {
+        if (typeof content !== 'object' && content === null) {
           SVG.style.display = 'none'; // TODO more error handling?
         } else {
           SVG.style.display = 'inline';
