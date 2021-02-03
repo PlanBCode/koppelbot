@@ -135,7 +135,12 @@ table.xyz-list tr.xyz-list-item:hover {
 
 table.xyz-list tr.xyz-list-selected {
     background-color: yellow;
-}div.xyz-timeline-wrapper {
+}.xyz-map-wrapper {
+  border-color: black;
+
+  /* b ackground-color: lightgreen; */
+}
+div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -194,12 +199,7 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}.xyz-map-wrapper {
-  border-color: black;
-
-  /* b ackground-color: lightgreen; */
-}
-@charset "UTF-8";
+}@charset "UTF-8";
 
 /*!
  * Pikaday

@@ -310,7 +310,8 @@ class Property
         $access = getMergedSetting(self::PROPERTY_ACCESS, $settings, $rootSettings);
         $this->settings['access'] = $access;
 
-        $required = !is_null(getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings));
+        $required = getMergedSetting(self::PROPERTY_REQUIRED, $settings, $rootSettings);
+        if(is_null($required)) $required = false;
         $this->settings['required'] = $required;
 
         $settingConnector = array_get($settings, self::PROPERTY_CONNECTOR, []);
