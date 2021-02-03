@@ -1,10 +1,100 @@
 /*
-?label  define a label property to use
+TODO?label  define a label property to use
+- mark user location
 
  */
 const xmlns = 'http://www.w3.org/2000/svg';
 
-const list = require('../list/list.js');
+let SCRIPT; // to dynamically load dependency;
+
+function empty (display) {
+  const WRAPPER = display.getWRAPPER();
+  WRAPPER.innerHTML = '';
+
+  WRAPPER.style.height = '500px';
+  WRAPPER.style.width = '100%';
+
+  const vectorSource = new ol.source.Vector({
+    features: []
+  });
+
+  const vectorLayer = new ol.layer.Vector({
+    source: vectorSource
+  });
+  WRAPPER.vectorLayer = vectorLayer;
+
+  const rasterLayer = new ol.layer.Tile({
+    source: new ol.source.TileJSON({
+      url: 'https://a.tiles.mapbox.com/v3/aj.1x1-degrees.json?secure=1',
+      crossOrigin: ''
+    })
+  });
+
+  const map = new ol.Map({
+    layers: [rasterLayer, vectorLayer],
+    target: WRAPPER,
+    view: new ol.View({ // TODO parametrize
+      center: [0, 0],
+      zoom: 3
+    })
+  });
+
+  const DIV_create = display.showCreateButton();
+
+  map.on('click', function (event) {
+    const feature = map.forEachFeatureAtPixel(event.pixel, feature => feature);
+
+    if (feature) {
+      if (typeof feature.onclick === 'function') feature.onclick();
+    } else if (DIV_create) {
+      DIV_create.patch({[locationPropertyName]: {type: 'Point', coordinates: event.coordinate}});
+      DIV_create.style.display = 'block';
+    }
+  });
+
+  // change mouse cursor when over marker
+  map.on('pointermove', function (e) {
+    if (e.dragging) return;
+
+    let pixel = map.getEventPixel(e.originalEvent);
+    let hit = map.hasFeatureAtPixel(pixel);
+
+    map.getTarget().style.cursor = hit ? 'pointer' : ''; // TODO only if feature has onclick
+  });
+
+  const locationPropertyName = display.getOption('location') || 'geojson';
+
+  const markUserLocation = locationResponse => {
+    const format = new ol.format.GeoJSON(); // TODO parametrize
+    const data = {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [ locationResponse.coords.latitude, locationResponse.coords.longitude]}, 'properties': null};
+
+    const features = format.readFeatures(data);
+
+    const iconFeature = features[0];
+
+    iconFeature.setStyle(
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          color: 'lightblue',
+          crossOrigin: 'anonymous',
+          src: 'bigdot.png', // TODO parametrize
+          scale: 0.2 // TODO parametrize
+        })
+      })
+    );
+    iconFeature.onclick = () => display.select(entityClassName, entityId);
+
+    // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
+    // TODO how do we handle changes to feature?
+    WRAPPER.vectorLayer.getSource().addFeature(iconFeature);
+  };
+  if (display.getOption('markUserLocation')) {
+    markUserLocation({coords: {accuracy: 20, latitude: 591095.2514266643, longitude: 6816187.834250114}});
+    /* navigator.geolocation.getCurrentPosition(markUserLocation, error => {
+      console.error(error);// TODO enable when mock is done
+    }); */
+  }
+}
 
 exports.display = {
   waitingForInput: display => {
@@ -15,83 +105,51 @@ exports.display = {
     display.getWRAPPER().innerHTML = 'Waiting for data...';
   },
   empty: display => {
-    const WRAPPER = display.getWRAPPER();
-    WRAPPER.innerHTML = '<svg class="xyz-map-wrapper" width="500" height="500"></svg>'; // TODO handle size
-    // Nb this does not seem to work const SVG_map =  document.createElementNS(xmlns,'SVG');
-    // using innerHTML instead
-    const SVG_map = WRAPPER.firstChild;
-    const locationPropertyName = display.getOption('location') || 'geojson';
-
-    const DIV_create = display.showCreateButton();
-
-    const markUserLocation = locationResponse => {
-      const x = locationResponse.coords.latitude; // TODO transform
-      const y = locationResponse.coords.latitude; // TODO transform
-      const radius = locationResponse.coords.accuracy; // TODO transform
-      const SVG_userLocation = document.createElementNS(xmlns, 'circle');
-      SVG_userLocation.setAttributeNS(null, 'cx', x);
-      SVG_userLocation.setAttributeNS(null, 'cy', y);
-      SVG_userLocation.setAttributeNS(null, 'r', radius);
-      SVG_userLocation.setAttributeNS(null, 'fill', 'blue');
-      SVG_userLocation.setAttributeNS(null, 'stroke', 'white');
-      SVG_map.appendChild(SVG_userLocation);
-      if (DIV_create) {
-        SVG_userLocation.onclick = event => {
-          DIV_create.patch({[locationPropertyName]: {'type': 'Point', 'coordinates': [x, y]}});
-          DIV_create.style.display = 'block';
-          event.stopPropagation();
-          return false;
-        };
-        SVG_userLocation.style.cursor = 'pointer';
-      }
-    };
-    if (display.getOption('markUserLocation')) {
-      markUserLocation({coords: {accuracy: 20, latitude: 352, longitude: 340}});
-      // TODO enable navigator.geolocation.getCurrentPosition(markUserLocation, error=>{
-      // console.error(error);//TOOD
-      // });
-    }
-
-    if (DIV_create) {
-      SVG_map.onclick = event => {
-        const rect = SVG_map.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        // TODO use transformation
-        DIV_create.patch({[locationPropertyName]: {'type': 'Point', 'coordinates': [x, y]}});
-        DIV_create.style.display = 'block';
-      };
-    }
+    if (!SCRIPT) {
+      SCRIPT = document.createElement('script');
+      SCRIPT.src = 'https://openlayers.org/en/v6.5.0/build/ol.js';
+      SCRIPT.onload = () => empty(display);
+      document.head.append(SCRIPT);
+    } else empty(display);
   },
   first: display => {},
 
   entity: display => {
+    // return;
     const content = display.getContent();
     const locationPropertyName = display.getOption('location') || 'geojson';
-    // TODO maybe const labelPropertyName = display.getOption('label')||'title'; //TODO
-
     const entityId = display.getEntityId();
     const entityClassName = display.getEntityClassName();
     const uri = '/' + entityClassName + '/' + entityId;
     const WRAPPER = display.getWRAPPER();
-    const SVG_map = WRAPPER.firstChild;
 
     if (typeof content !== 'object' || content === null || !content.hasOwnProperty(locationPropertyName)) return;
     // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
     // TODO maybe pass label to svg entity?
     const color = display.getColor();
-    const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
-    SVG_entity.entityId = entityId;
-    SVG_entity.onclick = event => {
-      display.select(entityClassName, entityId);
-      event.stopPropagation();
-      return false;
-    };
-    if (display.hasOption('select')) SVG_entity.style.cursor = 'pointer';
 
-    SVG_map.appendChild(SVG_entity);
+    const format = new ol.format.GeoJSON(); // TODO parametrize
+    const data = content[locationPropertyName].getContent();
 
-    // TODO Maybe SVG_map.appendChild(SPAN_label);
+    const features = format.readFeatures(data);
+
+    const iconFeature = features[0];
+
+    iconFeature.setStyle(
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          color,
+          crossOrigin: 'anonymous',
+          src: 'bigdot.png', // TODO parametrize
+          scale: 0.2 // TODO parametrize
+        })
+      })
+    );
+    iconFeature.onclick = () => display.select(entityClassName, entityId);
+
+    // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
+    // TODO how do we handle changes to feature?
+    WRAPPER.vectorLayer.getSource().addFeature(iconFeature);
   },
   remove: display => {
     const WRAPPER = display.getWRAPPER();

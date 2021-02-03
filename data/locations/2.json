@@ -1,6 +1,1 @@
-{
-  "title":"Iets",
-  "date":"01-01-2020",
-  "geojson": {"type": "Point", "coordinates": [200.0, 180.5]},
-  "owner":"Stichting Aap"
-}
+{"title":"Niger","date":"18-02-2021","owner":"Shell","extension":null,"geojson":{"type":"Point","coordinates":[1003453.6519293617,1949267.003023346]}}

@@ -1,7 +1,1 @@
-{
-  "title":"Onze Lieve Vrouwetoren",
-  "date":"01-01-2020",
-  "geojson": {"type": "Point", "coordinates": [300.0, 280.5]},
-  "owner":"Stichting Aap",
-  "extension":"png"
-}
+{"title":"Station","date":"01-01-2020","geojson":{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[411095.2514266643,6826187.834250114]},"properties":null},{"type":"Feature","geometry":{"type":"Point","coordinates":[599097.1048961859,6826191.356971868]},"properties":null}]},"owner":"Stichting AAP"}
