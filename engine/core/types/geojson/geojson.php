@@ -1,15 +1,8 @@
 <?php
 
-class Type_geojson extends Type
+require ('./engine/core/types/json/json.php');
+
+class Type_geojson extends Type_json
 {
-    public static function validateContent($content, array &$settings): bool
-    {
-        return true;
-    }
-
-    static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
-    {
-        return true;
-    }
-
+  //TODO extra validation for geojson
 }

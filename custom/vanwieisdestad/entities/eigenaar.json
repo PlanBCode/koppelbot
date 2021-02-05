@@ -1,0 +1,28 @@
+{
+  "_": {
+    "connector": {
+      "type": "sqlite",
+      "path": "data/mapdata.sqlite",
+      "table": "Eigenaren"
+    },
+    "access" : {
+      "read" : ["/group/guest"]
+    }
+  },
+  "id": {
+    "type": "id",
+    "autoIncrement": true,
+    "connector": {
+      "key": "ID"
+    }
+  },
+  "name" : {
+    "displayName": "Naam",
+    "title": true,
+    "type": "string",
+    "minLength": 1,
+    "connector": {
+      "key": "Naam"
+    }
+  }
+}

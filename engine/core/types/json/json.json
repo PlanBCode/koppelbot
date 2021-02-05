@@ -2,5 +2,10 @@
   "default": {
     "type": "json"
   },
+  "stringify": {
+    "info": "Whether to the json is stored stringified.",
+    "type": "bool",
+    "default" : false
+  },
   "schema": "TODO"
 }

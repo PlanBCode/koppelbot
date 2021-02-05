@@ -1,0 +1,69 @@
+{
+  "_": {
+    "connector": {
+      "type": "sqlite",
+      "path": "data/mapdata.sqlite",
+      "table": "Documenten"
+    },
+    "access" : {
+      "read" : ["/group/guest"]
+    }
+  },
+  "id": {
+    "type": "id",
+    "autoIncrement": true,
+    "connector": {
+      "key": "ID"
+    }
+  },
+  "Type" : {
+    "type": "string",
+    "connector": {
+      "key": "Type"
+    }
+  },
+  "Bron" : {
+    "type": "string",
+    "connector": {
+      "key": "Bron"
+    }
+  },
+  "Datum" : {
+    "type": "string",
+    "connector": {
+      "key": "Datum"
+    }
+  },
+  "Bestand" : {
+    "type": "string",
+    "connector": {
+      "key": "Bestand"
+    }
+  },
+  "EigenaarID" : {
+    "type": "string",
+    "connector": {
+      "key": "EigenaarID"
+    }
+  },
+  "BRK" : {
+    "type": "geojson",
+    "stringify":"true",
+    "connector": {
+      "key": "BRK"
+    }
+  },
+  "BAG" : {
+    "type": "geojson",
+    "stringify":"true",
+    "connector": {
+      "key": "BAG"
+    }
+  },
+  "Lijst" : {
+    "type": "string",
+    "connector": {
+      "key": "Lijst"
+    }
+  }
+}
