@@ -9,6 +9,7 @@ class EntityClass
 
     static public function get(string $entityClassName, array &$accessGroups): ?EntityClass
     {
+
         if (array_key_exists($entityClassName, self::$entityClasses)) {
             return self::$entityClasses[$entityClassName];
         } else {
@@ -17,15 +18,16 @@ class EntityClass
             $fileName = $fileNames[0];
             $fileContent = file_get_contents($fileName); //TODO make safe
             //TODO check if this goes well
-            $meta = json_decode($fileContent, true);
-            //TODO maybe resolve inheritance
+
+
+            $meta = json_decode($fileContent, true);//TODO catch parse error
+            //TODO maybe resolve inheritance            
 
             // Check if any of current sessions has access to this entity
             if (array_key_exists('_', $meta)) {
                 $accessSettings = array_get($meta['_'], 'access', []);
                 if (!AccessControl::check('HEAD', $accessSettings,  $accessGroups)) return null;
             }
-
             $entityClass = new EntityClass($entityClassName, $meta);
             self::$entityClasses[$entityClassName] = $entityClass;
             return $entityClass;
@@ -251,6 +253,9 @@ class EntityResponse extends Response
 
     public function add(int $status, array $propertyPath, $content)
     {
+        $method = $this->requestObject->getMethod();
+        if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
+
         $property = $this->entityClass->getProperty($propertyPath);
         $propertyResponse = new PropertyResponse($property, $this->requestObject, $status, $propertyPath, $content);
         $this->addStatus($propertyResponse->getStatus());
