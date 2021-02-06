@@ -22,14 +22,15 @@ class ConnectorResponse extends Response
 
     public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): ConnectorResponse
     {
+        $method = $propertyRequest->getMethod();
+        if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
+
         $this->addStatus($status);
         $requestId = $propertyRequest->getRequestId();
         if (!array_key_exists($requestId, $this->requestResponses)) {
             $requestObject = $propertyRequest->getRequestObject();
             $this->requestResponses[$requestId] = new RequestResponse($requestObject, $this->remappedAutoIncrementedUris);
         }
-        $method = $propertyRequest->getMethod();
-        if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
         $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content, $this->remappedAutoIncrementedUris);
         return $this;
     }

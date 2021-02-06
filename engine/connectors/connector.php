@@ -105,7 +105,7 @@ abstract class Connector
                     $entityIds = explode(',', $entityIdList);
                     $newEntityIds = [];
                     foreach ($entityIds as $entityId) {
-                      $autoIncrementedId = $connector->getAutoIncrementedId($entityId);
+                      $autoIncrementedId = $connector->getAutoIncrementedId($entityId, $propertyRequest);
                       $stubUri = $entityClassName.'/'.$entityId;
                       $remappedUri = $entityClassName.'/'.$autoIncrementedId;
                       $remappedAutoIncrementedUris[$stubUri] = $remappedUri;
@@ -126,5 +126,5 @@ abstract class Connector
 
     abstract public function createResponse(ConnectorRequest $connectorRequest): ConnectorResponse;
 
-    abstract protected function getAutoIncrementedId(string $entityId): ?string;
+    abstract protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string;
 }
