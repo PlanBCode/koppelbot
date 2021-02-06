@@ -1,5 +1,17 @@
 <?php
+/*
+- path,
+- table
 
+TODO
+- INSERT,
+- UPDATE
+- DELETE
+- sort, order, filter
+- file doesn't exist -> create
+- table doesn't exist -> create
+
+*/
 class MyDB extends SQLite3 {
   function __construct(string $fileName) {
      $this->open($fileName);
@@ -20,14 +32,15 @@ class Connector_sqlite extends Connector
         return $method.'_'.array_get($settings, 'path');
     }
 
-    protected function open(connectorRequest &$connectorRequest)
+    protected function open(connectorRequest &$connectorRequest, ConnectorResponse &$connectorResponse): bool
     {
-     $connectorRequest->getFirstPropertyRequest();
-     $this->db = new MyDB($this->path);
-     if(!$this->db) {
-       //TODO
-        echo $this->db->lastErrorMsg();
-     }
+        $connectorRequest->getFirstPropertyRequest();
+        $this->db = new MyDB($this->path);
+        if(!$this->db) {
+          $error = $this->db->lastErrorMsg();
+          $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.' . $error); //TODO check
+          return false;
+        } else return true;
     }
 
     protected function close()
@@ -37,50 +50,61 @@ class Connector_sqlite extends Connector
 
     public function createResponse(connectorRequest $connectorRequest): ConnectorResponse
     {
-        $this->open($connectorRequest);
-        $connectorResponse = new ConnectorResponse();
-        $queryPerTable = [];
-        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-            $propertyPath = $propertyRequest->getPropertyPath();
-            $propertyName = $propertyPath[0]; //TODO check
 
-            $connectorSettings = $propertyRequest->getProperty()->getConnectorSettings();
-            $table = array_get($connectorSettings, 'table'); //TODO default to entityClassName;
-            $key = array_get($connectorSettings, 'key', $propertyName); ;
-            if(!array_key_exists($table, $queryPerTable)) $queryPerTable[$table] = [];
-            $queryPerTable[$table][$key] = $propertyName;
+        $connectorResponse = new ConnectorResponse();
+        if( !$this->open($connectorRequest, $connectorResponse) ) return $connectorResponse;
+        $keysPerTable = [];
+        $entityIdsPerTable = [];
+        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+            if($propertyRequest->getMethod() !== 'GET') {
+              $connectorResponse->add(400, $propertyRequest, '*', 'Method not yet supported'); //TODO add PUT,PATCH,DELETE
+            }else{
+              $propertyPath = $propertyRequest->getPropertyPath();
+              $propertyName = $propertyPath[0]; //TODO check
+
+              $entityId = $propertyRequest->getEntityId();
+              $connectorSettings = $propertyRequest->getProperty()->getConnectorSettings();
+              $table = array_get($connectorSettings, 'table'); //TODO default to entityClassName;
+              $key = array_get($connectorSettings, 'key', $propertyName); ;
+              if(!array_key_exists($table, $keysPerTable)) {
+                $keysPerTable[$table] = [];
+                $entityIdsPerTable[$table] = [];
+              }
+              $keysPerTable[$table][$key] = $propertyRequest;
+              $entityIdsPerTable[$table][$entityId] = true;
+            }
         }
         $queryString = '';
-        foreach($queryPerTable as $table=>$query){
-          $queryString .='SELECT ';
+        foreach($keysPerTable as $table=>$keys){
+          $idKey='ID'; //TODO determine id properly /match with $propertyRequest?
+          $queryString .= 'SELECT '.$idKey;
           $first = true;
-          foreach($query as $key=>$propertyName){
-            if($first) $first = false;
-            else $queryString.= ', ';
-            $queryString .= $key. ' AS '. $propertyName;
+          foreach($keys as $key=>$propertyRequest){
+            $propertyPath = $propertyRequest->getPropertyPath();
+            $propertyName = $propertyPath[0]; //TODO check
+            $queryString .= ',' . ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
           }
-          $queryString .=' FROM '.$table; //TODO where sort, order left join
+          $queryString .=' FROM '.$table;
+          $entityIds = $entityIdsPerTable[$table];
+          if(!array_key_exists('*',$entityIds)){
+            $queryString .=' WHERE '.$idKey.'='. implode(' OR '.$idKey.'=', array_keys($entityIds));
+          }
+          //TODO sort, order left join
           $result = $this->db->query($queryString);
           if($result){
             while($row = $result->fetchArray()){
-              //echo serialize($row)."\n";
-              $entityContent = [];
-              foreach($query as $propertyName){
-                  $entityContent[$propertyName] = $row[$propertyName];
+              foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+                $propertyPath = $propertyRequest->getPropertyPath();
+                $propertyName = $propertyPath[0]; //TODO check
+                $entityId = (string)$row[$idKey];
+                $connectorResponse->add(200, $propertyRequest, $entityId,  $row[$propertyName]);//TODO determine ID
               }
-              $connectorResponse->add(200, $propertyRequest, $row['id'], $entityContent);//TODO determine ID
             }
-
-
-          }else{
-            //  TODO $connectorResponse->add(400, $propertyRequest, '*', 'ERROR');//TODO
-      //        echo $db->lastErrorMsg();
-
+          }else {
+            $error = $this->db->lastErrorMsg();
+            $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.'.$error); //TODO check
           }
         }
-
-
-
         $this->close();
         return $connectorResponse;
     }
