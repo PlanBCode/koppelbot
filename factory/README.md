@@ -5,51 +5,51 @@
 
 The code is separated into four distinct parts:
 
-- data: The raw data.
+- `custom/` : All custom entity, content and type definitions.
 
-- custom: All custom entity, content and type definitions.
+- `data/` : The raw data.
 
-- engine: The code for the server side engine
+- `engine/` : The code for the server side engine.
 
-- factory: The source and generating code used to compile the client side engine
+- `factory/`: The source and generating code used to compile the client side engine.
 
 
-## Plugins (WIP)
+## Plugins
 
 Custom code is structured using plugins (directories)
 
 `custom/*` : containing definitions and sub endpoints.
 For example: `https://$hostname/tutorial` will serve `custom/tutorial/content/index.html`
 
-Where `custom/main` contains main definitions and the root endpoint. 
-For example: `https://$hostname` will serve `custom/main/content/index.html` 
+Where `custom/main` contains main definitions and the root endpoint.
+For example: `https://$hostname` will serve `custom/main/content/index.html`
 
-`engine/core` : containing all elements required out of the box.
+`engine/core` : containing all elements available out of the box.
 
 A plugin can contain the following components:
 
-`content` : Served directly such as html, css, images
-`entities` : the data models
-`connectors` : defining the storage interfaces for entity data.
-`displays` : defining the user interfaces to display and manage
+`content/` : Served directly such as html, css, images
+`entities/` : the data models
+`connectors/` : defining the storage interfaces for entity data.
+`displays/` : defining the user interfaces to display and manage
 entities (lists, timelines)
-`types` : the data types for the entity properties. (strings, numbers,
+`types/` : the data types for the entity properties. (strings, numbers,
 arrays)
-[Future] `flows` : (automated) actions on entities. (on create entity
+[Future] `flows/` : (automated) actions on entities. (on create entity
 send mail)
 
 ## Entities
 
 An entity class is an abstract definition of an entity. It is
 identified by an EntityClassName (`fruit`) and defined by a json
-file (`fruit.json`).
+file (`entities/fruit.json`).
 
 An instance of an EntityClass, an Entity, is identified by an EntityId
 `apple`. The data is stored based on the connector settings for the
 EntityClass and can be queried using `/$EntityClassName/$EntityId`
 (`/fruit/apple`) or `/$EntityClassName/*` to get all instances.
 
-The EntityClass definition / json file contains specifications for
+The EntityClass definition is a json file that contains specifications for
 
 - properties : which type, which defaults,
 - connectors : how to store the data (per property)
@@ -71,9 +71,9 @@ located in `custom/`.
 
 The entry point for any request is `index.php`
 
+- `/api` requests : entity data in json format
+- `/doc` requests : auto generated documentation
 - content requests : serve web content
-- api requests : entity data in json format
-- doc requests : auto generated documentation
 
 An api requests consists of a path and a querystring:
 
@@ -84,7 +84,7 @@ requested filtering. This will be another api request (without
 querystring).
 
 First the request is grouped into connector requests. This ensures
-that a file is only opened once and not multiple times for diffferent
+that a file is only opened once and not multiple times for different
 entities or properties.
 
 These are then grouped in to responses based on the
