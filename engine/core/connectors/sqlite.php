@@ -32,15 +32,10 @@ class Connector_sqlite extends Connector
         return $method.'_'.array_get($settings, 'path');
     }
 
-    protected function open(connectorRequest &$connectorRequest, ConnectorResponse &$connectorResponse): bool
+    protected function open(): bool
     {
-        $connectorRequest->getFirstPropertyRequest();
         $this->db = new MyDB($this->path);
-        if(!$this->db) {
-          $error = $this->db->lastErrorMsg();
-          $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.' . $error); //TODO check
-          return false;
-        } else return true;
+        return !!$this->db;
     }
 
     protected function close()
@@ -52,7 +47,11 @@ class Connector_sqlite extends Connector
     {
 
         $connectorResponse = new ConnectorResponse();
-        if( !$this->open($connectorRequest, $connectorResponse) ) return $connectorResponse;
+        if( !$this->open() ) {
+          $error = $this->db->lastErrorMsg();
+          $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.' . $error); //TODO check
+          return $connectorResponse;
+        }
         $keysPerTable = [];
         $entityIdsPerTable = [];
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
@@ -74,8 +73,8 @@ class Connector_sqlite extends Connector
               $entityIdsPerTable[$table][$entityId] = true;
             }
         }
-        $queryString = '';
         foreach($keysPerTable as $table=>$keys){
+          $queryString = '';
           $idKey='ID'; //TODO determine id properly /match with $propertyRequest?
           $queryString .= 'SELECT '.$idKey;
           $first = true;
@@ -90,8 +89,10 @@ class Connector_sqlite extends Connector
             $queryString .=' WHERE '.$idKey.'='. implode(' OR '.$idKey.'=', array_keys($entityIds));
           }
           //TODO sort, order left join
+          $queryString = 'SHOW TABLE STATUS LIKE '.$table;
           $result = $this->db->query($queryString);
           if($result){
+            echo json_encode($result);
             while($row = $result->fetchArray()){
               foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
                 $propertyPath = $propertyRequest->getPropertyPath();
@@ -109,8 +110,18 @@ class Connector_sqlite extends Connector
         return $connectorResponse;
     }
 
-    protected function getAutoIncrementedId(string $entityId): ?string
+    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string
     {
+      $propertyPath = $propertyRequest->getPropertyPath();
+      $propertyName = $propertyPath[0]; //TODO check
+
+      $connectorSettings = $propertyRequest->getProperty()->getConnectorSettings();
+      $table = array_get($connectorSettings, 'table'); //TODO default to entityClassName?;
+      $key = array_get($connectorSettings, 'key', $propertyName); ; //TODO need
+
+      //TODO open db
+      //SHOW TABLE STATUS LIKE
+      //close db
       return null; //TODO check db
     }
 }
