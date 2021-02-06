@@ -17,8 +17,8 @@ class Type_json extends Type
         $stringify = array_get($settings, 'stringify', false);
 
         return $stringify
-          ? new ProcessResponse(200, json_encode($content)) // TODO catch error?
-          : new ProcessResponse(200, $content);
+          ? new ProcessResponse(200, json_encode($newContent)) // TODO catch error?
+          : new ProcessResponse(200, $newContent);
     }
 
     static function processAfterConnector(string $method, $content, array &$settings): ProcessResponse
