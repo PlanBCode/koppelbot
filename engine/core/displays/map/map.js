@@ -77,7 +77,7 @@ function empty (display) {
         image: new ol.style.Icon({
           color: 'lightblue',
           crossOrigin: 'anonymous',
-          src: 'bigdot.png', // TODO parametrize
+          src: 'vanwieisdestad/bigdot.png', // TODO parametrize
           scale: 0.2 // TODO parametrize
         })
       })
@@ -145,7 +145,7 @@ exports.display = {
           image: new ol.style.Icon({
             color,
             crossOrigin: 'anonymous',
-            src: 'bigdot.png', // TODO parametrize
+            src: 'vanwieisdestad/bigdot.png', // TODO parametrize
             scale: 0.2 // TODO parametrize
           })
         })
