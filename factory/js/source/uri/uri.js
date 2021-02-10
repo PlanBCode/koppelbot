@@ -9,6 +9,8 @@ const pathFromUri = uri => {
   return uri.split('/');
 };
 
+const uriFromPath = path => '/' + path.join('/');
+
 const wrapContent = (uri, content) => {
   const wrapper = {};
   const path = pathFromUri(uri);
@@ -73,5 +75,6 @@ exports.parseAggregationFromUri = parseAggregationFromUri;
 exports.getBaseUri = getBaseUri;
 exports.getEntityClassNames = getEntityClassNames;
 exports.pathFromUri = pathFromUri;
+exports.uriFromPath = uriFromPath;
 exports.wrapContent = wrapContent;
 exports.addQueryString = addQueryString;

@@ -76,6 +76,13 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
   };
 
   this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+  this.isSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('select'));
+
+  this.multiSelectAdd = (entityClassName, entityId) => xyz.selectAdd(entityClassName, entityId, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
+  this.multiSelectRemove = (entityClassName, entityId) => xyz.selectRemove(entityClassName, entityId, this.getOption('multiSelect'));
+  this.multiSelectNone = () => xyz.select(undefined, undefined, this.getOption('multiSelect'));
+  // TODO multiSelectAll
+  this.isMultiSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('multiSelect'));
 
   this.showCreateButton = () => {
     // TODO only if has the permissions to add
