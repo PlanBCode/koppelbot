@@ -108,7 +108,7 @@ exports.display = {
       WRAPPER.appendChild(CANVAS);
       WRAPPER.chart = new Chart(CANVAS, {
         type: flavor,
-        data: {},
+        data: {datasets: []},
         options: { // TODO parametrize
           legend: { // https://www.chartjs.org/docs/latest/configuration/legend.html
             display: display.getOption('showLegend') !== false
@@ -122,6 +122,7 @@ exports.display = {
           }
         }
       });
+      WRAPPER.chart.update();
     }
   },
   entity: display => {
@@ -212,6 +213,7 @@ exports.display = {
     } else {
       WRAPPER.chart.data.labels = Object.keys(groups);
       WRAPPER.chart.data.datasets = [];
+      WRAPPER.tmpDatasets = [];
       for (let aggregation of aggregations) {
         const [aggregator, propertyName] = aggregation;
         const label = aggregator + '(' + propertyName + ')';
@@ -225,9 +227,15 @@ exports.display = {
           backgroundColor
           // TODO borderColors
         };
-        WRAPPER.chart.data.datasets.push(dataset);
+        WRAPPER.tmpDatasets.push(dataset);
       }
-      WRAPPER.chart.update();
+      if (!WRAPPER.updateTimeOutHandle) { // Throttle chart updates
+        WRAPPER.updateTimeOutHandle = setTimeout(() => {
+          WRAPPER.chart.data.datasets = WRAPPER.tmpDatasets;
+          WRAPPER.chart.update();
+          delete WRAPPER.updateTimeOutHandle;
+        }, 500);
+      }
     }
   },
   remove: display => {
