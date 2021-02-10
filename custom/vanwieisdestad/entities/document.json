@@ -19,19 +19,25 @@
   "Type" : {
     "type": "string",
     "connector": {
-      "key": "type"
+      "key": "Type"
     }
   },
-  "geojson" : {
-    "type": "geojson",
-    "connector": {
-      "key": "geojson"
-    }
-  },
-  "DocumentID" : {
+  "Bron" : {
     "type": "string",
     "connector": {
-      "key": "DocumentID"
+      "key": "Bron"
+    }
+  },
+  "Datum" : {
+    "type": "string",
+    "connector": {
+      "key": "Datum"
+    }
+  },
+  "Bestand" : {
+    "type": "string",
+    "connector": {
+      "key": "Bestand"
     }
   },
   "EigenaarID" : {
@@ -39,6 +45,25 @@
     "connector": {
       "key": "EigenaarID"
     }
+  },
+  "BRK" : {
+    "type": "geojson",
+    "stringify":"true",
+    "connector": {
+      "key": "BRK"
+    }
+  },
+  "BAG" : {
+    "type": "geojson",
+    "stringify":"true",
+    "connector": {
+      "key": "BAG"
+    }
+  },
+  "Lijst" : {
+    "type": "string",
+    "connector": {
+      "key": "Lijst"
+    }
   }
-
 }

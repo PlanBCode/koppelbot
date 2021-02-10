@@ -18,8 +18,7 @@
     <tr><td colspan="2"><h1>Van wie is de stad?</h1></td></tr>
     <tr>
       <td style="text-align:center;">
-        <!-- color="owner" -->
-        <xyz uri="/locatie/*/Bron,BAG,EigenaarID" color="EigenaarID" location="BAG" markUserLocation="true" select="locatie" display="map"/>
+        <xyz uri="/locatie/*/geojson,EigenaarID" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
       </td>
       <td valign="top" width="25%" style="background-color:#EFEFEF;">
         <xyz uri="/locatie/*/count(EigenaarID)" color="EigenaarID" groupby="EigenaarID" display="chart" flavor="table" style="height:50vh; overflow-y:scroll;"/>
@@ -27,7 +26,7 @@
     </tr>
     <tr>
       <td>
-        <xyz uri="$locatie/Bron,Datum,EigenaarID,Bestand" display="item"/>
+        <xyz uri="$locatie/Type,DocumentID,EigenaarID" display="item"/>
       </td>
       <td width="25%" style="background-color:white;">
         <xyz uri="/locatie/*/count(EigenaarID)" groupby="EigenaarID" display="chart" showLegend="false" flavor="pie"/>
