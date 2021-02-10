@@ -112,14 +112,14 @@ exports.display = {
         options: { // TODO parametrize
           legend: { // https://www.chartjs.org/docs/latest/configuration/legend.html
             display: display.getOption('showLegend') !== false
-          },
-          scales: {
+          }
+          /* scales: { //TODO only if applicable (not for pie charts)
             yAxes: [{
               ticks: {
                 beginAtZero: true
               }
             }]
-          }
+          } */
         }
       });
       WRAPPER.chart.update();
