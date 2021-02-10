@@ -45,6 +45,8 @@ class Connector_sqlite extends Connector
 
     protected function constructQueryString(string $method, array &$keys, string $idKey, array &$entityIds, string $table): string
     {
+      $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN ('. implode(',',array_keys($entityIds)).')');
+
       if($method === 'GET'){
         $queryString = 'SELECT '.$idKey;
         foreach($keys as $key=>$propertyRequest){
@@ -52,14 +54,11 @@ class Connector_sqlite extends Connector
           $propertyName = $propertyPath[0]; //TODO check
           $queryString .= ',' . ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
         }
-        $queryString .=' FROM '.$table;
-        if(!array_key_exists('*',$entityIds)){
-          $queryString .=' WHERE '.$idKey.' IN ('. implode(',',$entityIds).')';
-        }
+        $queryString .=' FROM '.$table . $whereString;
       } else if($method === 'DELETE'){
-        $queryString ='DELETE FROM '.$table. ' WHERE '.$idKey.' IN ('. implode(',',$entityIds).')';
+        $queryString ='DELETE FROM '.$table. $whereString;
       } else if($method === 'HEAD'){
-        $queryString ='SELECT '.$idKey.' FROM '.$table. ' WHERE '.$idKey.' IN ('. implode(',',$entityIds).')';
+        $queryString ='SELECT '.$idKey.' FROM '.$table. $whereString;
       }
       //TODO PUT/POST ->insert
       // TODO PATCH -> update
@@ -135,7 +134,7 @@ class Connector_sqlite extends Connector
 
         foreach($keysPerTable as $table=>$keys){
           $idKey='ID'; //TODO determine id properly /match with $propertyRequest?
-          $entityIds = array_keys($entityIdsPerTable[$table]);
+          $entityIds = $entityIdsPerTable[$table];
           $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table);
           $result = $this->db->query($queryString);
           $this->handleResults($method, $idKey, $result, $connectorRequest, $connectorResponse);
