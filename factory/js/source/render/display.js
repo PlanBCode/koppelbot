@@ -65,12 +65,13 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
 
   this.getColor = string => {
     if (typeof string === 'string') {
-
+      // nothing to do
     } else if (this.hasOption('color')) {
       const colorPropertyName = this.getOption('color');
       string = this.getFlatContent()[colorPropertyName].getContent();// TODO check
+      if (typeof string === 'number') string = string.toString();
     } else string = entityClassName + '/' + entityId;
-    if (typeof string !== 'string') return 'black';
+    if (typeof string !== 'string') return 'black'; // can't make heads or tails of this, just return black
     return getColor(string);
   };
 
