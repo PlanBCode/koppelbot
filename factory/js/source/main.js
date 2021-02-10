@@ -34,11 +34,14 @@ function XYZ () {
   this.patch = (uri, content, callback) => request.patch(entityClasses, uri, content, callback);
   this.put = (uri, content, callback) => request.put(entityClasses, uri, content, callback);
   this.delete = (uri, callback) => request.delete(entityClasses, uri, callback);
+
+  this.setQueryParameter = (key, value) => web.setQueryParameter(key, value);
 }
 
 const xyz = new XYZ();
 exports.ui = xyz.ui;
 exports.on = xyz.on;
+exports.setQueryParameter = xyz.setQueryParameter;
 exports.xyz = xyz;
 // TODO get(Variable)
 // TODO set(Variable(s))

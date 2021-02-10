@@ -46,7 +46,11 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
   };
 
   this.patch = (newContent, additionalSubPropertyPath) => {
-    additionalSubPropertyPath = additionalSubPropertyPath || [];
+    if (options.display === 'input') {
+      additionalSubPropertyPath = additionalSubPropertyPath || [];
+    } else {
+      additionalSubPropertyPath = additionalSubPropertyPath || subPropertyPath;
+    }
     const data = json.set({}, additionalSubPropertyPath, newContent);
     // TODO these callbacks are done without validation
     const node = new response.Node({}, '?', 200, data, [], 'PATCH'); // not defining object and entityId

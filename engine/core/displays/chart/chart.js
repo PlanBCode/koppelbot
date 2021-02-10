@@ -3,9 +3,9 @@ const {pathFromUri} = require('../../../../factory/js/source/uri/uri.js'); // TO
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
 
-// TODO table,
 // TODO mixed
-const CHART_TYPES = ['table', 'line', 'bar', 'rader', 'doughnut', 'pie', 'polarArea', 'bubble', 'scatter'];
+const CHART_TYPES = require('./chart.json').options.flavor.choices;
+
 // TODO nth, avg, count_distinct, var(iance), stdev??
 const AGGREGATORS = ['count', 'sum', 'join', 'first', 'last', 'min', 'max'];
 

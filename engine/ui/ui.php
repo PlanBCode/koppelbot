@@ -59,6 +59,11 @@ class UiRequest extends HttpRequest2
             }
             $body .= '</ul> ';
         } else {
+            $optionSchema = [];
+            foreach (glob('{./engine/core,./custom/*}/displays/'.$display.'/'.$display.'.json', GLOB_BRACE) as $file) {
+              $optionSchema = json_decode( file_get_contents($file), true);
+            }
+            //TODO other optionSchema's for create, delete, edit and login
             if ($display === 'create') {
                 $uri = addQueryString('/' . $entityClassName , $this->queryString);
             } else {
@@ -69,6 +74,7 @@ class UiRequest extends HttpRequest2
             }
             $query = new Query($this->queryString);
             $options = array_merge([
+                'id'=>'xyz-ui-display',
                 'uri' => $uri,
                 'display' => $display
             ], $query->getOptions());
@@ -81,6 +87,76 @@ class UiRequest extends HttpRequest2
             $body .= renderInputs($this->queryString);
             if ($body !== '') $body .= '<br/>';
             $body .= '<script>xyz.ui(' . json_encode($options) . ');</script>';
+            $body .= '<pre id="xyz-ui-display-macro"></pre>';
+            ////$uri.
+            if(array_key_exists('options',$optionSchema)){
+              $body .='
+
+              <table class="xyz-list">
+              <tr class="xyz-list-header"><td>Option</td><td>Description</td><td>Value</td></tr>';
+              foreach($optionSchema['options'] as $optionName => $settings){
+                $info = array_get($settings, 'info', '<i>No description available.</i>');
+                $type = array_get($settings, 'type', 'string');
+                $value = array_get($options,$optionName, array_get($settings, 'default',''));
+                $body .= '<tr><td>'.$optionName.'</td><td>'.$info.'</td><td>
+                  <xyz display="input" id="'.$optionName.'" value="'.$value.'" type="'.$type.'" onChange="rerender(content,subPropertyPath);"';
+                foreach($settings as $settingId=>$value){
+                  if($settingId!=='info'){
+                    if(is_array($value)) $value = implode(',',$value);
+                    $body.= ' '.$settingId.'="'.$value.'"';
+                  }
+                }
+                $body .= '/>
+                </td></tr>';
+              }
+              $body .='</table>
+              <script>
+              const options = ' . json_encode($options) . ';
+              const optionSchema = '. json_encode($optionSchema['options']).';
+              function match(content, defaultContent){
+                return content === defaultContent || typeof defaultContent === "undefined" && content==="";
+              }
+              function rerender(content,subPropertyPath){
+                const optionName = subPropertyPath[0];
+                options[optionName] = content;
+                const defaultContent = optionSchema[optionName].default;
+                if(match(content, defaultContent)) content = undefined;
+                xyz.setQueryParameter(optionName,content);
+                const WRAPPER = document.getElementById("xyz-ui-display");
+                xyz.ui(options,WRAPPER);
+                updateMacro();
+              }
+              function updateMacro(){
+                let text = "<xyz";
+                for(let optionName in options){
+                  let content = options[optionName];
+                  if(optionName === "id" || optionName ==="aggregations") continue;
+                  if(optionName === "uri"){
+                    const [base,queryString] = content.split("?");
+                    if(queryString){
+                      content = base;
+                      let first = true;
+                      for(let keyval of queryString.split("&")){
+                        const [key,value] = keyval.split("=");
+                        if(!optionSchema.hasOwnProperty(key)){
+                          if(first){
+                            first=false;
+                            content+="?";
+                          }else content+="&"
+                          content+=keyval;
+                        }
+                      }
+                    }
+                  }
+                  const defaultContent = optionSchema.hasOwnProperty(optionName) ? optionSchema[optionName].default : undefined;
+                  if(!match(content, defaultContent)) text+=" "+optionName+"=\""+content+"\"";
+                }
+                document.getElementById("xyz-ui-display-macro").innerText = text+"/>";
+              }
+              updateMacro()
+              </script>
+              ';
+            }
         }
         return new DocResponse('ui' . $this->uri, $body, $menuItems);
     }
