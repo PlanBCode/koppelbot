@@ -5,12 +5,12 @@ class QueryStatement
 {
     static protected function eq($lhs, $rhs): bool
     {
-        return $lhs === $rhs;
+        return $lhs == $rhs;
     }
 
     static protected function neq($lhs, $rhs): bool
     {
-        return $lhs !== $rhs;
+        return $lhs != $rhs;
     }
 
     static protected function lt($lhs, $rhs): bool
