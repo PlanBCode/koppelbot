@@ -17,6 +17,7 @@ class DocResponse extends HttpResponse2
         'doc/api' => "API Reference",
         'doc/api/entities' => "Entities",
         'doc/api/types' => "Types",
+        'doc/api/connectors' => "Connectors",
 
         'doc/ui' => "UI Reference",
         'doc/ui/displays' => "Displays",
