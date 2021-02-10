@@ -1,5 +1,8 @@
 {
   "options":{
-    "flavor" : {"info":"Type of chart: table, bar,line,etc", "type":"enum","TODO":"TODO"}
+    "flavor" : {"info":"Type of chart: table, bar,line,etc", "type":"enum","TODO":"TODO"},
+    "showLegend" : {"info":"Whether to display the legend", "type":"bool","TODO":"TODO"},
+    "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
+    "groupBy" : {"info":"By which property to group aggregations.", "type":"string","TODO":"TODO"}
   }
 }
