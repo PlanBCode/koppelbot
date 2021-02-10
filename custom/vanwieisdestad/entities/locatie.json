@@ -24,6 +24,7 @@
   },
   "geojson" : {
     "type": "geojson",
+    "stringify":"true",
     "connector": {
       "key": "geojson"
     }

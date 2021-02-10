@@ -81,6 +81,12 @@ exports.display = {
       TABLE.className = 'xyz-list';
       const TR = document.createElement('TR');
       TR.className = 'xyz-list-header';
+      if (display.getOption('multiSelect')) {
+        const variableName = display.getOption('multiSelect');
+        const TD = document.createElement('TD');
+        // TODO TD.innerHTML = '[]';// TODO select/unselect all
+        TR.appendChild(TD);
+      } // TODO if color and select
       if (display.hasOption('color')) {
         const TD = document.createElement('TD');
         TR.appendChild(TD);
@@ -165,7 +171,11 @@ exports.display = {
     const flavor = display.getOption('flavor') || 'bar';
     if (flavor === 'table') {
       const TABLE = WRAPPER.firstChild;
-      const offset = display.hasOption('color') ? 2 : 1;
+      let offset = 0;
+      if (display.hasOption('groupby')) offset++;
+      if (display.hasOption('color')) offset++;
+      if (display.hasOption('multiSelect')) offset++;
+
       for (let groupId in groups) {
         const group = groups[groupId];
         let found = false;
@@ -184,7 +194,22 @@ exports.display = {
         if (!found) { // create new row
           const TR = document.createElement('TR');
           TR.groupId = groupId;
+          if (display.getOption('multiSelect')) {
+            const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
+            const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
 
+            const TD = document.createElement('TD');
+            const INPUT_checkbox = document.createElement('INPUT');
+            INPUT_checkbox.setAttribute('type', 'checkbox');
+            if (display.isMultiSelected(selectEntityClassName, selectEntityId)) INPUT_checkbox.checked = true;
+            INPUT_checkbox.onclick = event => {
+              if (INPUT_checkbox.checked) display.multiSelectAdd(selectEntityClassName, selectEntityId);
+              else display.multiSelectRemove(selectEntityClassName, selectEntityId);
+              event.stopPropagation();
+            };
+            TD.appendChild(INPUT_checkbox);
+            TR.appendChild(TD);
+          }
           if (display.hasOption('color')) {
             const TD = document.createElement('TD');
             const color = display.getColor();
@@ -209,7 +234,6 @@ exports.display = {
           TABLE.appendChild(TR);
         }
       }
-      // TODO
     } else {
       WRAPPER.chart.data.labels = Object.keys(groups);
       WRAPPER.chart.data.datasets = [];

@@ -82,7 +82,11 @@ const selectVariable = (xyz, entityClassName, entityId, variableNameOrCallback, 
       xyz.clearVariable(variableNameOrCallback);
     } else {
       const uriPostfix = selectUri || '';
-      xyz.setVariable(variableNameOrCallback, '/' + entityClassName + '/' + entityId + uriPostfix);
+      const includeEntityClass = typeof entityClassName !== 'undefined';
+      const value = includeEntityClass
+        ? '/' + entityClassName + '/' + entityId
+        : entityId;
+      xyz.setVariable(variableNameOrCallback, value + uriPostfix);
     }
   } else if (typeof variableNameOrCallback === 'function') {
     variableNameOrCallback(entityClassName, entityId);
@@ -90,17 +94,18 @@ const selectVariable = (xyz, entityClassName, entityId, variableNameOrCallback, 
 };
 
 function selectAdd (xyz, entityClassName, entityId, selectVariableName, selectUri) {
-  console.log(xyz, entityClassName, entityId, selectVariableName, selectUri);
   // TODO how to handle mixed entityClasses?
   if (hasVariable(selectVariableName)) {
     const uri = getVariable(selectVariableName);
     const path = uriTools.pathFromUri(uri);
-    if (path.length < 2) return;
-    const entityIds = path[1].split(',');
+    const includeEntityClass = typeof entityClassName !== 'undefined';
+    const offset = includeEntityClass ? 1 : 0;
+    if (path.length <= offset) return;
+    const entityIds = path[offset].split(',');
     if (entityIds.includes(entityId)) return; // already selected, nothing to do
     entityIds.push(entityId);
-    path[1] = entityIds.join(',');
-    const newUri = uriTools.uriFromPath(path);
+    path[offset] = entityIds.join(',');
+    const newUri = includeEntityClass ? uriTools.uriFromPath(path) : path[offset];
     xyz.setVariable(selectVariableName, newUri);
   } else selectVariable(xyz, entityClassName, entityId, selectVariableName, selectUri);
 }
@@ -110,14 +115,16 @@ function selectRemove (xyz, entityClassName, entityId, selectVariableName) {
   if (!hasVariable(selectVariableName)) return; // nothing selected, so nothing to do
   const uri = getVariable(selectVariableName);
   const path = uriTools.pathFromUri(uri);
-  if (path.length < 2) return;
-  const entityIds = path[1].split(',');
+  const includeEntityClass = typeof entityClassName !== 'undefined';
+  const offset = includeEntityClass ? 1 : 0;
+  if (path.length <= offset) return;
+  const entityIds = path[offset].split(',');
   const index = entityIds.indexOf(entityId);
   if (index !== -1) entityIds.splice(index, 1);
   if (entityIds.length === 0) selectVariable(xyz, undefined, undefined, selectVariableName);
   else {
-    path[1] = entityIds.join(',');
-    const newUri = uriTools.uriFromPath(path);
+    path[offset] = entityIds.join(',');
+    const newUri = includeEntityClass ? uriTools.uriFromPath(path) : path[offset];
     xyz.setVariable(selectVariableName, newUri);
   }
 }
@@ -127,8 +134,10 @@ function isSelected (xyz, entityClassName, entityId, selectVariableName) {
   if (!hasVariable(selectVariableName)) return false;
   const uri = getVariable(selectVariableName);
   const path = uriTools.pathFromUri(uri);
-  if (path.length < 2) return;
-  const entityIds = path[1].split(',');
+  const includeEntityClass = typeof entityClassName !== 'undefined';
+  const offset = includeEntityClass ? 1 : 0;
+  if (path.length <= offset) return;
+  const entityIds = path[offset].split(',');
   return entityIds.includes(entityId);
 }
 
