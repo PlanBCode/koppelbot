@@ -4,6 +4,7 @@ table.xyz-create, table.xyz-item, table.xyz-list {
     padding: 0;
     border-collapse: collapse;
     table-layout: fixed;
+    background-color: white;
 }
 
 table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {

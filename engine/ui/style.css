@@ -99,10 +99,43 @@ li.xyz-page-navigation-depth-0 {
 
 .xyz-page-content {
     padding: 50px;
-    width: calc(100vw - 400px);
+    width: calc(100vw - 300px);
     height: calc(100vh - 200px);
     display: inline-block;
     float: left;
+}
+table.xyz-create, table.xyz-item, table.xyz-list {
+    /*border: 1px solid lightgrey;
+    margin-bottom: 5px;*/
+    padding: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background-color: white;
+}
+
+table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
+    background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-create-header, .xyz-list-header, .xyz-item-header {
+    background-color: darkslateblue;
+    color: white;
+}
+
+.xyz-list, .xyz-item {
+    width: 100%;
+}
+
+.xyz-list-item {
+    cursor: pointer;
+}
+
+table.xyz-list tr.xyz-list-item:hover {
+    background-color: lightblue;
+}
+
+table.xyz-list tr.xyz-list-selected {
+    background-color: yellow;
 }
 .xyz-map-wrapper {
   border-color: black;
@@ -467,35 +500,4 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
-}table.xyz-create, table.xyz-item, table.xyz-list {
-    /*border: 1px solid lightgrey;
-    margin-bottom: 5px;*/
-    padding: 0;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-table.xyz-create tr:nth-child(even), table.xyz-item tr:nth-child(even), table.xyz-list tr:nth-child(even) {
-    background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-create-header, .xyz-list-header, .xyz-item-header {
-    background-color: darkslateblue;
-    color: white;
-}
-
-.xyz-list, .xyz-item {
-    width: 100%;
-}
-
-.xyz-list-item {
-    cursor: pointer;
-}
-
-table.xyz-list tr.xyz-list-item:hover {
-    background-color: lightblue;
-}
-
-table.xyz-list tr.xyz-list-selected {
-    background-color: yellow;
 }
