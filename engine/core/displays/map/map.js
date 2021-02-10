@@ -7,16 +7,26 @@ const xmlns = 'http://www.w3.org/2000/svg';
 
 let SCRIPT; // to dynamically load dependency;
 
-function empty (display) {
+function initializeOpenLayers (display) {
   const WRAPPER = display.getWRAPPER();
-  WRAPPER.innerHTML = '';
-
-  WRAPPER.style.height = '500px';
-  WRAPPER.style.width = '100%';
 
   const vectorSource = new ol.source.Vector({
     features: []
   });
+
+  if (WRAPPER.vectorLayer) { // map is already created, to reinitialize we clear all features
+    const DIV_message = WRAPPER.firstChild;
+    DIV_message.innerText = 'Waiting for input...';
+    vectorSource.clear();
+    return;
+  }
+
+  WRAPPER.innerHTML = '';
+  const DIV_message = document.createElement('DIV');
+  DIV_message.innerText = 'Waiting for input...';
+  WRAPPER.appendChild(DIV_message);
+  WRAPPER.style.height = '500px';
+  WRAPPER.style.width = '100%';
 
   const vectorLayer = new ol.layer.Vector({
     source: vectorSource
@@ -98,19 +108,22 @@ function empty (display) {
 
 exports.display = {
   waitingForInput: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for input...';
-  },
-  waitingForData: display => {
-    // TODO display map?
-    display.getWRAPPER().innerHTML = 'Waiting for data...';
-  },
-  empty: display => {
     if (!SCRIPT) {
       SCRIPT = document.createElement('script');
       SCRIPT.src = 'https://openlayers.org/en/v6.5.0/build/ol.js';
-      SCRIPT.onload = () => empty(display);
+      SCRIPT.onload = () => initializeOpenLayers(display);
       document.head.append(SCRIPT);
-    } else empty(display);
+    } else initializeOpenLayers(display);
+  },
+  waitingForData: display => {
+    const WRAPPER = display.getWRAPPER();
+    const DIV_message = WRAPPER.firstChild;
+    if (DIV_message) DIV_message.innerText = 'Waiting for data...';
+  },
+  empty: display => {
+    const WRAPPER = display.getWRAPPER();
+    const DIV_message = WRAPPER.firstChild;
+    if (DIV_message) DIV_message.innerText = '';
   },
   first: display => {},
 
@@ -138,10 +151,10 @@ exports.display = {
 
     if (data) {
       const features = format.readFeatures(data);
-
-      const iconFeature = features[0];
-      if (iconFeature) { // TODO check
-        iconFeature.setStyle(
+      const feature = features[0]; // TODO handle multiple features?
+      if (feature) { // TODO check
+        // TODO if feature is point
+        /* feature.setStyle(
           new ol.style.Style({
             image: new ol.style.Icon({
               color,
@@ -150,12 +163,12 @@ exports.display = {
               scale: 0.2 // TODO parametrize
             })
           })
-        );
-        iconFeature.onclick = () => display.select(entityClassName, entityId);
+        ); */
+        feature.onclick = () => display.select(entityClassName, entityId);
 
         // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
         // TODO how do we handle changes to feature?
-        WRAPPER.vectorLayer.getSource().addFeature(iconFeature);
+        WRAPPER.vectorLayer.getSource().addFeature(feature);
       }
     }
   },
@@ -166,5 +179,4 @@ exports.display = {
     for (let SVG_entity of SVG_map.childNodes) {
       if (typeof SVG_entity.entityId === 'string' && (SVG_entity.entityId === entityId || entityId === '*')) SVG_map.removeChild(SVG_entity);
     }
-  }
-};
+  }};
