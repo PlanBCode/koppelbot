@@ -136,25 +136,27 @@ exports.display = {
     const format = new ol.format.GeoJSON(); // TODO parametrize
     const data = content[locationPropertyName].getContent();
 
-    const features = format.readFeatures(data);
+    if (data) {
+      const features = format.readFeatures(data);
 
-    const iconFeature = features[0];
-    if (iconFeature) { // TODO check
-      iconFeature.setStyle(
-        new ol.style.Style({
-          image: new ol.style.Icon({
-            color,
-            crossOrigin: 'anonymous',
-            src: 'vanwieisdestad/bigdot.png', // TODO parametrize
-            scale: 0.2 // TODO parametrize
+      const iconFeature = features[0];
+      if (iconFeature) { // TODO check
+        iconFeature.setStyle(
+          new ol.style.Style({
+            image: new ol.style.Icon({
+              color,
+              crossOrigin: 'anonymous',
+              src: 'vanwieisdestad/bigdot.png', // TODO parametrize
+              scale: 0.2 // TODO parametrize
+            })
           })
-        })
-      );
-      iconFeature.onclick = () => display.select(entityClassName, entityId);
+        );
+        iconFeature.onclick = () => display.select(entityClassName, entityId);
 
-      // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
-      // TODO how do we handle changes to feature?
-      WRAPPER.vectorLayer.getSource().addFeature(iconFeature);
+        // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
+        // TODO how do we handle changes to feature?
+        WRAPPER.vectorLayer.getSource().addFeature(iconFeature);
+      }
     }
   },
   remove: display => {
