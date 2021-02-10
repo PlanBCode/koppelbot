@@ -52,18 +52,15 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
         xyz.post(uri, {[entityClassName]: {'new': data}}, displayCreatedMessage);
       } else { // PUT
         const entityId = entityClass.getIdFromContent(data);
+        displayMessage('Creating...');
         xyz.head(uri + '/' + entityId, status => {
-          if (status !== 200) {
+          if (status !== 200) { // only if entity does not yet exist
             xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
+            if (typeof options.onSubmit === 'function') options.onSubmit(data);
           } else {
             displayMessage('Failed: ' + entityId + ' already exists.');
           }
         });
-      }
-      displayMessage('Creating..');
-      if (typeof options.onSubmit === 'function') {
-        console.log('call onSubmit', JSON.stringify(data));
-        options.onSubmit(data);
       }
     };
     TAG.patch = patch;

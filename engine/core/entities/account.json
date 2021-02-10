@@ -14,9 +14,6 @@
     "index": true,
     "regex": "^TODO$",
     "default": "hello@default.com",
-    "connector": {
-      "key": "key"
-    },
     "access" : {
       "read" : ["/group/system"],
       "createBlind" : ["/group/guest"],
@@ -38,9 +35,12 @@
     "type": "string",
     "minLength": 3,
     "access" : {
-      "read" : ["/group/guest"],
+      "read" : ["/group/system"],
       "createBlind" : ["/group/guest"],
       "delete" : ["/group/admin"]
+    },
+    "connector": {
+      "key": "key"
     }
   },
   "groups" : {

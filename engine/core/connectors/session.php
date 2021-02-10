@@ -9,7 +9,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
 
     $accessGroups = ['/group/system'];
     $headers = [];
-    $accountsMatchingUserName = request('/account/*/password,groups?email==' . $userName, 'GET', '', $headers, $accessGroups)->getResultsById();
+    $accountsMatchingUserName = request('/account/*/password,groups?username==' . $userName, 'GET', '', $headers, $accessGroups)->getResultsById();
     if (count($accountsMatchingUserName) === 0) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination1.');
 
     /** @var InternalEntityResponse */
