@@ -12,12 +12,6 @@ TODO
 - table doesn't exist -> create
 */
 
-class MyDB extends SQLite3 {
-  function __construct(string $fileName) {
-     $this->open($fileName);
-  }
-}
-
 class Connector_sqlite extends Connector
 {
     protected $db;
@@ -34,7 +28,7 @@ class Connector_sqlite extends Connector
 
     protected function open(): bool
     {
-        $this->db = new MyDB($this->path);
+        $this->db = new SQLite3($this->path);
         return !!$this->db;
     }
 
