@@ -18,18 +18,19 @@
     <tr><td colspan="2"><h1>Van wie is de stad?</h1></td></tr>
     <tr>
       <td style="text-align:center;">
-        <xyz uri="/location/*/geojson,owner" color="owner" markUserLocation="true" select="location" display="map"/>
+        <!-- color="owner" -->
+        <xyz uri="/locatie/*/Bron,BAG,EigenaarID" color="EigenaarID" location="BAG" markUserLocation="true" select="locatie" display="map"/>
       </td>
       <td valign="top" width="25%" style="background-color:#EFEFEF;">
-        <xyz uri="/location/*/count(owner)" color="owner" groupby="owner" display="chart" flavor="table"/>
+        <xyz uri="/locatie/*/count(EigenaarID)" color="EigenaarID" groupby="EigenaarID" display="chart" flavor="table" style="height:50vh; overflow-y:scroll;"/>
       </td>
     </tr>
     <tr>
       <td>
-        <xyz uri="$location/photo,owner,title" display="item"/>
+        <xyz uri="$locatie/Bron,Datum,EigenaarID,Bestand" display="item"/>
       </td>
       <td width="25%" style="background-color:white;">
-        <xyz uri="/location/*/count(owner)" groupby="owner" display="chart" flavor="pie"/>
+        <xyz uri="/locatie/*/count(EigenaarID)" groupby="EigenaarID" display="chart" flavor="pie"/>
       </td>
     </tr>
     <tr><td colspan="2"><i>Powered by Koppelbot</i></td></tr>

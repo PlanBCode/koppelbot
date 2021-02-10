@@ -6,7 +6,7 @@
       "table": "Documenten"
     },
     "access" : {
-      "read" : ["/group/guest"]
+      "write" : ["/group/guest"]
     }
   },
   "id": {
