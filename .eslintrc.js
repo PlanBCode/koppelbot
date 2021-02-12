@@ -19,7 +19,9 @@ module.exports = {
     require: 'readonly',
     module: 'readonly',
     console: 'readonly',
-    xyz: 'readonly'
+    xyz: 'readonly',
+    setInterval: 'readonly',
+    setTimeout: 'readonly'
   },
 
   rules: {
@@ -231,7 +233,7 @@ module.exports = {
     'no-var': 1,
     'object-curly-spacing': 0,
     'new-cap': 0,
-    'no-prototype-builtins': 0,
-    curly: ['error', 'multi']
+    'no-prototype-builtins': 0
+    // curly: ['error', 'multi']
   }
 };
