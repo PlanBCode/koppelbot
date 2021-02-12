@@ -14,7 +14,7 @@ const generateRequiresFile = (name, component) => function generateRequiresFile 
       if (name === 'types') {
         js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
         js += `exports.${baseName(file.path)}.json = require('${folder}/${name}/${id}/${id}.json');\n\n`;
-      } else {
+      } else if (id !== 'create') {
         js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
       }
       cb();
@@ -25,7 +25,7 @@ const generateRequiresFile = (name, component) => function generateRequiresFile 
 };
 
 function generateCssFile (cb) {
-  let css = `/* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */\n\n`;
+  let css = '/* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */\n\n';
   forEachFile([
     '../../engine/core/*/*/*.css',
     '../../custom/*/types/*/*.css',
@@ -37,16 +37,16 @@ function generateCssFile (cb) {
     cb();
   }
   )(() => {
-    write(`../../engine/ui/style.css`, css)(cb);
+    write('../../engine/ui/style.css', css)(cb);
   });
 }
 
 exports.generateCssFile = generateCssFile;
 
-const audit = execute(`sh ../audit.sh`);
+const audit = execute('sh ../audit.sh');
 exports.audit = audit;
 
-const pack = execute(`sh ../pack.sh`);
+const pack = execute('sh ../pack.sh');
 exports.pack = pack;
 
 const generateTypesFile = generateRequiresFile('types', 'actions');
