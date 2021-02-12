@@ -52,14 +52,14 @@ The User Interface (UI) provides a html+js user interface to the data.
 
 The uri's for UI endpoints are structured as:
 
-`http(s)://$HOST:$PORT/ui/$DISPLAY_NAME/$ENTITY_CLASS/$ENTITY_ID/$PROPERTY_NAME/...`
+`http(s)://$HOST:$PORT/ui/$ENTITY_CLASS/$ENTITY_ID/$PROPERTY_NAME/...`
 
 Examples:
 
-`http://localhost:8080/ui/list/car?color==red`
+`http://localhost:8080/ui/car?color==red`
 Get a list overview for all red cars.
 
-`http://localhost:8080/ui/create/fruit`
+`http://localhost:8080/ui/fruit?display=create`
 Get an interface to create a new fruit.
 
 More UI documentation can be found at `http(s)://$HOST:$PORT/doc/ui`
