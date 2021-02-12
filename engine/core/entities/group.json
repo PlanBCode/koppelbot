@@ -12,7 +12,7 @@
   "name": {
     "type": "string",
     "required": true,
-    "index": "true",
+    "index": true,
     "connector": {
       "key": "key"
     }

@@ -48,14 +48,14 @@
   },
   "BRK" : {
     "type": "geojson",
-    "stringify":"true",
+    "stringify": true,
     "connector": {
       "key": "BRK"
     }
   },
   "BAG" : {
     "type": "geojson",
-    "stringify":"true",
+    "stringify": true,
     "connector": {
       "key": "BAG"
     }

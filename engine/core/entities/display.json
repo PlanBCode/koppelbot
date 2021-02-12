@@ -14,7 +14,7 @@
   },
   "id": {
     "type": "string",
-    "index": "true",
+    "index": true,
     "connector": {
       "key": "key"
     }
