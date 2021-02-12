@@ -1,11 +1,12 @@
 // parse choices from attribute string if required
 function getChoices (item) {
   let choices = item.getSetting('choices');
-  if (typeof choices === 'string') {
+  if (typeof choices === 'string')
     if (choices.startsWith('[')) choices = JSON.parse(choices);
     else choices = choices.split(',');
-  }
+
   if (!(choices instanceof Array)) choices = [];
+  return choices;
 }
 
 exports.actions = {
@@ -17,7 +18,7 @@ exports.actions = {
       item.patch(content);
     };
 
-    const choices = getChoices(item);
+    const choices = getChoices(item) || [];
 
     if (!item.getSetting('default') && item.getContent() === null) {
       const OPTION = document.createElement('OPTION');
@@ -27,13 +28,12 @@ exports.actions = {
       SELECT.appendChild(OPTION);
     }
 
-    const subSettings = item.getSetting('subType') || {};
+    const subSettings = item.getSetting('subType') || {}; // TODO use
     const content = item.getContent();
-    for (let choice of choices) {
+    for (const choice of choices) {
       const OPTION = document.createElement('OPTION');
-      if (choice === content) {
-        OPTION.selected = true;
-      }
+      if (choice === content) OPTION.selected = true;
+
       OPTION.innerText = choice; // TODO render choice content
       // OPTION.value = choice;
       // item.renderSubElement('view', ??, item.getStatus(), choice, subSettings, options);
@@ -42,11 +42,9 @@ exports.actions = {
     item.onChange(node => {
       // TODO use status
       const content = node.getContent();
-      for (let id in SELECT.options) {
+      for (const id in SELECT.options) {
         const OPTION = SELECT.options[id];
-        if (OPTION.innerText === content) {
-          OPTION.selected = true;
-        }
+        if (OPTION.innerText === content) OPTION.selected = true;
       }
     });
     return SELECT;
@@ -59,9 +57,7 @@ exports.actions = {
   },
   validateContent: function (item) {
     const choices = getChoices(item);
-    if (!(choices instanceof Array)) {
-      return false;
-    }
+    if (!(choices instanceof Array)) return false;
     return choices.indexOf(item.getContent()) !== -1;
   }
 };
