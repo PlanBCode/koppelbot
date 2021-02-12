@@ -322,12 +322,31 @@ class ApiRequest extends HttpRequest2
         }
     }
 
-    protected function stringifyContent($content): string
+    protected function stringifyContent($content, $status): string
     {
-        if (!$this->query->checkToggle('expand') && !is_array($content)) {
+        $output = $this->query->getOption('output');
+        if($output ==='json' || is_null($output)){
+          if (!$this->query->checkToggle('expand') && !is_array($content)) { // default to json
             return json_simpleEncode($content);
-        } else {
+          } else {
             return json_encode($content, JSON_PRETTY_PRINT);
+          }
+        }else if($output === 'csv' && $status === 200){
+          require_once('output/csv.php');
+          return outputCSV($content, $this->query,$this->path);
+        }else if($output === 'sql' && $status === 200){
+          require_once('output/sql.php');
+          return outputSQL($content, $this->query,$this->path);
+        }else if($output === 'xml' && $status === 200){
+          require_once('output/xml.php');
+          return outputXML($content, $this->query,$this->path);
+        }else if($output === 'yaml'){
+          require_once('output/yaml.php');
+          return outputYAML($content, $this->query,$this->path);
+        }else if($output === 'php'){
+          return serialize($content);
+        }else {
+          return 'Error Unknown output format '.$output; //TODO improve
         }
     }
 
@@ -345,7 +364,7 @@ class ApiRequest extends HttpRequest2
 
     public function createResponse()
     {
-        if ($this->uri === '') return APILandingPage($this->uri);        
+        if ($this->uri === '') return APILandingPage($this->uri);
 
         $requestResponses = $this->getRequestResponses();
         $status = $this->getStatus($requestResponses);
@@ -384,7 +403,7 @@ class ApiRequest extends HttpRequest2
                 $property = $entityClass->getProperty($propertyPath);
                 return $property->serveContent($status, $content);
             } else {
-                $stringContent = $this->stringifyContent($content);
+                $stringContent = $this->stringifyContent($content, $status);
                 return new HttpResponse2($status, $stringContent, []);
             }
         }
