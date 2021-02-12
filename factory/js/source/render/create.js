@@ -1,6 +1,6 @@
 /*
 uri
-onSubmit
+
 TODO onFailure
 
  */
@@ -28,8 +28,8 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
     let TABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
     const patch = newData => {
       // TODO check newData
-      for (let key in data) delete data[key]; // reset data  //TODO add defaults
-      for (let key in newData) data[key] = newData[key];
+      for (const key in data) delete data[key]; // reset data  //TODO add defaults
+      for (const key in newData) data[key] = newData[key];
 
       console.log('create.patch', JSON.stringify(data), JSON.stringify(newData));
       const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
@@ -48,18 +48,17 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
           patch({});
         }
       };
-      if (entityClass.isAutoIncremented()) { // POST
-        xyz.post(uri, {[entityClassName]: {'new': data}}, displayCreatedMessage);
-      } else { // PUT
+      if (entityClass.isAutoIncremented()) // POST
+        xyz.post(uri, {[entityClassName]: {new: data}}, displayCreatedMessage);
+      else { // PUT
         const entityId = entityClass.getIdFromContent(data);
         displayMessage('Creating...');
         xyz.head(uri + '/' + entityId, status => {
           if (status !== 200) { // only if entity does not yet exist
             xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
             if (typeof options.onSubmit === 'function') options.onSubmit(data);
-          } else {
+          } else
             displayMessage('Failed: ' + entityId + ' already exists.');
-          }
         });
       }
     };
