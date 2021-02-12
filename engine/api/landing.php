@@ -37,7 +37,7 @@ function APILandingPage($uri){
   <tr><td colspan="2"> <input type="submit" value="Execute" onclick="execute()"/></td></tr>
   <tr class="xyz-list-header"><td colspan="2">Response</td></tr>
   <tr><td style="font-family: monospace;" id="xyz-api-status" colspan="2"> </td></tr>
-  <tr><td style="font-family: monospace;" id="xyz-api-result" colspan="2"> </td></tr>
+  <tr><td style="font-family: monospace; white-space: pre-wrap;" id="xyz-api-result" colspan="2"> </td></tr>
   </table>
   <script>
   '.file_get_contents('./engine/api/api.js').'
