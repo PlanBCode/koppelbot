@@ -23,9 +23,8 @@ exports.display = {
       const SELECT = document.createElement('SELECT');
       SELECT.className = 'xyz-select';
       SELECT.onchange = () => {
-        const selectedUri = SELECT.options[SELECT.selectedIndex].value;
-        const path = selectedUri.substr(1).split('/');
-        const [entityClassName, entityId] = path;
+        const entityId = SELECT.options[SELECT.selectedIndex].value;
+        const entityClassName = display.getEntityClassName();
         display.select(entityClassName, entityId);
       };
       if (!display.getOption('initialValue')) {
@@ -38,6 +37,20 @@ exports.display = {
       // const entityClassNameList = display.getRequestUri().substr(1).split('/')[0] || '*';
       // const fullUri = '/' + entityClassNameList;
     }
+
+    display.onSelect(entityId => {
+      const WRAPPER = display.getWRAPPER();
+      const SELECT = WRAPPER.firstChild;
+      let found = false;
+      for (const OPTION of SELECT.childNodes) {
+        if (OPTION.value === entityId) {
+          OPTION.selected = true;
+          found = true;
+        } else OPTION.removeAttribute('selected');
+      }
+      if (!found) SELECT.firstChild.selected = true;
+    });
+
     display.showCreateButton();
   },
   first: display => {
@@ -75,7 +88,7 @@ exports.display = {
 
       const OPTION = document.createElement('OPTION');
       TAG_container = OPTION;
-      OPTION.value = uri;
+      OPTION.value = entityId;
       if (display.isSelected(entityClassName, entityId)) {
         OPTION.selected = true;
       }
@@ -96,10 +109,9 @@ exports.display = {
   remove: display => {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
-    const entityClassName = display.getEntityClassName();
     const SELECT = WRAPPER.firstChild;
-    for (let OPTION of SELECT.childNodes) {
-      if ((OPTION.value === '/' + entityClassName + '/' + entityId || entityId === '*')) {
+    for (const OPTION of SELECT.childNodes) {
+      if ((OPTION.value === entityId || entityId === '*')) {
         SELECT.removeChild(OPTION);
       }
     }

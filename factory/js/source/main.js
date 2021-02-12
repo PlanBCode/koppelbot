@@ -13,7 +13,9 @@ function XYZ () {
   this.clearVariable = variableName => variables.clearVariable(variableName);
   this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
   this.setVariables = variableObject => variables.setVariables(variableObject);
-  this.setVariables(web.getQueryParameters());
+  this.onVariable = (variableName, callback) => variables.onVariable(variableName, callback);
+
+  this.setVariables(web.getQueryParameters()); // initialize variables
 
   this.select = (entityClassName, entityId, selectVariableName, selectUri) => variables.selectVariable(this, entityClassName, entityId, selectVariableName, selectUri);
   this.selectAdd = (entityClassName, entityId, selectVariableName, selectUri) => variables.selectAdd(this, entityClassName, entityId, selectVariableName, selectUri);
@@ -44,6 +46,12 @@ exports.getQueryParameter = web.getQueryParameter;
 exports.getQueryParameters = web.getQueryParameters;
 exports.getQueryFilters = web.getQueryFilters;
 exports.xyz = xyz;
-// TODO get(Variable)
-// TODO set(Variable(s))
+
+exports.onVariable = xyz.onVariable;
+exports.hasVariable = xyz.hasVariable;
+exports.getVariable = xyz.getVariable;
+exports.setVariable = xyz.setVariable;
+exports.setVariables = xyz.setVariables;
+exports.clearVariable = xyz.clearVariable;
+
 // TODO globals()

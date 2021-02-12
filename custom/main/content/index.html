@@ -20,7 +20,7 @@
             <xyz uri="/source/*/file/id" createButtonText="Add source" display="list" select="source" showHeader="false"/>
         </td>
         <td id="view" valign="top">
-            <xyz uri="$source" showLabels="false" showTitle="true" showEditButton="true" showDeleteButton="true"/>
+            <xyz uri="/source/$source" showLabels="false" showTitle="true" showEditButton="true" showDeleteButton="true"/>
         </td>
         <td rowspan="2" id="facts" width="20%" valign="top">
             <h3>Facts</h3>
@@ -30,7 +30,7 @@
     <tr>
         <td valign="top">
            <xyz
-                   uri="$fact/*"
+                   uri="/fact/$fact/*"
                    showLabels="true"
                    showTitle="true"
                    showEditButton="true"

@@ -13,13 +13,9 @@ const getColor = string => colors[Math.abs(hashCode(string)) % colors.length];
 
 function flatten2 (source, target, prefix) {
   if (source.constructor !== Object) return;
-  for (let key in source) {
+  for (const key in source) {
     const value = source[key];
-    if (value.constructor === Object) {
-      flatten2(value, target, prefix + key + '.');
-    } else {
-      target[prefix + key] = value;
-    }
+    if (value.constructor === Object) { flatten2(value, target, prefix + key + '.'); } else { target[prefix + key] = value; }
   }
 }
 
@@ -45,6 +41,7 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
   this.getEntityClassName = () => entityClassName;
   this.getEntityId = () => entityId;
   this.getContent = () => response.filter(node, this.getPropertyPath());
+  this.onVariable = (variableName, callback) => xyz.onVariable(variableName, callback);
 
   this.getFlatContent = () => flatten(this.getContent());
   this.getDisplayName = propertyPath => xyz.getDisplayName(entityClassName, propertyPath);
@@ -74,8 +71,21 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     if (typeof string !== 'string') return 'black'; // can't make heads or tails of this, just return black
     return getColor(string);
   };
+  this.onSelect = callback => {
+    if (this.hasOption('select')) xyz.onVariable(this.getOption('select'), callback);
+  };
+  this.onMultiSelect = callback => {
+    if (this.hasOption('multiSelect')) xyz.onVariable(this.getOption('multiSelect'), callback);
+  };
 
-  this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+  this.select = (entityClassName, entityId) => {
+    xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+    if (this.hasOption('onChange')) {
+      const onChange = this.getOption('onChange');
+      if (typeof onChange === 'function') onChange();
+      else if (typeof onChange === 'string') eval(onChange);
+    }
+  };
   this.isSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('select'));
 
   this.multiSelectAdd = (entityClassName, entityId) => xyz.selectAdd(entityClassName, entityId, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
@@ -118,11 +128,9 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
 
   this.renderEntity = () => {
     const flatContent = this.getFlatContent();
-    if (flatContent.constructor !== Object) {
-      return flatContent.render(this.getAction(), this.getOptions());
-    } else {
+    if (flatContent.constructor !== Object) { return flatContent.render(this.getAction(), this.getOptions()); } else {
       const DIV = document.createElement('DIV');
-      for (let propertyName in flatContent) {
+      for (const propertyName in flatContent) {
         const DIV_property = flatContent[propertyName].render(this.getAction(), this.getSubOptions(propertyName));
         DIV.appendChild(DIV_property);
       }
@@ -138,58 +146,38 @@ const displayListenersPerWrapper = new Map();
 const uiElementWaitingForData = (display, displayParameters) => {
   const WRAPPER = displayParameters.getWRAPPER();
   WRAPPER.classList.add('xyz-waiting-for-data');
-  if (display && display.hasOwnProperty('waitingForData')) {
-    display.waitingForData(displayParameters);
-  } else {
-    WRAPPER.innerHTML = 'Waiting for user data...';
-  }
+  if (display && display.hasOwnProperty('waitingForData')) { display.waitingForData(displayParameters); } else { WRAPPER.innerHTML = 'Waiting for user data...'; }
 };
 
 const uiElementWaitingForInput = (display, displayParameters) => {
   const WRAPPER = displayParameters.getWRAPPER();
   WRAPPER.classList.add('xyz-waiting-for-input');
-  if (display && display.hasOwnProperty('waitingForInput')) {
-    display.waitingForInput(displayParameters);
-  } else {
-    WRAPPER.innerHTML = 'Waiting for user input...';
-  }
+  if (display && display.hasOwnProperty('waitingForInput')) { display.waitingForInput(displayParameters); } else { WRAPPER.innerHTML = 'Waiting for user input...'; }
 };
 
 const uiElementEmpty = (display, displayParameters) => {
   const WRAPPER = displayParameters.getWRAPPER();
   WRAPPER.classList.remove('xyz-waiting-for-input');
   WRAPPER.classList.add('xyz-empty');
-  if (display && display.hasOwnProperty('empty')) {
-    display.empty(displayParameters);
-  } else {
-    WRAPPER.innerHTML = 'Empty';
-  }
+  if (display && display.hasOwnProperty('empty')) { display.empty(displayParameters); } else { WRAPPER.innerHTML = 'Empty'; }
 };
 
 const uiElementFirst = (display, displayParameters) => {
   const WRAPPER = displayParameters.getWRAPPER();
   if (WRAPPER.classList.contains('xyz-empty')) {
     WRAPPER.classList.remove('xyz-empty');
-    if (display && display.hasOwnProperty('first')) {
-      display.first(displayParameters);
-    } else {
-      WRAPPER.innerHTML = '';
-    }
+    if (display && display.hasOwnProperty('first')) { display.first(displayParameters); } else { WRAPPER.innerHTML = ''; }
   }
 };
 
 const uiElementEntity = (display, displayParameters) => {
-  if (display && display.hasOwnProperty('entity')) {
-    display.entity(displayParameters);
-  } else {
+  if (display && display.hasOwnProperty('entity')) { display.entity(displayParameters); } else {
     // TODO a default way of handeling stuff
   }
 };
 
 const uiElementRemove = (display, displayParameters) => {
-  if (display && display.hasOwnProperty('remove')) {
-    display.remove(displayParameters);
-  } else {
+  if (display && display.hasOwnProperty('remove')) { display.remove(displayParameters); } else {
     // TODO a default way of handeling stuff
   }
 };
@@ -263,11 +251,12 @@ const renderUiElement = (xyz, options, WRAPPER) => {
     xyz.get(uri, node => { // TODO this should be handled by having an available instead of created listener
       WRAPPER.classList.remove('xyz-waiting-for-data');
 
-      for (let entityClassName in node) {
-        for (let entityId in node[entityClassName]) {
+      for (const entityClassName in node) {
+        for (const entityId in node[entityClassName]) {
           renderDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node[entityClassName][entityId]);
         }
       }
+
       addListeners(xyz, uri, options, WRAPPER);
     });
   },
