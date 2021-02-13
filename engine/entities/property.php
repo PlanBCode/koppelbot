@@ -388,16 +388,9 @@ class Property
 
     public function expand(array $propertyPath, int $depth, Query &$query): array
     {
-        if (count($propertyPath) < $depth) {
-            $propertyPath[] = $this->propertyName;
-        }
+        if (count($propertyPath) < $depth) $propertyPath[] = $this->propertyName;
 
-        if (count($propertyPath) === $depth) {
-            if ($this->isPrimitive() || $query->checkToggle('meta')) {
-                return [new PropertyHandle(200, $this, $propertyPath)];
-            }
-        }
-
+        if (count($propertyPath) === $depth && $this->isPrimitive()) return [new PropertyHandle(200, $this, $propertyPath)];
 
         if ($this->isPrimitive()) {
             $subPropertyPath = array_slice($propertyPath, 1);
