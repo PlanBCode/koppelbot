@@ -79,6 +79,7 @@ onUiChange = (content, subPropertyPath) => { // declared in /engine/api/api.js
 function updateOptions () {
   const TABLE = document.getElementById('xyz-ui-display-options');
   TABLE.innerHTML = '<tr class="xyz-list-header"><td>Display Option</td><td>Description</td><td>Value</td></tr>';
+  if (!displayName) displayName = 'list';
   for (const optionName in optionSchemas[displayName].options) {
     const settings = optionSchemas[displayName].options[optionName];
     const info = settings.info || '<i>No description available.</i>';
@@ -100,6 +101,7 @@ function updateOptions () {
     xyz.ui(uiOptions, TD);
   }
 }
+
 function sanitizeMacroUri (content) {
   const [base, queryString] = content.split('?');
   if (queryString) {
@@ -157,3 +159,4 @@ function updateMacro () {
   }
 }
 onUiChange(displayName, ['display']);
+updateOptions();

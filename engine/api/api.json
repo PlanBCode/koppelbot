@@ -1,0 +1,15 @@
+{
+
+  "sortBy":{"info":"TODO","type":"TODO"},
+  "expand":{"info":"TODO","type":"TODO"},
+  "offset":{"info":"TODO","type":"TODO"},
+  "limit":{"info":"TODO","type":"TODO"},
+  "search":{"info":"TODO","type":"TODO"},
+
+  "serve":{"info":"TODO (OR use output = html/file/raw?)","type":"TODO"},
+
+  "input":{"info":"TODO","type":"TODO"},
+  "output":{"info":"TODO","type":"TODO"},
+  
+  "embed":{"info":"TODO","type":"TODO"}
+}

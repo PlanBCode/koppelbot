@@ -38,13 +38,13 @@ class UiRequest extends HttpRequest2
 
         $optionSchemas = [];
 
-        $defaulltOptions = [
-            'display' => ["info"=>"How to display the data.","type" => "enum", "choices" => $displayNames]
+        $defaultOptions = [
+          'display' => ["info"=>"How to display the data.","type" => "enum", "choices" => $displayNames, "default" => "list"]
         ];
         foreach (glob('{./engine/core,./engine/main}/displays/*', GLOB_BRACE) as $dir) {
           $displayName = basename($dir, '');
           $optionSchemas[$displayName] = json_decode(file_get_contents($dir.'/'.$displayName.'.json'), true);
-          $optionSchemas[$displayName]['options'] = array_merge($defaulltOptions, $optionSchemas[$displayName]['options']);
+          $optionSchemas[$displayName]['options'] = array_merge($defaultOptions, $optionSchemas[$displayName]['options']);
         }
 
         require_once __DIR__ . '/../api/landing.php';
