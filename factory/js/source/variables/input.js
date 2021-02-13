@@ -16,10 +16,11 @@ function renderUiInput (xyz, options, WRAPPER) {
         variables.setVariable(name, options.value);
       }
     }
-
-    const LABEL = document.createElement('LABEL');
-    LABEL.innerHTML = name + '&nbsp;';
-    WRAPPER.appendChild(LABEL);
+    if (options.showLabel !== false) {
+      const LABEL = document.createElement('LABEL');
+      LABEL.innerHTML = name + '&nbsp;';
+      WRAPPER.appendChild(LABEL);
+    }
     INPUT.name = name;
     INPUT.onpaste = () => variables.setVariable(name, INPUT.value);
     INPUT.oninput = () => variables.setVariable(name, INPUT.value);
