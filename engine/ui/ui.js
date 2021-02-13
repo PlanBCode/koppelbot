@@ -37,14 +37,13 @@ function match (content, defaultContent) {
   return content === defaultContent || (typeof defaultContent === 'undefined' && content === '');
 }
 
-onUiChange = (content, subPropertyPath) => { // declared in /engine/api/api.js
+onUiChange = (content, optionName) => { // declared in /engine/api/api.js
   options.uri = INPUT_uri.value;
 
   window.history.pushState({html: null, pageTitle: document.title}, '', window.location.origin + '/ui' + options.uri + window.location.search);
 
   const entityClassName = options.uri.substr(1).split('/')[0];
   if (!entityClassName) return;
-  const optionName = (subPropertyPath instanceof Array) ? subPropertyPath[0] : null;
   if (optionName) {
     options[optionName] = content;
     const defaultContent = optionSchemas[displayName].options[optionName].default;
@@ -90,7 +89,7 @@ function updateOptions () {
       id: optionName,
       value,
       type,
-      onChange: (content, subPropertyPath) => onUiChange(content, subPropertyPath),
+      onChange: content => onUiChange(content, optionName),
       ...settings
     };
     const TR = document.createElement('TR');
@@ -158,5 +157,5 @@ function updateMacro () {
     PRE_macro.innerHTML = `<a href="${url}" target="_black">${url}</a> <a target="_blank" href="${window.location.origin}${moreUri}">More...</a>`;
   }
 }
-onUiChange(displayName, ['display']);
+onUiChange(displayName, 'display');
 updateOptions();

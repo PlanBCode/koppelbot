@@ -19,7 +19,7 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
   this.getSettings = () => settings;
   this.getSetting = (...settingNames) => {
     let iterator = settings;
-    for (let settingName of settingNames) {
+    for (const settingName of settingNames) {
       if (
         typeof iterator !== 'object' ||
           iterator === null ||
@@ -33,7 +33,7 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
 
   this.hasSetting = (...settingNames) => {
     let iterator = settings;
-    for (let settingName of settingNames) {
+    for (const settingName of settingNames) {
       if (
         typeof iterator !== 'object' ||
           iterator === null ||
@@ -46,15 +46,12 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
   };
 
   this.patch = (newContent, additionalSubPropertyPath) => {
-    if (options.display === 'input') {
-      additionalSubPropertyPath = additionalSubPropertyPath || [];
-    } else {
-      additionalSubPropertyPath = additionalSubPropertyPath || subPropertyPath;
-    }
+    additionalSubPropertyPath = additionalSubPropertyPath || [];
+
     const data = json.set({}, additionalSubPropertyPath, newContent);
     // TODO these callbacks are done without validation
     const node = new response.Node({}, '?', 200, data, [], 'PATCH'); // not defining object and entityId
-    for (let callback of callbacks) {
+    for (const callback of callbacks) {
       callback(node);
     }
     // note: adding the subPropertyPath and additionalSubPropertyPath is handled by the onChange function
@@ -63,6 +60,14 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
 
   this.delete = subPropertyPath => {
     // TODO call callbacks
+    /*
+    verify:
+    const node = new response.Node({}, '?', 200, null, [], 'DELETE'); // not defining object and entityId
+    for (const callback of callbacks) {
+      callback(node);
+    }
+    */
+    // TODO these callbacks are done without validation
     (options.onDelete || onDelete)(subPropertyPath);
   };
 
@@ -76,7 +81,7 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
         console.error('Item.renderSubElement json.set failed', e);
       }
       const TRs = render.creator(xyz, options_, baseUri, settings, subPropertyPath.concat(additionalSubPropertyPath), creatorData);
-      for (let TR of TRs) {
+      for (const TR of TRs) {
         TABLE.appendChild(TR);
       }
       return TABLE;
