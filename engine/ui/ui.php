@@ -39,7 +39,8 @@ class UiRequest extends HttpRequest2
         $optionSchemas = [];
 
         $defaultOptions = [
-          'display' => ["info"=>"How to display the data.","type" => "enum", "choices" => $displayNames, "default" => "list"]
+          'display' => ["info"=>"How to display the data.","type" => "enum", "choices" => $displayNames, "default" => "list"],
+          'dynamic' => ["info"=>"Whether to refresh the data continously.","type" => "bool", "default" => false]
         ];
         foreach (glob('{./engine/core,./engine/main}/displays/*', GLOB_BRACE) as $dir) {
           $displayName = basename($dir, '');
@@ -53,7 +54,7 @@ class UiRequest extends HttpRequest2
         if ($body !== '') $body .= '<br/>';
         $body .= '<table class="xyz-list">
           <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
-          <tr><td colspan="2" style="padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"></div></td></tr>';
+          <tr><td colspan="2" style="overflow: scroll; padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"></div></td></tr>';
 
         $inputs = renderInputs($this->uri.'?'.$this->queryString);
         if($inputs){

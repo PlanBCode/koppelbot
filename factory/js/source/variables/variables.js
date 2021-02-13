@@ -8,7 +8,7 @@ const variableCallbacks = {};
 
 function onVariable (variableNameEventName, callback) {
   if (typeof callback !== 'function') throw new TypeError('Expected callback function.');
-
+  if (typeof variableNameEventName !== 'string') return;
   let [variableName, eventName] = variableNameEventName.split(':');
   if (!eventName) eventName = 'change';
   if (!['change', 'clear', 'create'].includes(eventName)) throw new Error(`Illegal variable event '${eventName}'`);
@@ -83,9 +83,14 @@ function refresh () {
   }
 }
 
-const registerUri = (xyz, uri, readyCallback, waitCallback) => {
+// TODO parametrize refresh rate / throttle
+const registerUri = (xyz, uri, readyCallback, waitCallback, dynamic = false) => {
   const callbacks = {xyz, ready: readyCallback, wait: waitCallback};
-  if (!uriCallbacks.hasOwnProperty(uri)) { uriCallbacks[uri] = [callbacks]; } else { uriCallbacks[uri].push(callbacks); }
+
+  if (dynamic) { // skip updates for non dynamic
+    if (!uriCallbacks.hasOwnProperty(uri)) uriCallbacks[uri] = [callbacks];
+    else uriCallbacks[uri].push(callbacks);
+  }
 
   handleUri(uri, callbacks);
 };
