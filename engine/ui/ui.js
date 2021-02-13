@@ -56,7 +56,7 @@ onUiChange = (content, subPropertyPath) => { // declared in /engine/api/api.js
 
     ...options,
     id: 'xyz-ui-display',
-    uri
+    uri: options.uri
   };
 
   if (displayOptions.display === 'edit') {
