@@ -233,7 +233,9 @@ module.exports = {
     'no-var': 1,
     'object-curly-spacing': 0,
     'new-cap': 0,
-    'no-prototype-builtins': 0
+    'no-prototype-builtins': 0,
+    'valid-jsdoc': ['error', { prefer: { arg: 'param', argument: 'param', class: 'constructor', return: 'returns', virtual: 'abstract' } }]
+
     // curly: ['error', 'multi']
   }
 };

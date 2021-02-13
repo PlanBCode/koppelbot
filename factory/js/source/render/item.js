@@ -8,7 +8,10 @@ const DEFAULT_ACTION = 'view';
 
 function Item (xyz, baseUri, subPropertyPath, status, content, settings, options, onChange, onDelete, creatorData) {
   const callbacks = [];
-
+  /**
+   * Get the uri for the current entity
+   * @returns {string} uri
+   */
   this.getUri = () => baseUri;
   this.getStatus = () => status;
   this.getContent = () => content;

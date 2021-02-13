@@ -36,11 +36,31 @@ function flatten (source) {
 }
 
 function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, entityId, node, uri) {
+  /**
+   * Get the uri for the current entity
+   * @returns {string} uri
+   */
   this.getRequestUri = () => uri;
+  /**
+   * Get the action for the display.
+   * @returns {string} action 'edit' or 'view'
+   */
   this.getAction = () => action;
+  /**
+   * @param {string} optionName The name of the option
+   * @returns {bool}            Whether the display has a given option defined.
+   */
   this.hasOption = optionName => options.hasOwnProperty(optionName);
+  /**
+   * @returns {Object} All options as an object.
+   */
   this.getOptions = () => options;
+  /**
+   * @param {string} optionName The name of the option
+   * @returns {Mixed}            The value of the requested option.
+   */
   this.getOption = optionName => options[optionName];
+
   this.getSubOptions = propertyName => {
     return options.hasOwnProperty('subOptions') && options.subOptions.hasOwnProperty(propertyName)
       ? options.subOptions[propertyName]
@@ -69,6 +89,9 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     return path.slice(2);
   };
 
+  /**
+   * @returns {string} The title of current entity. Defaults to the entityId is title is not defined;
+   */
   this.getTitle = () => {
     const fallback = '/' + entityClassName + '/' + entityId;
     const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
@@ -79,7 +102,10 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
 
     return typeof titleContent === 'undefined' ? fallback : titleContent;
   };
-
+  /**
+   * @param  {[string]} string TODO
+   * @returns {string} The color associated with the content.
+   */
   this.getColor = string => {
     if (typeof string === 'string') {
       // nothing to do

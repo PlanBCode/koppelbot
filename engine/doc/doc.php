@@ -33,6 +33,9 @@ class DocResponse extends HttpResponse2
         'doc/dev/type' => "Build a type",
         'doc/dev/connector' => "Build a connector",
         'doc/dev/javascript' => "Javascript packing",
+        'doc/dev/classes' => "Classes",
+        'doc/dev/classes/display' => "Display Class",
+        'doc/dev/classes/item' => "Item Class",
 
         'map' => "Site Map",
     ];
