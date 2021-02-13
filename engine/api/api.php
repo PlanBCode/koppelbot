@@ -403,6 +403,7 @@ class ApiRequest extends HttpRequest2
                 $propertyPath = array_slice($this->path, 2);
                 /** @var Property */
                 $property = $entityClass->getProperty($propertyPath);
+                if(is_null($property)) return  new HttpResponse2($status, $content, []);
                 return $property->serveContent($status, $content);
             } else {
                 $stringContent = $this->stringifyContent($content, $status);
