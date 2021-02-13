@@ -17,11 +17,13 @@ session_start();
 $isCli = PHP_SAPI === 'cli';
 
 if ($isCli) {
+    $VERSION = '0.1.0'; //TODO make an api endpoint for this.
     require './engine/cli/cli.php';
 
     $cliOptions = [
         new CliOption('m', 'method', 1, "Set HTTP method. ", "GET"),
-        new CliOption('v', 'verbose', 0, "Set verbose output. ", false),
+        new CliOption('V', 'verbose', 0, "Set verbose output. ", false),
+        new CliOption('v', 'version', 0, "Get version. ", false),
         new CliOption('S', 'server', 1, "Run local server. ", 'localhost:8000'),
         new CliOption('p', 'prefix', 1, "Set uri prefix ", '/api')
     ];
@@ -29,8 +31,8 @@ if ($isCli) {
     /*TODO
         new CliOption('H', 'headers', 1, "Set HTTP headers. ", ""),
    -f  --file     set file input
+     - input/output
    -i  --interactive interactive mode
-   -v  --verbose  set verbose debugging
    }*/
 
     $options = getCliOptions($cliOptions, $argc, $argv);
@@ -51,11 +53,15 @@ if ($isCli) {
         echo ' - uri         : ' . $uri . PHP_EOL;
         echo ' - queryString : ' . $queryString . PHP_EOL;
         echo ' - content     : ' . json_encode($content) . PHP_EOL;
+        echo ' - version     : ' . $VERSION . PHP_EOL;
         //TODO headers
     }
     if ($uri === '') {
         showHelp($cliOptions);
         exit(0);
+    } else if (array_get($options, 'version', false)) {
+      echo 'v'.$VERSION.PHP_EOL;
+      exit(0);
     }
 } else if (php_sapi_name() === 'cli-server') {
     $headers = getallheaders();

@@ -8,7 +8,7 @@
     https://github.com/PlanBCode/koppelbot/archive/master.zip
 
   or clone using git
-  
+
     ```
     $ git clone https://github.com/PlanBCode/koppelbot.git
     ```
@@ -22,7 +22,7 @@ custom		engine		index.php	xyz
 ```
 
 -  `custom` : the place to store custom data model definitions and other plugins
-  
+
 -  `data` : in this folder all data is stored.
 -  `engine` : the server code that uses the custom definitions to build the interfaces.
 -  `factory` : code used to generate the server code. Only required for developers, out of scope for this tutorial.
@@ -44,7 +44,7 @@ Usage: xyz [options] uri [content]
    xyz --method PATCH "/fruit/melon/size" large
 
   -m  --method <arg>      Set HTTP method. (Default = GET)
-  -v  --verbose           Set verbose output. (Default = false)
+  -V  --verbose           Set verbose output. (Default = false)
   -S  --server <arg>      Run local server. (Default = localhost:8000)
 ```
 
@@ -193,19 +193,19 @@ When the `myFruit` variable is not empty this will retrieve the specified fruit 
 
 11. Press the `+` Button below the list to unfold the creation interface. Try to add a fruit.
 
-12. Open the `./custom/tutorial/content/index.html` file in your text editor and change the 
+12. Open the `./custom/tutorial/content/index.html` file in your text editor and change the
 
 ```
     <xyz uri="$myFruit" display="item"/>
 ```
 
-Into: 
+Into:
 
 ```
     <xyz uri="$myFruit" display="edit"/>
 ```
 
-This will display an editor instead of an item viewer. Browse to http://localhost:8000/tutorial again to edit 
+This will display an editor instead of an item viewer. Browse to http://localhost:8000/tutorial again to edit
 the selected piece of fruit.
 
 13. Now view `./custom/main/entities/fruit.json` in your text editor.
@@ -238,7 +238,7 @@ the selected piece of fruit.
 }
 ```
 
-This file shows the property definitions for the fruit entity. 
+This file shows the property definitions for the fruit entity.
 
 ```
   "_": {
@@ -294,4 +294,3 @@ The name is used as the key by the connector.
 ```
 
 This is the raw data for the fruit entities.
-
