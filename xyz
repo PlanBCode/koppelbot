@@ -33,8 +33,22 @@ elif [ "$1" = "-S" ] || [ "$1" = "start" ]; then
     echo "Server already running under pid $pid."
     echo "Use 'xyz stop' to stop."
   fi
-
+elif [ "$1" = "test" ]; then
+  sh "$XYZ_HOME/factory/test.sh"
+elif [ "$1" = "build" ]; then
+  sh "$XYZ_HOME/factory/build.sh"
 
 else
-  php -f "$XYZ_HOME/index.php" -- $@
+  prefix=$( echo "$1" |cut -c1 );
+  if [ "$prefix" = "-" ] || [ "$prefix" = "/" ]; then
+    php -f "$XYZ_HOME/index.php" -- $@
+  elif [ -e "$XYZ_HOME/engine/cli/commands/$1.sh" ]; then
+    file="$XYZ_HOME/engine/cli/commands/$1.sh"
+    shift;
+    sh "$file" $@
+  else
+    #TODO did you mean?
+    echo "[!] Unknown command: '$1'."
+    exit 1
+  fi
 fi
