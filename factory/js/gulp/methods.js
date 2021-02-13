@@ -1,4 +1,5 @@
 const gulp = require('gulp');
+const fs = require('fs');
 
 const {forEachFile, baseName, read, write, execute} = require('./util.js');
 
@@ -42,10 +43,13 @@ function generateCssFile (cb) {
 }
 
 const parseType = string => {
-  if (!string.includes('{')) return string;
-  if (!string.includes('}')) return string;
+  string = string.trim().split(' ')[0];
 
-  return string.split('{')[1].split('}')[0] // get {type}
+  if (string.includes('{') && string.includes('}')) {
+    string = string.split('{')[1].split('}')[0]; // get {type}
+  }
+  string = string.replace(/;/g, '');
+  return string
     .replace(/String/g, 'string')
     .replace(/Bool/g, 'bool')
     .replace(/boolean/g, 'bool')
@@ -57,92 +61,49 @@ const parseType = string => {
 };
 
 const parseTypeAndDef = string => {
-  if (!string.includes('{')) return string;
-  if (!string.includes('}')) return string;
-  return '<span style="margin-left:20px;margin-right:20px;color:green;">' + parseType(string) + '</span> ' + string.split('}')[1];
+  const type = parseType(string);
+  const description = string.trim().split(' ')[1] || '';
+  return '<span style="margin-left:20px;margin-right:20px;color:green;">' + type + '</span> ' + description;
 };
 
-const generateJsDoc = (path, title) => cb => {
+// this.$function = ...
+// $function2: ...
+const jsRegex = /(\*\*\s*\n([^*]|\*[^/])*\*\/)\s*(this\.(?<function>\w+)|(?<function2>\w+):)/g;
+// abstract public function $function(...):$returns
+const phpRegex = /(\*\*\s*\n([^*]|\*[^/])*\*\/)\s*(?<function>[^\n]+)/g;
+
+const generateJsDoc = (path, title, docPath) => cb => {
+  const isPhp = path.endsWith('.php');
+  const regex = isPhp ? phpRegex : jsRegex;
+  const css = fs.readFileSync('../../engine/doc/dev/dev.css').toString();
   read(path)(string => {
-    const regex = /(\*\*\s*\n([^*]|\*[^/])*\*\/)\s*this\.(?<function>\w+)/g;
     let x;
     let html = `<!-- This file is created by gulpfile.js using the jsdoc definitions of factory/${path} -->
 <h1>${title}</h1>
-<style>
-
-.xyz-doc-method{
-  margin-bottom: 2cm;
-}
-
-.xyz-doc-returns, .xyz-doc-parameters {
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 5px;
-  border-color: lightgray;
-  padding: 10px;
-  margin: 10px;
-  border-left-width: 5px;
-
-}
-
-h4 {
-  margin-top: 0;
-}
-.xyz-doc-returns{
-  border-left-color: green;
-}
-.xyz-doc-returns h4 {
-  color:green
-}
-.xyz-doc-parameters{
-  border-left-color: blue;
-}
-
-.xyz-doc-parameters h4{
-  color:blue
-}
-
-.xyz-doc-parameters table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.xyz-doc-parameters td{
-  padding:10px;
-}
-.xyz-doc-parameters tr{
-  background-color:EEE;
-}
-.xyz-doc-parameters tr:first-child{
-  background-color:FFF;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-}
-.xyz-doc-signature{
-  color:blue;
-  font-weight:normal;
-  font-style: inherit;
-}
-.xyz-doc-returnSignature{
-  color:green;
-  font-weight:normal;
-  font-style: inherit;
-}
-</style>`;
+<style>${css}</style>`;
     const methods = [];
     while ((x = regex.exec(string))) {
       methods.push(x);
     }
-    methods.sort((a, b) => a.groups.function.localeCompare(b.groups.function));
+    methods.sort((a, b) => (a.groups.function || a.groups.function2).localeCompare(b.groups.function || b.groups.function2));
     for (const x of methods) {
-      const name = x.groups.function;
+      let name = x.groups.function || x.groups.function2;
+      let abstract = false;
+      let returns = '{void}';
+
+      if (isPhp) {
+        if (name.includes(':')) returns = '{' + name.split(':')[1].trim() + '}';
+        const words = name.split('(')[0].split(' ');
+        abstract = name.includes('abstract ');
+        name = words[words.length - 1];
+      }
+
       const lines = x[1]
         .split('\n')
-        .filter(line => line.startsWith('   * '))
-        .map(line => line.substr(5).replace(/ {2}/g, ' '));
+        .filter(line => line.trim().startsWith('* '))
+        .map(line => line.trim().substr(2).replace(/  +/g, ' '));
       let description = '';
       const examples = [];
-      let returns = '{void}';
       const params = {};
       for (const line of lines) {
         if (line.startsWith('@param')) {
@@ -150,13 +111,15 @@ h4 {
           params[name] = {type, description: description.join(' ')};
           // @param {string} target
         } else if (line.startsWith('@returns')) returns = line.substr(9);
+        else if (line.startsWith('@abstract')) abstract = true;
+        else if (line.startsWith('@return')) returns = line.substr(8);
         else if (line.startsWith('@example')) examples.push(line.substr(9));
         else if (examples.length > 0) examples[examples.length - 1] += line;
         else description += line;
       }
       const hasReturn = returns && !returns.toLowerCase().includes('{void}');
-
-      html += `  <div class="xyz-doc-method"><h3>${name}(<span class="xyz-doc-signature">${Object.keys(params).join(',')}</span>)`;
+      abstract = abstract ? '<span class="xyz-doc-abstract">abstract</span> ' : '';
+      html += `  <div class="xyz-doc-method"><h3>${abstract}${name}(<span class="xyz-doc-signature">${Object.keys(params).join(',')}</span>)`;
       if (hasReturn) {
         html += ` &rarr; <span class="xyz-doc-returnSignature">${parseType(returns)}</span>`;
       }
@@ -177,7 +140,7 @@ h4 {
       }
       html += '</div>';
     }
-    write(`../../engine/doc/dev/classes/${title.toLowerCase()}.html`, html)(cb);
+    write(`../../engine/doc/dev/${docPath}.html`, html)(cb);
   });
 };
 
@@ -194,6 +157,11 @@ exports.generateTypesFile = generateTypesFile;
 
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 exports.generateDisplaysFile = generateDisplaysFile;
-const generateJsDocs = gulp.series(generateJsDoc('./source/render/display.js', 'Display'), generateJsDoc('./source/render/item.js', 'Item'));
+const generateJsDocs = gulp.series(
+  generateJsDoc('./source/render/display.js', 'Display', 'display/display'),
+  generateJsDoc('../../engine/connectors/connector.php', 'Connector', 'connector/connector'),
+  generateJsDoc('../../engine/core/types/type/type.js', 'Type', 'type/type_js'),
+  generateJsDoc('../../engine/core/types/type/type.php', 'Type', 'type/type_php'),
+  generateJsDoc('./source/render/item.js', 'Item', 'type/item'));
 exports.build = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, audit, pack, generateJsDocs);
 exports.generateJsDocs = generateJsDocs;

@@ -74,9 +74,18 @@ abstract class Type
             return $typeClass;
         }
     }
-
+    /**
+     * [abstract description]
+     * @param Mixed $content [description]
+     * @param array $settings [description]
+     */
     abstract static public function validateContent($content, array &$settings): bool;
-
+    /**
+     * [validateSubPropertyPath description]
+     * @param  array $subPropertyPath [description]
+     * @param  array $settings        [description]
+     * @return bool                   [description]
+     */
     static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
     {
         return false;
@@ -86,7 +95,13 @@ abstract class Type
     {
         return [];
     }
-
+    /**
+     * [sort description]
+     * @param  Mixed $content1 [description]
+     * @param  Mixed $content2 [description]
+     * @param  array  $settings [description]
+     * @return int              [description]
+     */
     public static function sort(&$content1, &$content2, array &$settings): int
     {
         // first try to parse as numbers
@@ -100,22 +115,45 @@ abstract class Type
             return $content1 <=> $content2;
         }
     }
-
+    /**
+     * [toNumber description]
+     * @param  Mixed $content  [description]
+     * @param  array  $settings [description]
+     * @return number           [description]
+     */
     public static function toNumber(&$content, array &$settings)
     {
         return NAN;
     }
-
+    /**
+     * [processBeforeConnector description]
+     * @param  string          $method         [description]
+     * @param  Mixed          $newContent     [description]
+     * @param  Mixed          $currentContent [description]
+     * @param  array           $settings       [description]
+     * @return ProcessResponse                 [description]
+     */
     static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
     {
         return new ProcessResponse(200, $newContent);
     }
-
+    /**
+     * [processAfterConnector description]
+     * @param  string          $method   [description]
+     * @param  Mixed          $content  [description]
+     * @param  array           $settings [description]
+     * @return ProcessResponse           [description]
+     */
     static function processAfterConnector(string $method, $content, array &$settings): ProcessResponse
     {
         return new ProcessResponse(200, $content);
     }
-
+    /**
+     * [serve description]
+     * @param  int           $status  [description]
+     * @param  Mixed        $content [description]
+     * @return HttpResponse2          [description]
+     */
     static function serve(int $status, &$content): HttpResponse2
     {
         //TODO Content-Type: text/html; charset=UTF-8

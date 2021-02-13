@@ -9,7 +9,6 @@ abstract class Connector
     /** @var Connector[] */
     private static $connectors = []; // string $connectorString -> Connector
     private static $connectorClasses = [];
-
     static public function getConnectorClass(string $typeName)
     {
         if (array_key_exists($typeName, self::$connectorClasses)) {
@@ -124,6 +123,11 @@ abstract class Connector
 
     abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
 
+    /**
+     * TODO
+     * @param {ConnectorRequest} $connectorRequest TODO
+     * @return {connectorResponse} TODO
+     */
     abstract public function createResponse(ConnectorRequest $connectorRequest): ConnectorResponse;
 
     abstract protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string;
