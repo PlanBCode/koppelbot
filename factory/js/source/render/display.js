@@ -6,10 +6,19 @@ const variables = require('../variables/variables.js');
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';
 
+let DIV_tmpColor;
+
 // string to int
 const hashCode = string => string.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
 const colors = ['red', 'green', 'blue', 'yellow', 'pink', 'cyan', 'orange', 'purple'];
-const getColor = string => colors[Math.abs(hashCode(string)) % colors.length];
+const getColor = string => {
+  if (isNaN(string)) { // integers are colors, we don't want that
+    if (!DIV_tmpColor) DIV_tmpColor = document.createElement('DIV');
+    DIV_tmpColor.style.color = string; // this only works if it's a valid css color
+    if (DIV_tmpColor.style.color) return DIV_tmpColor.style.color;
+  }
+  return colors[Math.abs(hashCode(string)) % colors.length];
+};
 
 function flatten2 (source, target, prefix) {
   if (source.constructor !== Object) return;
@@ -40,15 +49,26 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
   this.getWRAPPER = () => WRAPPER;
   this.getEntityClassName = () => entityClassName;
   this.getEntityId = () => entityId;
-  this.getContent = () => response.filter(node, this.getPropertyPath());
+
+  this.getNode = propertyPathOrString => {
+    const filteredNode = response.filter(node, this.getPropertyPath());
+    if (typeof propertyPathOrString === 'undefined') return filteredNode;
+    if (typeof propertyPathOrString === 'string') return response.getSubNode(filteredNode, [propertyPathOrString]);
+    if (propertyPathOrString instanceof Array) return response.getSubNode(filteredNode, propertyPathOrString);
+    throw new Error('Illegal propertyPath or propertyName');
+  };
+
+  this.getFlatNodes = () => flatten(this.getNode()); // TODO depr
+
   this.onVariable = (variableName, callback) => xyz.onVariable(variableName, callback);
 
-  this.getFlatContent = () => flatten(this.getContent());
   this.getDisplayName = propertyPath => xyz.getDisplayName(entityClassName, propertyPath);
+
   this.getPropertyPath = () => {
     const path = uriTools.pathFromUri(uri);
     return path.slice(2);
   };
+
   this.getTitle = () => {
     const fallback = '/' + entityClassName + '/' + entityId;
     const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
@@ -65,7 +85,7 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
       // nothing to do
     } else if (this.hasOption('color')) {
       const colorPropertyName = this.getOption('color');
-      string = this.getFlatContent()[colorPropertyName].getContent();// TODO check
+      string = this.getNode(colorPropertyName).getContent();// TODO check
       if (typeof string === 'number') string = string.toString();
     } else string = entityClassName + '/' + entityId;
     if (typeof string !== 'string') return 'black'; // can't make heads or tails of this, just return black
@@ -127,7 +147,7 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
   };
 
   this.renderEntity = () => {
-    const flatContent = this.getFlatContent();
+    const flatContent = this.getFlatNodes(); // TODO
     if (flatContent.constructor !== Object) { return flatContent.render(this.getAction(), this.getOptions()); } else {
       const DIV = document.createElement('DIV');
       for (const propertyName in flatContent) {
@@ -260,7 +280,8 @@ const renderUiElement = (xyz, options, WRAPPER) => {
       addListeners(xyz, uri, options, WRAPPER);
     });
   },
-  () => uiElementWaitingForInput(display, displayParameters)
+  () => uiElementWaitingForInput(display, displayParameters),
+  options.dynamic
   );
 };
 

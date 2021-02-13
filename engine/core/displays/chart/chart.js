@@ -46,7 +46,7 @@ exports.display = {
     const WRAPPER = display.getWRAPPER();
     const aggregations = display.getOption('aggregations');
     const errors = [];
-    for (let aggregation of aggregations) {
+    for (const aggregation of aggregations) {
       const [aggregator, propertyName] = aggregation;
       if (!AGGREGATORS.includes(aggregator)) errors.push(`Unknown aggregator: '${aggregator}'.`);
       // TODO error if type are not numbers
@@ -99,7 +99,7 @@ exports.display = {
       }
 
       const aggregations = display.getOption('aggregations');
-      for (let aggregation of aggregations) {
+      for (const aggregation of aggregations) {
         const [aggregator, propertyName] = aggregation;
         const label = aggregator + '(' + propertyName + ')';
         const TD = document.createElement('TD');
@@ -139,20 +139,20 @@ exports.display = {
     const entityId = display.getEntityId();
     const entityClassName = display.getEntityClassName();
 
-    const columns = display.getFlatContent();
+    const columns = display.getFlatNodes();
 
     const aggregations = display.getOption('aggregations');
     let groupId = '*';
     let groupBy = '*';
     if (display.hasOption('groupby')) {
       groupBy = display.getOption('groupby');
-      groupId = display.getFlatContent()[groupBy].getContent();
+      groupId = display.getNode(groupBy).getContent();
     }
 
     if (!groups.hasOwnProperty(groupId)) {
       const group = {count: 0};
       groups[groupId] = group;
-      for (let aggregation of aggregations) {
+      for (const aggregation of aggregations) {
         const [aggregator, propertyName] = aggregation;
         const label = aggregator + '(' + propertyName + ')';
         const value = getBaseValue(aggregator);
@@ -162,7 +162,7 @@ exports.display = {
     const group = groups[groupId];
     ++group.count;
 
-    for (let aggregation of aggregations) {
+    for (const aggregation of aggregations) {
       const [aggregator, propertyName] = aggregation;
       const label = aggregator + '(' + propertyName + ')';
       const value = columns[propertyName].getContent();
@@ -176,10 +176,10 @@ exports.display = {
       if (display.hasOption('color')) offset++;
       if (display.hasOption('multiSelect')) offset++;
 
-      for (let groupId in groups) {
+      for (const groupId in groups) {
         const group = groups[groupId];
         let found = false;
-        for (let TR of TABLE.children) {
+        for (const TR of TABLE.children) {
           if (TR.groupId === groupId) {
             for (let i = 0; i < aggregations.length; ++i) {
               const aggregation = aggregations[i];
@@ -224,7 +224,7 @@ exports.display = {
           }
 
           const aggregations = display.getOption('aggregations');
-          for (let aggregation of aggregations) {
+          for (const aggregation of aggregations) {
             const [aggregator, propertyName] = aggregation;
             const label = aggregator + '(' + propertyName + ')';
             const TD = document.createElement('TD');
@@ -238,7 +238,7 @@ exports.display = {
       WRAPPER.chart.data.labels = Object.keys(groups);
       WRAPPER.chart.data.datasets = [];
       WRAPPER.tmpDatasets = [];
-      for (let aggregation of aggregations) {
+      for (const aggregation of aggregations) {
         const [aggregator, propertyName] = aggregation;
         const label = aggregator + '(' + propertyName + ')';
         const data = Object.keys(groups).map(groupId => groups[groupId][label]);

@@ -58,7 +58,6 @@ exports.display = {
   },
   entity: display => {
     const WRAPPER = display.getWRAPPER();
-    const columns = display.getFlatContent();
     const entityId = display.getEntityId();
     const entityClassName = display.getEntityClassName();
 

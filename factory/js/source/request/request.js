@@ -36,10 +36,15 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
         console.error('PROBLEM parsing meta response', data);
         return;
       }
-      for (let entityClassName of entityClassNames) {
+      for (const entityClassName of entityClassNames) {
         if (!entityClasses.hasOwnProperty(entityClassName)) {
-          const metaData = data['entity'][entityClassName]['content']; // TODO validate data
-          entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metaData);
+          if (!data.entity.hasOwnProperty(entityClassName)) {
+            console.error(`Entity data not found for '${entityClassName}'`);
+            return;
+          } else {
+            const metaData = data.entity[entityClassName].content; // TODO validate data
+            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metaData);
+          }
         }
       }
       callback();

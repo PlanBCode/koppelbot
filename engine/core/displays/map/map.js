@@ -66,8 +66,8 @@ function initializeOpenLayers (display) {
   map.on('pointermove', function (e) {
     if (e.dragging) return;
 
-    let pixel = map.getEventPixel(e.originalEvent);
-    let hit = map.hasFeatureAtPixel(pixel);
+    const pixel = map.getEventPixel(e.originalEvent);
+    const hit = map.hasFeatureAtPixel(pixel);
 
     map.getTarget().style.cursor = hit ? 'pointer' : ''; // TODO only if feature has onclick
   });
@@ -76,7 +76,7 @@ function initializeOpenLayers (display) {
 
   const markUserLocation = locationResponse => {
     const format = new ol.format.GeoJSON(); // TODO parametrize
-    const data = {'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [ locationResponse.coords.latitude, locationResponse.coords.longitude]}, 'properties': null};
+    const data = {type: 'Feature', geometry: {type: 'Point', coordinates: [locationResponse.coords.latitude, locationResponse.coords.longitude]}, properties: null};
 
     const features = format.readFeatures(data);
 
@@ -129,17 +129,13 @@ exports.display = {
 
   entity: display => {
     // return;
-    const content = display.getContent();
     const locationPropertyName = display.getOption('location') || 'geojson';
     const entityId = display.getEntityId();
     const entityClassName = display.getEntityClassName();
-    const uri = '/' + entityClassName + '/' + entityId;
     const WRAPPER = display.getWRAPPER();
 
-    if (typeof content !== 'object' || content === null || !content.hasOwnProperty(locationPropertyName)) return;
     // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
     // TODO maybe pass label to svg entity?
-    const color = display.getColor();
 
     /* const feature = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, display: 'map'});
     feature.onclick = () => display.select(entityClassName, entityId);
@@ -147,13 +143,14 @@ exports.display = {
     WRAPPER.vectorLayer.getSource().addFeature(feature);
     return; */
     const format = new ol.format.GeoJSON(); // TODO parametrize
-    const data = content[locationPropertyName].getContent();
+    const data = display.getNode(locationPropertyName).getContent();
 
     if (data) {
       const features = format.readFeatures(data);
       const feature = features[0]; // TODO handle multiple features?
       if (feature) { // TODO check
         // TODO if feature is point
+        // const color = display.getColor();
         /* feature.setStyle(
           new ol.style.Style({
             image: new ol.style.Icon({
@@ -176,7 +173,8 @@ exports.display = {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
     const SVG_map = WRAPPER.firstChild;
-    for (let SVG_entity of SVG_map.childNodes) {
+    for (const SVG_entity of SVG_map.childNodes) {
       if (typeof SVG_entity.entityId === 'string' && (SVG_entity.entityId === entityId || entityId === '*')) SVG_map.removeChild(SVG_entity);
     }
-  }};
+  }
+};

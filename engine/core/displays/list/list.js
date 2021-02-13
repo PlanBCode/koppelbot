@@ -26,7 +26,7 @@ exports.display = {
   first: display => {
     if (display.getOption('showHeader') !== false) {
       const WRAPPER = display.getWRAPPER();
-      const columns = display.getFlatContent();
+      const columns = display.getFlatNodes();
       const TABLE = WRAPPER.firstChild;
       const TR_header = document.createElement('TR');
       TR_header.className = 'xyz-list-header';
@@ -35,12 +35,16 @@ exports.display = {
         // TODO select all/none
         TR_header.appendChild(TD_checkbox);
       }
+      if (display.hasOption('color')) {
+        const TD = document.createElement('TD');
+        TR_header.appendChild(TD);
+      }
       if (columns.constructor !== Object) {
         const TD_header = document.createElement('TD');
         TD_header.innerHTML = display.getEntityClassName();
         TR_header.appendChild(TD_header);
       } else {
-        for (let flatPropertyName in columns) {
+        for (const flatPropertyName in columns) {
           const TD_header = document.createElement('TD');
           TD_header.innerHTML = flatPropertyName;
           TR_header.appendChild(TD_header);
@@ -52,7 +56,7 @@ exports.display = {
 
   entity: display => {
     const WRAPPER = display.getWRAPPER();
-    const columns = display.getFlatContent();
+    const columns = display.getFlatNodes();
     const TR_entity = document.createElement('TR');
     TR_entity.className = 'xyz-list-item';
     TR_entity.entityId = display.getEntityId();
@@ -76,6 +80,13 @@ exports.display = {
       TD_checkbox.appendChild(INPUT_checkbox);
       TR_entity.appendChild(TD_checkbox);
     }
+    if (display.hasOption('color')) {
+      const TD = document.createElement('TD');
+      const color = display.getColor();
+      TD.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>`;
+      TR_entity.appendChild(TD);
+    }
+
     const propertyPath = display.getPropertyPath();
     if (propertyPath.length === 0) {
       const TD_entityContent = document.createElement('TD');
@@ -88,7 +99,7 @@ exports.display = {
       TD_entityContent.appendChild(TAG);
       TR_entity.appendChild(TD_entityContent);
     } else {
-      for (let flatPropertyName in columns) {
+      for (const flatPropertyName in columns) {
         const TD_flatProperty = document.createElement('TD');
         const node = columns[flatPropertyName];
         const TAG = node.render(display.getAction(), display.getSubOptions(flatPropertyName));
@@ -104,7 +115,7 @@ exports.display = {
       }
       TR_entity.onclick = () => {
         display.select(entityClassName, entityId);
-        for (let row of TABLE.childNodes) {
+        for (const row of TABLE.childNodes) {
           if (row === TR_entity) {
             row.classList.add('xyz-list-selected');
           } else {
@@ -119,7 +130,7 @@ exports.display = {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
     const TABLE = WRAPPER.firstChild;
-    for (let TR_entity of TABLE.childNodes) {
+    for (const TR_entity of TABLE.childNodes) {
       if (typeof TR_entity.entityId === 'string' && (TR_entity.entityId === entityId || entityId === '*')) {
         TABLE.removeChild(TR_entity);
       }

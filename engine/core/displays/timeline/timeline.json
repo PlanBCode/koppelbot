@@ -2,6 +2,7 @@
   "options":{
     "key" : {"info":"Define which property should be used for time key.", "type":"string", "default":"date"},
     "label" : {"info":"Define which property should be used for label.", "type":"string", "default":"title"},
+    "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "horizontal" : {"info":"Whether to allow multiple entities to be selected.", "type":"bool", "default":false},
     "midLine" : {"info":"Where the midline is located.", "type":"number", "default":0}
   }

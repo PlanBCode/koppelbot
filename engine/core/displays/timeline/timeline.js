@@ -24,7 +24,7 @@ function getDateFromRatio (DIV, ratio) {
   let minTime = Infinity;
   let maxTime = -Infinity;
   const LABELS = [];
-  for (let NODE of DIV.childNodes) {
+  for (const NODE of DIV.childNodes) {
     if (NODE.classList.contains('xyz-timeline-node')) {
       const time = parseDateString(NODE.date);
       minTime = Math.min(minTime, time);
@@ -55,7 +55,7 @@ function drawNodes (DIV, display) {
   let minTime = Infinity;
   let maxTime = -Infinity;
   const LABELS = [];
-  for (let NODE of DIV.childNodes) {
+  for (const NODE of DIV.childNodes) {
     if (NODE.classList.contains('xyz-timeline-node')) {
       const time = parseDateString(NODE.date);
       minTime = Math.min(minTime, time);
@@ -65,7 +65,7 @@ function drawNodes (DIV, display) {
     }
   }
   LABELS.sort(sortLabels);
-  for (let NODE of DIV.childNodes) {
+  for (const NODE of DIV.childNodes) {
     if (NODE.classList.contains('xyz-timeline-node')) {
       const time = parseDateString(NODE.date);
       const ratio = (time - minTime) / (maxTime - minTime);
@@ -95,7 +95,7 @@ function drawNodes (DIV, display) {
         LABEL.style[left] = (prevRectLABEL[right] - rectDIV[left] + labelMargin) + 'px';
       }
     }
-    let defaultTop = 40;
+    const defaultTop = 40;
     if (Q === 100) {
       LABEL.style[bottom] = `${defaultTop}px`;
       LABEL.style[top] = null;
@@ -110,8 +110,7 @@ function drawNodes (DIV, display) {
 
   // DIV.offsetHeight;
   const rDIV = DIV.getBoundingClientRect();
-  let i = 0;
-  for (let CONNECTOR of DIV.childNodes) {
+  for (const CONNECTOR of DIV.childNodes) {
     if (CONNECTOR.classList.contains('xyz-timeline-connector')) {
       const r1 = CONNECTOR.NODE.getBoundingClientRect();
       const r2 = CONNECTOR.LABEL.getBoundingClientRect();
@@ -130,8 +129,6 @@ function drawNodes (DIV, display) {
 
       CONNECTOR.style.left = (r1.left - rDIV.left + 5) + 'px';
       CONNECTOR.style.top = (r1.top - rDIV.top + 3) + 'px';
-
-      ++i;
     }
   }
 }
@@ -204,16 +201,16 @@ exports.display = {
     window.addEventListener('resize', () => drawNodes(DIV, display));
   },
   entity: display => {
-    const content = display.getContent();
-
     const datePropertyName = display.getOption('key') || 'date'; // TODO
     const labelPropertyName = display.getOption('label') || 'title'; // TODO
 
-    const date = content.getContent()[datePropertyName];
+    const dateNode = display.getNode(datePropertyName);
+    const labelNode = display.getNode(labelPropertyName);
+
+    const date = dateNode.getContent();
 
     const entityId = display.getEntityId();
     const entityClassName = display.getEntityClassName();
-    const uri = '/' + entityClassName + '/' + entityId;
 
     const WRAPPER = display.getWRAPPER();
     const DIV = WRAPPER.firstChild;
@@ -229,8 +226,6 @@ exports.display = {
     if (display.isSelected(entityClassName, entityId) || display.getOption('default') === entityId) {
       LABEL.classList.add('xyz-list-selected');
     }
-    const dateNode = content.getSubNode([datePropertyName]);
-    const labelNode = content.getSubNode([labelPropertyName]);
 
     LABEL.entityId = entityId;
     const TAG_date = dateNode.render(display.getAction(), display.getSubOptions(datePropertyName));
@@ -243,7 +238,7 @@ exports.display = {
     LABEL.date = date;
     LABEL.onclick = () => {
       display.select(entityClassName, entityId);
-      for (let NODE of DIV.childNodes) {
+      for (const NODE of DIV.childNodes) {
         if (NODE.classList.contains('xyz-timeline-label')) {
           NODE.classList[NODE === LABEL ? 'add' : 'remove']('xyz-list-selected');
         }
@@ -257,6 +252,12 @@ exports.display = {
     CONNECTOR.LABEL = LABEL;
     CONNECTOR.NODE = NODE;
     DIV.appendChild(CONNECTOR);
+    if (display.hasOption('color')) {
+      const color = display.getColor();
+      NODE.style.backgroundColor = color;
+      LABEL.style.backgroundColor = color;
+      CONNECTOR.style.backgroundColor = color;
+    }
     // TODO add a listener for changes on this node
     drawNodes(DIV, display);
   },
@@ -264,7 +265,7 @@ exports.display = {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
     const DIV = WRAPPER.firstChild;
-    for (let NODE of DIV.childNodes) {
+    for (const NODE of DIV.childNodes) {
       if (typeof NODE.entityId === 'string' && (NODE.entityId === entityId || entityId === '*')) DIV.removeChild(NODE);
     }
     drawNodes(DIV, display);
