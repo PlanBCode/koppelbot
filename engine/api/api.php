@@ -1,7 +1,6 @@
 <?php
 
 require 'internal.php';
-require 'landing.php';
 
 function pathFromUri(string $uri): ?array
 {
@@ -364,7 +363,10 @@ class ApiRequest extends HttpRequest2
 
     public function createResponse()
     {
-        if ($this->uri === '') return APILandingPage($this->uri);
+        if ($this->uri === '') {
+          require_once 'landing.php';
+          return new DocResponse('api' . $this->uri, APILandingHtml());
+        }
 
         $requestResponses = $this->getRequestResponses();
         $status = $this->getStatus($requestResponses);

@@ -8,12 +8,26 @@ const INPUT_data = document.getElementById('xyz-api-data');
 const TD_result = document.getElementById('xyz-api-result');
 const TD_status = document.getElementById('xyz-api-status');
 
-INPUT_uri.value = xyz.getQueryParameter('uri') || '';
-INPUT_entityId.value = xyz.getQueryParameter('entityId') || '';
-INPUT_property.value = xyz.getQueryParameter('property') || '';
-SELECT_commandFlavor.value = xyz.getQueryParameter('commandFlavor') || 'url';
-SELECT_method.value = xyz.getQueryParameter('method') || 'GET';
-INPUT_data.value = xyz.getQueryParameter('data') || '';
+const ui = !SELECT_commandFlavor;
+
+let onUiChange;
+
+if (ui) {
+  const uri = window.location.pathname.substr(3); // '/ui/a/b/c/' -> '/a/b/c'
+  const path = uri.substr(1).split('/'); // '/a/b/c/' -> ['a','b','c']
+
+  INPUT_uri.value = uri;
+  xyz.setVariable('entityClass', path[0]);
+  INPUT_entityId.value = path[1] || '';
+  INPUT_property.value = path.slice(2).join('/');
+} else {
+  INPUT_uri.value = xyz.getQueryParameter('uri') || '';
+  INPUT_entityId.value = xyz.getQueryParameter('entityId') || '';
+  INPUT_property.value = xyz.getQueryParameter('property') || '';
+  SELECT_commandFlavor.value = xyz.getQueryParameter('commandFlavor') || 'url';
+  SELECT_method.value = xyz.getQueryParameter('method') || 'GET';
+  INPUT_data.value = xyz.getQueryParameter('data') || '';
+}
 
 INPUT_uri.oninput = INPUT_uri.onpaste = () => {
   const uri = INPUT_uri.value;
@@ -24,6 +38,7 @@ INPUT_uri.oninput = INPUT_uri.onpaste = () => {
   xyz.setVariable('entityClass', entityClass);
   INPUT_entityId.value = entityId;
   INPUT_property.value = property;
+  if (onUiChange) onUiChange(); // ./engine/ui/ui.js
   onCommandChange();
 };
 
@@ -36,10 +51,12 @@ function onPathChange () {
   else if (property) uri += '/*';
   if (property) uri += '/' + property;
   INPUT_uri.value = uri;
+  if (onUiChange) onUiChange(); // ./engine/ui/ui.js
   onCommandChange();
 }
 
 function onMethodChange () {
+  if (ui) return;
   const method = SELECT_method.value;
   if (['HEAD', 'DELETE', 'GET'].includes(method)) INPUT_data.disabled = true;
   else INPUT_data.disabled = false;
@@ -47,6 +64,7 @@ function onMethodChange () {
 }
 
 function onCommandChange () {
+  if (ui) return;
   const uri = INPUT_uri.value;
   let method = SELECT_method.value;
   let data = INPUT_data.value;
@@ -61,7 +79,7 @@ function onCommandChange () {
   xyz.setQueryParameter('property', property);
   xyz.setQueryParameter('method', method);
   xyz.setQueryParameter('commandFlavor', flavor);
-
+  // TODO add querystring
   switch (flavor) {
     case 'curl' :
       if (['HEAD', 'DELETE', 'GET'].includes(method)) data = '';
@@ -71,9 +89,20 @@ function onCommandChange () {
       else method = '-X ' + method + ' ';
       SPAN_command.innerText = 'curl ' + method + data + '"' + window.location.origin + window.location.pathname + uri + '"';
       break;
-    case 'url' :
-      SPAN_command.innerText = window.location.origin + window.location.pathname + uri;
+    case 'ui' :
+      {
+        let d = 'list';
+        if (method === 'DELETE') d = 'delete';
+        if (method === 'POST' || method === 'PUT') d = 'create';
+        if (method === 'PATCH') d = 'edit';
+        SPAN_command.innerHTML = '&lt;xyz uri="' + uri + '" display="' + d + '"/&gt; <a target="_blank" href="./ui' + uri + '">More...</a>';
+      }
       break;
+    case 'url' :
+    { const url = window.location.origin + window.location.pathname + uri;
+      SPAN_command.innerHTML = `<a target="_blank" href="${url}">${url}</a>`;
+      break;
+    }
     case 'cli' :
       if (['HEAD', 'DELETE', 'GET'].includes(method)) data = '';
       else data = ' ' + '"' + data.replace(/"/g, '\\"') + '"';
@@ -82,6 +111,17 @@ function onCommandChange () {
       else method = '--method ' + method + ' ';
       SPAN_command.innerText = './xyz ' + method + '"' + uri + '"' + data;
       break;
+    case 'embed' : {
+      if (['HEAD', 'DELETE', 'GET'].includes(method)) data = '';
+      else data = ' ' + '"' + data.replace(/"/g, '\\"') + '"';
+
+      if (method === 'GET') method = '';
+      else method = '--method ' + method + ' ';
+      const url = window.location.origin + '/ui' + window.location.pathname.substr(4) + uri + (uri.includes('?') ? '&' : '?') + 'embed';
+      SPAN_command.innerText = `<iframe src="${url}" title="XYZ"></iframe>`;
+
+      break;
+    }
   }
 }
 
@@ -122,7 +162,7 @@ function execute () {
 
 INPUT_entityId.oninput = INPUT_entityId.onpaste = onPathChange;
 INPUT_property.oninput = INPUT_property.onpaste = onPathChange;
-INPUT_data.oninput = INPUT_data.onpaste = onCommandChange;
+if (!ui) INPUT_data.oninput = INPUT_data.onpaste = onCommandChange;
 
 xyz.onVariable('entityClass', onPathChange);
 onPathChange();
