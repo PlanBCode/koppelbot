@@ -30,7 +30,6 @@ class UiRequest extends HttpRequest2
 
         $rootUri = 'http://localhost:8000/';//TODO proper location
 
-        $menuItems = [];
         $displayNames = ["create","edit","delete"];
         foreach (glob('{./engine/core,./custom/main}/displays/*', GLOB_BRACE) as $file) {
             $displayName = basename($file, '.js');
@@ -85,6 +84,6 @@ class UiRequest extends HttpRequest2
         </script>
         ';
 
-        return new DocResponse('ui' . $this->uri, $body, $menuItems);
+        return new DocResponse('ui' . $this->uri, $body);
     }
 }

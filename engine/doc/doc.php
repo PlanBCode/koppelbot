@@ -4,15 +4,18 @@ class DocRequest extends HttpRequest2
 {
     public function createResponse(): DocResponse
     {
+        if($this->uri === 'map') return new DocResponse($this->uri, '');
         $fileName = $this->uri === 'doc' ? './engine/doc/doc.html' : './engine/'.$this->uri.'.html';
-        $content = file_exists($fileName) ? file_get_contents($fileName) : 'Work in progress...';
-        return new DocResponse($this->uri, $content);
+        if(file_exists($fileName)) return new DocResponse($this->uri, file_get_contents($fileName));
+        return new DocResponse($this->uri, 'Page Not Found',404);
     }
 }
 
 class DocResponse extends HttpResponse2
 {
     static protected $menuItems = [
+        'api' => "Rest API",
+        'ui' => "User Interface",
         'doc' => "Documentation",
         'doc/api' => "API Reference",
         'doc/api/entities' => "Entities",
@@ -31,40 +34,74 @@ class DocResponse extends HttpResponse2
         'doc/dev/connector' => "Build a connector",
         'doc/dev/javascript' => "Javascript packing",
 
-        'api' => "Rest API",
-        'ui' => "User Interface"
+        'map' => "Site Map",
     ];
 
-    protected function spliceInExtraMenuItems($extraMenuItems){
-        if (!empty($extraMenuItems)) {
-            $firstExtraMenuItemUri = array_keys($extraMenuItems)[0];
-            $index = 1;
-            foreach (self::$menuItems as $uri => $menuItem) {
-                if (strpos($firstExtraMenuItemUri, $uri . '/') === 0) {
-                    return  array_slice(self::$menuItems, 0, $index, true) +
-                        $extraMenuItems +
-                        array_slice(self::$menuItems, $index, true);
-                }
-                ++$index;
-            }
+    protected function getSiteMap(string $rootUri): string
+    {
+      //TODO create a xml robots site map
+      $map = '<A href="' . $rootUri . '">Home</a><br/><br/>';
+
+      foreach (glob('{./engine/core,./custom/*}/content/**.html', GLOB_BRACE) as $file) {
+
+        $path = explode('/',$file);
+        $plugin = $path[2];
+        $base =  $path[count($path)-1];
+        $uri = implode('/',array_slice($path,4));
+        if($plugin === 'main' || $plugin === 'core'){
+          if($base === 'index.html'){
+            $depth = substr_count($file, '/')-3;
+            $uri = $uri;
+            if($depth === 1) continue;
+            $uri = $base; //TODO handle nested
+            $title = $plugin; //TODO handle nested
+          }else{
+            if($base==='404.html'||$base==='403.html') continue;
+            $depth = substr_count($file, '/')-3;
+            $uri = $base; //TODO handle nested
+            $title = $base; //TODO handle nested
+          }
+        }else if($base === 'index.html'){
+          $depth = substr_count($file, '/')-3;
+          $uri = $plugin.'/'.$base; //TODO handle nested
+          $title =  $plugin; //TODO handle nested
         }else{
-            return self::$menuItems;
+          $depth = substr_count($file, '/')-2;
+          $uri = $plugin.'/'.$base; //TODO handle nested
+          $title =  $base; //TODO handle nested
         }
+        $A = '<a href="' . $rootUri . $uri . '">' . $title . '</a>';
+        $map.= str_repeat('&nbsp;', 2 * $depth) . $A .'<br/>';
+      }
+
+
+      foreach (self::$menuItems as $uri => $menuItem) {
+        $depth = substr_count($uri, '/')+1;
+        if($depth===1) $map .='<br/>';
+        $A = '<A href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
+        $map .=  str_repeat('&nbsp;', 2 * $depth) . $A . '<br/>';
+      }
+      return $map;
     }
 
-    public function __construct(string $currentUri, $content, $extraMenuItems = [])
+    public function __construct(string $currentUri, $content, $status = 200)
     {
         $rootUri = 'http://localhost:8000/';//TODO proper location
 
-
-        $menuItems = $this->spliceInExtraMenuItems($extraMenuItems);
-
         $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
-
+        $currentDepth = substr_count($currentUri, '/');
+        $path = explode('/',$currentUri);
+        $parentUri = implode('/',array_slice($path,0, count($path)-1));
         $navigation = '<ul>';
-        foreach ($menuItems as $uri => $menuItem) {
+        foreach (self::$menuItems as $uri => $menuItem) {
             $depth = substr_count($uri, '/');
+            if($depth > $currentDepth +1) continue;
+            if($depth >= $currentDepth && substr($uri,0, strlen($parentUri)) !== $parentUri) continue;
+            if($depth > $currentDepth && substr($uri,0, strlen($currentUri)) !== $currentUri) continue;
+
             $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current"' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
+
+
 
             if ($depth === 0) {
                 $navigation .= '<li class="xyz-page-navigation-depth-0">' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
@@ -72,6 +109,8 @@ class DocResponse extends HttpResponse2
                 $navigation .= '<li>' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
             }
         }
+        if($currentUri === 'map') $content = $this->getSiteMap($rootUri);
+
         $navigation .= '</ul>';
         $content =
             '<html>
@@ -86,6 +125,7 @@ class DocResponse extends HttpResponse2
             <div class="xyz-page-content">' . $content . '</div>
             </body >
         </html > ';
-        parent::__construct(200, replaceXyzTag($content));
+
+        parent::__construct($status, replaceXyzTag($content));
     }
 }

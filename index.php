@@ -1,5 +1,5 @@
 <?php
-http_response_code(500); // Default to error because if php crashes it will return a 200 if display_errors is on 
+http_response_code(500); // Default to error because if php crashes it will return a 200 if display_errors is on
 
 $GLOBALS['constants'] = json_decode(file_get_contents('./engine/const/constants.json'), true);
 
@@ -11,7 +11,6 @@ require './engine/router/request.php';
 require './engine/api/api.php';
 require './engine/content/content.php';
 require './engine/doc/doc.php';
-require './engine/ui/ui.php';
 
 session_start();
 
@@ -88,6 +87,7 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
         $accessGroups
     );
 } elseif (strpos($uri, '/ui/') === 0 || $uri === '/ui') {
+    require_once './engine/ui/ui.php';
     $request = new UiRequest(
         $method,
         substr($uri, 4),
@@ -95,7 +95,7 @@ if (strpos($uri, '/api/') === 0 || $uri === '/api') {
         $headers,
         $content
     );
-} elseif (strpos($uri, '/doc/') === 0 || $uri === '/doc') {
+} elseif (strpos($uri, '/doc/') === 0 || $uri === '/doc' || $uri === '/map') {
     $request = new DocRequest(
         $method,
         substr($uri, 1),
