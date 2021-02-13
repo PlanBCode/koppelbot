@@ -1,9 +1,9 @@
 exports.actions = {
   /**
    * TODO
-   * @param {Item} item TODO
+   * @param {TypeItem} item TODO
    * @abstract
-   * @returns {Element} [description]
+   * @returns {Element} TODO
    */
   edit: function (item) {
     const originalItem = item;
@@ -57,9 +57,9 @@ exports.actions = {
   },
   /**
    * TODO
-   * @param {Item} item TODO
+   * @param {TypeItem} item TODO
    * @abstract
-   * @returns {Element} [description]
+   * @returns {Element} TODO
    */
   view: function (item) {
     const SPAN = document.createElement('SPAN');
@@ -87,9 +87,9 @@ exports.actions = {
   },
   /**
    * TODO
-   * @param {Item} item TODO
+   * @param {TypeItem} item TODO
    * @abstract
-   * @returns {bool} [description]
+   * @returns {bool} TODO
    */
   validateContent: function (item) {
     // TODO should be 0 or null always?
@@ -100,7 +100,7 @@ exports.actions = {
    * @param {Array} subPropertyPath TODO
    * @param {Object} settings TODO
    * @abstract
-   * @returns {bool} [description]
+   * @returns {bool} TODO
    */
   validateSubPropertyPath: function (subPropertyPath, settings) {
     return subPropertyPath instanceof Array;

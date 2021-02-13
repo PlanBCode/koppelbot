@@ -10,19 +10,44 @@ function isFullEntity (uri) {
 }
 
 exports.display = {
+  /**
+   * [waitingForInput description]
+   * @param  {DisplayItem} display TODO
+   * @returns {void}         TODO
+   */
   waitingForInput: display => {
     display.getWRAPPER().innerHTML = 'Waiting for input...';
   },
+  /**
+   * [waitingForInput description]
+   * @param  {DisplayItem} display TODO
+   * @returns {void}         TODO
+   */
   waitingForData: display => {
     display.getWRAPPER().innerHTML = 'Waiting for data...';
   },
+  /**
+   * [waitingForInput description]
+   * @param  {DisplayItem} display TODO
+   * @returns {void}         TODO
+   */
   empty: display => {
     display.getWRAPPER().innerHTML = 'No items to display.';
   },
+  /**
+   * [waitingForInput description]
+   * @param  {DisplayItem} display TODO
+   * @returns {void}         TODO
+   */
   first: display => {
     display.getWRAPPER().innerHTML = '';
     if (display.getOption('showCreateButton') === true) display.showCreateButton();
   },
+  /**
+   * [waitingForInput description]
+   * @param  {DisplayItem} display TODO
+   * @returns {void}         TODO
+   */
   entity: display => {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
@@ -139,6 +164,11 @@ exports.display = {
     }
     WRAPPER.appendChild(TABLE_entity);
   },
+  /**
+   * [waitingForInput description]
+   * @param  {DisplayItem} display TODO
+   * @returns {void}         TODO
+   */
   remove: display => {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();

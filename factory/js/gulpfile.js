@@ -15,6 +15,7 @@ gulp.watch(['../../custom/*/displays/**/*.js'], gulp.series(generateDisplaysFile
 gulp.watch([
   './source/render/display.js',
   '../../engine/connectors/connector.php',
+  '../../engine/core/displays/item/item.js',
   '../../engine/core/types/type/type.js',
   '../../engine/core/types/type/type.php',
   './source/render/item.js'

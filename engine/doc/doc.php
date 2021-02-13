@@ -29,12 +29,16 @@ class DocResponse extends HttpResponse2
 
         'doc/dev' => "Developers",
         'doc/dev/files' => "File structure",
+
         'doc/dev/display' => "Build a display",
         'doc/dev/display/display' => "Display Class",
+        'doc/dev/display/item' => "DisplayItem Class",
+
         'doc/dev/type' => "Build a type",
-        'doc/dev/type/item' => "Item Class",
         'doc/dev/type/type_js' => "Type Class (js)",
         'doc/dev/type/type_php' => "Type Class (php)",
+        'doc/dev/type/item' => "TypeItem Class (js)",
+        //TODO 'doc/dev/type/item' => "TypeItem Class (php)",
         'doc/dev/connector' => "Build a connector",
         'doc/dev/connector/connector' => "Connector Class",
         'doc/dev/javascript' => "Javascript packing",

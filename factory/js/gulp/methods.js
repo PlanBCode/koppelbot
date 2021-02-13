@@ -158,10 +158,13 @@ exports.generateTypesFile = generateTypesFile;
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 exports.generateDisplaysFile = generateDisplaysFile;
 const generateJsDocs = gulp.series(
-  generateJsDoc('./source/render/display.js', 'Display', 'display/display'),
   generateJsDoc('../../engine/connectors/connector.php', 'Connector', 'connector/connector'),
+
+  generateJsDoc('../../engine/core/displays/item/item.js', 'Display', 'display/display'),
+  generateJsDoc('./source/render/display.js', 'DisplayItem', 'display/item'),
+
   generateJsDoc('../../engine/core/types/type/type.js', 'Type', 'type/type_js'),
   generateJsDoc('../../engine/core/types/type/type.php', 'Type', 'type/type_php'),
-  generateJsDoc('./source/render/item.js', 'Item', 'type/item'));
+  generateJsDoc('./source/render/item.js', 'TypeItem', 'type/item'));
 exports.build = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, audit, pack, generateJsDocs);
 exports.generateJsDocs = generateJsDocs;

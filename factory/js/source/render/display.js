@@ -60,16 +60,36 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
    * @returns {Mixed}            The value of the requested option.
    */
   this.getOption = optionName => options[optionName];
-
+  /**
+   * [getSubOptions description]
+   * @param  {string} propertyName TODO
+   * @returns {Object}              TODO
+   */
   this.getSubOptions = propertyName => {
     return options.hasOwnProperty('subOptions') && options.subOptions.hasOwnProperty(propertyName)
       ? options.subOptions[propertyName]
       : options;
   };
+  /**
+   * [getWRAPPER description]
+   * @returns {Element} TODO
+   */
   this.getWRAPPER = () => WRAPPER;
+  /**
+   * [getEntityClassName description]
+   * @returns {string} TODO
+   */
   this.getEntityClassName = () => entityClassName;
+  /**
+   * [getEntityId description]
+   * @returns {string} TODO
+   */
   this.getEntityId = () => entityId;
-
+  /**
+   * [getNode description]
+   * @param  {string|Array} propertyPathOrString TODO
+   * @returns {Object|TypeItem}                         TODO
+   */
   this.getNode = propertyPathOrString => {
     const filteredNode = response.filter(node, this.getPropertyPath());
     if (typeof propertyPathOrString === 'undefined') return filteredNode;
@@ -77,13 +97,29 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     if (propertyPathOrString instanceof Array) return response.getSubNode(filteredNode, propertyPathOrString);
     throw new Error('Illegal propertyPath or propertyName');
   };
-
+  /**
+   * [getFlatNodes description]
+   * @returns {Object} TODO
+   */
   this.getFlatNodes = () => flatten(this.getNode());
-
+  /**
+   * [onVariable description]
+   * @param  {string}   variableName TODO
+   * @param  {Function} callback     TODO
+   * @returns {void}                TODO
+   */
   this.onVariable = (variableName, callback) => xyz.onVariable(variableName, callback);
+  /**
+   * [getDisplayName description]
+   * @param  {Array} propertyPath TODO
+   * @return {string}              TODO
+   */
 
   this.getDisplayName = propertyPath => xyz.getDisplayName(entityClassName, propertyPath);
-
+  /**
+   * [getPropertyPath description]
+   * @returns {Array} TODO
+   */
   this.getPropertyPath = () => {
     const path = uriTools.pathFromUri(uri);
     return path.slice(2);
@@ -117,13 +153,28 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     if (typeof string !== 'string') return 'black'; // can't make heads or tails of this, just return black
     return getColor(string);
   };
+  /**
+   * [onSelect description]
+   * @param  {Function} callback TODO
+   * @returns {void}            TODO
+   */
   this.onSelect = callback => {
     if (this.hasOption('select')) xyz.onVariable(this.getOption('select'), callback);
   };
+  /**
+   * [onSelect description]
+   * @param  {Function} callback TODO
+   * @returns {void}            TODO
+   */
   this.onMultiSelect = callback => {
     if (this.hasOption('multiSelect')) xyz.onVariable(this.getOption('multiSelect'), callback);
   };
-
+  /**
+   * [select description]
+   * @param  {string} entityClassName TODO
+   * @param  {string} entityId        TODO
+   * @returns {void}                 TODO
+   */
   this.select = (entityClassName, entityId) => {
     xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
     if (this.hasOption('onChange')) {
@@ -132,14 +183,44 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
       else if (typeof onChange === 'string') eval(onChange);
     }
   };
+  /**
+   * [isSelected description]
+   * @param  {string}  entityClassName TODO
+   * @param  {string}  entityId        TODO
+   * @returns {Boolean}                 TODO
+   */
   this.isSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('select'));
-
+  /**
+   * [multiSelectAdd description]
+   * @param  {string} entityClassName TODO
+   * @param  {string} entityId        TODO
+   * @returns {void}                 TODO
+   */
   this.multiSelectAdd = (entityClassName, entityId) => xyz.selectAdd(entityClassName, entityId, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
+  /**
+   * [multiSelectRemove description]
+   * @param  {string} entityClassName TODO
+   * @param  {string} entityId        TODO
+   * @returns {void}                 TODO
+   */
   this.multiSelectRemove = (entityClassName, entityId) => xyz.selectRemove(entityClassName, entityId, this.getOption('multiSelect'));
+  /**
+   * [multiSelectNone description]
+   * @returns {void} TODO
+   */
   this.multiSelectNone = () => xyz.select(undefined, undefined, this.getOption('multiSelect'));
-  // TODO multiSelectAll
+  // TODO multiSelectAll  ('*')
+  /**
+   * [isMultiSelected description]
+   * @param  {string}  entityClassName TODO
+   * @param  {string}  entityId        TODO
+   * @returns {Boolean}                 TODO
+   */
   this.isMultiSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('multiSelect'));
-
+  /**
+   * [showCreateButton description]
+   * @returns {void} TODO
+   */
   this.showCreateButton = () => {
     // TODO only if has the permissions to add
     if (this.getOption('showCreateButton') !== false) {
@@ -171,7 +252,10 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
       return DIV;
     } else return null;
   };
-
+  /**
+   * [renderEntity description]
+   * @returns {Element} TODO
+   */
   this.renderEntity = () => {
     const flatContent = this.getFlatNodes(); // TODO
     if (flatContent.constructor !== Object) { return flatContent.render(this.getAction(), this.getOptions()); } else {
