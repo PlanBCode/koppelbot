@@ -3,6 +3,7 @@
     "select" : {"info":"Define a variable that stores the selection of this list.", "type":"string"},
     "flavor" : {"info":"What variant of selection interface to show.","type":"enum","subType":"string","choices":["dropdown","radio"],"default":"dropdown"},
     "initialValue" : {"info":"The initial value to be used."},
+    "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "showCreateButton" : {"info":"Whether to show a button to a create interface.", "type":"bool", "default":false},
     "createButtonText" : {"info":"Define a custom text for the create button.", "type":"string", "default":"+"}
 

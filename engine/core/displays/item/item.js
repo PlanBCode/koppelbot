@@ -47,6 +47,7 @@ exports.display = {
       TD_header = document.createElement('TD');
       TD_header.setAttribute('colspan', display.getOption('showLabels') !== false ? '2' : '1');
       TR_header.appendChild(TD_header);
+      if (display.hasOption('color')) TR_header.style.backgroundColor = display.getColor();
       TABLE_entity.appendChild(TR_header);
     }
 

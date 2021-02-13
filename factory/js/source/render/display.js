@@ -58,7 +58,7 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     throw new Error('Illegal propertyPath or propertyName');
   };
 
-  this.getFlatNodes = () => flatten(this.getNode()); // TODO depr
+  this.getFlatNodes = () => flatten(this.getNode());
 
   this.onVariable = (variableName, callback) => xyz.onVariable(variableName, callback);
 

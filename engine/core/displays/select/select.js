@@ -76,6 +76,11 @@ exports.display = {
         INPUT.checked = true;
       }
       LABEL.appendChild(INPUT);
+      if (display.hasOption('color')) {
+        const color = display.getColor();
+        SPAN.innerHTML = `<svg width="20" height="20" style="display:inline-block;"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>`;
+      }
+
       TAG_container = SPAN;
       LABEL.appendChild(SPAN);
       WRAPPER.appendChild(LABEL);
