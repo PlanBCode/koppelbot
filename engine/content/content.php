@@ -2,20 +2,23 @@
 
 function replaceXyzTag($fileContent): string
 {
-    $pattern = '/<(xyz|XYZ)((\s+(\w+)="([^"]*?)")+)\s*\/>/';
+    // '<xyz a="b" c />'
+    $pattern = '/<(xyz|XYZ)((\s+(\w+)(="([^"]*?)")?)+)\s*\/>/';
     $fileContent = preg_replace_callback(
         $pattern,
         function ($xyzTagMatches) {
             $attributeString = $xyzTagMatches[2];
             $attributeMatches = [];
-            preg_match_all('/(\w+)="([^"]*?)"/', $attributeString, $attributeMatches);
+            // 'a="b"' or without value/toggle: 'c'
+            preg_match_all('/(\w+)(="([^"]*?)")?/', $attributeString, $attributeMatches);
             $count = count($attributeMatches[0]);
-            $attributeNames = $attributeMatches[1];
-            $attributeValues = $attributeMatches[2];
+            $attributeNames = $attributeMatches[1];  // 'a' or 'c'
+            $attributeHasValues = $attributeMatches[2];  // '="b"'
+            $attributeValues = $attributeMatches[3]; // 'b'
             $options = [];
             for ($i = 0; $i < $count; ++$i) {
                 $attributeName = $attributeNames[$i];
-                $attributeValue = $attributeValues [$i];
+                $attributeValue = $attributeHasValues[$i] ? $attributeValues[$i] : 'true'; // an attribute without value is set to true
                 $attributePath = explode('_', $attributeName); // "property_subOption" -> ["property","subOption"]
                 $attributePathLength = count($attributePath);
                 if ($attributePathLength === 1) { // optionName="value" -> options[optionName]="value"
