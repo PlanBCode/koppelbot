@@ -205,8 +205,11 @@ class PropertyResponse extends Response
         if(is_null($property)){
           $this->addStatus(400);
           $this->content = 'Illegal property '.$propertyPath[0].'.';
+        }else if($status === 404 && $property->hasDefault()){
+          $this->addStatus(200);
+          $this->content = $property->getDefault();
         }else{
-            $processResponse = $property->processAfterConnector($requestObject, $content);
+            $processResponse = $property->processAfterConnector($requestObject, $content);            
             if ($processResponse->succeeded()) {
                 $this->addStatus($status);
                 $this->content = $processResponse->getContent();
@@ -460,6 +463,11 @@ class Property
     public function getMeta(): array
     {
         return $this->settings;
+    }
+
+    public function hasDefault(): bool
+    {
+        return array_key_exists('default',$this->settings);
     }
 
     public function getDefault()
