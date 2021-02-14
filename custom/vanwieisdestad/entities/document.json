@@ -3,7 +3,7 @@
     "connector": {
       "type": "sqlite",
       "path": "data/mapdata.sqlite",
-      "table": "Locaties"
+      "table": "Documenten"
     },
     "access" : {
       "write" : ["/group/guest"]
@@ -41,7 +41,8 @@
     }
   },
   "EigenaarID" : {
-    "type": "string",
+    "type": "reference",
+    "uri": "/eigenaar/*",
     "connector": {
       "key": "EigenaarID"
     }

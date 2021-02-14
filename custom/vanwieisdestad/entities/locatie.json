@@ -30,13 +30,15 @@
     }
   },
   "DocumentID" : {
-    "type": "string",
+    "type": "reference",
+    "uri": "/document/*",
     "connector": {
       "key": "DocumentID"
     }
   },
   "EigenaarID" : {
-    "type": "string",
+    "type": "reference",
+    "uri": "/eigenaar/*",
     "connector": {
       "key": "EigenaarID"
     }
