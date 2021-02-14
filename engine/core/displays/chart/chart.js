@@ -121,6 +121,7 @@ exports.display = {
       WRAPPER.appendChild(TABLE);
     } else {
       const CANVAS = document.createElement('CANVAS');
+
       WRAPPER.appendChild(CANVAS);
       WRAPPER.chart = new Chart(CANVAS, {
         type: flavor,
@@ -138,6 +139,23 @@ exports.display = {
           } */
         }
       });
+      if (display.hasOption('select')) {
+        CANVAS.onclick = function (evt) {
+          // activePoints is an array of points on the canvas that are at the same position as the click event.
+          const activePoints = WRAPPER.chart.getElementsAtEvent(evt);
+          if (activePoints.length > 0) {
+            const selectEntityId = WRAPPER.chart.data.datasets[0].entityIds[activePoints[0]._index];
+            display.select(undefined, selectEntityId);
+          }
+        };
+        display.onSelect(selectEntityId => {
+          const borderColor = WRAPPER.chart.data.datasets[0].borderColor.map((borderColor, index) => {
+            return selectEntityId === WRAPPER.chart.data.datasets[0].entityIds[index] ? 'yellow' : 'white';
+          });
+          WRAPPER.chart.data.datasets[0].borderColor = borderColor;
+          WRAPPER.chart.update();
+        });
+      }
       WRAPPER.chart.update();
     }
   },
@@ -275,11 +293,14 @@ exports.display = {
         const data = Object.keys(groups).map(groupId => groups[groupId][label]);
         const labels = entityClassName + ' ' + label + (groupBy === '*' ? '' : ' by ' + groupBy); // TODO parametrize
         const backgroundColor = Object.keys(groups).map(groupId => display.getColor(groupId));
+        const borderColor = Object.keys(groups).map(groupId => display.hasOption('select') && display.isSelected(undefined, groupId) ? 'yellow' : 'white');
         const dataset = {
+          entityIds: Object.keys(groups),
           data,
           label: labels,
           borderWidth: 1, // TODO parametrize
-          backgroundColor
+          backgroundColor,
+          borderColor
           // TODO borderColors
         };
         WRAPPER.tmpDatasets.push(dataset);
