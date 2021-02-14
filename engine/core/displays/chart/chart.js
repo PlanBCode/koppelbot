@@ -82,11 +82,13 @@ exports.display = {
         TR.className = 'xyz-list-header';
         if (display.getOption('multiSelect')) {
           const TD = document.createElement('TD');
+          TD.className = 'xyz-list-icon';
           // TODO TD.innerHTML = '[]';// TODO select/unselect all
           TR.appendChild(TD);
         } // TODO if color and select
         if (display.hasOption('color')) {
           const TD = document.createElement('TD');
+          TD.className = 'xyz-list-icon';
           TR.appendChild(TD);
         }
         if (display.hasOption('groupby')) {
@@ -208,6 +210,7 @@ exports.display = {
             const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
 
             const TD = document.createElement('TD');
+            TD.className = 'xyz-list-icon';
             const INPUT_checkbox = document.createElement('INPUT');
             INPUT_checkbox.setAttribute('type', 'checkbox');
             if (display.isMultiSelected(selectEntityClassName, selectEntityId)) INPUT_checkbox.checked = true;
@@ -221,6 +224,7 @@ exports.display = {
           }
           if (display.hasOption('color')) {
             const TD = document.createElement('TD');
+            TD.className = 'xyz-list-icon';
             const color = display.getColor();
             TD.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>`;
             TR.appendChild(TD);

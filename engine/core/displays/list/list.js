@@ -32,11 +32,13 @@ exports.display = {
       TR_header.className = 'xyz-list-header';
       if (display.getOption('multiSelect')) {
         const TD_checkbox = document.createElement('TD');
+        TD_checkbox.className = 'xyz-list-icon';
         // TODO select all/none
         TR_header.appendChild(TD_checkbox);
       }
       if (display.hasOption('color')) {
         const TD = document.createElement('TD');
+        TD.className = 'xyz-list-icon';
         TR_header.appendChild(TD);
       }
       if (columns.constructor !== Object) {
@@ -64,6 +66,7 @@ exports.display = {
 
     if (display.getOption('multiSelect')) {
       const TD_checkbox = document.createElement('TD');
+      TD_checkbox.className = 'xyz-list-icon';
       const INPUT_checkbox = document.createElement('INPUT');
       INPUT_checkbox.type = 'checkbox';
 
@@ -79,6 +82,7 @@ exports.display = {
     }
     if (display.hasOption('color')) {
       const TD = document.createElement('TD');
+      TD.className = 'xyz-list-icon';
       const color = display.getColor();
       TD.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>`;
       TR_entity.appendChild(TD);

@@ -41,3 +41,8 @@ table.xyz-list tr.xyz-list-item:hover {
 table.xyz-list tr.xyz-list-selected {
   background-color: yellow;
 }
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
