@@ -171,12 +171,12 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
   };
   /**
    * [select description]
-   * @param  {string} entityClassName TODO
-   * @param  {string} entityId        TODO
+   * @param  {string} [entityClassName_] TODO
+   * @param  {string} [entityId_]        TODO
    * @returns {void}                 TODO
    */
-  this.select = (entityClassName, entityId) => {
-    xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+  this.select = (entityClassName_ = entityClassName, entityId_ = entityId) => {
+    xyz.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'));
     if (this.hasOption('onChange')) {
       const onChange = this.getOption('onChange');
       if (typeof onChange === 'function') onChange();
@@ -184,26 +184,41 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
     }
   };
   /**
+   * [select description]
+   * @returns {void}                 TODO
+   */
+  this.selectAll = () => this.select('*', '*');
+  /**
+   * [select description]
+   * @returns {void}                 TODO
+   */
+  this.selectNone = () => this.select(undefined, undefined);
+  /**
    * [isSelected description]
-   * @param  {string}  entityClassName TODO
-   * @param  {string}  entityId        TODO
+   * @param  {string} [entityClassName_] TODO
+   * @param  {string} [entityId_]        TODO
    * @returns {Boolean}                 TODO
    */
-  this.isSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('select'));
+  this.isSelected = (entityClassName_ = entityClassName, entityId_ = entityId) => xyz.isSelected(entityClassName_, entityId_, this.getOption('select'));
   /**
    * [multiSelectAdd description]
-   * @param  {string} entityClassName TODO
-   * @param  {string} entityId        TODO
+   * @param  {string} [entityClassName_] TODO
+   * @param  {string} [entityId_]        TODO
    * @returns {void}                 TODO
    */
-  this.multiSelectAdd = (entityClassName, entityId) => xyz.selectAdd(entityClassName, entityId, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
+  this.multiSelectAdd = (entityClassName_ = entityClassName, entityId_ = entityId) => xyz.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
   /**
    * [multiSelectRemove description]
-   * @param  {string} entityClassName TODO
-   * @param  {string} entityId        TODO
+   * @param  {string} [entityClassName_] TODO
+   * @param  {string} [entityId_]        TODO
    * @returns {void}                 TODO
    */
-  this.multiSelectRemove = (entityClassName, entityId) => xyz.selectRemove(entityClassName, entityId, this.getOption('multiSelect'));
+  this.multiSelectRemove = (entityClassName_ = entityClassName, entityId_ = entityId) => xyz.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
+  /**
+   * [multiSelectNone description]
+   * @returns {void} TODO
+   */
+  this.multiSelectAll = () => xyz.select('*', '*', this.getOption('multiSelect'));
   /**
    * [multiSelectNone description]
    * @returns {void} TODO
@@ -212,11 +227,11 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
   // TODO multiSelectAll  ('*')
   /**
    * [isMultiSelected description]
-   * @param  {string}  entityClassName TODO
-   * @param  {string}  entityId        TODO
+   * @param  {string} [entityClassName_] TODO
+   * @param  {string} [entityId_]        TODO
    * @returns {Boolean}                 TODO
    */
-  this.isMultiSelected = (entityClassName, entityId) => xyz.isSelected(entityClassName, entityId, this.getOption('multiSelect'));
+  this.isMultiSelected = (entityClassName_, entityId_) => xyz.isSelected(entityClassName_ || entityClassName, entityId_ || entityId, this.getOption('multiSelect'));
   /**
    * [showCreateButton description]
    * @returns {void} TODO

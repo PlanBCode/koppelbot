@@ -210,7 +210,6 @@ exports.display = {
     const date = dateNode.getContent();
 
     const entityId = display.getEntityId();
-    const entityClassName = display.getEntityClassName();
 
     const WRAPPER = display.getWRAPPER();
     const DIV = WRAPPER.firstChild;
@@ -223,7 +222,7 @@ exports.display = {
 
     const LABEL = document.createElement('DIV');
     LABEL.classList.add('xyz-timeline-label');
-    if (display.isSelected(entityClassName, entityId) || display.getOption('default') === entityId) {
+    if (display.isSelected() || display.getOption('default') === entityId) {
       LABEL.classList.add('xyz-list-selected');
     }
 
@@ -237,7 +236,7 @@ exports.display = {
     LABEL.appendChild(TAG_label);
     LABEL.date = date;
     LABEL.onclick = () => {
-      display.select(entityClassName, entityId);
+      display.select();
       for (const NODE of DIV.childNodes) {
         if (NODE.classList.contains('xyz-timeline-label')) {
           NODE.classList[NODE === LABEL ? 'add' : 'remove']('xyz-list-selected');

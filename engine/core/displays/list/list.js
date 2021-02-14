@@ -61,20 +61,17 @@ exports.display = {
     TR_entity.className = 'xyz-list-item';
     TR_entity.entityId = display.getEntityId();
     const entityId = display.getEntityId();
-    const entityClassName = display.getEntityClassName();
-    const uri = '/' + entityClassName + '/' + entityId;
 
     if (display.getOption('multiSelect')) {
-      const variableName = display.getOption('multiSelect');
       const TD_checkbox = document.createElement('TD');
       const INPUT_checkbox = document.createElement('INPUT');
       INPUT_checkbox.type = 'checkbox';
 
-      if (display.isMultiSelected(entityClassName, entityId)) INPUT_checkbox.checked = true;
+      if (display.isMultiSelected()) INPUT_checkbox.checked = true;
 
       INPUT_checkbox.onclick = event => {
-        if (INPUT_checkbox.checked) display.multiSelectAdd(entityClassName, entityId);
-        else display.multiSelectRemove(entityClassName, entityId);
+        if (INPUT_checkbox.checked) display.multiSelectAdd();
+        else display.multiSelectRemove();
         event.stopPropagation();
       };
       TD_checkbox.appendChild(INPUT_checkbox);
@@ -110,11 +107,11 @@ exports.display = {
 
     const TABLE = WRAPPER.firstChild;
     if (display.getOption('select')) {
-      if (display.isSelected(entityClassName, entityId) || display.getOption('default') === entityId) {
+      if (display.isSelected() || display.getOption('default') === entityId) {
         TR_entity.classList.add('xyz-list-selected');
       }
       TR_entity.onclick = () => {
-        display.select(entityClassName, entityId);
+        display.select();
         for (const row of TABLE.childNodes) {
           if (row === TR_entity) {
             row.classList.add('xyz-list-selected');

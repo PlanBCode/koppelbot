@@ -92,7 +92,7 @@ function initializeOpenLayers (display) {
         })
       })
     );
-    iconFeature.onclick = () => display.select(entityClassName, entityId);
+    iconFeature.onclick = () => display.select();
 
     // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
     // TODO how do we handle changes to feature?
@@ -130,15 +130,13 @@ exports.display = {
   entity: display => {
     // return;
     const locationPropertyName = display.getOption('location') || 'geojson';
-    const entityId = display.getEntityId();
-    const entityClassName = display.getEntityClassName();
     const WRAPPER = display.getWRAPPER();
 
     // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
     // TODO maybe pass label to svg entity?
 
     /* const feature = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, display: 'map'});
-    feature.onclick = () => display.select(entityClassName, entityId);
+    feature.onclick = () => display.select();
 
     WRAPPER.vectorLayer.getSource().addFeature(feature);
     return; */
@@ -161,7 +159,7 @@ exports.display = {
             })
           })
         ); */
-        feature.onclick = () => display.select(entityClassName, entityId);
+        feature.onclick = () => display.select();
 
         // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
         // TODO how do we handle changes to feature?

@@ -25,7 +25,7 @@ exports.display = {
       SELECT.onchange = () => {
         const entityId = SELECT.options[SELECT.selectedIndex].value;
         const entityClassName = display.getEntityClassName();
-        display.select(entityClassName, entityId);
+        display.select();
       };
       if (!display.getOption('initialValue')) {
         const OPTION = document.createElement('OPTION');
@@ -72,7 +72,7 @@ exports.display = {
       INPUT.setAttribute('name', 'radio');
       INPUT.setAttribute('value', uri);
       if (display.getOption('initialValue') === uri) {
-        display.select(entityClassName, entityId);
+        display.select();
         INPUT.checked = true;
       }
       LABEL.appendChild(INPUT);
@@ -87,17 +87,17 @@ exports.display = {
     } else {
       const SELECT = WRAPPER.firstChild;
       if (SELECT.childElementCount === 0 && !display.getOption('initialValue')) { // select the first option as default
-        display.select(entityClassName, entityId);
+        display.select();
       }
 
       const OPTION = document.createElement('OPTION');
       TAG_container = OPTION;
       OPTION.value = entityId;
-      if (display.isSelected(entityClassName, entityId)) {
+      if (display.isSelected()) {
         OPTION.selected = true;
       }
       if (display.getOption('initialValue') === OPTION.value) {
-        display.select(entityClassName, entityId);
+        display.select();
         OPTION.selected = true;
       }
       SELECT.appendChild(OPTION);
