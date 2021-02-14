@@ -1,3 +1,5 @@
+const variables = require('../variables/variables.js');
+
 const pathFromUri = uri => {
   uri = uri.split('?')[0]; // remove querystring
   if (uri.startsWith('/')) {
@@ -70,6 +72,33 @@ function parseAggregationFromUri (uri) {
   uri = '/' + path.slice(0, 2).join('/') + '/' + propertyNameList.join(',');
   return {uri, aggregations};
 }
+
+const variableRegex = /\$(\w+|\{\w+\})/g;
+
+function resolveVariablesInUri (uri) {
+  return uri.replace(variableRegex,
+    (_, variableName) => variables.hasVariable(variableName) ? variables.getVariable(variableName) : '$' + variableName
+  );
+}
+
+function getVariableNamesFromUri (uri) {
+  const variableNames = [];
+  let match;
+  while ((match = variableRegex.exec(uri))) {
+    let variableName = match[1];
+    if (variableName.startsWith('{') && variableName.endsWith('}')) variableName = variableName.substr(1, variableName.length - 2);
+    variableNames.push(variableName);
+  }
+  return variableNames;
+}
+
+function uriHasUnresolvedVariables (uri) {
+  return uri.includes('$');
+}
+
+exports.getVariableNamesFromUri = getVariableNamesFromUri;
+exports.uriHasUnresolvedVariables = uriHasUnresolvedVariables;
+exports.resolveVariablesInUri = resolveVariablesInUri;
 
 exports.parseAggregationFromUri = parseAggregationFromUri;
 exports.getBaseUri = getBaseUri;

@@ -2,8 +2,6 @@ const web = require('../web/web.js');
 const uriTools = require('../uri/uri.js');
 
 const variables = {};
-const uriCallbacks = {};
-
 const variableCallbacks = {};
 
 function onVariable (variableNameEventName, callback) {
@@ -20,13 +18,6 @@ function onVariable (variableNameEventName, callback) {
 
 const handleVariableChange = (variableName, eventName) => {
   web.setQueryParameter(variableName, variables[variableName]);
-  for (const uri in uriCallbacks) {
-    if (uri.indexOf('$' + variableName) !== -1) { // TODO find ${variableName} and ignore $variableNameWithPostfix
-      for (const callback of uriCallbacks[uri]) {
-        handleUri(uri, callback);
-      }
-    }
-  }
   if (variableCallbacks.hasOwnProperty(variableName)) {
     const value = variables[variableName];
     if (variableCallbacks[variableName].hasOwnProperty('change')) {
@@ -55,44 +46,6 @@ const setVariable = (variableName, value) => {
 
 const setVariables = (variableObject) => {
   for (const variableName in variableObject) { setVariable(variableName, variableObject[variableName]); }
-};
-
-function resolveVariablesInUri (uri) {
-  // TODO find ${variableName}
-  return uri.replace(/\$(\w+)/g, (_, variableName) => {
-    if (variables.hasOwnProperty(variableName)) { return variables[variableName]; } else { return '$' + variableName; }
-  });
-}
-
-function uriHasUnresolvedVariables (uri) {
-  return uri.includes('$');
-}
-
-function handleUri (uri, callbacks) {
-  uri = resolveVariablesInUri(uri);
-  if (typeof callbacks.wait === 'function') callbacks.wait(uri);
-  if (!uriHasUnresolvedVariables(uri)) callbacks.ready(uri);
-}
-
-function refresh () {
-  for (let uri in uriCallbacks) {
-    const xyz = uriCallbacks[uri][0].xyz;
-    uri = resolveVariablesInUri(uri);
-    // uri starting without '/' are input variables
-    if (!uriHasUnresolvedVariables(uri) && uri.startsWith('/')) xyz.get(uri);
-  }
-}
-
-// TODO parametrize refresh rate / throttle
-const registerUri = (xyz, uri, readyCallback, waitCallback, dynamic = false) => {
-  const callbacks = {xyz, ready: readyCallback, wait: waitCallback};
-
-  if (dynamic) { // skip updates for non dynamic
-    if (!uriCallbacks.hasOwnProperty(uri)) uriCallbacks[uri] = [callbacks];
-    else uriCallbacks[uri].push(callbacks);
-  }
-
-  handleUri(uri, callbacks);
 };
 
 const selectVariable = (xyz, entityClassName, entityId, variableNameOrCallback, selectUri) => {
@@ -159,8 +112,6 @@ function isSelected (xyz, entityClassName, entityId, selectVariableName) {
   return entityIds.includes(entityId);
 }
 
-setInterval(refresh, 1000);
-
 exports.selectVariable = selectVariable;
 exports.selectAdd = selectAdd;
 exports.selectRemove = selectRemove;
@@ -171,5 +122,4 @@ exports.hasVariable = hasVariable;
 exports.setVariable = setVariable;
 exports.setVariables = setVariables;
 exports.clearVariable = clearVariable;
-exports.registerUri = registerUri;
 exports.onVariable = onVariable;

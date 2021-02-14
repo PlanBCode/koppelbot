@@ -1,6 +1,6 @@
 const variables = require('./variables');
 const types = require('../../build/types.js');
-const Item = require('../render/item.js').constructor;
+const TypeItem = require('../render/item.js').TypeItem;
 
 function renderUiInput (xyz, options, WRAPPER) {
   if (options.name) {
@@ -8,14 +8,18 @@ function renderUiInput (xyz, options, WRAPPER) {
 
     const INPUT = document.createElement('INPUT');
     if (options.hasOwnProperty('type')) INPUT.type = options.type;
+
+    if (variables.hasVariable(name)) INPUT.value = variables.getVariable(name, '');
+
     if (options.hasOwnProperty('value')) {
       if (variables.hasVariable(name)) {
-        INPUT.value = variables.getVariable(name, '');
+        // TODO also set variable?
       } else {
         INPUT.value = options.value;
         variables.setVariable(name, options.value);
       }
     }
+
     if (options.showLabel !== false) {
       const LABEL = document.createElement('LABEL');
       LABEL.innerHTML = name + '&nbsp;';
@@ -42,7 +46,7 @@ function renderUiInput (xyz, options, WRAPPER) {
 
       const options = {};// TODO
       const onDelete = () => {};// TODO
-      const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
+      const item = new TypeItem(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
       const TAG = types[type].edit(item);
       WRAPPER.appendChild(TAG);
     }

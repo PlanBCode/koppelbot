@@ -6,7 +6,7 @@ const DEFAULT_ACTION = 'view';
 // onChange = (content, [additionalSubPropertyPath]) => {...}
 // onDelete = (content, [additionalSubPropertyPath]) => {...}
 
-function Item (xyz, baseUri, subPropertyPath, status, content, settings, options, onChange, onDelete, creatorData) {
+function TypeItem (xyz, baseUri, subPropertyPath, status, content, settings, options, onChange, onDelete, creatorData) {
   const callbacks = [];
   /**
    * Get the uri for the current entity
@@ -138,7 +138,7 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
       try {
         json.set(creatorData, subPropertyPath.concat(additionalSubPropertyPath), content);
       } catch (e) {
-        console.error('Item.renderSubElement json.set failed', e);
+        console.error('TypeItem.renderSubElement json.set failed', e);
       }
       const TRs = render.creator(xyz, options_, baseUri, settings, subPropertyPath.concat(additionalSubPropertyPath), creatorData);
       for (const TR of TRs) {
@@ -194,7 +194,7 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
     const typeName = settings_.type || 'string';
     if (!types.hasOwnProperty(typeName)) return false;
     if (!types[typeName].hasOwnProperty('validateContent')) return false;
-    const item = new Item(xyz, baseUri, subPropertyPath, status, content_, settings_, options);
+    const item = new TypeItem(xyz, baseUri, subPropertyPath, status, content_, settings_, options);
     return types[typeName].validateContent(item);
   };
   /**
@@ -206,4 +206,4 @@ function Item (xyz, baseUri, subPropertyPath, status, content, settings, options
   this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
 }
 
-exports.constructor = Item;
+exports.TypeItem = TypeItem;

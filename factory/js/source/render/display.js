@@ -35,7 +35,7 @@ function flatten (source) {
   return target;
 }
 
-function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, entityId, node, uri) {
+function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, node, uri) {
   /**
    * Get the uri for the current entity
    * @returns {string} uri
@@ -288,41 +288,41 @@ function DisplayParameters (xyz, action, options, WRAPPER, entityClassName, enti
 
 const displayListenersPerWrapper = new Map();
 
-const uiElementWaitingForData = (display, displayParameters) => {
-  const WRAPPER = displayParameters.getWRAPPER();
+const uiElementWaitingForData = (display, displayItem) => {
+  const WRAPPER = displayItem.getWRAPPER();
   WRAPPER.classList.add('xyz-waiting-for-data');
-  if (display && display.hasOwnProperty('waitingForData')) { display.waitingForData(displayParameters); } else { WRAPPER.innerHTML = 'Waiting for user data...'; }
+  if (display && display.hasOwnProperty('waitingForData')) { display.waitingForData(displayItem); } else { WRAPPER.innerHTML = 'Waiting for user data...'; }
 };
 
-const uiElementWaitingForInput = (display, displayParameters) => {
-  const WRAPPER = displayParameters.getWRAPPER();
+const uiElementWaitingForInput = (display, displayItem) => {
+  const WRAPPER = displayItem.getWRAPPER();
   WRAPPER.classList.add('xyz-waiting-for-input');
-  if (display && display.hasOwnProperty('waitingForInput')) { display.waitingForInput(displayParameters); } else { WRAPPER.innerHTML = 'Waiting for user input...'; }
+  if (display && display.hasOwnProperty('waitingForInput')) { display.waitingForInput(displayItem); } else { WRAPPER.innerHTML = 'Waiting for user input...'; }
 };
 
-const uiElementEmpty = (display, displayParameters) => {
-  const WRAPPER = displayParameters.getWRAPPER();
+const uiElementEmpty = (display, displayItem) => {
+  const WRAPPER = displayItem.getWRAPPER();
   WRAPPER.classList.remove('xyz-waiting-for-input');
   WRAPPER.classList.add('xyz-empty');
-  if (display && display.hasOwnProperty('empty')) { display.empty(displayParameters); } else { WRAPPER.innerHTML = 'Empty'; }
+  if (display && display.hasOwnProperty('empty')) { display.empty(displayItem); } else { WRAPPER.innerHTML = 'Empty'; }
 };
 
-const uiElementFirst = (display, displayParameters) => {
-  const WRAPPER = displayParameters.getWRAPPER();
+const uiElementFirst = (display, displayItem) => {
+  const WRAPPER = displayItem.getWRAPPER();
   if (WRAPPER.classList.contains('xyz-empty')) {
     WRAPPER.classList.remove('xyz-empty');
-    if (display && display.hasOwnProperty('first')) { display.first(displayParameters); } else { WRAPPER.innerHTML = ''; }
+    if (display && display.hasOwnProperty('first')) { display.first(displayItem); } else { WRAPPER.innerHTML = ''; }
   }
 };
 
-const uiElementEntity = (display, displayParameters) => {
-  if (display && display.hasOwnProperty('entity')) { display.entity(displayParameters); } else {
+const uiElementEntity = (display, displayItem) => {
+  if (display && display.hasOwnProperty('entity')) { display.entity(displayItem); } else {
     // TODO a default way of handeling stuff
   }
 };
 
-const uiElementRemove = (display, displayParameters) => {
-  if (display && display.hasOwnProperty('remove')) { display.remove(displayParameters); } else {
+const uiElementRemove = (display, displayItem) => {
+  if (display && display.hasOwnProperty('remove')) { display.remove(displayItem); } else {
     // TODO a default way of handeling stuff
   }
 };
@@ -333,17 +333,17 @@ const renderDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId
   const action = options.action || DEFAULT_ACTION;
   const path = uriTools.pathFromUri(uri);
   node = response.filter(node, path.slice(2)); // filter the content that was not requested
-  const displayParameters = new DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
-  uiElementFirst(display, displayParameters);
-  uiElementEntity(display, displayParameters);
+  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
+  uiElementFirst(display, displayItem);
+  uiElementEntity(display, displayItem);
 };
 
 const removeDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId, node, eventName) => {
   const displayName = options.display || DEFAULT_DISPLAYNAME;
   const display = displays[displayName];
   const action = options.action || DEFAULT_ACTION;
-  const displayParameters = new DisplayParameters(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
-  uiElementRemove(display, displayParameters);
+  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
+  uiElementRemove(display, displayItem);
 };
 
 const addListeners = (xyz, uri, options, WRAPPER) => {
@@ -386,13 +386,15 @@ const renderUiElement = (xyz, options, WRAPPER) => {
   const path = uriTools.pathFromUri(uri);
   const entityId = path[1] || '*';
   const entityClass = path[0];
-  const displayParameters = new DisplayParameters(xyz, action, options, WRAPPER, entityClass, entityId, null, uri);
+  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClass, entityId, null, uri);
 
-  uiElementWaitingForData(display, displayParameters);
+  uiElementWaitingForData(display, displayItem);
 
-  variables.registerUri(xyz, uri, uri => {
+  const variableNames = uriTools.getVariableNamesFromUri(uri);
+
+  const readyCallback = uri => {
     // TODO this can be called multiple times on variable changes,
-    uiElementEmpty(display, displayParameters);
+    uiElementEmpty(display, displayItem);
     xyz.get(uri, node => { // TODO this should be handled by having an available instead of created listener
       WRAPPER.classList.remove('xyz-waiting-for-data');
 
@@ -404,10 +406,56 @@ const renderUiElement = (xyz, options, WRAPPER) => {
 
       addListeners(xyz, uri, options, WRAPPER);
     });
-  },
-  () => uiElementWaitingForInput(display, displayParameters),
-  options.dynamic
-  );
+  };
+
+  const onChange = () => {
+    const resolvedUri = uriTools.resolveVariablesInUri(uri);
+    if (uriTools.uriHasUnresolvedVariables(resolvedUri)) {
+      uiElementWaitingForInput(display, displayItem);
+    } else {
+      readyCallback(resolvedUri);
+    }
+  };
+
+  for (const variableName of variableNames) {
+    variables.onVariable(variableName, onChange);
+  }
+
+  const waitCallback = () => uiElementWaitingForInput(display, displayItem);
+  registerUri(xyz, uri, readyCallback, waitCallback, options.dynamic);
 };
+
+// DISPLAY DATA REFRESHING TODO : NEEDS TO BE IMPROVED
+
+const uriCallbacks = {};
+
+function refresh () {
+  for (let uri in uriCallbacks) {
+    const xyz = uriCallbacks[uri][0].xyz;
+    uri = uriTools.resolveVariablesInUri(uri);
+    // uri starting without '/' are input variables
+    if (!uriTools.uriHasUnresolvedVariables(uri) && uri.startsWith('/')) xyz.get(uri);
+  }
+}
+
+function handleUri (uri, callbacks) {
+  uri = uriTools.resolveVariablesInUri(uri);
+  if (typeof callbacks.wait === 'function') callbacks.wait(uri);
+  if (!uriTools.uriHasUnresolvedVariables(uri)) callbacks.ready(uri);
+}
+
+// TODO parametrize refresh rate / throttle
+const registerUri = (xyz, uri, readyCallback, waitCallback, dynamic = false) => {
+  const callbacks = {xyz, ready: readyCallback, wait: waitCallback};
+
+  if (dynamic) { // skip updates for non dynamic
+    if (!uriCallbacks.hasOwnProperty(uri)) uriCallbacks[uri] = [callbacks];
+    else uriCallbacks[uri].push(callbacks);
+  }
+
+  handleUri(uri, callbacks);
+};
+
+setInterval(refresh, 1000);
 
 exports.renderUiElement = renderUiElement;

@@ -1,6 +1,6 @@
 const types = require('../../build/types.js');
 const uriTools = require('../uri/uri.js');
-const Item = require('./item.js').constructor;
+const TypeItem = require('./item.js').TypeItem;
 const json = require('../web/json.js');
 
 const DEFAULT_TYPE = 'string';
@@ -34,7 +34,7 @@ function element (xyz, action, uri, subPropertyPath, status, content, settings, 
       onChange = (subContent, additionalSubPropertyPath) => {
         const tmpContentToValidate = createTmpContentToValidate(content, subContent, subPropertyPath, additionalSubPropertyPath);
 
-        const item = new Item(xyz, uri, subPropertyPath, status, tmpContentToValidate, settings, options, onChange, onDelete);
+        const item = new TypeItem(xyz, uri, subPropertyPath, status, tmpContentToValidate, settings, options, onChange, onDelete);
         if (item.validateContent()) {
           additionalSubPropertyPath = subPropertyPath.concat(additionalSubPropertyPath);
           const subUri = typeof additionalSubPropertyPath === 'undefined' ? '' : ('/' + additionalSubPropertyPath.join('/'));
@@ -50,7 +50,7 @@ function element (xyz, action, uri, subPropertyPath, status, content, settings, 
         xyz.delete(uri + subUri);
       };
     }
-    const item = new Item(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
+    const item = new TypeItem(xyz, uri, subPropertyPath, status, content, settings, options, onChange, onDelete);
     TAG = type[action](item);
     TAG.classList.add(`xyz-status-${status}`);
     return TAG;
@@ -59,7 +59,7 @@ function element (xyz, action, uri, subPropertyPath, status, content, settings, 
     // TODO check if settings.signature is object
     const DIV = document.createElement('DIV');
     DIV.classList.add(`xyz-status-${status}`);
-    for (let subPropertyName in settings.signature) {
+    for (const subPropertyName in settings.signature) {
       const subSettings = settings.signature[subPropertyName];
       const subContent = content[subPropertyName];
       const subType = subSettings.type;
@@ -136,7 +136,7 @@ function creator (xyz, options, uri, settings, subPropertyPath, data, INPUT_subm
   let onChange, onDelete;
   onChange = (content, additionalSubPropertyPath) => {
     const tmpContentToValidate = createTmpContentToValidate(data, content, subPropertyPath, additionalSubPropertyPath);
-    const item = new Item(xyz, uri, subPropertyPath, 200, tmpContentToValidate, settings, options, onChange, onDelete, data);
+    const item = new TypeItem(xyz, uri, subPropertyPath, 200, tmpContentToValidate, settings, options, onChange, onDelete, data);
     if (validate(item)) {
       const keyPath = typeof additionalSubPropertyPath === 'undefined'
         ? subPropertyPath
@@ -172,7 +172,7 @@ function creator (xyz, options, uri, settings, subPropertyPath, data, INPUT_subm
     }
   }
 
-  const item = new Item(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
+  const item = new TypeItem(xyz, uri, subPropertyPath, 200, content, settings, options, onChange, onDelete, data);
   TAG = type.edit(item);
   validate(item, true);
   // TODO add id from options (also for label for)
