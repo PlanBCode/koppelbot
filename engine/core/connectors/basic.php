@@ -66,7 +66,10 @@ abstract class BasicConnector extends Connector
         $connectorResponse = new ConnectorResponse();
 
         $entityIdList = $propertyRequest->getEntityId();
-        $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
+        if($entityIdList === '*' ){
+            if(is_null($this->data)) $entityIds =[];
+            else $entityIds =  array_keys($this->data);
+        }else $entityIds = explode(',', $entityIdList);
 
         $property = $propertyRequest->getProperty();
         $propertyName = $property->getName();
