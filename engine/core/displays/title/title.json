@@ -1,0 +1,11 @@
+{
+  "options":{
+    "action": {"info":"Which action to perform", "type":"enum","choices":["view","edit"],"default":"view"},
+    "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
+    "showTitle" : {"info":"Whether to show the title bar.", "type":"bool", "default":true},
+    "showLabels" : {"info":"Whether to show property labels", "type":"bool", "default":true},
+    "showDeleteButton" : {"info":"Whether to show a button to a delete interface.", "type":"bool", "default":false},
+    "showEditbutton" : {"info":"Whether to show a button to a edit interface.", "type":"bool", "default":false},
+    "onDone" : {"info":"Action to execute on done (show done button)","type":"function"}
+  }
+}
