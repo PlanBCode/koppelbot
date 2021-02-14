@@ -46,7 +46,9 @@ onUiChange = (content, optionName) => { // declared in /engine/api/api.js
   const entityClassName = options.uri.substr(1).split('/')[0];
   if (!entityClassName) return;
   if (optionName) {
-    options[optionName] = content;
+    if (typeof content === 'undefined' || content === '') delete options[optionName];
+    else options[optionName] = content;
+
     const defaultContent = optionSchemas[displayName].options[optionName].default;
     if (match(content, defaultContent)) content = undefined;
     xyz.setQueryParameter(optionName, content);
@@ -178,7 +180,10 @@ function onVariableChange (value, variableName) {
     INPUT.value = value;
     INPUT.id = `xyz-ui-variable-${variableName}`;
 
-    INPUT.oninput = INPUT.onpaste = () => xyz.setVariable(variableName, INPUT.value);
+    INPUT.oninput = INPUT.onpaste = () => {
+      if (INPUT.value === '') xyz.clearVariable(variableName);
+      else xyz.setVariable(variableName, INPUT.value);
+    };
 
     TD_value.appendChild(INPUT);
 

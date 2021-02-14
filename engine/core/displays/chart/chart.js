@@ -85,7 +85,7 @@ exports.display = {
           TD.className = 'xyz-list-icon';
           // TODO TD.innerHTML = '[]';// TODO select/unselect all
           TR.appendChild(TD);
-        } // TODO if color and select
+        } // TODO if color and multi select
         if (display.hasOption('color')) {
           const TD = document.createElement('TD');
           TD.className = 'xyz-list-icon';
@@ -96,6 +96,15 @@ exports.display = {
           const TD = document.createElement('TD');
           TD.innerText = groupBy;
           TR.appendChild(TD);
+        }
+        if (display.hasOption('select')) {
+          display.onSelect(selectEntityId => {
+            for (const TR of TABLE.childNodes) {
+              const entityId = display.hasOption('groupby') ? TR.groupId : TR.entityId;
+              if (entityId === selectEntityId) TR.classList.add('xyz-list-selected');
+              else TR.classList.remove('xyz-list-selected');
+            }
+          });
         }
 
         const aggregations = display.getOption('aggregations');
@@ -195,17 +204,19 @@ exports.display = {
         if (!found) { // create new row
           const TR = document.createElement('TR');
           TR.groupId = groupId;
+          TR.entityId = entityId;
           if (display.hasOption('select')) {
             const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
             const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
             if (display.isSelected(selectEntityClassName, selectEntityId) || display.getOption('default') === selectEntityId) {
               TR.classList.add('xyz-list-selected');
             }
+            TR.classList.add('xyz-list-selectable');
             TR.onclick = () => {
               display.select(selectEntityClassName, selectEntityId);
             };
           }
-          if (display.getOption('multiSelect')) {
+          if (display.hasOption('multiSelect')) {
             const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
             const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
 

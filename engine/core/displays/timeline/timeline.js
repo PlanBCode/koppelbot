@@ -179,6 +179,16 @@ exports.display = {
       };
     }
 
+    if (display.hasOption('select')) {
+      display.onSelect(selectEntityId => {
+        for (const NODE of DIV.childNodes) {
+          if (NODE.classList.contains('xyz-timeline-label')) {
+            NODE.classList[NODE.entityId === selectEntityId ? 'add' : 'remove']('xyz-list-selected');
+          }
+        }
+      });
+    }
+
     /* WIP
                 const DIV_lineCreator = document.createElement('DIV');
         DIV_lineCreator.className = 'xyz-timeline-line-creator';
@@ -235,14 +245,10 @@ exports.display = {
     LABEL.appendChild(DIV_date);
     LABEL.appendChild(TAG_label);
     LABEL.date = date;
-    LABEL.onclick = () => {
-      display.select();
-      for (const NODE of DIV.childNodes) {
-        if (NODE.classList.contains('xyz-timeline-label')) {
-          NODE.classList[NODE === LABEL ? 'add' : 'remove']('xyz-list-selected');
-        }
-      }
-    };
+    if (display.hasOption('select')) {
+      LABEL.onclick = () => display.select();
+    }
+
     DIV.appendChild(LABEL);
 
     const CONNECTOR = document.createElement('DIV');

@@ -26,10 +26,13 @@ function renderUiInput (xyz, options, WRAPPER) {
       WRAPPER.appendChild(LABEL);
     }
     INPUT.name = name;
-    INPUT.onpaste = () => variables.setVariable(name, INPUT.value);
-    INPUT.oninput = () => variables.setVariable(name, INPUT.value);
+    INPUT.onpaste = INPUT.oninput = () => {
+      if (INPUT.value === '') variables.clearVariable(name);
+      else variables.setVariable(name, INPUT.value);
+    };
+
     variables.onVariable(name, value => {
-      INPUT.value = value;
+      if (document.activeElement !== INPUT) INPUT.value = value;
     });
     WRAPPER.appendChild(INPUT);
   } else {

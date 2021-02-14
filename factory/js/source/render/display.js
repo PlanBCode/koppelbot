@@ -98,6 +98,19 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
     throw new Error('Illegal propertyPath or propertyName');
   };
   /**
+   * [getNode description]
+   * @param  {string|Array} propertyPathOrString TODO
+   * @returns {bool}                         TODO
+   */
+  this.hasNode = propertyPathOrString => {
+    return !!this.getNode(propertyPathOrString);
+    /* TODO
+    const filteredNode = response.filter(node, this.getPropertyPath());
+    if (typeof propertyPathOrString === 'string') return response.getSubNode(filteredNode, [propertyPathOrString]);
+    if (propertyPathOrString instanceof Array) return response.getSubNode(filteredNode, propertyPathOrString);
+    throw new Error('Illegal propertyPath or propertyName'); */
+  };
+  /**
    * [getFlatNodes description]
    * @returns {Object} TODO
    */
@@ -147,6 +160,7 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
       // nothing to do
     } else if (this.hasOption('color')) {
       const colorPropertyName = this.getOption('color');
+      if (!this.hasNode(colorPropertyName)) return 'black';
       string = this.getNode(colorPropertyName).getContent();// TODO check
       if (typeof string === 'number') string = string.toString();
     } else string = entityClassName + '/' + entityId;

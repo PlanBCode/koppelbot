@@ -30,11 +30,11 @@ table.xyz-list tr:nth-child(even) {
   width: 100%;
 }
 
-.xyz-list-item {
+table.xyz-list tr.xyz-list-selectable {
   cursor: pointer;
 }
 
-table.xyz-list tr.xyz-list-item:hover {
+table.xyz-list tr.xyz-list-selectable:hover {
   background-color: lightblue;
 }
 

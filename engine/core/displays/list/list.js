@@ -52,6 +52,14 @@ exports.display = {
           TR_header.appendChild(TD_header);
         }
       }
+      if (display.hasOption('select')) {
+        display.onSelect(selectEntityId => {
+          for (const TR of TABLE.childNodes) {
+            if (TR.entityId === selectEntityId) TR.classList.add('xyz-list-selected');
+            else TR.classList.remove('xyz-list-selected');
+          }
+        });
+      }
       TABLE.appendChild(TR_header);
     }
   },
@@ -114,16 +122,8 @@ exports.display = {
       if (display.isSelected() || display.getOption('default') === entityId) {
         TR_entity.classList.add('xyz-list-selected');
       }
-      TR_entity.onclick = () => {
-        display.select();
-        for (const row of TABLE.childNodes) {
-          if (row === TR_entity) {
-            row.classList.add('xyz-list-selected');
-          } else {
-            row.classList.remove('xyz-list-selected');
-          }
-        }
-      };
+      TR_entity.classList.add('xyz-list-selectable');
+      TR_entity.onclick = () => display.select();
     }
     TABLE.appendChild(TR_entity);
   },
