@@ -21,15 +21,25 @@ const handleVariableChange = (variableName, eventName) => {
   if (variableCallbacks.hasOwnProperty(variableName)) {
     const value = variables[variableName];
     if (variableCallbacks[variableName].hasOwnProperty('change')) {
-      for (const callback of variableCallbacks[variableName].change) callback(value);
+      for (const callback of variableCallbacks[variableName].change) callback(value, variableName);
     } else if (eventName !== 'change' && variableCallbacks[variableName].hasOwnProperty(eventName)) {
-      for (const callback of variableCallbacks[variableName][eventName]) callback(value);
+      for (const callback of variableCallbacks[variableName][eventName]) callback(value, variableName);
+    }
+  }
+  if (variableCallbacks.hasOwnProperty('*')) {
+    const value = variables[variableName];
+    if (variableCallbacks['*'].hasOwnProperty('change')) {
+      for (const callback of variableCallbacks['*'].change) callback(value, variableName);
+    } else if (eventName !== 'change' && variableCallbacks['*'].hasOwnProperty(eventName)) {
+      for (const callback of variableCallbacks['*'][eventName]) callback(value, variableName);
     }
   }
 };
 
 const hasVariable = variableName => variables.hasOwnProperty(variableName);
 const getVariable = (variableName, fallback) => variables.hasOwnProperty(variableName) ? variables[variableName] : fallback;
+
+const getVariables = () => JSON.parse(JSON.stringify(variables));
 
 const clearVariable = variableName => {
   delete variables[variableName];
@@ -118,6 +128,7 @@ exports.selectRemove = selectRemove;
 exports.isSelected = isSelected;
 
 exports.getVariable = getVariable;
+exports.getVariables = getVariables;
 exports.hasVariable = hasVariable;
 exports.setVariable = setVariable;
 exports.setVariables = setVariables;

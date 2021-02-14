@@ -10,6 +10,7 @@ function XYZ () {
 
   this.hasVariable = variableName => variables.hasVariable(variableName);
   this.getVariable = (variableName, fallback) => variables.getVariable(variableName, fallback);
+  this.getVariables = () => variables.getVariables();
   this.clearVariable = variableName => variables.clearVariable(variableName);
   this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
   this.setVariables = variableObject => variables.setVariables(variableObject);
@@ -50,6 +51,7 @@ exports.xyz = xyz;
 exports.onVariable = xyz.onVariable;
 exports.hasVariable = xyz.hasVariable;
 exports.getVariable = xyz.getVariable;
+exports.getVariables = xyz.getVariables;
 exports.setVariable = xyz.setVariable;
 exports.setVariables = xyz.setVariables;
 exports.clearVariable = xyz.clearVariable;

@@ -1,6 +1,7 @@
 //  optionSchemas is defined in /engine/ui.php
 const SELECT_macroFlavor = document.getElementById('xyz-ui-display-macroFlavor');
 const PRE_macro = document.getElementById('xyz-ui-display-macro');
+const TABLE_variables = document.getElementById('xyz-ui-display-variables');
 let displayName = xyz.getQueryParameter('display') || 'list';
 
 const uri = window.location.pathname.substr(3); // '/ui/$entityClassName/...' -> '$entityClassName'  TODO
@@ -157,5 +158,42 @@ function updateMacro () {
     PRE_macro.innerHTML = `<a href="${url}" target="_black">${url}</a> <a target="_blank" href="${window.location.origin}${moreUri}">More...</a>`;
   }
 }
+
+const INPUTsByVariableName = {};
+function onVariableChange (value, variableName) {
+  if (variableName === 'entityClass' || optionSchemas[displayName].options.hasOwnProperty(variableName)) return;
+
+  if (Object.keys(INPUTsByVariableName).length === 0) {
+    TABLE_variables.innerHTML = '<tr class="xyz-list-header"><td>VariableName</td><td>Value</td></tr>';
+  }
+  if (!INPUTsByVariableName.hasOwnProperty(variableName)) {
+    const TR = document.createElement('TR');
+    const TD_variableName = document.createElement('TD');
+    TD_variableName.innerText = variableName;
+    const TD_value = document.createElement('TD');
+    TR.appendChild(TD_variableName);
+    TR.appendChild(TD_value);
+
+    const INPUT = document.createElement('INPUT');
+    INPUT.value = value;
+    INPUT.id = `xyz-ui-variable-${variableName}`;
+
+    INPUT.oninput = INPUT.onpaste = () => xyz.setVariable(variableName, INPUT.value);
+
+    TD_value.appendChild(INPUT);
+
+    TABLE_variables.appendChild(TR);
+    INPUTsByVariableName[variableName] = INPUT;
+  } else {
+    const INPUT = INPUTsByVariableName[variableName];
+    if (document.activeElement !== INPUT) INPUT.value = value || '';
+  }
+}
+
+const variables = xyz.getVariables();
+for (const variableName in variables) onVariableChange(variables[variableName], variableName);
+
+xyz.onVariable('*', onVariableChange);
+
 onUiChange(displayName, 'display');
 updateOptions();
