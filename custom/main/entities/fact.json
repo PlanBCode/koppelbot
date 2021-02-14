@@ -33,7 +33,7 @@
     "type": "array",
     "subType": {
       "type": "reference",
-      "uri": "/source/*/file/id"
+      "uri": "/source/*"
     }
   }
 }

@@ -5,7 +5,7 @@ function request (method, uri, data, callback) {
   // TODO set content type and length headers
   // TODO allow for multiple hosts by prepending http(s)://..
   const location = window.location.origin + '/';
-
+  uri = encodeURI(uri);
   const xhr = new window.XMLHttpRequest();
   xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
 

@@ -1,5 +1,3 @@
-const {pathFromUri} = require('../../../../factory/js/source/uri/uri.js'); // TODO better solution
-
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
 
@@ -82,7 +80,6 @@ exports.display = {
       const TR = document.createElement('TR');
       TR.className = 'xyz-list-header';
       if (display.getOption('multiSelect')) {
-        const variableName = display.getOption('multiSelect');
         const TD = document.createElement('TD');
         // TODO TD.innerHTML = '[]';// TODO select/unselect all
         TR.appendChild(TD);
@@ -219,7 +216,14 @@ exports.display = {
 
           if (display.hasOption('groupby')) {
             const TD = document.createElement('TD');
-            TD.innerText = groupId;
+            const groupByPropertyName = display.getOption('groupby');
+            const groupByNode = display.getNode(groupByPropertyName);
+            if (groupByNode) {
+              const TAG = groupByNode.render('view', {display: 'title'});
+              TD.appendChild(TAG);
+            } else {
+              TD.innerText = groupId;
+            }
             TR.appendChild(TD);
           }
 

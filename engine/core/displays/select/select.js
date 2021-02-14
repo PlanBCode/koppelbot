@@ -25,7 +25,7 @@ exports.display = {
       SELECT.onchange = () => {
         const entityId = SELECT.options[SELECT.selectedIndex].value;
         const entityClassName = display.getEntityClassName();
-        display.select();
+        display.select(entityClassName, entityId);
       };
       if (!display.getOption('initialValue')) {
         const OPTION = document.createElement('OPTION');
