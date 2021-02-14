@@ -1,36 +1,38 @@
 /* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */
 
-html, body {
-    padding: 0;
-    margin: 0;
-    font-family: sans-serif;
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
 }
 
 input[type='submit'] {
-    background-color: rgb(76, 175, 80);
-    border: none;
-    border-radius: 5px;
-    color: white;
-    padding: 5px;
-    text-decoration: none;
-    margin: 4px 2px;
-    cursor: pointer;
+  background-color: rgb(76, 175, 80);
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 5px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
 }
+
 input[type='submit'].xyz-delete {
-    /*background-color: red;*/
+  /* background-color: red; */
 }
 
 input[type='submit'].xyz-edit {
-    /*background-color: orange;*/
+  /* background-color: orange; */
 }
-
 
 input[type='submit']:hover {
-    background-color: rgb(106, 205, 110)
+  background-color: rgb(106, 205, 110);
 }
 
-input[type="submit"]:disabled, input[type="submit"]:disabled:hover {
-    background: rgb(150, 150, 150)
+input[type="submit"]:disabled,
+input[type="submit"]:disabled:hover {
+  background: rgb(150, 150, 150);
 }
 
 
@@ -39,15 +41,18 @@ STATUS
 ==================================================================================================== */
 
 .xyz-waiting {
-    color: grey;
+  color: grey;
 }
 
-.xyz-status-400, .xyz-status-403, .xyz-status-404, .xyz-status-500 {
-    color: red;
+.xyz-status-400,
+.xyz-status-403,
+.xyz-status-404,
+.xyz-status-500 {
+  color: red;
 }
 
 .xyz-invalid-content {
-    color: red;
+  color: red;
 }
 
 /* ====================================================================================================
@@ -55,54 +60,74 @@ PAGE
 ==================================================================================================== */
 
 .xyz-page-header {
-    padding: 35px;
-    width: 100vw;
-    height: 30px;
-    background-color: white;
-    color: black;
-    border-bottom: 1px solid rgb(230, 230, 230);
-    font-size: xx-large;
+  padding: 35px;
+  width: 100vw;
+  height: 30px;
+  background-color: white;
+  color: black;
+  border-bottom: 1px solid rgb(230, 230, 230);
+  font-size: xx-large;
 }
 
 .xyz-page-navigation {
-    padding-top: 20px;
-    height: calc(100vh - 100px);
-    width: 200px;
-    background-color: rgb(247, 247, 247);
-    display: inline-block;
-    float: left;
+  padding-top: 20px;
+  height: calc(100vh - 100px);
+  width: 200px;
+  background-color: rgb(247, 247, 247);
+  display: inline-block;
+  float: left;
 }
 
-.xyz-page-navigation ul, .xyz-page-content ul {
-    list-style-type: none;
+.xyz-page-navigation ul,
+.xyz-page-content ul {
+  list-style-type: none;
 }
 
 .xyz-page-navigation li {
-    margin-bottom: 25px;
-    color: rgb(100, 100, 100);
+  margin-bottom: 25px;
+  color: rgb(100, 100, 100);
 }
 
 .xyz-page-navigation a {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  color: inherit;
 }
 
 a.xyz-page-navigation-current {
-    color: darkgoldenrod;
+  color: darkgoldenrod;
 }
 
 li.xyz-page-navigation-depth-0 {
-    margin-top: 40px;
-    font-weight: bold;
-    color: black;
+  margin-top: 40px;
+  font-weight: bold;
+  color: black;
 }
 
 .xyz-page-content {
-    padding: 50px;
-    width: calc(100vw - 300px);
-    height: calc(100vh - 200px);
-    display: inline-block;
-    float: left;
+  padding: 50px;
+  width: calc(100vw - 300px);
+  height: calc(100vh - 200px);
+  display: inline-block;
+  float: left;
+}
+
+/* ====================================================================================================
+DOC
+==================================================================================================== */
+
+.xyz-doc-wrapper {
+  background-color: darkgrey;
+  padding: 1cm;
+  margin-top: 1cm;
+  margin-bottom: 1cm;
+  margin-left: 2cm;
+  margin-right: 2cm;
+}
+
+.xyz-doc-wrapper > *:first-child {
+  background-color: white;
+  padding: 0.5cm;
+  display: block;
 }
 table.xyz-create,
 table.xyz-item,
@@ -115,6 +140,9 @@ table.xyz-list {
   background-color: white;
 }
 
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
 table tbody:first-child tr.xyz-create-header,
 table tbody:first-child tr.xyz-list-header,
 table tbody:first-child tr.xyz-item-header {

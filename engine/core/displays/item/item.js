@@ -12,72 +12,72 @@ function isFullEntity (uri) {
 exports.display = {
   /**
    * [waitingForInput description]
-   * @param  {DisplayItem} display TODO
+   * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
-  waitingForInput: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for input...';
+  waitingForInput: displayItem => {
+    displayItem.getWRAPPER().innerHTML = 'Waiting for input...';
   },
   /**
    * [waitingForInput description]
-   * @param  {DisplayItem} display TODO
+   * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
-  waitingForData: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for data...';
+  waitingForData: displayItem => {
+    displayItem.getWRAPPER().innerHTML = 'Waiting for data...';
   },
   /**
    * [waitingForInput description]
-   * @param  {DisplayItem} display TODO
+   * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
-  empty: display => {
-    display.getWRAPPER().innerHTML = 'No items to display.';
+  empty: displayItem => {
+    displayItem.getWRAPPER().innerHTML = 'No items to display.';
   },
   /**
    * [waitingForInput description]
-   * @param  {DisplayItem} display TODO
+   * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
-  first: display => {
-    display.getWRAPPER().innerHTML = '';
-    if (display.getOption('showCreateButton') === true) display.showCreateButton();
+  first: displayItem => {
+    displayItem.getWRAPPER().innerHTML = '';
+    if (displayItem.getOption('showCreateButton') === true) displayItem.showCreateButton();
   },
   /**
    * [waitingForInput description]
-   * @param  {DisplayItem} display TODO
+   * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
-  entity: display => {
-    const WRAPPER = display.getWRAPPER();
-    const entityId = display.getEntityId();
-    const entityClassName = display.getEntityClassName();
+  entity: displayItem => {
+    const WRAPPER = displayItem.getWRAPPER();
+    const entityId = displayItem.getEntityId();
+    const entityClassName = displayItem.getEntityClassName();
 
-    const columns = display.getFlatNodes();
+    const columns = displayItem.getFlatNodes();
 
     const TABLE_entity = document.createElement('TABLE');
     TABLE_entity.className = 'xyz-item';
     TABLE_entity.entityId = entityId;
     const uri = '/' + entityClassName + '/' + entityId;
-    const showTitle = display.getOption('showTitle') !== false;
-    const showEditButton = display.getOption('showEditButton') === true && display.getAction() !== 'edit';
+    const showTitle = displayItem.getOption('showTitle') !== false;
+    const showEditButton = displayItem.getOption('showEditButton') === true && displayItem.getAction() !== 'edit';
 
-    const showDeleteButton = display.getOption('showDeleteButton') === true && display.getAction() !== 'delete' && isFullEntity(display.getRequestUri());
-    const showDoneButton = display.getOption('onDone') && display.getAction() === 'edit';
+    const showDeleteButton = displayItem.getOption('showDeleteButton') === true && displayItem.getAction() !== 'delete' && isFullEntity(displayItem.getRequestUri());
+    const showDoneButton = displayItem.getOption('onDone') && displayItem.getAction() === 'edit';
 
     let TD_header;
     if (showTitle || showEditButton || showDeleteButton || showDoneButton) {
       const TR_header = document.createElement('TR');
       TR_header.className = 'xyz-item-header';
       TD_header = document.createElement('TD');
-      TD_header.setAttribute('colspan', display.getOption('showLabels') !== false ? '2' : '1');
+      TD_header.setAttribute('colspan', displayItem.getOption('showLabels') !== false ? '2' : '1');
       TR_header.appendChild(TD_header);
-      if (display.hasOption('color')) TR_header.style.backgroundColor = display.getColor();
+      if (displayItem.hasOption('color')) TR_header.style.backgroundColor = displayItem.getColor();
       TABLE_entity.appendChild(TR_header);
     }
 
     if (showTitle) {
-      TD_header.innerHTML += display.getTitle();
+      TD_header.innerHTML += displayItem.getTitle();
     }
     if (showDeleteButton) {
       const INPUT_deleteButton = document.createElement('INPUT');
@@ -86,9 +86,9 @@ exports.display = {
       INPUT_deleteButton.style.float = 'right';
       INPUT_deleteButton.value = 'Delete';
       INPUT_deleteButton.onclick = () => {
-        display.xyz.delete(uri); // TODO encapsulate xyz
+        displayItem.xyz.delete(uri); // TODO encapsulate xyz
       };
-      display.xyz.on(uri, 'access:delete', access => { // TODO encapsulate xyz   // detect access changes
+      displayItem.xyz.on(uri, 'access:delete', access => { // TODO encapsulate xyz   // detect access changes
         INPUT_deleteButton.disabled = !access;
       });
 
@@ -100,7 +100,7 @@ exports.display = {
       INPUT_doneButton.type = 'submit';
       INPUT_doneButton.value = 'Done';
       INPUT_doneButton.style.float = 'right';
-      const onDone = display.getOption('onDone');
+      const onDone = displayItem.getOption('onDone');
       if (typeof onDone === 'function') INPUT_doneButton.onclick = onDone;
       TD_header.appendChild(INPUT_doneButton);
     }
@@ -110,10 +110,10 @@ exports.display = {
       DIV_edit.style.display = 'none';
       WRAPPER.appendChild(DIV_edit);
 
-      display.xyz.ui({
+      displayItem.xyz.ui({
         display: 'item',
         action: 'edit',
-        uri: display.getRequestUri(),
+        uri: displayItem.getRequestUri(),
         showLabels: true,
         showDeleteButton,
         onDone: () => {
@@ -131,7 +131,7 @@ exports.display = {
         DIV_edit.style.display = 'block';
         TABLE_entity.style.display = 'none';
       };
-      display.xyz.on(uri, 'access:patch', access => { // TODO encapsulate xyz   // detect access changes
+      displayItem.xyz.on(uri, 'access:patch', access => { // TODO encapsulate xyz   // detect access changes
         INPUT_editButton.disabled = !access;
       });
       TD_header.appendChild(INPUT_editButton);
@@ -142,21 +142,21 @@ exports.display = {
       const TR_entity = document.createElement('TR');
       // todo name
       const TD_entityContent = document.createElement('TD');
-      const TAG = node.render(display.getAction(), display.getOptions());
+      const TAG = node.render(displayItem.getAction(), displayItem.getOptions());
       TD_entityContent.appendChild(TAG);
       TR_entity.appendChild(TD_entityContent);
       TABLE_entity.appendChild(TR_entity);
     } else {
       for (const flatPropertyName in columns) {
         const TR_flatProperty = document.createElement('TR');
-        if (display.getOption('showLabels') !== false) {
+        if (displayItem.getOption('showLabels') !== false) {
           const TD_flatPropertyName = document.createElement('TD');
-          TD_flatPropertyName.innerHTML = display.getDisplayName(flatPropertyName.split('.'));
+          TD_flatPropertyName.innerHTML = displayItem.getDisplayName(flatPropertyName.split('.'));
           TR_flatProperty.appendChild(TD_flatPropertyName);
         }
         const TD_flatPropertyContent = document.createElement('TD');
         const node = columns[flatPropertyName];
-        const TAG = node.render(display.getAction(), display.getSubOptions(flatPropertyName));
+        const TAG = node.render(displayItem.getAction(), displayItem.getSubOptions(flatPropertyName));
         TD_flatPropertyContent.appendChild(TAG);
         TR_flatProperty.appendChild(TD_flatPropertyContent);
         TABLE_entity.appendChild(TR_flatProperty);
@@ -166,12 +166,12 @@ exports.display = {
   },
   /**
    * [waitingForInput description]
-   * @param  {DisplayItem} display TODO
+   * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
-  remove: display => {
-    const WRAPPER = display.getWRAPPER();
-    const entityId = display.getEntityId();
+  remove: displayItem => {
+    const WRAPPER = displayItem.getWRAPPER();
+    const entityId = displayItem.getEntityId();
     for (const TABLE_entity of WRAPPER.childNodes) {
       if (typeof TABLE_entity.entityId === 'string' && (TABLE_entity.entityId === entityId || entityId === '*')) {
         WRAPPER.removeChild(TABLE_entity);

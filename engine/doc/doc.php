@@ -23,9 +23,8 @@ class DocResponse extends HttpResponse2
         'doc/api/connectors' => "Connectors",
 
         'doc/ui' => "UI Reference",
+
         'doc/ui/displays' => "Displays",
-        'doc/ui/templates' => "HTML templates",
-        'doc/ui/types' => "Types",
 
         'doc/dev' => "Developers",
         'doc/dev/files' => "File structure",

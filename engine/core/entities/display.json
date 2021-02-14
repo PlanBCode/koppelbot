@@ -19,6 +19,13 @@
       "key": "key"
     }
   },
+  "info": {
+    "type": "string",
+    "default":"",
+    "connector": {
+      "key": ".info"
+    }
+  },
   "content": {
     "type": "object",
     "subType": {

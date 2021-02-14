@@ -9,6 +9,9 @@ table.xyz-list {
   background-color: white;
 }
 
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
 table tbody:first-child tr.xyz-create-header,
 table tbody:first-child tr.xyz-list-header,
 table tbody:first-child tr.xyz-item-header {

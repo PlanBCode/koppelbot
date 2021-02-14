@@ -1,16 +1,98 @@
-TODO
+<p>A display is created from an html macro:</p>
 
+<div class="xyz-doc-wrapper">
+  <pre>
+<&#8203;xyz id="myDisplay" uri="/fruit" display="list"/>
+</pre>
+</div>
+<p>When served this is automatically transformed to the following html with javascript code:</p>
 
-add display methods:
+<div class="xyz-doc-wrapper">
+<pre>
+<&#8203;script>xyz.ui({id:'myDisplay', uri:'/fruit', display:'list'});<&#8203;/script>
+</pre>
+</div>
 
-waitingForInput
+<p>The <code>xyz.ui</code> function then converts this html to the following DOM Element when the page is loaded by the client:</p>
 
-waitingForData
+<div class="xyz-doc-wrapper">
+  <pre>
+<&#8203;div id="myDisplay"><&#8203;/div>
+</pre>
+</div>
+<!-- TODO links to diplay class -->
+<p>This div element is called the display <i>Wrapper</i> and its contents are populated by the Display class.</p>
 
-empty
+<p>Each implementation of the Display class (for example the 'list' or the 'map') has the following methods. These methods align with the life cycle of a display: waiting for data and then receiving data.</p>
 
-first
+<!-- TODO links to diplay methods-->
+<table class="xyz-list">
+<tr class="xyz-list-header"><td>Method</td><td>Phase</td></tr>
+<tr><td><code>waitingForInput</code></td><td>Only used if the uri contains a variable (for example <code>$variable</code>) which has does not have a value yet.</td></tr>
+<tr><td><code>waitingForData</code></td><td>When waiting to receive data.</td></tr>
+<tr><td><code>empty</code></td><td>Called before the first item is received or when the last element is removed.</td></tr>
+<tr><td><code>first</code></td><td>Called when the first item is received.</td></tr>
+<tr><td><code>entity</code></td><td>Called for each item that is received.</td></tr>
+<tr><td><code>remove</code></td><td>Called when an item is removed.</td></tr>
+</table>
 
-entity
+<p>Each of these methods updates the <i>Wrapper</i> element accordingly. A simplified example would be:<p>
 
-remove
+<div class="xyz-doc-wrapper">
+  <pre>
+// /custom/myPlugin/displays/mySimpleDisplay.js
+
+exports.display = { // This exposes our methods to the rest of the xyz system.
+
+  waitingForInput: displayItem => {
+    // We take the Wrapper that contains this display and update its text content.
+    displayItem.getWrapper().innerText = "I'm now waiting for input...";
+  },
+
+  waitingForData: displayItem => {
+    // Instead of replacing the Wrapper text we add a line break and a message:
+    displayItem.getWrapper().innerText += "<&#8203;br/> I'm now waiting for data...";
+  },
+
+  empty: displayItem => {
+    displayItem.getWrapper().innerText += "<&#8203;br/> I'm empty!";
+  },
+
+  first: displayItem => {
+    displayItem.getWrapper().innerText += "<&#8203;br/> I've received my first item!";
+  },
+
+  entity: displayItem => {
+    // we use displayItem.getEntityId() to retrieve the id of the item that was received.
+    displayItem.getWrapper().innerText += "<&#8203;br/> I've received an item: "+ displayItem.getEntityId() + "!";
+  },
+
+  remove: displayItem => {
+    displayItem.getWrapper().innerText += "<&#8203;br/> An item was removed!";
+  }
+}
+</pre>
+</div>
+
+<p>We can then use this <code>mySimpleDisplay</code> in a macro:</p>
+
+<div class="xyz-doc-wrapper">
+<pre>
+<&#8203;xyz uri="/fruit" display="mySimpleDisplay"/>
+</pre>
+</div>
+
+<p>The result will then be as follows:</p>
+
+<div class="xyz-doc-wrapper">
+<div>
+I'm now waiting for input...
+<br/> I'm now waiting for data...
+<br/> I'm empty!
+<br/> I've received my first item!
+<br/> I've received an item: apple!
+<br/> I've received an item: orange!
+<br/> I've received an item: grape!
+<br/> I've received an item: melon!
+</div>
+</div>

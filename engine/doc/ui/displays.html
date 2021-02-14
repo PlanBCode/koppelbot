@@ -1,14 +1,55 @@
+<h2>Displays</h2>
 
 <p>Displays are used to present entities in an html page.</p>
 
-<p>The following html code will generate a list of fruits.</p>
+<p>The following html macro will generate a list of fruits.</p>
 
+<div class="xyz-doc-wrapper">
 <code><pre>
 <&#8203;xyz uri="/fruit/*/name,color" display="list"/>
 </pre></code>
+</div>
 
+<p>The result</p>
+
+<div class="xyz-doc-wrapper">
 <xyz uri="/fruit/*/name,color" display="list"/>
+</div>
 
-The following displays are available:
+<p>The following displays are available:</p>
 
-<xyz uri="/display/*/id" showCreateButton="false" display="list"/>
+<xyz uri="/display/*/id,info" showCreateButton="false" display="list"/>
+
+<h2>Selection and Variables</h2>
+
+TODO input variables
+
+combin
+
+
+<div class="xyz-doc-wrapper">
+<code><pre>
+<&#8203;xyz uri="/fruit/*/name,color" select="myFruit" display="list"/>
+<&#8203;xyz uri="/fruit/$myFruit" display="item"/>
+</pre></code>
+</div>
+
+
+<div class="xyz-doc-wrapper">
+<xyz uri="/fruit/*/name,color" select="myFruit" display="list"/>
+<xyz uri="/fruit/$myFruit/name,color" dynamic="true" display="item"/>
+<xyz name="myFruit" dynamic="true" display="input"/>
+</div>
+
+<div class="xyz-doc-wrapper">
+<code><pre>
+<&#8203;xyz name="myFruit" display="input"/>
+<&#8203;xyz uri="/fruit/*/name,color" select="myFruit" display="list"/>
+</pre></code>
+</div>
+
+<div class="xyz-doc-wrapper">
+
+<xyz name="myFruit2" dynamic="true" display="input"/>
+<xyz uri="/fruit/$myFruit2/name,color" dynamic="true" display="item"/>
+</div>

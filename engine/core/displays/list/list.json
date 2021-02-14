@@ -1,4 +1,5 @@
 {
+  "info" : "Table view. Items per row, properties per column.",
   "options":{
     "select" : {"info":"Define a variable that stores the selection of this list.", "type":"string"},
     "multiSelect" : {"info":"Whether to allow multiple entities to be selected.", "type":"string", "default":false},

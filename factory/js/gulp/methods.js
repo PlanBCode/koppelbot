@@ -119,7 +119,7 @@ const generateJsDoc = (path, title, docPath) => cb => {
       }
       const hasReturn = returns && !returns.toLowerCase().includes('{void}');
       abstract = abstract ? '<span class="xyz-doc-abstract">abstract</span> ' : '';
-      html += `  <div class="xyz-doc-method"><h3>${abstract}${name}(<span class="xyz-doc-signature">${Object.keys(params).join(',')}</span>)`;
+      html += `  <div class="xyz-doc-method"><h3>${abstract}${name}(<span class="xyz-doc-signature">${Object.keys(params).join(', ')}</span>)`;
       if (hasReturn) {
         html += ` &rarr; <span class="xyz-doc-returnSignature">${parseType(returns)}</span>`;
       }
