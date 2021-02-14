@@ -1,8 +1,13 @@
 {
   "options":{
+    "select" : {"info":"Define a variable that stores the selection of this chart.", "type":"string"},
+    "multiSelect" : {"info":"Whether to allow multiple entities to be selected.", "type":"string", "default":false},
+    "default" : {"info":"The default selected item.", "type":"string"},
+    "showHeader" : {"info":"Whether to show the table header.", "type":"bool", "default":true},
+
     "flavor" : {"info":"Type of chart: table, bar,line,etc", "type":"enum","choices":["table", "line", "bar", "rader", "doughnut", "pie", "polarArea", "bubble", "scatter"]},
     "showLegend" : {"info":"Whether to display the legend", "type":"bool","TODO":"TODO"},
     "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
-    "groupBy" : {"info":"By which property to group aggregations.", "type":"string","TODO":"TODO"}
+    "groupby" : {"info":"By which property to group aggregations.", "type":"string","TODO":"TODO"}
   }
 }

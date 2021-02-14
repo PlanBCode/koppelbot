@@ -77,33 +77,35 @@ exports.display = {
     if (flavor === 'table') {
       const TABLE = document.createElement('TABLE');
       TABLE.className = 'xyz-list';
-      const TR = document.createElement('TR');
-      TR.className = 'xyz-list-header';
-      if (display.getOption('multiSelect')) {
-        const TD = document.createElement('TD');
-        // TODO TD.innerHTML = '[]';// TODO select/unselect all
-        TR.appendChild(TD);
-      } // TODO if color and select
-      if (display.hasOption('color')) {
-        const TD = document.createElement('TD');
-        TR.appendChild(TD);
-      }
-      if (display.hasOption('groupby')) {
-        const groupBy = display.getOption('groupby');
-        const TD = document.createElement('TD');
-        TD.innerText = groupBy;
-        TR.appendChild(TD);
-      }
+      if (display.getOption('showHeader') !== false) {
+        const TR = document.createElement('TR');
+        TR.className = 'xyz-list-header';
+        if (display.getOption('multiSelect')) {
+          const TD = document.createElement('TD');
+          // TODO TD.innerHTML = '[]';// TODO select/unselect all
+          TR.appendChild(TD);
+        } // TODO if color and select
+        if (display.hasOption('color')) {
+          const TD = document.createElement('TD');
+          TR.appendChild(TD);
+        }
+        if (display.hasOption('groupby')) {
+          const groupBy = display.getOption('groupby');
+          const TD = document.createElement('TD');
+          TD.innerText = groupBy;
+          TR.appendChild(TD);
+        }
 
-      const aggregations = display.getOption('aggregations');
-      for (const aggregation of aggregations) {
-        const [aggregator, propertyName] = aggregation;
-        const label = aggregator + '(' + propertyName + ')';
-        const TD = document.createElement('TD');
-        TD.innerText = label;
-        TR.appendChild(TD);
+        const aggregations = display.getOption('aggregations');
+        for (const aggregation of aggregations) {
+          const [aggregator, propertyName] = aggregation;
+          const label = aggregator + '(' + propertyName + ')';
+          const TD = document.createElement('TD');
+          TD.innerText = label;
+          TR.appendChild(TD);
+        }
+        TABLE.appendChild(TR);
       }
-      TABLE.appendChild(TR);
 
       WRAPPER.appendChild(TABLE);
     } else {
@@ -191,6 +193,16 @@ exports.display = {
         if (!found) { // create new row
           const TR = document.createElement('TR');
           TR.groupId = groupId;
+          if (display.hasOption('select')) {
+            const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
+            const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
+            if (display.isSelected(selectEntityClassName, selectEntityId) || display.getOption('default') === selectEntityId) {
+              TR.classList.add('xyz-list-selected');
+            }
+            TR.onclick = () => {
+              display.select(selectEntityClassName, selectEntityId);
+            };
+          }
           if (display.getOption('multiSelect')) {
             const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
             const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
