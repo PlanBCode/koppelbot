@@ -24,8 +24,8 @@ function renderUiInput (xyz, options, WRAPPER) {
     INPUT.name = name;
     INPUT.onpaste = () => variables.setVariable(name, INPUT.value);
     INPUT.oninput = () => variables.setVariable(name, INPUT.value);
-    variables.registerUri(xyz, '$' + name, () => {
-      INPUT.value = variables.getVariable(name, '');
+    variables.onVariable(name, value => {
+      INPUT.value = value;
     });
     WRAPPER.appendChild(INPUT);
   } else {
