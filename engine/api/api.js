@@ -16,17 +16,17 @@ if (ui) {
   const uri = window.location.pathname.substr(3); // '/ui/a/b/c/' -> '/a/b/c'
   const path = uri.substr(1).split('/'); // '/a/b/c/' -> ['a','b','c']
 
-  INPUT_uri.value = uri;
+  if (document.activeElement !== INPUT_uri) INPUT_uri.value = uri;
   xyz.setVariable('entityClass', path[0]);
-  INPUT_entityId.value = path[1] || '';
-  INPUT_property.value = path.slice(2).join('/');
+  if (document.activeElement !== INPUT_entityId) INPUT_entityId.value = path[1] || '';
+  if (document.activeElement !== INPUT_property) INPUT_property.value = path.slice(2).join('/');
 } else {
-  INPUT_uri.value = xyz.getQueryParameter('uri') || '';
-  INPUT_entityId.value = xyz.getQueryParameter('entityId') || '';
-  INPUT_property.value = xyz.getQueryParameter('property') || '';
+  if (document.activeElement !== INPUT_uri)INPUT_uri.value = xyz.getQueryParameter('uri') || '';
+  if (document.activeElement !== INPUT_entityId) INPUT_entityId.value = xyz.getQueryParameter('entityId') || '';
+  if (document.activeElement !== INPUT_property) INPUT_property.value = xyz.getQueryParameter('property') || '';
   SELECT_commandFlavor.value = xyz.getQueryParameter('commandFlavor') || 'url';
   SELECT_method.value = xyz.getQueryParameter('method') || 'GET';
-  INPUT_data.value = xyz.getQueryParameter('data') || '';
+  if (document.activeElement !== INPUT_data) INPUT_data.value = xyz.getQueryParameter('data') || '';
 }
 
 INPUT_uri.oninput = INPUT_uri.onpaste = () => {
@@ -36,8 +36,8 @@ INPUT_uri.oninput = INPUT_uri.onpaste = () => {
   const entityId = path[1] || '';
   const property = path.slice(2).join('/');
   xyz.setVariable('entityClass', entityClass);
-  INPUT_entityId.value = entityId;
-  INPUT_property.value = property;
+  if (document.activeElement !== INPUT_entityId) INPUT_entityId.value = entityId;
+  if (document.activeElement !== INPUT_property) INPUT_property.value = property;
   if (onUiChange) onUiChange(); // ./engine/ui/ui.js
   onCommandChange();
 };
@@ -50,7 +50,7 @@ function onPathChange () {
   if (entityId) uri += '/' + entityId;
   else if (property) uri += '/*';
   if (property) uri += '/' + property;
-  INPUT_uri.value = uri;
+  if (document.activeElement !== INPUT_uri) INPUT_uri.value = uri;
   if (onUiChange) onUiChange(); // ./engine/ui/ui.js
   onCommandChange();
 }
