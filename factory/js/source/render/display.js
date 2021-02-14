@@ -232,6 +232,20 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * [multiSelectNone description]
    * @returns {void} TODO
    */
+  /**
+    * [multiSelectToggle description]
+    * @param  {string} [entityClassName_] TODO
+    * @param  {string} [entityId_]        TODO
+    * @returns {void}                 TODO
+    */
+  this.multiSelectToggle = (entityClassName_ = entityClassName, entityId_ = entityId) => {
+    if (this.isMultiSelected(entityClassName_, entityId_)) xyz.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
+    else xyz.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'));
+  };
+  /**
+    * [multiSelectNone description]
+    * @returns {void} TODO
+    */
   this.multiSelectAll = () => xyz.select('*', '*', this.getOption('multiSelect'));
   /**
    * [multiSelectNone description]

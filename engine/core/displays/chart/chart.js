@@ -128,7 +128,12 @@ exports.display = {
         data: {datasets: []},
         options: { // TODO parametrize
           legend: { // https://www.chartjs.org/docs/latest/configuration/legend.html
-            display: display.getOption('showLegend') !== false
+            display: display.getOption('showLegend') !== false,
+            onClick: function (event, elem) {
+              const entityId = WRAPPER.chart.data.datasets[0].entityIds[elem.index];
+              if (display.hasOption('select')) display.select(undefined, entityId);
+              if (display.hasOption('multiSelect')) display.multiSelectToggle(undefined, entityId);
+            }
           }
           /* scales: { //TODO only if applicable (not for pie charts)
             yAxes: [{
@@ -139,13 +144,14 @@ exports.display = {
           } */
         }
       });
-      if (display.hasOption('select')) {
+      if (display.hasOption('select') || display.hasOption('multiSelect')) {
         CANVAS.onclick = function (evt) {
           // activePoints is an array of points on the canvas that are at the same position as the click event.
           const activePoints = WRAPPER.chart.getElementsAtEvent(evt);
           if (activePoints.length > 0) {
             const selectEntityId = WRAPPER.chart.data.datasets[0].entityIds[activePoints[0]._index];
-            display.select(undefined, selectEntityId);
+            if (display.hasOption('select')) display.select(undefined, selectEntityId);
+            if (display.hasOption('multiSelect')) display.multiSelectToggle(undefined, selectEntityId);
           }
         };
         display.onSelect(selectEntityId => {
