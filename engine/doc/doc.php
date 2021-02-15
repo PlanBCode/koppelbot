@@ -4,10 +4,10 @@ class DocRequest extends HttpRequest2
 {
     public function createResponse(): DocResponse
     {
-        if($this->uri === 'map') return new DocResponse($this->uri, '');
+        if($this->uri === 'map') return new DocResponse($this->uri, $this->getQuery(), $this->getQuery(), '');
         $fileName = $this->uri === 'doc' ? './engine/doc/doc.html' : './engine/'.$this->uri.'.html';
-        if(file_exists($fileName)) return new DocResponse($this->uri, file_get_contents($fileName));
-        return new DocResponse($this->uri, 'Page Not Found',404);
+        if(file_exists($fileName)) return new DocResponse($this->uri, $this->getQuery(), file_get_contents($fileName));
+        return new DocResponse($this->uri, $this->getQuery(), 'Page Not Found',404);
     }
 }
 
@@ -92,48 +92,62 @@ class DocResponse extends HttpResponse2
       return $map;
     }
 
-    public function __construct(string $currentUri, $content, $status = 200)
+    public function __construct(string $currentUri, Query &$query, $content, $status = 200, array $headers = [])
     {
         $rootUri = 'http://localhost:8000/';//TODO proper location
 
-        $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
-        $currentDepth = substr_count($currentUri, '/');
-        $path = explode('/',$currentUri);
-        $parentUri = implode('/',array_slice($path,0, count($path)-1));
-        $navigation = '<ul>';
-        foreach (self::$menuItems as $uri => $menuItem) {
-            $depth = substr_count($uri, '/');
-            if($depth > $currentDepth +1) continue;
-            if($depth >= $currentDepth && substr($uri,0, strlen($parentUri)) !== $parentUri) continue;
-            if($depth > $currentDepth && substr($uri,0, strlen($currentUri)) !== $currentUri) continue;
+        if($query->checkToggle('embed')){
+          $content =
+              '<html>
+              <head>
+                  <title> ' . $title . '</title >
+                  <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
+                  <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
+              </head>
+              <body>
+              <div class="xyz-page-content">' . $content . '</div>
+              </body>
+          </html>';
+        } else {
 
-            $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current"' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
+            $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
+            $currentDepth = substr_count($currentUri, '/');
+            $path = explode('/',$currentUri);
+            $parentUri = implode('/',array_slice($path,0, count($path)-1));
+            $navigation = '<ul>';
+            foreach (self::$menuItems as $uri => $menuItem) {
+                $depth = substr_count($uri, '/');
+                if($depth > $currentDepth +1) continue;
+                if($depth >= $currentDepth && substr($uri,0, strlen($parentUri)) !== $parentUri) continue;
+                if($depth > $currentDepth && substr($uri,0, strlen($currentUri)) !== $currentUri) continue;
+
+                $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current"' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
 
 
 
-            if ($depth === 0) {
-                $navigation .= '<li class="xyz-page-navigation-depth-0">' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
-            } else {
-                $navigation .= '<li>' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
+                if ($depth === 0) {
+                    $navigation .= '<li class="xyz-page-navigation-depth-0">' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
+                } else {
+                    $navigation .= '<li>' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
+                }
             }
+            if($currentUri === 'map') $content = $this->getSiteMap($rootUri);
+
+            $navigation .= '</ul>';
+            $content =
+                '<html>
+                <head>
+                    <title> ' . $title . '</title >
+                    <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
+                    <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
+                </head>
+                <body>
+                <div class="xyz-page-header">' . $title . '</div>
+                <div class="xyz-page-navigation">' . $navigation . '</div>
+                <div class="xyz-page-content">' . $content . '</div>
+                </body>
+            </html>';
         }
-        if($currentUri === 'map') $content = $this->getSiteMap($rootUri);
-
-        $navigation .= '</ul>';
-        $content =
-            '<html>
-            <head>
-                <title> ' . $title . '</title >
-                <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
-                <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
-            </head >
-            <body >
-            <div class="xyz-page-header">' . $title . '</div>
-            <div class="xyz-page-navigation">' . $navigation . '</div>
-            <div class="xyz-page-content">' . $content . '</div>
-            </body >
-        </html > ';
-
-        parent::__construct($status, replaceXyzTag($content));
+        parent::__construct($status, replaceXyzTag($content), $headers);
     }
 }

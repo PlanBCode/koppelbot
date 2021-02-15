@@ -47,45 +47,54 @@ class UiRequest extends HttpRequest2
           $optionSchemas[$displayName] = json_decode(file_get_contents($dir.'/'.$displayName.'.json'), true);
           $optionSchemas[$displayName]['options'] = array_merge($defaultOptions, $optionSchemas[$displayName]['options']);
         }
+        if($this->query->checkToggle('embed')) {
+          $body =  '<div id="xyz-ui-display"></div>
+          <script>
+            const optionSchemas = '. json_encode($optionSchemas).';
+            '.file_get_contents('./engine/ui/ui.js').'
+            </script>';
 
-        require_once __DIR__ . '/../api/landing.php';
+            return new DocResponse('ui' . $this->uri, $this->getQuery(), $body, 200, ["Content-Security-Policy"=> "frame-ancestors *"]);            
+        } else {
 
-        $body = '';
-        if ($body !== '') $body .= '<br/>';
-        $body .= '<table class="xyz-list">
-          <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
-          <tr><td colspan="2" style="overflow: scroll; padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"></div></td></tr>';
+          require_once __DIR__ . '/../api/landing.php';
 
-        $inputs = renderInputs($this->uri.'?'.$this->queryString);
-        if($inputs){
-        $body .= '<tr class="xyz-list-header"><td colspan="2">Inputs</td></tr>'
-              . $inputs;
+          $body = '';
+          if ($body !== '') $body .= '<br/>';
+          $body .= '<table class="xyz-list">
+            <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
+            <tr><td colspan="2" style="overflow: scroll; padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"></div></td></tr>';
+
+          $inputs = renderInputs($this->uri.'?'.$this->queryString);
+          if($inputs){
+          $body .= '<tr class="xyz-list-header"><td colspan="2">Inputs</td></tr>'
+                . $inputs;
+          }
+
+
+          $body .= '</table>
+
+          '.APILandingHtml(false).'
+
+          <table id="xyz-ui-display-options" class="xyz-list"></table>
+          <table class="xyz-list">
+            <tr class="xyz-list-header"><td>UI Macro</td></tr>
+            <tr><td>
+            <select id="xyz-ui-display-macroFlavor" onchange="onUiChange();">
+              <option value="ui">ui</option>
+              <option value="api">api</option>
+              <option value="embed">embed</option>
+            </select>
+            </td></tr>
+            <tr><td style="padding:1cm;" ><pre id="xyz-ui-display-macro"></pre></td></tr>
+            <tr><td><table  class="xyz-list" id="xyz-ui-display-variables"></table></td></tr>
+          </table>
+          <script>
+          const optionSchemas = '. json_encode($optionSchemas).';
+          '.file_get_contents('./engine/ui/ui.js').'
+          </script>
+          ';
+          return new DocResponse('ui' . $this->uri, $this->getQuery(), $body);
         }
-
-
-        $body .= '</table>
-
-        '.APILandingHtml(false).'
-
-        <table id="xyz-ui-display-options" class="xyz-list"></table>
-        <table class="xyz-list">
-          <tr class="xyz-list-header"><td>UI Macro</td></tr>
-          <tr><td>
-          <select id="xyz-ui-display-macroFlavor" onchange="onUiChange();">
-            <option value="ui">ui</option>
-            <option value="api">api</option>
-            <option value="embed">embed</option>
-          </select>
-          </td></tr>
-          <tr><td style="padding:1cm;" ><pre id="xyz-ui-display-macro"></pre></td></tr>
-          <tr><td><table  class="xyz-list" id="xyz-ui-display-variables"></table></td></tr>          
-        </table>
-        <script>
-        const optionSchemas = '. json_encode($optionSchemas).';
-        '.file_get_contents('./engine/ui/ui.js').'
-        </script>
-        ';
-
-        return new DocResponse('ui' . $this->uri, $body);
     }
 }

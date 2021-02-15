@@ -141,24 +141,9 @@ class RequestObject
         return $this->requestId;
     }
 
-    public function getMethod(): string
-    {
-        return $this->method;
-    }
-
     public function setMethod(string $method): void
     {
       $this->method = $method;
-    }
-
-    public function getUri(): string
-    {
-        return $this->requestUri;
-    }
-
-    public function getQuery(): Query
-    {
-        return $this->query;
     }
 
     public function getEntityIdList(): string
@@ -176,6 +161,20 @@ class RequestObject
         return $this->accessGroups;
     }
 
+    public function getUri(): string
+    {
+        return $this->requestUri;
+    }
+
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+
+    public function getQuery(): Query
+    {
+        return $this->query;
+    }
 }
 
 function isSingularPath(array $path): bool
@@ -220,8 +219,7 @@ class ApiError
 
 class ApiRequest extends HttpRequest2
 {
-    /** @var Query */
-    protected $query;
+
     /** @var string[] */
     protected $path;
 
@@ -232,7 +230,6 @@ class ApiRequest extends HttpRequest2
 
     public function __construct(string $method, string $uri, string $queryString, array $headers, string $content, array $accessGroups)
     {
-        $this->query = new Query($queryString);
         if (substr($uri, -1, 1) === '/') $uri = substr($uri, 0, -1); // '/a/b/c/' -> '/a/b/c'
         $this->path = array_slice(explode('/', $uri), 1); // '/a/b/c' -> ['a','b','c']
         $this->errors = [];
@@ -365,7 +362,7 @@ class ApiRequest extends HttpRequest2
     {
         if ($this->uri === '') {
           require_once 'landing.php';
-          return new DocResponse('api' . $this->uri, APILandingHtml());
+          return new DocResponse('api' . $this->uri, $this->getQuery(), APILandingHtml());
         }
 
         $requestResponses = $this->getRequestResponses();

@@ -38,22 +38,9 @@ function match (content, defaultContent) {
   return content === defaultContent || (typeof defaultContent === 'undefined' && content === '');
 }
 
-onUiChange = (content, optionName) => { // declared in /engine/api/api.js
-  options.uri = INPUT_uri.value;
-
-  window.history.pushState({html: null, pageTitle: document.title}, '', window.location.origin + '/ui' + options.uri + window.location.search);
-
-  const entityClassName = options.uri.substr(1).split('/')[0];
-  if (!entityClassName) return;
-  if (optionName) {
-    if (typeof content === 'undefined' || content === '') delete options[optionName];
-    else options[optionName] = content;
-
-    const defaultContent = optionSchemas[displayName].options[optionName].default;
-    if (match(content, defaultContent)) content = undefined;
-    xyz.setQueryParameter(optionName, content);
-  }
+function render () {
   const WRAPPER = document.getElementById('xyz-ui-display');
+
   const displayOptions = {
 
     ...options,
@@ -70,6 +57,24 @@ onUiChange = (content, optionName) => { // declared in /engine/api/api.js
     displayOptions.showDeleteButton = typeof displayOptions.showDeleteButton === 'undefined' ? true : displayOptions.showDeleteButton;
   }
   if (WRAPPER) xyz.ui(displayOptions, WRAPPER);
+}
+
+onUiChange = (content, optionName) => { // declared in /engine/api/api.js
+  options.uri = INPUT_uri.value;
+
+  window.history.pushState({html: null, pageTitle: document.title}, '', window.location.origin + '/ui' + options.uri + window.location.search);
+
+  const entityClassName = options.uri.substr(1).split('/')[0];
+  if (!entityClassName) return;
+  if (optionName) {
+    if (typeof content === 'undefined' || content === '') delete options[optionName];
+    else options[optionName] = content;
+
+    const defaultContent = optionSchemas[displayName].options[optionName].default;
+    if (match(content, defaultContent)) content = undefined;
+    xyz.setQueryParameter(optionName, content);
+  }
+  render();
 
   if (optionName === 'display') {
     displayName = content;
@@ -195,10 +200,12 @@ function onVariableChange (value, variableName) {
   }
 }
 
-const variables = xyz.getVariables();
-for (const variableName in variables) onVariableChange(variables[variableName], variableName);
+if (SELECT_macroFlavor) {
+  const variables = xyz.getVariables();
+  for (const variableName in variables) onVariableChange(variables[variableName], variableName);
 
-xyz.onVariable('*', onVariableChange);
+  xyz.onVariable('*', onVariableChange);
 
-onUiChange(displayName, 'display');
-updateOptions();
+  onUiChange(displayName, 'display');
+  updateOptions();
+} else render();
