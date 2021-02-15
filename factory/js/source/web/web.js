@@ -36,7 +36,7 @@ exports.getQueryParameters = getQueryParameters;
 exports.getQueryParameter = queryParameterName => getQueryParameters()[queryParameterName];
 
 function splitKeyValuePair (keyValueString) { // 'a=1' -> ['a','=','1']
-  return /^(?<key>[*,;%\w.-]+)(?<operator>[^*,;%\w.-]+)(?<value>[*,;%\w.-]*)$/.exec(keyValueString).slice(1);
+  return /^(?<key>[*,;%\w.-]+)(?<operator>[^*,;%\w.-]+)?(?<value>[*,;%\w.-]*)?$/.exec(keyValueString).slice(1);
 }
 
 function updateQueryParameter (queryParameterName, value, operator = '=') {
