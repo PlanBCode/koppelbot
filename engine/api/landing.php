@@ -1,6 +1,7 @@
 <?
 function APILandingHtml($full = true){
-  $html = '
+  if($full) $html = '<p>Welcome to the XYZ REST API. This page offers an interface to create and execute API calls.</p> <p>For more information please visit: <a href="./doc/api">the API reference</a>.</p>';
+  $html .= '
   <table class="xyz-list">
   <tr class="xyz-list-header"><td colspan="2">Request</td></tr>
   <tr><td>uri</td><td><input id="xyz-api-uri" value=""/></td></tr>

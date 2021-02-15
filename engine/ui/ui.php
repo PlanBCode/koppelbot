@@ -54,13 +54,15 @@ class UiRequest extends HttpRequest2
             '.file_get_contents('./engine/ui/ui.js').'
             </script>';
 
-            return new DocResponse('ui' . $this->uri, $this->getQuery(), $body, 200, ["Content-Security-Policy"=> "frame-ancestors *"]);            
+            return new DocResponse('ui' . $this->uri, $this->getQuery(), $body, 200, ["Content-Security-Policy"=> "frame-ancestors *"]);
         } else {
 
           require_once __DIR__ . '/../api/landing.php';
 
-          $body = '';
-          if ($body !== '') $body .= '<br/>';
+          $body = 'This page offers and interface to create and test XYZ data displays.
+
+          For more information please visit: <a href="../doc/ui">UI reference</a>.';
+
           $body .= '<table class="xyz-list">
             <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
             <tr><td colspan="2" style="overflow: scroll; padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"></div></td></tr>';

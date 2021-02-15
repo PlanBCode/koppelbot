@@ -177,6 +177,11 @@ td.xyz-list-icon {
   width: 30px;
   max-width: 30px;
 }
+.xyz-map-wrapper {
+  border-color: black;
+
+  /* b ackground-color: lightgreen; */
+}
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -236,71 +241,6 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}.xyz-login a {
-  color: blue;
-  cursor: pointer;
-  margin: 5px;
-}
-
-.xyz-login a:hover {
-  text-decoration: underline;
-}
-
-.xyz-login-message {
-  background-color: khaki;
-  color: black;
-  border-radius: 5px;
-  text-align: center;
-  animation-iteration-count: 1;
-  animation-duration: 10s;
-  animation-fill-mode: forwards;
-}
-
-@keyframes xyz-login-hide {
-  from {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  to {
-    visibility: hidden;
-    opacity: 0;
-  }
-}
-
-.xyz-login-capslock-notifier {
-  color: red;
-}
-.xyz-map-wrapper {
-  border-color: black;
-
-  /* b ackground-color: lightgreen; */
-}
-
-.xyz-reference {
-    cursor: pointer;
-}
-
-.xyz-reference:hover {
-    background-color: lightblue;
 }@charset "UTF-8";
 
 /*!
@@ -540,3 +480,64 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}.xyz-login a {
+  color: blue;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.xyz-login a:hover {
+  text-decoration: underline;
+}
+
+.xyz-login-message {
+  background-color: khaki;
+  color: black;
+  border-radius: 5px;
+  text-align: center;
+  animation-iteration-count: 1;
+  animation-duration: 10s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes xyz-login-hide {
+  from {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  to {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+.xyz-login-capslock-notifier {
+  color: red;
+}
+
+.xyz-reference {
+    cursor: pointer;
+}
+
+.xyz-reference:hover {
+    background-color: lightblue;
+}
