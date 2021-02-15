@@ -4,7 +4,7 @@ class DocRequest extends HttpRequest2
 {
     public function createResponse(): DocResponse
     {
-        if($this->uri === 'map') return new DocResponse($this->uri, $this->getQuery(), $this->getQuery(), '');
+        if($this->uri === 'map') return new DocResponse($this->uri, $this->getQuery(), '');
         $fileName = $this->uri === 'doc' ? './engine/doc/doc.html' : './engine/'.$this->uri.'.html';
         if(file_exists($fileName)) return new DocResponse($this->uri, $this->getQuery(), file_get_contents($fileName));
         return new DocResponse($this->uri, $this->getQuery(), 'Page Not Found',404);
@@ -92,7 +92,7 @@ class DocResponse extends HttpResponse2
       return $map;
     }
 
-    public function __construct(string $currentUri, Query &$query, $content, $status = 200, array $headers = [])
+    public function __construct(string $currentUri, Query &$query, $content, int $status = 200, array $headers = [])
     {
         $rootUri = 'http://localhost:8000/';//TODO proper location
 
