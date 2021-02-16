@@ -10,20 +10,30 @@
 
 <h3>Examples:</h3>
 
-<p><u>http://localhost:8000/api/car?color==red</u><br/>
-Get all red cars.</p>
+<p><u>http://localhost:8000/api/fruit?color==green</u><br/>
+<a class= "xyz-doc-tryIt" href="../../api/fruit?color==green"></a>
+Get all green fruits.</p>
+
 
 <p><u>https://www.site.com/api/fruit/apple/color</u><br/>
+<a class= "xyz-doc-tryIt" href="../../api/fruit/apple/color"></a>
 Get the color of the fruit apple.</p>
 
+
 <p><u>https://www.site.com/api/fruit/*/color</u><br/>
+<a class= "xyz-doc-tryIt" href="../../api/fruit/*/color"></a>
 Get the colors of all fruits.</p>
 
-<p><u>http://localhost:8000/api/car/*/color,model</u><br/>
-Get the color and model for all cars.</p>
+
+<p><u>http://localhost:8000/api/fruit/*/color,size</u><br/>
+<a class= "xyz-doc-tryIt" href="../../api/fruit/*/color,size"></a>
+Get the color and size for all fruits.</p>
+
 
 <p><u>https://www.site.com/api/fruit/banana,grape/color</u><br/>
+<a class= "xyz-doc-tryIt" href="../../api/fruit/banana,grape/color"></a>
 Get the colors of the banana and grape fruit.</p>
+
 
 <h2>command line interface (cli)</h2>
 
@@ -35,8 +45,8 @@ Get the colors of the banana and grape fruit.</p>
 
 <h3>Examples:</h3>
 
-<p><code><pre>$ ./xyz "/car?color==red"</pre></code><br/>
-Get all red cars.</p>
+<p><code><pre>$ ./xyz "/fruit?color==green"</pre></code><br/>
+Get all the green fruits.</p>
 
 <p><code><pre>$ ./xyz "fruit/apple/color"</pre></code><br/>
 Get the color of the fruit apple.</p>
@@ -44,8 +54,8 @@ Get the color of the fruit apple.</p>
 <p><code><pre>$ ./xyz "/fruit/*/color"</pre></code><br/>
 Get the colors of all fruits.</p>
 
-<p><code><pre>$ ./xyz "/car/*/color,model"</pre></code><br/>
-Get the color and model for all cars.</p>
+<p><code><pre>$ ./xyz "/fruit/*/color,size"</pre></code><br/>
+Get the color and size for all fruits.</p>
 
 <p><code><pre>$ ./xyz "/fruit/banana,grape/color"</pre></code><br/>
 Get the colors of the banana and grape fruit.</p>

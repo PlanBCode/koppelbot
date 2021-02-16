@@ -29,8 +29,8 @@ The uri's for API endpoints are structured as:
 
 Examples
 
-`http://localhost:8000/api/car?color==red`
-Get all red cars.
+`http://localhost:8000/api/fruit?color==green`
+Get all green fruits
 
 `https://www.site.com/api/fruit/apple/color`
 Get the color of the fruit apple.
@@ -38,8 +38,8 @@ Get the color of the fruit apple.
 `https://www.site.com/api/fruit/*/color`
 Get the colors of all fruits.
 
-`http://localhost:8000/api/car/*/color,model`
-Get the color and model for all cars.
+`http://localhost:8000/api/fruit/*/color,size`
+Get the color and size for all fruits.
 
 `https://www.site.com/api/fruit/banana,grape/color`
 Get the colors of the banana and grape fruit.
@@ -56,8 +56,8 @@ The uri's for UI endpoints are structured as:
 
 Examples:
 
-`http://localhost:8080/ui/car?color==red`
-Get a list overview for all red cars.
+`http://localhost:8080/ui/fruit?color==green`
+Get a list overview for all green fruits.
 
 `http://localhost:8080/ui/fruit?display=create`
 Get an interface to create a new fruit.

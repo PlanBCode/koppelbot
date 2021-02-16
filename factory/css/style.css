@@ -127,3 +127,17 @@ DOC
   padding: 0.5cm;
   display: block;
 }
+
+.xyz-doc-tryIt {
+  float: right;
+  background-color: green;
+  padding: 3px;
+  text-decoration: none;
+  border-radius: 5px;
+  color: white;
+}
+
+.xyz-doc-tryIt:hover {
+  background-color: lightgreen;
+}
+.xyz-doc-tryIt::before { content: "Try it!"; }

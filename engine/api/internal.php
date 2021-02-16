@@ -127,15 +127,15 @@ class InternalApiResponse
 /**
  * Returns an api response for internal usage
  *
- * @param string $url The api uri and query string for example '/car/*?color==red'
+ * @param string $url The api uri and query string for example '/fruit/*?color==green'
  * @param string $method The http request method (GET|PUT|POST|DELETE|PATCH)
  * @param $content
  * @param array $headers =[]
  * @param array $accessGroups =[]
  * @return InternalApiResponse
  * @example
- * for(request('/car/*?color==red').getResultsById() as $id => $car){
- *   echo $car->getContent('licensePlate').PHP_EOL;
+ * for(request('/fruit/*?color==green').getResultsById() as $id => $fruit){
+ *   echo $fruit->getContent('size').PHP_EOL;
  * }
  */
 function request(string $url, string $method = 'GET', $content = '', array &$headers = [], array &$accessGroups = []): InternalApiResponse
@@ -155,4 +155,3 @@ function request(string $url, string $method = 'GET', $content = '', array &$hea
     );
     return $request->getInternalApiResponse();
 }
-
