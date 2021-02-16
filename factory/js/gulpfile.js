@@ -1,8 +1,12 @@
 const gulp = require('gulp');
 
-const {build, pack, generateTypesFile, generateDisplaysFile, generateCssFile, generateJsDocs} = require('./gulp/methods.js');
+const {build, pack, generateTypesFile, generateDisplaysFile, generateCssFile, generateJsDocs, watchGulp} = require('./gulp/methods.js');
+// a
+watchGulp(['./gulp/**/*.js', './gulpfile.js']);
 
+gulp.watch(['../../factory/css/**/*.css'], gulp.series(generateCssFile, pack));
 gulp.watch(['../../engine/core/*/*/*.css'], gulp.series(generateCssFile, pack));
+
 gulp.watch(['../../custom/*/types/*/*.css'], gulp.series(generateCssFile, pack));
 gulp.watch(['../../custom/*/displays/*/*.css'], gulp.series(generateCssFile, pack));
 

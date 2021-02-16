@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const fs = require('fs');
 
-const {forEachFile, baseName, read, write, execute} = require('./util.js');
+const {forEachFile, baseName, read, write, execute, watchGulp} = require('./util.js');
 
 // generate a requires file for types|displays
 const generateRequiresFile = (name, component) => function generateRequiresFile (cb) {
@@ -165,6 +165,8 @@ const generateJsDocs = gulp.series(
 
   generateJsDoc('../../engine/core/types/type/type.js', 'Type', 'type/type_js'),
   generateJsDoc('../../engine/core/types/type/type.php', 'Type', 'type/type_php'),
-  generateJsDoc('./source/render/item.js', 'TypeItem', 'type/item'));
+  generateJsDoc('./source/render/item.js', 'TypeItem', 'type/item')
+);
 exports.build = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, audit, pack, generateJsDocs);
 exports.generateJsDocs = generateJsDocs;
+exports.watchGulp = watchGulp;
