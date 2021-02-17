@@ -5,12 +5,20 @@ class QueryStatement
 {
     static protected function eq($lhs, $rhs): bool
     {
+      if(is_string($rhs)){
+        return $rhs === '*' || in_array($lhs,explode(',',$rhs));
+      }else{
         return $lhs == $rhs;
+      }
     }
 
     static protected function neq($lhs, $rhs): bool
     {
+      if(is_string($rhs)){
+        return $rhs !== '*' && !in_array($lhs,explode(',',$rhs));
+      }else{
         return $lhs != $rhs;
+      }
     }
 
     static protected function lt($lhs, $rhs): bool
@@ -58,17 +66,17 @@ class QueryStatement
         $this->rhs = $matches[3];
     }
 
-    public function getLhs()
+    public function getLhs(): string
     {
         return $this->lhs;
     }
 
-    public function getRhs()
+    public function getRhs(): ?string
     {
         return $this->rhs;
     }
 
-    public function getOperator()
+    public function getOperator(): ?string
     {
         return $this->operator;
     }
