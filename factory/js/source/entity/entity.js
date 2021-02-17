@@ -349,9 +349,10 @@ function getResponse (uri, entityClasses, method, entityIdsPerClassName) {
   const subPath = path.slice(1);
   for (const entityClassName of entityClassNames) {
     if (entityClasses.hasOwnProperty(entityClassName)) {
-      const entityIds = typeof entityIdsPerClassName === 'object' && entityIdsPerClassName !== null && entityIdsPerClassName.hasOwnProperty(entityClassName)
-        ? entityIdsPerClassName[entityClassName]
-        : undefined;
+      let entityIds;
+      if (typeof entityIdsPerClassName === 'object' && entityIdsPerClassName !== null) {
+        entityIds = entityIdsPerClassName.hasOwnProperty(entityClassName) ? entityIdsPerClassName[entityClassName] : [];
+      } else entityIds = undefined;
       content[entityClassName] = entityClasses[entityClassName].getEntityClassResponse(subPath, method, entityIds);
     } else {
       // TODO replace null with something that has the endpoints required by Node
