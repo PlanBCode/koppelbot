@@ -39,8 +39,8 @@ exports.actions = {
     TR_capsLockNotifier.appendChild(TD_capsLockNotifier);
     TABLE.appendChild(TR_capsLockNotifier);
 
-    INPUT_password.addEventListener('keyup', function (e) {
-      TR_capsLockNotifier.style.display = e.getModifierState('CapsLock') ? 'table-row' : 'none';
+    INPUT_password.addEventListener('keyup', event => {
+      TR_capsLockNotifier.style.display = event.getModifierState && event.getModifierState('CapsLock') ? 'table-row' : 'none';
     });
 
     const onChangeHandler = node => {
@@ -85,7 +85,7 @@ exports.actions = {
     if (typeof content.username !== 'string') return false;
     if (content.password === '') return false;
     if (content.username === '') return false;
-    if (content.username === typeof content.password) return false;
+    // if (content.username === content.password) return false; TODO reinstate after testing
     return true; // TODO min/max length, allowed chars, regex
   },
   getIdFromContent: function (content) {
