@@ -3,7 +3,6 @@ TODO?label  define a label property to use
 - mark user location
 
  */
-const xmlns = 'http://www.w3.org/2000/svg';
 
 let SCRIPT; // to dynamically load dependency;
 
@@ -149,6 +148,40 @@ exports.display = {
       const features = format.readFeatures(data);
       const feature = features[0]; // TODO handle multiple features?
       if (feature) { // TODO check
+        if (data.geometry.type === 'Point') {
+        // https://openlayers.org/en/latest/examples/polygon-styles.html
+          const color = display.getColor();
+          const style = new ol.style.Style({
+            image: new ol.style.Circle({
+              radius: 5,
+              fill: new ol.style.Fill({
+                color
+              })
+            })
+          });
+          feature.setStyle(style);
+        } else {
+          const color = display.getColor();
+          const style = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+              color,
+              width: 1
+            }),
+            fill: new ol.style.Fill({
+              color
+            })
+          });
+          feature.setStyle(style);
+        }
+        /*
+        fillColor
+        fillOpacity
+        strokeColor
+        strokeOpacity
+        strokeWidth
+        strokeLinecap
+        strokeDashstyle */
+
         // TODO if feature is point
         // const color = display.getColor();
         /* feature.setStyle(
