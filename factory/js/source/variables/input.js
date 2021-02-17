@@ -26,7 +26,7 @@ function renderUiInput (xyz, options, WRAPPER) {
       WRAPPER.appendChild(LABEL);
     }
     INPUT.name = name;
-    INPUT.onpaste = INPUT.oninput = () => {
+    INPUT.onchange = () => {
       if (INPUT.value === '') variables.clearVariable(name);
       else variables.setVariable(name, INPUT.value);
     };
