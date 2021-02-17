@@ -70,9 +70,9 @@ exports.head = (uri, callback) => {
 
 const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, callback) => {
   const requestStringContent = JSON.stringify(requestObjectContent);
-  console.log(method + ' request: ' + uri + ' ' + requestStringContent);
+  // console.log(method + ' request: ' + uri + ' ' + requestStringContent);
   request(method, uri, requestStringContent, (status, responseStringContent) => {
-    console.log(method + ' response:' + responseStringContent, uri);
+    // console.log(method + ' response:' + responseStringContent, uri);
     const responseObjectContent = JSON.parse(responseStringContent);
     const state = entity.handleInput(method, uri, status, responseObjectContent, requestObjectContent, entityClasses);
     if (typeof callback === 'function') callback(state);
