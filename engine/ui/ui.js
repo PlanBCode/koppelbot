@@ -38,14 +38,24 @@ function match (content, defaultContent) {
   return content === defaultContent || (typeof defaultContent === 'undefined' && content === '');
 }
 
+function addQueryFiltersToUri (uri) {
+  const filters = xyz.getQueryFilters();
+  for (const id in filters) {
+    const [operator, value] = filters[id];
+    uri += (uri.includes('?') ? '&' : '?') + id + operator + value;
+  }
+  return uri;
+}
+
 function render () {
   const WRAPPER = document.getElementById('xyz-ui-display');
 
-  const displayOptions = {
+  const uri = addQueryFiltersToUri(options.uri);
 
+  const displayOptions = {
     ...options,
     id: 'xyz-ui-display',
-    uri: options.uri
+    uri
   };
 
   if (displayOptions.display === 'edit') {
@@ -109,23 +119,24 @@ function updateOptions () {
   }
 }
 
-function sanitizeMacroUri (content) {
-  const [base, queryString] = content.split('?');
+function sanitizeMacroUri (uri) {
+  // addQueryFiltersToUri(
+  const [base, queryString] = uri.split('?');
   if (queryString) {
-    content = base;
+    uri = base;
     let first = true;
     for (const keyval of queryString.split('&')) {
       const [key, value] = keyval.split('=');
       if (!optionSchemas[displayName].options.hasOwnProperty(key)) {
         if (first) {
           first = false;
-          content += '?';
-        } else content += '&';
-        content += keyval;
+          uri += '?';
+        } else uri += '&';
+        uri += keyval;
       }
     }
   }
-  return content;
+  return addQueryFiltersToUri(uri);
 }
 
 function updateMacro () {

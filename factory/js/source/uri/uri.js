@@ -51,8 +51,10 @@ const addQueryString = (uri, queryString) => {
     : uri + '&' + queryString;
 };
 
-// '/$entityClassName/$entityId/sum(x),x' -> '/$entityClassName/$entityId/x,y'  and ['sum','x']
+// '/$entityClassName/$entityId/sum(x),x?q' -> '/$entityClassName/$entityId/x,y?q'  and ['sum','x']
 function parseAggregationFromUri (uri) {
+  const queryString = uri.split('?')[1];
+
   const aggregations = [];
 
   const path = pathFromUri(uri);
@@ -69,7 +71,7 @@ function parseAggregationFromUri (uri) {
       aggregations.push(aggregation);
     } else if (!propertyNameList.includes(part)) propertyNameList.push(part);
   }
-  uri = '/' + path.slice(0, 2).join('/') + '/' + propertyNameList.join(',');
+  uri = '/' + path.slice(0, 2).join('/') + '/' + propertyNameList.join(',') + (queryString ? '?' + queryString : '');
   return {uri, aggregations};
 }
 

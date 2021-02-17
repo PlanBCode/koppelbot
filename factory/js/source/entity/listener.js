@@ -128,7 +128,7 @@ function ListenerHandler () {
         }
       }
     }
-    // DEBUG console.log('addListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, count);
+    // console.log('addListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, count);
     return listener;
   };
 
