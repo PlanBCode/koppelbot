@@ -1,6 +1,6 @@
 const gulp = require('gulp');
 
-const {build, pack, generateTypesFile, generateDisplaysFile, generateCssFile, generateJsDocs, watchGulp} = require('./gulp/methods.js');
+const {build, pack, generateTypesFile, generateDisplaysFile, generateCssFile, generateDocs, watchGulp} = require('./gulp/methods.js');
 // a
 watchGulp(['./gulp/**/*.js', './gulpfile.js']);
 
@@ -22,8 +22,9 @@ gulp.watch([
   '../../engine/core/displays/item/item.js',
   '../../engine/core/types/type/type.js',
   '../../engine/core/types/type/type.php',
-  './source/render/item.js'
-], generateJsDocs);
+  './source/render/item.js',
+  './source/main.js'
+], generateDocs);
 
 gulp.watch(['./source/**/*.js'], pack);
 

@@ -83,7 +83,7 @@ exports.hasVariable = variableName => variables.hasVariable(variableName);
  */
 exports.getVariable = variableName => variables.getVariable(variableName);
 /**
- * TODO
+ * Get all variables as an object with key:value pairs
  * @returns {Object}  TODO
  */
 exports.getVariables = () => variables.getVariables();

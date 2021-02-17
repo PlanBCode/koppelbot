@@ -40,6 +40,7 @@ class DocResponse extends HttpResponse2
         //TODO 'doc/dev/type/item' => "TypeItem Class (php)",
         'doc/dev/connector' => "Build a connector",
         'doc/dev/connector/connector' => "Connector Class",
+        'doc/dev/xyz' => "XYZ Class",
         'doc/dev/javascript' => "Javascript packing",
 
         'map' => "Site Map",

@@ -21,7 +21,10 @@ module.exports = {
     console: 'readonly',
     xyz: 'readonly',
     setInterval: 'readonly',
-    setTimeout: 'readonly'
+    setTimeout: 'readonly',
+    clearInterval: 'readonly',
+    clearTimeout: 'readonly',
+    process: 'readonly'
   },
 
   rules: {

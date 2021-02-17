@@ -62,17 +62,17 @@ const parseType = string => {
 
 const parseTypeAndDef = string => {
   const type = parseType(string);
-  const description = string.trim().split(' ')[1] || '';
+  const description = string.trim().split(' ').slice(1).join(' ') || '';
   return '<span style="margin-left:20px;margin-right:20px;color:green;">' + type + '</span> ' + description;
 };
 
 // this.$function = ...
 // $function2: ...
-const jsRegex = /(\*\*\s*\n([^*]|\*[^/])*\*\/)\s*(this\.(?<function>\w+)|(?<function2>\w+):)/g;
+const jsRegex = /(\*\*\s*\n([^*]|\*[^/])*\*\/)\s*((this|exports)\.(?<function>\w+)|(?<function2>\w+):)/g;
 // abstract public function $function(...):$returns
 const phpRegex = /(\*\*\s*\n([^*]|\*[^/])*\*\/)\s*(?<function>[^\n]+)/g;
 
-const generateJsDoc = (path, title, docPath) => cb => {
+const generateDoc = (path, title, docPath) => function generateDoc (cb) {
   const isPhp = path.endsWith('.php');
   const regex = isPhp ? phpRegex : jsRegex;
   const css = fs.readFileSync('../../engine/doc/dev/dev.css').toString();
@@ -157,16 +157,18 @@ exports.generateTypesFile = generateTypesFile;
 
 const generateDisplaysFile = generateRequiresFile('displays', 'display');
 exports.generateDisplaysFile = generateDisplaysFile;
-const generateJsDocs = gulp.series(
-  generateJsDoc('../../engine/connectors/connector.php', 'Connector', 'connector/connector'),
+const generateDocs = gulp.parallel(
+  generateDoc('../../engine/connectors/connector.php', 'Connector', 'connector/connector'),
 
-  generateJsDoc('../../engine/core/displays/item/item.js', 'Display', 'display/display'),
-  generateJsDoc('./source/render/display.js', 'DisplayItem', 'display/item'),
+  generateDoc('../../engine/core/displays/item/item.js', 'Display', 'display/display'),
+  generateDoc('./source/render/display.js', 'DisplayItem', 'display/item'),
 
-  generateJsDoc('../../engine/core/types/type/type.js', 'Type', 'type/type_js'),
-  generateJsDoc('../../engine/core/types/type/type.php', 'Type', 'type/type_php'),
-  generateJsDoc('./source/render/item.js', 'TypeItem', 'type/item')
+  generateDoc('../../engine/core/types/type/type.js', 'Type', 'type/type_js'),
+  generateDoc('../../engine/core/types/type/type.php', 'Type', 'type/type_php'),
+  generateDoc('./source/render/item.js', 'TypeItem', 'type/item'),
+  generateDoc('./source/main.js', 'XYZ', 'xyz')
+
 );
-exports.build = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, audit, pack, generateJsDocs);
-exports.generateJsDocs = generateJsDocs;
+exports.build = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, audit, pack, generateDocs);
+exports.generateDocs = generateDocs;
 exports.watchGulp = watchGulp;
