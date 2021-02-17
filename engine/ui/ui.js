@@ -196,7 +196,7 @@ function onVariableChange (value, variableName) {
     INPUT.value = value;
     INPUT.id = `xyz-ui-variable-${variableName}`;
 
-    INPUT.oninput = INPUT.onpaste = () => {
+    INPUT.onchange = () => {
       if (INPUT.value === '') xyz.clearVariable(variableName);
       else xyz.setVariable(variableName, INPUT.value);
     };
