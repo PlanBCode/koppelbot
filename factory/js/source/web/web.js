@@ -16,9 +16,9 @@ exports.getCookie = function () {
   return cookie;
 };
 
-function getQueryParameters (filter) {
+function getQueryParameters (filter = false, queryString = undefined) {
   const queryParameters = {};
-  window.location.search
+  (typeof queryString === 'undefined' ? window.location.search : queryString)
     .substr(1) // '?a=1&b=2' -> 'a=1&b=2'
     .split('&') // ['a=1','b=2']
     .filter(x => x !== '')
@@ -30,10 +30,10 @@ function getQueryParameters (filter) {
   return queryParameters;
 }
 
-exports.getQueryFilters = () => getQueryParameters(true);
+exports.getQueryFilters = (queryString = undefined) => getQueryParameters(true, queryString);
 
-exports.getQueryParameters = getQueryParameters;
-exports.getQueryParameter = queryParameterName => getQueryParameters()[queryParameterName];
+exports.getQueryParameters = (queryString = undefined) => getQueryParameters(false, queryString);
+exports.getQueryParameter = (queryParameterName, queryString = undefined) => getQueryParameters(false, queryString)[queryParameterName];
 
 function splitKeyValuePair (keyValueString) { // 'a=1' -> ['a','=','1']
   return /^(?<key>[*,;%\w.-]+)(?<operator>[^*,;%\w.-]+)?(?<value>[*,;%\w.-]*)?$/.exec(keyValueString).slice(1);
