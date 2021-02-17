@@ -79,14 +79,14 @@ abstract class Type
      * @param Mixed $content [description]
      * @param array $settings [description]
      */
-    abstract static public function validateContent($content, array &$settings): bool;
+    abstract static public function validateContent(&$content, array &$settings): bool;
     /**
      * [validateSubPropertyPath description]
      * @param  array $subPropertyPath [description]
      * @param  array $settings        [description]
      * @return bool                   [description]
      */
-    static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
+    static function validateSubPropertyPath(array &$subPropertyPath, array &$settings): bool
     {
         return false;
     }
@@ -144,7 +144,7 @@ abstract class Type
      * @param  array           $settings [description]
      * @return ProcessResponse           [description]
      */
-    static function processAfterConnector(string $method, $content, array &$settings): ProcessResponse
+    static function processAfterConnector(string $method, &$content, array &$settings): ProcessResponse
     {
         return new ProcessResponse(200, $content);
     }
@@ -165,7 +165,7 @@ abstract class Type
 
 class Type_type extends Type
 {
-    static public function validateContent($content, array &$settings): bool
+    static public function validateContent(&$content, array &$settings): bool
     {
         return true;
     }

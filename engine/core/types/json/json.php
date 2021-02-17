@@ -2,12 +2,12 @@
 
 class Type_json extends Type
 {
-    public static function validateContent($content, array &$settings): bool
+    public static function validateContent(&$content, array &$settings): bool
     {
         return true;
     }
 
-    static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
+    static function validateSubPropertyPath(array &$subPropertyPath, array &$settings): bool
     {
         return true;
     }
@@ -21,11 +21,11 @@ class Type_json extends Type
           : new ProcessResponse(200, $newContent);
     }
 
-    static function processAfterConnector(string $method, $content, array &$settings): ProcessResponse
+    static function processAfterConnector(string $method, &$content, array &$settings): ProcessResponse
     {
       $stringify = array_get($settings, 'stringify', false);
       if($stringify){
-        $parsedContent = json_decode($content);
+        $parsedContent =& json_decode($content);
         return  is_null($parsedContent)
          ? new ProcessResponse(500, 'Failed to parse JSON.') // TODO add json error?
          : new ProcessResponse(200, $parsedContent);

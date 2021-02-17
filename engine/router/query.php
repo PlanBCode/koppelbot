@@ -66,7 +66,7 @@ class QueryStatement
         $this->rhs = $matches[3];
     }
 
-    public function getLhs(): string
+    public function getLhs(): ?string
     {
         return $this->lhs;
     }
@@ -93,7 +93,7 @@ class QueryStatement
         }
     }
 
-    public function match($entityContent): bool
+    public function match(&$entityContent): bool
     {
         if ($this->operator === '') return true;
         if ($this->operator === '=') return true;
@@ -235,9 +235,6 @@ class Query
                 return $property->sort($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
             });
         }
-        $offset = $this->getOption('offset', 0);
-        $limit = $this->getOption('limit', count($entityIds));
-        $entityIds = array_slice($entityIds, $offset, $limit);
         return $entityIds;
     }
 }

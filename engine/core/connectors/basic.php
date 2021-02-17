@@ -99,7 +99,8 @@ abstract class BasicConnector extends Connector
 
                     $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
                     if ($jsonActionResponse->succeeded()) {
-                        $connectorResponse->add(200, $propertyRequest, $entityId, $head ? null : $jsonActionResponse->content);
+                        $content = $head ? null : $jsonActionResponse->content;
+                        $connectorResponse->add(200, $propertyRequest, $entityId, $content);
                     } else {
                         //TODO use $jsonActionResponse->getErrorMessage()
                         //TODO might result in 404 or 500

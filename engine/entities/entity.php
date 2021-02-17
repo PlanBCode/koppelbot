@@ -21,7 +21,7 @@ class EntityClass
 
 
             $meta = json_decode($fileContent, true);//TODO catch parse error
-            //TODO maybe resolve inheritance            
+            //TODO maybe resolve inheritance
 
             // Check if any of current sessions has access to this entity
             if (array_key_exists('_', $meta)) {
@@ -73,7 +73,7 @@ class EntityClass
         return '/' . $this->entityClassName . '/' . (is_null($entityId) ? '*' : $entityId);
     }
 
-    protected function expand(array $propertyPath, Query &$query, RequestObject &$requestObject): array
+    protected function expand(array &$propertyPath, Query &$query, RequestObject &$requestObject): array
     {
         /** @var string */
         $propertyList = array_get($propertyPath, 0, '*');
@@ -101,7 +101,7 @@ class EntityClass
         return $propertyHandles;
     }
 
-    protected function validateAndCheckRequired(RequestObject &$requestObject, string $entityId, $entityIdContent, array &$errorPropertyRequests)
+    protected function validateAndCheckRequired(RequestObject &$requestObject, string $entityId, &$entityIdContent, array &$errorPropertyRequests)
     {
         $method = $requestObject->getMethod();
         if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
@@ -128,7 +128,7 @@ class EntityClass
         }
     }
 
-    protected function createPropertyRequests(RequestObject &$requestObject, string $entityIdList, array $propertyPath, $entityClassContent): array
+    protected function createPropertyRequests(RequestObject &$requestObject, string $entityIdList, array &$propertyPath, &$entityClassContent): array
     {
 
         $method = $requestObject->getMethod();
@@ -162,6 +162,7 @@ class EntityClass
         $propertyRequests = [];
         /** @var PropertyRequest[] */
         $errorPropertyRequests = [];
+        //TODO can we pass single propertyRequests using entityIdList to connector? SEARCHME4SfF3R5
 
         foreach ($entityIds as $entityId) {
             if (is_array($entityClassContent)) {
@@ -182,11 +183,10 @@ class EntityClass
     }
 
     public
-    function createConnectorRequests(RequestObject $requestObject, string $entityIdList, array $propertyPath, $entityClassContent)
+    function createConnectorRequests(RequestObject &$requestObject, string $entityIdList, array $propertyPath, &$entityClassContent)
     {
         /** @var PropertyRequest[] */
         $propertyRequests = $this->createPropertyRequests($requestObject, $entityIdList, $propertyPath, $entityClassContent);
-
         //TODO only when adding new : check if entity exists
         //TODO check if required properties are handled
 
@@ -251,7 +251,7 @@ class EntityResponse extends Response
         $this->requestObject = $requestObject;
     }
 
-    public function add(int $status, array $propertyPath, $content)
+    public function add(int $status, array &$propertyPath, &$content)
     {
         $method = $this->requestObject->getMethod();
         if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
@@ -262,7 +262,7 @@ class EntityResponse extends Response
         $this->propertyResponses[] = $propertyResponse;
     }
 
-    public function merge(EntityResponse $entityResponse)
+    public function merge(EntityResponse &$entityResponse)
     {
         $this->addStatus($entityResponse->getStatus());
         foreach ($entityResponse->propertyResponses as $propertyResponse) {
@@ -364,7 +364,7 @@ class EntityClassResponse extends Response
         $this->entityResponses[$entityId]->add($status, $propertyPath, $content);
     }
 
-    public function merge(EntityClassResponse $entityClassResponse)
+    public function merge(EntityClassResponse &$entityClassResponse)
     {
         $this->addStatus($entityClassResponse->getStatus());
         foreach ($entityClassResponse->entityResponses as $entityId => $entityResponse) {

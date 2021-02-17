@@ -32,7 +32,8 @@ function replaceXyzTag($fileContent): string
                         $optionIterator =& $optionIterator['subOptions'][$propertyName];
                     }
                     $optionName = $attributePath[$attributePathLength - 1];
-                    json_set($optionIterator, [$optionName], $attributeValue);
+                    $path = [$optionName];
+                    json_set($optionIterator, $path, $attributeValue);
                 }
             }
             return '<script>xyz.ui(' . json_encode($options, JSON_UNESCAPED_SLASHES) . ');</script>';

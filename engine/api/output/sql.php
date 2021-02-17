@@ -2,7 +2,7 @@
 
 //TODO use entity classes and properties to define sql types and defaults
 
-function createTable(string $entityClassName, $content){
+function createTable(string $entityClassName, &$content){
   $tables = "CREATE TABLE `".$entityClassName."`".PHP_EOL;
   $tables .= "  `ID` var_char(16) NOT NULL PRIMARY KEY AUTOINCREMENT".PHP_EOL; // TOOD var_char length
   $firstEntity = true;
@@ -49,5 +49,8 @@ function outputSQL(&$content, Query &$query, array& $path){
     }
     return $body;
   } else if($multipleEntityIds) return createTable($entityClassNameList, $content);
-  else return createTable($entityClassNameList, [$entityIdList =>$content] );
+  else {
+    $map = [$entityIdList =>$content];
+    return createTable($entityClassNameList, $map );
+  }
 }

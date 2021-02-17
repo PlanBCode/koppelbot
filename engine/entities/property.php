@@ -1,7 +1,7 @@
 <?php
 require './engine/core/types/type/type.php';
 
-function getMergedSetting($name, $settings, $rootSettings)
+function getMergedSetting($name, &$settings, &$rootSettings)
 {
     //TODO handle access and connector merges better
     if (array_key_exists($name, $settings)) {
@@ -13,7 +13,7 @@ function getMergedSetting($name, $settings, $rootSettings)
     }
 }
 
-function getSingleSetting($name, $settings, $rootSettings)
+function getSingleSetting($name, &$settings, &$rootSettings)
 {
     //TODO handle access and connector merges better
     if (array_key_exists($name, $settings) && array_key_exists($name, $rootSettings)) {
@@ -27,7 +27,7 @@ function getSingleSetting($name, $settings, $rootSettings)
     }
 }
 
-function mergeSubSettings(array $customSubSettings, array &$defaultSubSettings): array
+function mergeSubSettings(array &$customSubSettings, array &$defaultSubSettings): array
 {
     //TODO handle access and connector merges better
     foreach ($defaultSubSettings as $subSettingName => $subSetting) {
@@ -58,24 +58,24 @@ class  PropertyRequest
     /** @var string */
     protected $connectorString;
 
-    public function __construct(int $status, RequestObject &$requestObject, string $entityClassName, string $entityId, $propertyOrError, array $propertyPath, $propertyContent)
+    public function __construct(int $status, RequestObject &$requestObject, string $entityClassName, string $entityId, $propertyOrError, array &$propertyPath, &$propertyContent)
     {
-        $this->requestObject = $requestObject;
+        $this->requestObject =& $requestObject;
         $this->entityId = $entityId;
         $this->entityClassName = $entityClassName;
-        $this->propertyPath = $propertyPath;
+        $this->propertyPath =& $propertyPath;
 
         if ($status !== 200) {
             $this->status = $status;
             $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
-            $this->content = $propertyOrError;
+            $this->content =& $propertyOrError;
         } elseif (is_string($propertyOrError)) {
             $this->status = 500;
             $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
-            $this->content = $propertyOrError;
+            $this->content =& $propertyOrError;
         } else {
             $this->property = $propertyOrError;
-            $this->content = $propertyContent;
+            $this->content =& $propertyContent;
             $this->status = 200;
             $connectorSettings = $this->property->getConnectorSettings();
             $connectorType = array_get($connectorSettings, 'type');
@@ -199,7 +199,7 @@ class PropertyResponse extends Response
     /** @var string[] */
     protected $propertyPath;
 
-    public function __construct(?Property &$property, RequestObject &$requestObject, int $status, array $propertyPath, $content = null)
+    public function __construct(?Property &$property, RequestObject &$requestObject, int $status, array &$propertyPath, &$content = null)
     {
         $this->propertyPath = $propertyPath;
         if(is_null($property)){
@@ -243,7 +243,7 @@ class PropertyHandle
     /** @var string[] */
     protected $propertyPath;
 
-    public function __construct(int $status, $propertyOrError, array $propertyPath)
+    public function __construct(int $status, $propertyOrError, array &$propertyPath)
     {
         $this->status = $status;
         $this->propertyPath = $propertyPath;
@@ -254,7 +254,7 @@ class PropertyHandle
         }
     }
 
-    public function createPropertyRequest(RequestObject &$requestObject, string $entityClassName, string $entityId, $entityIdContent): PropertyRequest
+    public function createPropertyRequest(RequestObject &$requestObject, string $entityClassName, string $entityId, &$entityIdContent): PropertyRequest
     {
         $propertyContent =& $entityIdContent;
         foreach ($this->propertyPath as $subPropertyName) {
@@ -291,7 +291,7 @@ class Property
       audit
       default*/
 
-    public function __construct($parent, int $depth, string $propertyName, $settings, $rootSettings)
+    public function __construct(&$parent, int $depth, string $propertyName, &$settings, &$rootSettings)
     {
         $this->propertyName = $propertyName;
         $this->settings = $settings;
@@ -476,7 +476,7 @@ class Property
         return array_get($this->settings,'default');
     }
 
-    public function validateContent($content): bool
+    public function validateContent(&$content): bool
     {
         return $this->typeClass::validateContent($content, $this->settings);
     }

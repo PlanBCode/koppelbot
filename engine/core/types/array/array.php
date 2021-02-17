@@ -4,7 +4,7 @@ class Type_array extends Type
 {
     static protected $DEFAULT_TYPE = 'string';
 
-    public static function validateContent($content, array &$settings): bool
+    public static function validateContent(&$content, array &$settings): bool
     {
         if (!is_array($content)) return false;
         $subSettings = array_get($settings, 'subSettings', []);
@@ -18,7 +18,7 @@ class Type_array extends Type
         return true;
     }
 
-    static function validateSubPropertyPath(array $subPropertyPath, array $settings): bool
+    static function validateSubPropertyPath(array &$subPropertyPath, array &$settings): bool
     {
         $subSettings = array_get($settings, 'subType', []);
         $subTypeName = array_get($subSettings, 'type', self::$DEFAULT_TYPE);

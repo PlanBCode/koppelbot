@@ -20,7 +20,7 @@ class ConnectorResponse extends Response
       }
     }
 
-    public function add(int $status, PropertyRequest $propertyRequest, string $entityId, $content): ConnectorResponse
+    public function add(int $status, PropertyRequest &$propertyRequest, string $entityId, &$content): ConnectorResponse
     {
         $method = $propertyRequest->getMethod();
         if ($method === 'POST' && $status === 404) return $this; // POST request are made with dummy entityId's if hey can't be found. Ignore it.
@@ -35,7 +35,7 @@ class ConnectorResponse extends Response
         return $this;
     }
 
-    public function merge(ConnectorResponse $connectorResponse): ConnectorResponse
+    public function merge(ConnectorResponse &$connectorResponse): ConnectorResponse
     {
         $this->addStatus($connectorResponse->getStatus());
         foreach ($connectorResponse->requestResponses as $requestId => $requestResponse) {

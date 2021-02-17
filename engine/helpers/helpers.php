@@ -86,7 +86,7 @@ class JsonActionResponse
     }
 }
 
-function json_get(&$object, array $keyPath): JsonActionResponse
+function json_get(&$object, array &$keyPath): JsonActionResponse
 {
     if (empty($keyPath)) {
         return new JsonActionResponse(true, $object);
@@ -101,7 +101,7 @@ function json_get(&$object, array $keyPath): JsonActionResponse
     }
 }
 
-function json_set(&$object, array $keyPath, &$content): JsonActionResponse
+function json_set(&$object, array &$keyPath, &$content): JsonActionResponse
 {
     if (empty($keyPath)) {
         $object = $content;
@@ -122,13 +122,13 @@ function json_set(&$object, array $keyPath, &$content): JsonActionResponse
     }
 }
 
-function isAssociativeArray(array $arr)
+function isAssociativeArray(array &$arr)
 {
     if (array() === $arr) return false;
     return array_keys($arr) !== range(0, count($arr) - 1);
 }
 
-function json_unset(&$object, array $keyPath): JsonActionResponse
+function json_unset(&$object, array &$keyPath): JsonActionResponse
 {
     if (empty($keyPath)) {
         return new JsonActionResponse(false); // TODO error message cannot delete prime
@@ -149,10 +149,10 @@ function json_unset(&$object, array $keyPath): JsonActionResponse
     }
 }
 
-function json_search($object, string $needle): bool
+function json_search(&$object, string $needle): bool
 {
     if (is_array($object)) {
-        foreach ($object as $subObject) {
+        foreach ($object as &$subObject) {
             if (json_search($subObject, $needle)) return true;
         }
         return false;

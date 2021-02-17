@@ -29,7 +29,7 @@ class Type_date extends Type
         return $datetime->getTimestamp();
     }
 
-    public static function validateContent($content, array &$settings): bool
+    public static function validateContent(&$content, array &$settings): bool
     {
         if (!is_string($content)) return false; //TODO maybe numbers for single date things?
 

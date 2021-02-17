@@ -4,7 +4,7 @@ class Type_string extends Type
 {
     static protected $encodings = ['utf8', 'base64']; //TODO single source of truth (php+js)
 
-    public static function validateContent($content, array &$settings): bool
+    public static function validateContent(&$content, array &$settings): bool
     {
         if (is_string($content)) {
             if (strlen($content) < array_get($settings, 'minLength', 0)) return false;
@@ -42,7 +42,7 @@ class Type_string extends Type
         }
     }
 
-    static function processAfterConnector(string $method, $content, array &$settings): ProcessResponse
+    static function processAfterConnector(string $method, &$content, array &$settings): ProcessResponse
     {
         $isGetMethod = $method === 'GET';
         $isBinary = array_get($settings, 'binary', false);

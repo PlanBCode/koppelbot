@@ -8,7 +8,7 @@ function pathFromUri(string $uri): ?array
     return explode('/', substr($uri, 1));
 }
 
-function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array $propertyPath, Query &$query, array &$accessGroups): array
+function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array &$propertyPath, Query &$query, array &$accessGroups): array
 {
     $requestObject = new RequestObject($method, null, $requestUri, $query, $accessGroups);
 
@@ -24,7 +24,7 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
                 ? $content
                 : $jsonContent;
             $path = pathFromUri($requestUri);
-            foreach (array_reverse($path) as $item) {
+            foreach (array_reverse($path) as &$item) {
                 $jsonContent = [$item => $jsonContent];
             }
         }
@@ -67,7 +67,7 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
         } else {
             $entityClassContent = array_null_get($content, $entityClassName);
             $entityClassConnectorRequests = $entityClass->createConnectorRequests($requestObject, $entityIdList, $propertyPath, $entityClassContent);
-            foreach ($entityClassConnectorRequests as $connectorString => $entityClassConnectorRequest) {
+            foreach ($entityClassConnectorRequests as $connectorString => &$entityClassConnectorRequest) {
                 if (!array_key_exists($connectorString, $connectorRequests)) {
                     $connectorRequests[$connectorString] = $entityClassConnectorRequest;
                 } else {
@@ -81,7 +81,7 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
 function addRequestResponse(ConnectorRequest &$connectorRequest, array &$requestResponses): void
 {
   $connectorResponse = Connector::getConnectorResponse($connectorRequest);
-  foreach ($connectorResponse->getRequestResponses() as $requestId => $requestResponse) {
+  foreach ($connectorResponse->getRequestResponses() as $requestId => &$requestResponse) {
       if (!array_key_exists($requestId, $requestResponses)) {
           $requestResponses[$requestId] = $requestResponse;
       } else {
@@ -101,7 +101,7 @@ function getRequestResponses(array &$connectorRequests): array
         $postIdPropertyRequests = $connectorRequest->getPostIdPropertyRequests();
         if(!empty($postIdPropertyRequests)){
           addRequestResponse($connectorRequest, $requestResponses); // need to track which id's have been added
-          foreach($postIdPropertyRequests as $postIdPropertyRequest){ // map '$entityClassName/$stub' to '$entityClassName/$maxAutoIncrementedId'
+          foreach($postIdPropertyRequests as &$postIdPropertyRequest){ // map '$entityClassName/$stub' to '$entityClassName/$maxAutoIncrementedId'
             $entityClassName = $postIdPropertyRequest->getEntityClass();
             $entityId = $postIdPropertyRequest->getEntityId();
             $stubUri = $entityClassName . '/' . $entityId;
@@ -112,7 +112,7 @@ function getRequestResponses(array &$connectorRequests): array
         }else $remainingConnectorRequests[] = $connectorRequest;
     }
 
-    foreach ($remainingConnectorRequests as $connectorRequest) {
+    foreach ($remainingConnectorRequests as &$connectorRequest) {
         $connectorRequest->updateAutoIncrementedUris($remappedAutoIncrementedUris);
         addRequestResponse($connectorRequest, $requestResponses);
     }
@@ -177,7 +177,7 @@ class RequestObject
     }
 }
 
-function isSingularPath(array $path): bool
+function isSingularPath(array &$path): bool
 {
     $pathLength = count($path);
     if ($pathLength <= 2) return false; // at least a property needs to be defined
@@ -276,7 +276,6 @@ class ApiRequest extends HttpRequest2
         $requestURi = $this->uri;
         $queryConnectorRequests = $this->getQueryConnectorRequests($this->query);
         $queryRequestResponses = getRequestResponses($queryConnectorRequests);
-
         if (count($queryRequestResponses) > 0) {
 
             /** @var RequestResponse */
@@ -285,6 +284,12 @@ class ApiRequest extends HttpRequest2
 
             //TODO handle failure
             $entityIds = $this->query->getMatchingEntityIds($data, $this->accessGroups);
+
+            $offset = $this->query->getOption('offset', 0);
+            if($offset !== 0 || $this->query->hasOption('limit')){
+              $limit = $this->query->getOption('limit', count($entityIds));
+              $entityIds = array_slice($entityIds, $offset, $limit);
+            }
 
             if ($this->query->hasOption('search')) {
                 $search = $this->query->getOption('search');
@@ -318,7 +323,7 @@ class ApiRequest extends HttpRequest2
         }
     }
 
-    protected function stringifyContent($content, $status): string
+    protected function stringifyContent(&$content, $status): string
     {
         $output = $this->query->getOption('output');
         if($output ==='json' || is_null($output)){
@@ -364,7 +369,6 @@ class ApiRequest extends HttpRequest2
           require_once 'landing.php';
           return new DocResponse('api' . $this->uri, $this->getQuery(), APILandingHtml());
         }
-
         $requestResponses = $this->getRequestResponses();
         $status = $this->getStatus($requestResponses);
 
@@ -384,7 +388,6 @@ class ApiRequest extends HttpRequest2
                             $content = [];
                             json_set($content, $path, $error->getErrorMessage());
                             $status = $error->getStatus();
-
                         } else {  //TODO add error properly
                             echo $status . '<br/>';
                             echo implode('/', $path) . ' ' . $error->getErrorMessage() . '<br/>';;
@@ -404,7 +407,8 @@ class ApiRequest extends HttpRequest2
                 return $property->serveContent($status, $content);
             } else {
                 $stringContent = $this->stringifyContent($content, $status);
-                return new HttpResponse2($status, $stringContent, []);
+                $headers = [];
+                return new HttpResponse2($status, $stringContent, $headers);
             }
         }
     }

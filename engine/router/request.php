@@ -18,7 +18,7 @@ class HttpRequest2
     /** @var Query */
     protected $query;
 
-    public function __construct(string $method, string $uri, string $queryString, array $headers, string $content)
+    public function __construct(string $method, string $uri, string $queryString, array &$headers, string &$content)
     {
 
         $this->method = $method;
@@ -26,8 +26,8 @@ class HttpRequest2
         $uri = preg_replace('/\/+/', '/', $uri); // remove multiple slashes
         $this->uri = $uri;
         $this->queryString = $queryString;
-        $this->headers = $headers;
-        $this->content = $content;
+        $this->headers =& $headers;
+        $this->content =& $content;
         $this->query = new Query($queryString);
     }
 

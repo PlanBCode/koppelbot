@@ -7,7 +7,7 @@ class Type_number extends Type
         return $content + 0;
     }
 
-    public static function validateContent($content, array &$settings): bool
+    public static function validateContent(&$content, array &$settings): bool
     {
         if (!is_numeric($content)) return false; //TODO nr of decimals
         if (array_key_exists('max', $settings) && $content > array_get($settings, 'max')) return false;

@@ -5,7 +5,7 @@ class InternalPropertyResponse
     protected $status;
     protected $content;
 
-    public function __construct(int $status, $content)
+    public function __construct(int $status, &$content)
     {
         $this->status = $status;
         $this->content =& $content;
@@ -27,7 +27,7 @@ class InternalEntityResponse
     /** @var EntityResponse */
     protected $entityResponse;
 
-    public function __construct(EntityResponse $entityResponse)
+    public function __construct(EntityResponse &$entityResponse)
     {
         $this->entityResponse =& $entityResponse;
     }
@@ -86,7 +86,7 @@ class InternalApiResponse
     protected $requestResponse;
     protected $content;
 
-    public function __construct(array $requestResponses)
+    public function __construct(array &$requestResponses)
     {
         $this->requestResponse = array_get(array_values($requestResponses), 0);
     }

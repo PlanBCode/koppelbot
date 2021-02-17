@@ -16,11 +16,12 @@ class Connector_sqlite extends Connector
 {
     protected $db;
     protected $path;
-    public function __construct(array $settings)
+    public function __construct(array $settings) //TODO &
     {
         $this->path = array_get($settings, 'path');
     }
 
+    //TODO &
     static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
     {
         return $method.'_'.array_get($settings, 'path');
@@ -68,11 +69,14 @@ class Connector_sqlite extends Connector
         $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.'.$error); //TODO check, set entityId?
       }else if($method === 'GET'){
         while($row = $result->fetchArray()){
-          foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+          foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
+
             $propertyPath = $propertyRequest->getPropertyPath();
             $propertyName = $propertyPath[0]; //TODO check
             $entityId = (string)$row[$idKey];
-            $connectorResponse->add(200, $propertyRequest, $entityId,  $row[$propertyName]);
+            if($entityId === $propertyRequest->getEntityId() ||  $propertyRequest->getEntityId()==='*'){  //TODO SEARCHME4SfF3R5
+              $connectorResponse->add(200, $propertyRequest, $entityId,  $row[$propertyName]);
+            }
           }
         }
       }else if($method === 'HEAD'){
@@ -89,7 +93,9 @@ class Connector_sqlite extends Connector
             $connectorResponse->add(404, $propertyRequest, $entityId,  null);
           }
         }
-      }//TODO DELETE, PATCH, PUT,POST
+      }else{//TODO DELETE, PATCH, PUT,POST
+        $connectorResponse->add(500, $propertyRequest, '*', 'Method not yet supported');
+      }
     }
 
     public function createResponse(connectorRequest $connectorRequest): ConnectorResponse
