@@ -32,7 +32,14 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     request('GET', metaUri, undefined, (status, content) => { // TODO add querystring better
       // TODO check status
       // console.log(metaUri, content);
-      const data = JSON.parse(content); // TODO check
+      let data;
+      try {
+        data = JSON.parse(content); // TODO check
+      } catch (e) {
+        console.log(content);
+        console.error('PROBLEM parsing meta response', data);
+        return;
+      }
       if (typeof data !== 'object' || data === null || !data.hasOwnProperty('entity')) {
         console.error('PROBLEM parsing meta response', data);
         return;
