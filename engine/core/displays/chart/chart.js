@@ -81,10 +81,36 @@ exports.display = {
         const TR = document.createElement('TR');
         TR.className = 'xyz-list-header';
         if (display.getOption('multiSelect')) {
-          const TD = document.createElement('TD');
-          TD.className = 'xyz-list-icon';
-          // TODO TD.innerHTML = '[]';// TODO select/unselect all
-          TR.appendChild(TD);
+          const TD_checkbox = document.createElement('TD');
+          TD_checkbox.className = 'xyz-list-icon';
+          const INPUT_checkAll = document.createElement('INPUT');
+          INPUT_checkAll.type = 'checkbox';
+          INPUT_checkAll.onclick = () => {
+            if (INPUT_checkAll.checked) display.multiSelectAll();
+            else display.multiSelectNone();
+          };
+          TD_checkbox.appendChild(INPUT_checkAll);
+
+          TR.appendChild(TD_checkbox);
+
+          display.onMultiSelect(selectEntityIds => {
+            selectEntityIds = selectEntityIds ? selectEntityIds.split(',') : [];
+            let all = true;
+            let none = true;
+            for (const TR of TABLE.childNodes) {
+              const TD_checkbox = TR.firstChild;
+              const INPUT_checkbox = TD_checkbox.firstChild;
+              if (INPUT_checkbox && INPUT_checkbox.type === 'checkbox' && INPUT_checkbox !== INPUT_checkAll) {
+                const entityId = display.hasOption('groupby') ? TR.groupId : TR.entityId;
+                const checked = selectEntityIds.includes(entityId) || selectEntityIds.includes('*');
+                INPUT_checkbox.checked = checked;
+                if (checked) none = false;
+                else all = false;
+              }
+            }
+            INPUT_checkAll.checked = all;
+            INPUT_checkAll.indeterminate = (!none && !all);
+          });
         } // TODO if color and multi select
         if (display.hasOption('color')) {
           const TD = document.createElement('TD');

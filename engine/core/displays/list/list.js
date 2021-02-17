@@ -34,7 +34,32 @@ exports.display = {
         const TD_checkbox = document.createElement('TD');
         TD_checkbox.className = 'xyz-list-icon';
         // TODO select all/none
+        const INPUT_checkAll = document.createElement('INPUT');
+        INPUT_checkAll.type = 'checkbox';
+        INPUT_checkAll.onclick = () => {
+          if (INPUT_checkAll.checked) display.multiSelectAll();
+          else display.multiSelectNone();
+        };
+        TD_checkbox.appendChild(INPUT_checkAll);
         TR_header.appendChild(TD_checkbox);
+
+        display.onMultiSelect(selectEntityIds => {
+          selectEntityIds = selectEntityIds ? selectEntityIds.split(',') : [];
+          let all = true;
+          let none = true;
+          for (const TR of TABLE.childNodes) {
+            const TD_checkbox = TR.firstChild;
+            const INPUT_checkbox = TD_checkbox.firstChild;
+            if (INPUT_checkbox && INPUT_checkbox.type === 'checkbox' && INPUT_checkbox !== INPUT_checkAll) {
+              const checked = selectEntityIds.includes(TR.entityId) || selectEntityIds.includes('*');
+              INPUT_checkbox.checked = checked;
+              if (checked) none = false;
+              else all = false;
+            }
+          }
+          INPUT_checkAll.checked = all;
+          INPUT_checkAll.indeterminate = (!none && !all);
+        });
       }
       if (display.hasOption('color')) {
         const TD = document.createElement('TD');
