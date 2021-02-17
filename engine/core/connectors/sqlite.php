@@ -66,7 +66,7 @@ class Connector_sqlite extends Connector
     {
       if(!$result){
         $error = $this->db->lastErrorMsg();
-        $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.'.$error); //TODO check, set entityId?
+        $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.'.$error);
       }else if($method === 'GET'){
         while($row = $result->fetchArray()){
           foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
@@ -74,9 +74,7 @@ class Connector_sqlite extends Connector
             $propertyPath = $propertyRequest->getPropertyPath();
             $propertyName = $propertyPath[0]; //TODO check
             $entityId = (string)$row[$idKey];
-            if($entityId === $propertyRequest->getEntityId() ||  $propertyRequest->getEntityId()==='*'){  //TODO SEARCHME4SfF3R5
-              $connectorResponse->add(200, $propertyRequest, $entityId,  $row[$propertyName]);
-            }
+            $connectorResponse->add(200, $propertyRequest, $entityId,  $row[$propertyName]);
           }
         }
       }else if($method === 'HEAD'){
@@ -86,8 +84,9 @@ class Connector_sqlite extends Connector
           $foundEntityIds[$entityId] = true;
         }
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-          $entityId = $propertyRequest->getEntityId();
-          if(array_key_exists($entityId,$foundEntityIds)){
+          $entityIdList = $propertyRequest->getEntityIdList();
+          $entityIds = explode(',', $entityIdList);
+          if(count(array_intersect($entityId,$foundEntityIds))>0){ //TODO performance
             $connectorResponse->add(200, $propertyRequest, $entityId,  null);
           } else {
             $connectorResponse->add(404, $propertyRequest, $entityId,  null);
@@ -114,7 +113,9 @@ class Connector_sqlite extends Connector
           $propertyPath = $propertyRequest->getPropertyPath();
           $propertyName = $propertyPath[0]; //TODO check
 
-          $entityId = $propertyRequest->getEntityId();
+          $entityIdList = $propertyRequest->getEntityIdList();
+          $entityIds = explode(',',$entityIdList);
+
           $connectorSettings = $propertyRequest->getProperty()->getConnectorSettings();
           $table = array_get($connectorSettings, 'table'); //TODO default to entityClassName;
           $key = array_get($connectorSettings, 'key', $propertyName); ;
@@ -123,7 +124,9 @@ class Connector_sqlite extends Connector
             $entityIdsPerTable[$table] = [];
           }
           $keysPerTable[$table][$key] = $propertyRequest;
-          $entityIdsPerTable[$table][$entityId] = true;
+          foreach($entityIds as $entityId){
+            $entityIdsPerTable[$table][$entityId] = true;
+          }
         }
 
         if( !$this->open() ) {

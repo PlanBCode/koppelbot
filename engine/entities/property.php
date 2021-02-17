@@ -46,7 +46,7 @@ class  PropertyRequest
     /** @var string */
     protected $entityClassName;
     /** @var string */
-    protected $entityId;
+    protected $entityIdList;
     /** @var Property */
     protected $property;
     /** @var string[] */
@@ -58,10 +58,10 @@ class  PropertyRequest
     /** @var string */
     protected $connectorString;
 
-    public function __construct(int $status, RequestObject &$requestObject, string $entityClassName, string $entityId, $propertyOrError, array &$propertyPath, &$propertyContent)
+    public function __construct(int $status, RequestObject &$requestObject, string $entityClassName, string $entityIdList, $propertyOrError, array &$propertyPath, &$propertyContent)
     {
         $this->requestObject =& $requestObject;
-        $this->entityId = $entityId;
+        $this->entityIdList = $entityIdList;
         $this->entityClassName = $entityClassName;
         $this->propertyPath =& $propertyPath;
 
@@ -79,10 +79,10 @@ class  PropertyRequest
             $this->status = 200;
             $connectorSettings = $this->property->getConnectorSettings();
             $connectorType = array_get($connectorSettings, 'type');
-            $this->connectorString = Connector::addConnector($connectorType, $connectorSettings, $requestObject, $entityClassName, $entityId, $this->propertyPath);
+            $this->connectorString = Connector::addConnector($connectorType, $connectorSettings, $requestObject, $entityClassName, $entityIdList, $this->propertyPath);
             if ($this->connectorString === Connector::CONNECTOR_STRING_ERROR) {
                 $this->status = 500;
-                $this->content = 'Connector failure for /' . $entityClassName . '/' . $entityId . '/' . implode('/', $this->propertyPath) . '.';
+                $this->content = 'Connector failure for /' . $entityClassName . '/' . $entityIdList . '/' . implode('/', $this->propertyPath) . '.';
             }
 
         }
@@ -129,14 +129,14 @@ class  PropertyRequest
         return $this->requestObject->getMethod();
     }
 
-    public function getEntityId(): string
+    public function getEntityIdList(): string
     {
-        return $this->entityId;
+        return $this->entityIdList;
     }
 
-    public function setEntityId(string $entityId): void
+    public function setEntityId(string $entityIdList): void
     {
-        $this->entityId = $entityId;
+        $this->entityIdList = $entityIdList;
     }
 
     public function getEntityClass(): string
@@ -188,7 +188,7 @@ class  PropertyRequest
         if(is_null($autoIncrementedUri)) return;
         $path = explode('/',$autoIncrementedUri);
         if(count($path)<2) return;
-        $this->entityId = $path[1];
+        $this->entityIdList = $path[1];
     }
 
 }

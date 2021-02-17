@@ -2,7 +2,7 @@
 
 function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$connectorResponse): ConnectorResponse
 {
-    $userName = $propertyRequest->getEntityId();
+    $userName = $propertyRequest->getEntityIdList(); // TODO explode
     $submittedPasswordArray = $propertyRequest->getContent();
 
     if (!is_array($submittedPasswordArray) || !array_key_exists('password', $submittedPasswordArray)) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
@@ -69,7 +69,7 @@ class Connector_session extends Connector
     {
         $connectorResponse = new ConnectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
-        $userName = $propertyRequest->getEntityId();
+        $userName = $propertyRequest->getEntityIdList();//TODO explode
 
         if ($userName === '*') {
             return $connectorResponse->add(400, $propertyRequest, $userName, 'Session not defined.');
@@ -107,7 +107,7 @@ class Connector_session extends Connector
     protected function logout(PropertyRequest &$propertyRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
-        $userName = $propertyRequest->getEntityId();
+        $userName = $propertyRequest->getEntityIdList(); //TODO explode
         if ($userName === '*') {
             $_SESSION['content'] = [];
             if (!session_id()) session_destroy();
@@ -127,7 +127,7 @@ class Connector_session extends Connector
     {
         $connectorResponse = new ConnectorResponse();
         $propertyName = $propertyRequest->getProperty()->getName();
-        $userNameList = $propertyRequest->getEntityId();
+        $userNameList = $propertyRequest->getEntityIdList();
         if (!array_key_exists('content', $_SESSION)) {
             if ($userNameList !== '*') {
                 $connectorResponse->add(404, $propertyRequest, $userNameList, 'Not found');

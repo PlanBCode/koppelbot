@@ -65,7 +65,7 @@ abstract class BasicConnector extends Connector
         }*/
         $connectorResponse = new ConnectorResponse();
 
-        $entityIdList = $propertyRequest->getEntityId();
+        $entityIdList = $propertyRequest->getEntityIdList();
         if($entityIdList === '*' ){
             if(is_null($this->data)) $entityIds =[];
             else $entityIds =  array_keys($this->data);
@@ -118,7 +118,7 @@ abstract class BasicConnector extends Connector
     protected function patch(PropertyRequest $propertyRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
-        $entityIdList = $propertyRequest->getEntityId();
+        $entityIdList = $propertyRequest->getEntityIdList();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
         $property = $propertyRequest->getProperty();
@@ -189,7 +189,7 @@ abstract class BasicConnector extends Connector
     protected function delete(PropertyRequest $propertyRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
-        $entityIdList = $propertyRequest->getEntityId();
+        $entityIdList = $propertyRequest->getEntityIdList();
         $entityIds = $entityIdList === '*' ? array_keys($this->data) : explode(',', $entityIdList);
 
         $property = $propertyRequest->getProperty();

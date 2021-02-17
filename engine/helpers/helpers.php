@@ -25,16 +25,10 @@ function array_get(array &$array, $key, $default = null)
 
 function array_null_get(?array &$array, $key)
 {
-    if (is_null($array)) {
-        return null;
-    }
-    if (array_key_exists($key, $array)) {
-        return $array[$key];
-    } elseif (array_key_exists('*', $array)) {
-        return $array['*'];
-    } else {
-        return null;
-    }
+    if (is_null($array)) return null;
+    if (array_key_exists($key, $array)) return $array[$key];
+    elseif (array_key_exists('*', $array)) return $array['*'];
+    else return null;
 }
 
 function endsWith($haystack, $needle)

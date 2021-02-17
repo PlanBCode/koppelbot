@@ -99,7 +99,7 @@ class Connector_directory extends BasicConnector
         $this->meta = [];
         $entityIds = [];
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-            $entityIdList = $propertyRequest->getEntityId();
+            $entityIdList = $propertyRequest->getEntityIdList();
 
             if ($propertyRequest->isEntityCreation()) {
               // do nothing. No file yet to write to, this file will be created

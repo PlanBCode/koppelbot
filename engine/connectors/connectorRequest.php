@@ -28,7 +28,8 @@ class ConnectorRequest
     public function isReadOnly(string $entityId = ''): bool
     {
         foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && !$propertyRequest->isReadOnly()) return false;
+            $entityIds = explode(',',$propertyRequest->getEntityIdList());
+            if (($entityId === '' || $entityId === '*' || in_array($entityId,$entityIds)) && !$propertyRequest->isReadOnly()) return false;
         }
         return true;
     }
@@ -36,7 +37,8 @@ class ConnectorRequest
     public function isDeletion(string $entityId = ''): bool
     {
         foreach ($this->propertyRequests as $propertyRequest) {
-            if (($entityId === '' || $entityId === $propertyRequest->getEntityId()) && $propertyRequest->isDeletion()) return true;
+            $entityIds = explode(',',$propertyRequest->getEntityIdList());
+            if (($entityId === '' || $entityId === '*' || in_array($entityId,$entityIds)) && $propertyRequest->isDeletion()) return true;
         }
         return false;
     }

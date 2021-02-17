@@ -101,7 +101,7 @@ class EntityClass
         return $propertyHandles;
     }
 
-    protected function validateAndCheckRequired(RequestObject &$requestObject, string $entityId, &$entityIdContent, array &$errorPropertyRequests)
+    protected function validateAndCheckRequired(RequestObject &$requestObject, string $entityIdList, &$entityIdContent, array &$errorPropertyRequests)
     {
         $method = $requestObject->getMethod();
         if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
@@ -110,18 +110,18 @@ class EntityClass
                 $propertyPath = [$propertyName];
                 if (!is_null($propertyContent)) {
                     if ($property->getTypeName() === 'id' && $method === 'POST') {
-                        $error = '/' . $this->entityClassName . '/' . $entityId . '/' . $propertyName . ' is an auto incremented id and should not be supplied.';
-                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
+                        $error = '/' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName . ' is an auto incremented id and should not be supplied.';
+                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     } else if (!$property->validateContent($propertyContent)) {
-                        $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
+                        $error = 'Invalid content for /' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName;
+                        $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
                     }
                 } elseif
                 (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
-                    $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityId . '/' . $propertyName;
-                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityId, $error, $propertyPath, $propertyContent);
+                    $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName;
+                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
                     $errorPropertyRequests[] = $errorPropertyRequest;
                 }
             }
@@ -162,20 +162,22 @@ class EntityClass
         $propertyRequests = [];
         /** @var PropertyRequest[] */
         $errorPropertyRequests = [];
-        //TODO can we pass single propertyRequests using entityIdList to connector? SEARCHME4SfF3R5
 
-        foreach ($entityIds as $entityId) {
-            if (is_array($entityClassContent)) {
-                $entityIdContent = array_null_get($entityClassContent, $entityId);
-            } else {
-                $entityIdContent = null;
-            }
+        if ($method === 'HEAD' || $method === 'GET' || $method === 'DELETE' ) {
+          $entityIdContent = null;
+          foreach ($propertyHandles as $propertyHandle) {
+            $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityIdList, $entityIdContent);
+          }
+        }else{ // for write methods entityIdList is expanded to separate requests
+          foreach ($entityIds as $entityId) {
+              $entityIdContent = array_null_get($entityClassContent, $entityId);
 
-            $this->validateAndCheckRequired($requestObject, $entityId, $entityIdContent, $errorPropertyRequests);
+              $this->validateAndCheckRequired($requestObject, $entityId, $entityIdContent, $errorPropertyRequests);
 
-            foreach ($propertyHandles as $propertyHandle) {
-                $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityId, $entityIdContent);
-            }
+              foreach ($propertyHandles as $propertyHandle) {
+                  $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityId, $entityIdContent);
+              }
+          }
         }
         if (!empty($errorPropertyRequests)) return $errorPropertyRequests;
 
