@@ -68,9 +68,10 @@ exports.watchGulp = function watchGulp (pattern) {
     watcher.on('ready', () => { watcher.ready = true; });
     watchers.push(watcher);
   };
-  const launchGulp = () => {
-    message('Booting...');
+  const launchGulp = cb => {
+    // cb(); causes crash?
 
+    message('Booting...');
     const child = spawn('gulp', [], {});
 
     child.stdout.on('data', data => process.stdout.write(data.toString()));
@@ -93,7 +94,7 @@ exports.watchGulp = function watchGulp (pattern) {
       if (watchers.filter(w => !w.closed).length === 0) {
         message('All watchers closed.');
         clearInterval(interval);
-        launchGulp();
+        launchGulp(cb);
       }
       console.log();
     }, 500);

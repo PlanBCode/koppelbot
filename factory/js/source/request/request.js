@@ -30,7 +30,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     const metaUri = addQueryString('/entity/' + entityClassNames.join(','), 'expand');
     request('GET', metaUri, undefined, (status, content) => { // TODO add querystring better
       // TODO check status
-      console.log(metaUri, content);
+      // console.log(metaUri, content);
       const data = JSON.parse(content); // TODO check
       if (typeof data !== 'object' || data === null || !data.hasOwnProperty('entity')) {
         console.error('PROBLEM parsing meta response', data);
