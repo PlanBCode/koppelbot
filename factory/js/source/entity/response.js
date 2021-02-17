@@ -10,11 +10,11 @@ function extractContentFromNode (contentOrNode) {
     ];
   } else {
     let entityId, method;
-    let errors = [];
+    const errors = [];
     let status = 200;
     const content = {};
     let subObject, subStatus, subContent, subErrors;
-    for (let propertyName in contentOrNode) {
+    for (const propertyName in contentOrNode) {
       [subObject, entityId, subStatus, subContent, subErrors, method] = extractContentFromNode(contentOrNode[propertyName]);
 
       if (typeof status === 'undefined') {
@@ -47,12 +47,12 @@ function filter (content, path) {
     const propertyNameList = path[0];
     const filteredContent = {};
     if (propertyNameList === '*') {
-      for (let propertyName in content) {
+      for (const propertyName in content) {
         filteredContent[propertyName] = filter(content[propertyName], subPath);
       }
     } else {
       const propertyNames = propertyNameList.split(',');
-      for (let propertyName in content) {
+      for (const propertyName in content) {
         if (propertyNames.includes(propertyName)) {
           filteredContent[propertyName] = filter(content[propertyName], subPath);
         }

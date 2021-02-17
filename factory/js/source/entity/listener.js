@@ -21,7 +21,7 @@ function ListenerHandler () {
         const listenersPerSubUri = listenersPerEventNamePerSubUri[eventName];
         const entityClassName = this.getEntityClassName();
         if (typeof subUri === 'undefined') { // if no subUri is specified, call all subUri's
-          for (let subUri in listenersPerSubUri) {
+          for (const subUri in listenersPerSubUri) {
             const subPath = subUri === '' ? [] : subUri.split('/');
             const subNode = response.getSubNode(node, subPath);
             // DEBUG console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
@@ -76,7 +76,7 @@ function ListenerHandler () {
 
     // DEBUG console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
     if (entityId === '*') {
-      for (let entityId in contents) {
+      for (const entityId in contents) {
         const node = this.getResponse(subPath, entityId, 'GET');
         callback(entityClassName, entityId, node, eventName);
       }
@@ -118,11 +118,11 @@ function ListenerHandler () {
 
     // for debug reasons output listener counts:
     let count = 0;
-    for (let entityId in listenersPerEntityIdPerEventNamePerSubUri) {
+    for (const entityId in listenersPerEntityIdPerEventNamePerSubUri) {
       const listenersPerEventNamePerSubUri = listenersPerEntityIdPerEventNamePerSubUri[entityId];
-      for (let eventName in listenersPerEventNamePerSubUri) {
+      for (const eventName in listenersPerEventNamePerSubUri) {
         const listenersPerSubUri = listenersPerEventNamePerSubUri[eventName];
-        for (let subUri in listenersPerSubUri) {
+        for (const subUri in listenersPerSubUri) {
           const listeners = listenersPerSubUri[subUri];
           count += listeners.size;
         }

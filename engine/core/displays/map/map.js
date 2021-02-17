@@ -10,16 +10,17 @@ let SCRIPT; // to dynamically load dependency;
 function initializeOpenLayers (display) {
   const WRAPPER = display.getWRAPPER();
 
-  const vectorSource = new ol.source.Vector({
-    features: []
-  });
-
   if (WRAPPER.vectorLayer) { // map is already created, to reinitialize we clear all features
     const DIV_message = WRAPPER.firstChild;
     DIV_message.innerText = 'Waiting for input...';
-    vectorSource.clear();
+    WRAPPER.vectorSource.clear();
     return;
   }
+
+  const vectorSource = new ol.source.Vector({
+    features: []
+  });
+  WRAPPER.vectorSource = vectorSource;
 
   WRAPPER.innerHTML = '';
   const DIV_message = document.createElement('DIV');
@@ -48,7 +49,7 @@ function initializeOpenLayers (display) {
       zoom: 3
     })
   });
-
+  WRAPPER.map = map;
   const DIV_create = display.showCreateButton();
 
   map.on('click', function (event) {
@@ -124,11 +125,12 @@ exports.display = {
     const WRAPPER = display.getWRAPPER();
     const DIV_message = WRAPPER.firstChild;
     if (DIV_message) DIV_message.innerText = '';
+    if (WRAPPER.vectorSource) WRAPPER.vectorSource.clear();
   },
+
   first: display => {},
 
   entity: display => {
-    // return;
     const locationPropertyName = display.getOption('location') || 'geojson';
     const WRAPPER = display.getWRAPPER();
 
@@ -164,15 +166,15 @@ exports.display = {
         // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
         // TODO how do we handle changes to feature?
         WRAPPER.vectorLayer.getSource().addFeature(feature);
+
+        const extent = ol.extent.createEmpty();
+        ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
+        WRAPPER.map.getView().fit(extent, WRAPPER.map.getSize());
       }
     }
   },
   remove: display => {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
-    const SVG_map = WRAPPER.firstChild;
-    for (const SVG_entity of SVG_map.childNodes) {
-      if (typeof SVG_entity.entityId === 'string' && (SVG_entity.entityId === entityId || entityId === '*')) SVG_map.removeChild(SVG_entity);
-    }
   }
 };

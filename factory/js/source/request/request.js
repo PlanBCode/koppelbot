@@ -6,6 +6,7 @@ function request (method, uri, data, callback) {
   // TODO allow for multiple hosts by prepending http(s)://..
   const location = window.location.origin + '/';
   uri = encodeURI(uri);
+
   const xhr = new window.XMLHttpRequest();
   xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
 
@@ -54,7 +55,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
 
 exports.delete = (entityClasses, uri, callback) => {
   request('DELETE', uri, null, (status, response) => {
-    console.log('delete response: ' + uri + ' ' + response);
+    // console.log('delete response: ' + uri + ' ' + response);
     const responseContent = JSON.parse(response);
     const state = entity.handleInput('DELETE', uri, status, responseContent, null, entityClasses);
     if (typeof callback === 'function') callback(state);
@@ -63,7 +64,7 @@ exports.delete = (entityClasses, uri, callback) => {
 
 exports.head = (uri, callback) => {
   request('HEAD', uri, null, (status, response) => {
-    console.log('head response: ' + uri + ' ' + status + ' ' + response);
+    // console.log('head response: ' + uri + ' ' + status + ' ' + response);
     if (typeof callback === 'function') callback(status); // TODO pass state
   });
 };
@@ -97,13 +98,24 @@ exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
         responseObjectContent = JSON.parse(responseStringContent);
       } catch (e) {
         console.error('GET', uri, responseStringContent, e);
+        return;
       }
       // console.log('GET', uri, status, responseObjectContent);
       // TODO replace null with current content?
       const state = entity.handleInput('GET', uri, status, responseObjectContent, null, entityClasses);
       // TODO  word er nog iets met state gedaan...?
       if (typeof dataCallback === 'function') {
-        const node = entity.getResponse(uri, entityClasses, 'GET');
+        // determine the actually requested entityIds per ClassName
+        const entityIdsPerClassName = {};
+        for (const entityClassName in responseObjectContent) {
+          // TODO check
+          const entityClassContent = status === 207
+            ? responseObjectContent[entityClassName].content
+            : responseObjectContent[entityClassName];
+          const entityIds = Object.keys(entityClassContent); // TODO check
+          entityIdsPerClassName[entityClassName] = entityIds;
+        }
+        const node = entity.getResponse(uri, entityClasses, 'GET', entityIdsPerClassName);
         dataCallback(node);
       }
     });

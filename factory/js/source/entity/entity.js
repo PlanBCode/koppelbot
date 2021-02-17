@@ -7,11 +7,11 @@ const input = require('../request/input.js');
 
 function compileSettings (rawSettings) {
   const settings = {};
-  const rootSettings = rawSettings.hasOwnProperty('_') ? rawSettings['_'] : {};
-  for (let propertyName in rawSettings) {
+  const rootSettings = rawSettings.hasOwnProperty('_') ? rawSettings._ : {};
+  for (const propertyName in rawSettings) {
     if (propertyName !== '_') {
       settings[propertyName] = {...rootSettings};
-      for (let id in rawSettings[propertyName]) {
+      for (const id in rawSettings[propertyName]) {
         if ((id === 'access' || id === 'connector') && rootSettings.hasOwnProperty(id)) {
           settings[propertyName][id] = {...rootSettings[id], ...rawSettings[propertyName][id]};
         } else {
@@ -35,7 +35,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
 
   const properties = {};
 
-  for (let propertyName in settings) {
+  for (const propertyName in settings) {
     properties[propertyName] = new Property(xyz, this, propertyName, settings[propertyName]);
   }
 
@@ -60,7 +60,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
         ? Object.keys(properties)
         : propertNameList.split(',');
       const subPath = path.slice(1);
-      for (let propertyName of propertyNames) {
+      for (const propertyName of propertyNames) {
         if (properties.hasOwnProperty(propertyName)) {
           const propertyListeners = properties[propertyName].addPropertyListener(entityId, subPath, eventName, callback);
           listeners.push(...propertyListeners);
@@ -81,7 +81,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
       ? ['*']
       : path[0].split(',');
     const subPath = path.splice(1);
-    for (let entityId of entityIds) {
+    for (const entityId of entityIds) {
       const entityListeners = addEntityListener(entityId, subPath, eventName, callback);
       listeners.push(...entityListeners);
     }
@@ -94,29 +94,31 @@ function EntityClass (xyz, entityClassName, rawSettings) {
       : path[0].split(',');
     const content = {};
     const subPath = path.slice(1);
-    for (let propertyName of propertyNames) {
-      if (properties.hasOwnProperty(propertyName)) {
-        content[propertyName] = properties[propertyName].getResponse(subPath, entityId, method);
-      } else {
-        content[propertyName] = new response.Node(this, entityId, 400, null, [`${propertyName} does not exist.`], method); // TODO
-      }
+    for (const propertyName of propertyNames) {
+      content[propertyName] = properties.hasOwnProperty(propertyName)
+        ? properties[propertyName].getResponse(subPath, entityId, method)
+        : content[propertyName] = new response.Node(this, entityId, 400, null, [`${propertyName} does not exist.`], method); // TODO
     }
+    // TODO use query
+
     return content;
   };
 
   // TODO MAYBE make private /remove
-  this.getEntityClassResponse = (path, method) => {
-    const entityIds = (path.length === 0 || path[0] === '*')
-      ? Object.keys(entities)
-      : path[0].split(',');
+  this.getEntityClassResponse = (path, method, entityIds) => {
+    if (typeof entityIds === 'undefined') {
+      entityIds = (path.length === 0 || path[0] === '*')
+        ? Object.keys(entities)
+        : path[0].split(',');
+    }
     const content = {};
     const subPath = path.slice(1);
-    for (let entityId of entityIds) {
-      if (entities.hasOwnProperty(entityId)) {
-        content[entityId] = this.getResponse(subPath, entityId, method);
-      } else {
-        content[entityId] = new response.Node(this, entityId, 404, null, [`/${entityClassName}/${entityId} not found.`], method); // TODO
-      }
+
+    for (const entityId of entityIds) {
+      const entityContent = entities.hasOwnProperty(entityId)
+        ? this.getResponse(subPath, entityId, method)
+        : new response.Node(this, entityId, 404, null, [`/${entityClassName}/${entityId} not found.`], method); // TODO
+      content[entityId] = entityContent;
     }
     return content;
   };
@@ -133,8 +135,8 @@ function EntityClass (xyz, entityClassName, rawSettings) {
       TABLE.appendChild(TR_header);
       TD_header.innerText = 'New ' + entityClassName;
     }
-    for (let propertyName in properties) {
-      for (let TR of properties[propertyName].createCreator(options, data, INPUT_submit, displayMessage)) {
+    for (const propertyName in properties) {
+      for (const TR of properties[propertyName].createCreator(options, data, INPUT_submit, displayMessage)) {
         TABLE.appendChild(TR);
       }
     }
@@ -142,7 +144,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
 
   this.getTitlePropertyPath = () => {
-    for (let propertyName in properties) {
+    for (const propertyName in properties) {
       const titlePropertyPath = properties[propertyName].getTitlePropertyPath();
       if (titlePropertyPath !== null) return [propertyName].concat(titlePropertyPath);
     }
@@ -160,14 +162,14 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
 
   this.isAutoIncremented = () => {
-    for (let propertyName in properties) {
+    for (const propertyName in properties) {
       if (properties[propertyName].isAutoIncremented()) return true;
     }
     return false;
   };
 
   this.getIdProperty = () => {
-    for (let propertyName in properties) {
+    for (const propertyName in properties) {
       const property = properties[propertyName];
       if (property.isId()) return propertyName;
     }
@@ -175,7 +177,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
 
   this.getIdPropertyPath = () => {
-    for (let propertyName in properties) {
+    for (const propertyName in properties) {
       const possibleIdProperty = properties[propertyName].getIdPropertyPath();
       if (possibleIdProperty instanceof Array) return possibleIdProperty;
     }
@@ -183,10 +185,8 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
 
   this.getIdFromContent = data => {
-    if (typeof data !== 'object' || data === null) { // TODO is_object
-      return null;
-    }
-    for (let propertyName in properties) {
+    if (typeof data !== 'object' || data === null) return null;
+    for (const propertyName in properties) {
       if (data.hasOwnProperty(propertyName)) {
         const id = properties[propertyName].getIdFromContent(data[propertyName]);
         if (id) return id;
@@ -195,7 +195,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     return null;
   };
 
-  this.callListeners = (state, entityId) => {
+  this.callListeners = (state, entityId) => { // TODO pass method?
     this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()));
   };
 
@@ -204,7 +204,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   this.handleInput = (path, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
     const state = new State(method);
     if (entityClassStatus === 207) {
-      for (let entityId of entityIds) {
+      for (const entityId of entityIds) {
         const entity207Wrapper = entityClassContent[entityId];
         if (entity207Wrapper === null || typeof entity207Wrapper !== 'object' ||
                     !entity207Wrapper.hasOwnProperty('status') ||
@@ -219,13 +219,14 @@ function EntityClass (xyz, entityClassName, rawSettings) {
           const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
           const subPath = path.slice(1);
           const entityState = handleEntityIdInput(subPath, method, entityId, entityStatus, entityContent, subRequestContent);
+          // TODO check with query
           state.addSubState(entityState);
         }
       }
     } else {
       // TODO if error set error
       //            state.setError(404, 'Not found');
-      for (let entityId of entityIds) {
+      for (const entityId of entityIds) {
         const entityContent = (entityClassContent === null || typeof entityClassContent !== 'object')
           ? null
           : entityClassContent[entityId];
@@ -242,14 +243,12 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   this.getSubObject = propertyName => properties[propertyName];
 
   this.render = (action, options, entityId, subPath) => {
-    let propertyNames;
-    if (typeof subPath === 'undefined' || subPath[0] === '*') {
-      propertyNames = Object.keys(properties);
-    } else {
-      propertyNames = subPath[0].split(',');
-    }
+    const propertyNames = typeof subPath === 'undefined' || subPath[0] === '*'
+      ? Object.keys(properties)
+      : subPath[0].split(',');
+
     const DIV = document.createElement('DIV');
-    for (let propertyName of propertyNames) {
+    for (const propertyName of propertyNames) {
       if (properties.hasOwnProperty(propertyName)) {
         const TAG = properties[propertyName].render(action, options, entityId);
         DIV.appendChild(TAG);
@@ -270,12 +269,9 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     } else {
       const subPropertyPath = propertyPath.slice(1);
       const propertyNames = propertyPath[0] === '*' ? Object.keys(properties) : propertyPath[0].split(',');
-      for (let propertyName of propertyNames) {
-        if (!properties.hasOwnProperty(propertyName)) {
-          return false;
-        } else if (!properties[propertyName].checkAccess(subPropertyPath, method, groups)) {
-          return false;
-        }
+      for (const propertyName of propertyNames) {
+        if (!properties.hasOwnProperty(propertyName)) return false;
+        else if (!properties[propertyName].checkAccess(subPropertyPath, method, groups)) return false;
       }
     }
     return true;
@@ -291,7 +287,7 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
   const entityIdList = path[1] || '*';
   const entityClassNames = entityClassNameList.split(',');
   if (status === 207) {
-    for (let entityClassName of entityClassNames) {
+    for (const entityClassName of entityClassNames) {
       const entityClass207Wrapper = responseContent[entityClassName];
       if (entityClass207Wrapper === null || typeof entityClass207Wrapper !== 'object' ||
                 !entityClass207Wrapper.hasOwnProperty('status') ||
@@ -312,7 +308,7 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
       }
     }
   } else {
-    for (let entityClassName of entityClassNames) {
+    for (const entityClassName of entityClassNames) {
       const entityClassContent = responseContent[entityClassName];
       const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[entityClassName] : null;
       const subPath = path.slice(1);
@@ -336,16 +332,27 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
   return state;
 };
 
-function getResponse (uri, entityClasses, method) {
+/**
+ * [getResponse description]
+ * @param  {[type]} uri                   [description]
+ * @param  {[type]} entityClasses         [description]
+ * @param  {[type]} method                [description]
+ * @param  {[type]} entityIdsPerClassName   Object containing the entityIds per entity class
+ * @returns {[type]}                       [description]
+ */
+function getResponse (uri, entityClasses, method, entityIdsPerClassName) {
   const path = uriTools.pathFromUri(uri);
   const entityClassNames = (path.length === 0 || path[0] === '*')
     ? Object.keys(entityClasses)
     : path[0].split(',');
   const content = {};
   const subPath = path.slice(1);
-  for (let entityClassName of entityClassNames) {
+  for (const entityClassName of entityClassNames) {
     if (entityClasses.hasOwnProperty(entityClassName)) {
-      content[entityClassName] = entityClasses[entityClassName].getEntityClassResponse(subPath, method);
+      const entityIds = typeof entityIdsPerClassName === 'object' && entityIdsPerClassName !== null && entityIdsPerClassName.hasOwnProperty(entityClassName)
+        ? entityIdsPerClassName[entityClassName]
+        : undefined;
+      content[entityClassName] = entityClasses[entityClassName].getEntityClassResponse(subPath, method, entityIds);
     } else {
       // TODO replace null with something that has the endpoints required by Node
       content[entityClassName] = new response.Node(null, '*', 404, null, [`/${entityClassName} not found.`], method); // TODO
@@ -378,7 +385,7 @@ const checkAccess = (entityClasses, uri, method) => {
   if (entityClasses.hasOwnProperty('session')) {
     const response = getResponse('/session/*/groups', entityClasses, 'GET');
     if (response.hasOwnProperty('session')) {
-      for (let sessionId in response.session) {
+      for (const sessionId in response.session) {
         const session = response.session[sessionId];
         const sessionGroups = session.groups;
         if (!sessionGroups.hasErrors()) {
@@ -393,7 +400,7 @@ const checkAccess = (entityClasses, uri, method) => {
   }
   const entityClassNames = uriTools.getEntityClassNames(uri, entityClasses);
   const subPath = uriTools.pathFromUri(uri).slice(2);
-  for (let entityClassName of entityClassNames) {
+  for (const entityClassName of entityClassNames) {
     if (!entityClasses.hasOwnProperty(entityClassName) ||
             !entityClasses[entityClassName].checkAccess(subPath, method, groups)) return false;
   }
