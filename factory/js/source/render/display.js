@@ -121,7 +121,7 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * @param  {Function} callback     TODO
    * @returns {void}                TODO
    */
-  this.onVariable = (variableName, callback) => xyz.onVariable(variableName, callback);
+  this.onVariable = (variableName, callback) => variables.onVariable(variableName, callback);
   /**
    * [getDisplayName description]
    * @param  {Array} propertyPath TODO
@@ -173,7 +173,7 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * @returns {void}            TODO
    */
   this.onSelect = callback => {
-    if (this.hasOption('select')) xyz.onVariable(this.getOption('select'), callback);
+    if (this.hasOption('select')) variables.onVariable(this.getOption('select'), callback);
   };
   /**
    * [onSelect description]
@@ -181,7 +181,7 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * @returns {void}            TODO
    */
   this.onMultiSelect = callback => {
-    if (this.hasOption('multiSelect')) xyz.onVariable(this.getOption('multiSelect'), callback);
+    if (this.hasOption('multiSelect')) variables.onVariable(this.getOption('multiSelect'), callback);
   };
   /**
    * [select description]
@@ -190,7 +190,7 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * @returns {void}                 TODO
    */
   this.select = (entityClassName_ = entityClassName, entityId_ = entityId) => {
-    xyz.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'));
+    variables.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'));
     if (this.hasOption('onChange')) {
       const onChange = this.getOption('onChange');
       if (typeof onChange === 'function') onChange();
@@ -213,21 +213,21 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * @param  {string} [entityId_]        TODO
    * @returns {Boolean}                 TODO
    */
-  this.isSelected = (entityClassName_ = entityClassName, entityId_ = entityId) => xyz.isSelected(entityClassName_, entityId_, this.getOption('select'));
+  this.isSelected = (entityClassName_ = entityClassName, entityId_ = entityId) => variables.isSelected(entityClassName_, entityId_, this.getOption('select'));
   /**
    * [multiSelectAdd description]
    * @param  {string} [entityClassName_] TODO
    * @param  {string} [entityId_]        TODO
    * @returns {void}                 TODO
    */
-  this.multiSelectAdd = (entityClassName_ = entityClassName, entityId_ = entityId) => xyz.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
+  this.multiSelectAdd = (entityClassName_ = entityClassName, entityId_ = entityId) => variables.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'), this.getOption('multiSelectUri'));
   /**
    * [multiSelectRemove description]
    * @param  {string} [entityClassName_] TODO
    * @param  {string} [entityId_]        TODO
    * @returns {void}                 TODO
    */
-  this.multiSelectRemove = (entityClassName_ = entityClassName, entityId_ = entityId) => xyz.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
+  this.multiSelectRemove = (entityClassName_ = entityClassName, entityId_ = entityId) => variables.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
   /**
    * [multiSelectNone description]
    * @returns {void} TODO
@@ -239,19 +239,19 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
     * @returns {void}                 TODO
     */
   this.multiSelectToggle = (entityClassName_ = entityClassName, entityId_ = entityId) => {
-    if (this.isMultiSelected(entityClassName_, entityId_)) xyz.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
-    else xyz.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'));
+    if (this.isMultiSelected(entityClassName_, entityId_)) variables.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
+    else variables.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'));
   };
   /**
     * [multiSelectNone description]
     * @returns {void} TODO
     */
-  this.multiSelectAll = () => xyz.select('*', '*', this.getOption('multiSelect'));
+  this.multiSelectAll = () => variables.select('*', '*', this.getOption('multiSelect'));
   /**
    * [multiSelectNone description]
    * @returns {void} TODO
    */
-  this.multiSelectNone = () => xyz.select(undefined, undefined, this.getOption('multiSelect'));
+  this.multiSelectNone = () => variables.select(undefined, undefined, this.getOption('multiSelect'));
   // TODO multiSelectAll  ('*')
   /**
    * [isMultiSelected description]
@@ -259,7 +259,7 @@ function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, 
    * @param  {string} [entityId_]        TODO
    * @returns {Boolean}                 TODO
    */
-  this.isMultiSelected = (entityClassName_, entityId_) => xyz.isSelected(entityClassName_ || entityClassName, entityId_ || entityId, this.getOption('multiSelect'));
+  this.isMultiSelected = (entityClassName_, entityId_) => variables.isSelected(entityClassName_ || entityClassName, entityId_ || entityId, this.getOption('multiSelect'));
   /**
    * [showCreateButton description]
    * @returns {void} TODO

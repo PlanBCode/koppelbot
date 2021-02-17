@@ -10,7 +10,7 @@ const on = (xyz, entityClasses, uri, eventName, callback) => {
   const entityClassNames = uriTools.getEntityClassNames(uri, entityClasses);
   request.retrieveMeta(xyz, entityClasses, uri, () => {
     const subPath = uriTools.pathFromUri(uri).slice(1);
-    for (const entityClassName of entityClassNames)
+    for (const entityClassName of entityClassNames) {
       if (entityClasses.hasOwnProperty(entityClassName)) {
         const entityClassListeners = entityClasses[entityClassName].addListener(subPath, eventName, callback);
         listeners.push(...entityClassListeners);
@@ -18,6 +18,7 @@ const on = (xyz, entityClasses, uri, eventName, callback) => {
         // TODO callback 404 on listener
         // if eventName = 'error' or 404  callback(entityClassName);
       }
+    }
   });
   return listeners;
 };
@@ -52,8 +53,8 @@ function addAccessListener (xyz, entityClasses, uri, eventName, callback) {
       on(xyz, entityClasses, '/session/*', 'touched', monitorSessionChanges(xyz));
       initialized = true;
     } else
-      // DEBUG console.log('callListener ', uri + ':' + eventName);
-      callback(state);
+    // DEBUG console.log('callListener ', uri + ':' + eventName);
+    { callback(state); }
   });
 }
 

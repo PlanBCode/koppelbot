@@ -21,7 +21,7 @@ const ui = (xyz, entityClasses, options, WRAPPER) => {
     options.showDeleteButton = true;
   }
   let SCRIPT;
-  if (typeof WRAPPER === 'undefined') {
+  if (!WRAPPER) {
     const tag = options.tag || DEFAULT_TAG;
     WRAPPER = document.createElement(tag);
     SCRIPT = document.currentScript;
@@ -34,15 +34,10 @@ const ui = (xyz, entityClasses, options, WRAPPER) => {
     SCRIPT.parentNode.insertBefore(WRAPPER, SCRIPT);
     SCRIPT.parentNode.removeChild(SCRIPT);
   }
-  if (options.display === 'input')
-    renderUiInput(xyz, options, WRAPPER);
-  else if (options.display === 'create')
-    renderUiCreate(xyz, entityClasses, options, WRAPPER);
-  else if (options.display === 'login')
-    renderUiLogin(xyz, options, WRAPPER);
-  else
-    renderUiElement(xyz, options, WRAPPER);
-
+  if (options.display === 'input') renderUiInput(xyz, options, WRAPPER);
+  else if (options.display === 'create') renderUiCreate(xyz, entityClasses, options, WRAPPER);
+  else if (options.display === 'login') renderUiLogin(xyz, options, WRAPPER);
+  else renderUiElement(xyz, options, WRAPPER);
   return WRAPPER;
 };
 

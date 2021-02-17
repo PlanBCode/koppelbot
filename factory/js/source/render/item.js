@@ -1,6 +1,7 @@
 const types = require('../../build/types.js');
 const response = require('../entity/response.js');
 const json = require('../web/json.js');
+const variables = require('../variables/variables.js');
 const render = require('./render');
 const DEFAULT_ACTION = 'view';
 // onChange = (content, [additionalSubPropertyPath]) => {...}
@@ -203,7 +204,7 @@ function TypeItem (xyz, baseUri, subPropertyPath, status, content, settings, opt
    * @param  {string} entityId        TODO
    * @returns {void}                 TODO
    */
-  this.select = (entityClassName, entityId) => xyz.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+  this.select = (entityClassName, entityId) => variables.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
 }
 
 exports.TypeItem = TypeItem;

@@ -14,6 +14,7 @@ function onVariable (variableNameEventName, callback) {
   if (!variableCallbacks.hasOwnProperty(variableName)) variableCallbacks[variableName] = {};
   if (!variableCallbacks[variableName].hasOwnProperty(eventName)) variableCallbacks[variableName][eventName] = [];
   variableCallbacks[variableName][eventName].push(callback);
+  // TODO return listener handle that can be cleared
 }
 
 const handleVariableChange = (variableName, eventName) => {
@@ -58,10 +59,10 @@ const setVariables = (variableObject) => {
   for (const variableName in variableObject) { setVariable(variableName, variableObject[variableName]); }
 };
 
-const selectVariable = (xyz, entityClassName, entityId, variableNameOrCallback, selectUri) => {
+const selectVariable = (entityClassName, entityId, variableNameOrCallback, selectUri) => {
   if (typeof variableNameOrCallback === 'string') {
     if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
-      xyz.clearVariable(variableNameOrCallback);
+      clearVariable(variableNameOrCallback);
     } else {
       const uriPostfix = selectUri || '';
       const includeEntityClass = false; // TODO
@@ -69,12 +70,12 @@ const selectVariable = (xyz, entityClassName, entityId, variableNameOrCallback, 
         ? '/' + entityClassName + '/' + entityId
         : entityId;
 
-      xyz.setVariable(variableNameOrCallback, value + uriPostfix);
+      setVariable(variableNameOrCallback, value + uriPostfix);
     }
   } else if (typeof variableNameOrCallback === 'function') variableNameOrCallback(entityClassName, entityId);
 };
 
-function selectAdd (xyz, entityClassName, entityId, selectVariableName, selectUri) {
+function selectAdd (entityClassName, entityId, selectVariableName, selectUri) {
   // TODO how to handle mixed entityClasses?
   if (hasVariable(selectVariableName)) {
     const uri = getVariable(selectVariableName);
@@ -87,11 +88,11 @@ function selectAdd (xyz, entityClassName, entityId, selectVariableName, selectUr
     entityIds.push(entityId);
     path[offset] = entityIds.join(',');
     const newUri = includeEntityClass ? uriTools.uriFromPath(path) : path[offset];
-    xyz.setVariable(selectVariableName, newUri);
-  } else selectVariable(xyz, entityClassName, entityId, selectVariableName, selectUri);
+    setVariable(selectVariableName, newUri);
+  } else selectVariable(entityClassName, entityId, selectVariableName, selectUri);
 }
 
-function selectRemove (xyz, entityClassName, entityId, selectVariableName) {
+function selectRemove (entityClassName, entityId, selectVariableName) {
   // TODO how to handle mixed entityClasses?
   if (!hasVariable(selectVariableName)) return; // nothing selected, so nothing to do
   const uri = getVariable(selectVariableName);
@@ -102,15 +103,15 @@ function selectRemove (xyz, entityClassName, entityId, selectVariableName) {
   const entityIds = path[offset].split(',');
   const index = entityIds.indexOf(entityId);
   if (index !== -1) entityIds.splice(index, 1);
-  if (entityIds.length === 0) selectVariable(xyz, undefined, undefined, selectVariableName);
+  if (entityIds.length === 0) selectVariable(undefined, undefined, selectVariableName);
   else {
     path[offset] = entityIds.join(',');
     const newUri = includeEntityClass ? uriTools.uriFromPath(path) : path[offset];
-    xyz.setVariable(selectVariableName, newUri);
+    setVariable(selectVariableName, newUri);
   }
 }
 
-function isSelected (xyz, entityClassName, entityId, selectVariableName) {
+function isSelected (entityClassName, entityId, selectVariableName) {
   // TODO how to handle mixed entityClasses?
   if (!hasVariable(selectVariableName)) return false;
   const uri = getVariable(selectVariableName);
@@ -122,7 +123,9 @@ function isSelected (xyz, entityClassName, entityId, selectVariableName) {
   return entityIds.includes(entityId);
 }
 
-exports.selectVariable = selectVariable;
+setVariables(web.getQueryParameters());
+
+exports.select = selectVariable;
 exports.selectAdd = selectAdd;
 exports.selectRemove = selectRemove;
 exports.isSelected = isSelected;

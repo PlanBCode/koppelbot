@@ -8,28 +8,13 @@ const variables = require('./variables/variables');
 function XYZ () {
   const entityClasses = {};
 
-  this.hasVariable = variableName => variables.hasVariable(variableName);
-  this.getVariable = (variableName, fallback) => variables.getVariable(variableName, fallback);
-  this.getVariables = () => variables.getVariables();
-  this.clearVariable = variableName => variables.clearVariable(variableName);
-  this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
-  this.setVariables = variableObject => variables.setVariables(variableObject);
-  this.onVariable = (variableName, callback) => variables.onVariable(variableName, callback);
-
-  this.setVariables(web.getQueryParameters()); // initialize variables
-
-  this.select = (entityClassName, entityId, selectVariableName, selectUri) => variables.selectVariable(this, entityClassName, entityId, selectVariableName, selectUri);
-  this.selectAdd = (entityClassName, entityId, selectVariableName, selectUri) => variables.selectAdd(this, entityClassName, entityId, selectVariableName, selectUri);
-  this.selectRemove = (entityClassName, entityId, selectVariableName) => variables.selectRemove(this, entityClassName, entityId, selectVariableName);
-  this.isSelected = (entityClassName, entityId, selectVariableName) => variables.isSelected(this, entityClassName, entityId, selectVariableName);
-
   this.isAutoIncremented = entityClassName => entity.isAutoIncremented(entityClasses, entityClassName);
   this.getTitlePropertyPath = entityClassName => entity.getTitlePropertyPath(entityClasses, entityClassName);
   this.getDisplayName = (entityClassName, propertyPath) => entity.getDisplayName(entityClasses, entityClassName, propertyPath);
 
   this.on = (uri, eventName, callback) => on(this, entityClasses, uri, eventName, callback);
-  this.checkAccess = (uri, method) => entity.checkAccess(entityClasses, uri, method);
   this.ui = (options, WRAPPER) => ui(this, entityClasses, options, WRAPPER);
+  this.checkAccess = (uri, method) => entity.checkAccess(entityClasses, uri, method);
 
   this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);
   this.head = (uri, callback) => request.head(uri, callback);
@@ -40,20 +25,84 @@ function XYZ () {
 }
 
 const xyz = new XYZ();
-exports.ui = xyz.ui;
-exports.on = xyz.on;
-exports.setQueryParameter = web.setQueryParameter;
-exports.getQueryParameter = web.getQueryParameter;
-exports.getQueryParameters = web.getQueryParameters;
-exports.getQueryFilters = web.getQueryFilters;
-exports.xyz = xyz;
-
-exports.onVariable = xyz.onVariable;
-exports.hasVariable = xyz.hasVariable;
-exports.getVariable = xyz.getVariable;
-exports.getVariables = xyz.getVariables;
-exports.setVariable = xyz.setVariable;
-exports.setVariables = xyz.setVariables;
-exports.clearVariable = xyz.clearVariable;
-
-// TODO globals()
+/**
+ * Create a ui component or display.
+ * @param  {[Object]} options The options for the ui component
+ * @param  {[Element]} WRAPPER  The DOM element in which to create the ui component
+ * @returns {Element}         Returns the (created) DOM element.
+ */
+exports.ui = (options, WRAPPER = null) => xyz.ui(options, WRAPPER);
+/**
+ * Create an event listener
+ * @param  {string}   uri       TODO
+ * @param  {string}   eventName TODO
+ * @param  {Function} callback  TODO
+ * @returns {Array}             An array containing the attached listeners
+ */
+exports.on = (uri, eventName, callback) => xyz.on(uri, eventName, callback);
+/**
+ * TODO
+ * @param {[type]} queryParameterName TODO
+ * @param {[type]} value              TODO
+ * @returns {void}
+ */
+exports.setQueryParameter = (queryParameterName, value) => web.setQueryParameter(queryParameterName, value);
+/**
+ * TODO
+ * @param {[type]} queryParameterName TODO
+ * @returns {void}
+ */
+exports.getQueryParameter = queryParameterName => web.getQueryParameter(queryParameterName);
+/**
+ * TODO
+* @returns {Object}        TODO
+*/
+exports.getQueryParameters = () => web.getQueryParameters();
+/**
+ * TODO
+* @returns {Object}        TODO
+*/
+exports.getQueryFilters = () => web.getQueryFilters();
+/**
+ * TODO
+ * @param  {[type]}   variableNameEventName TODO 'myVariable:change'   'myVariable:create' 'myVariable:clear'
+ * @param  {Function} callback              (value,variableName)=>{...}
+ * @returns {void}                         TODO
+ */
+exports.onVariable = (variableNameEventName, callback) => variables.onVariable(variableNameEventName, callback);
+/**
+ * TODO
+ * @param {string} variableName TODO
+ * @returns {bool}  TODO
+ */
+exports.hasVariable = variableName => variables.hasVariable(variableName);
+/**
+ * TODO
+ * @param {string} variableName TODO
+ * @returns {string}  TODO
+ */
+exports.getVariable = variableName => variables.getVariable(variableName);
+/**
+ * TODO
+ * @returns {Object}  TODO
+ */
+exports.getVariables = () => variables.getVariables();
+/**
+ * TODO
+ * @param {[type]} variableName TODO
+ * @param {[type]} value TODO
+ * @returns {void}
+ */
+exports.setVariable = (variableName, value) => variables.setVariable(variableName, value);
+/**
+ * TODO
+ * @param {Object} values TODO
+ * @returns {void}
+ */
+exports.setVariables = values => variables.setVariables(values);
+/**
+ * TODO
+ * @param {[type]} queryParameterName TODO
+ * @returns {void}
+ */
+exports.clearVariable = queryParameterName => variables.clearVariable(queryParameterName);
