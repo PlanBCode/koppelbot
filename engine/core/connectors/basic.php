@@ -108,7 +108,8 @@ abstract class BasicConnector extends Connector
                     }
                 }
             } else {
-                $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');//TODO
+                $content = 'Not found';
+                $connectorResponse->add(404, $propertyRequest, $entityId, $content);//TODO
             }
 
         }

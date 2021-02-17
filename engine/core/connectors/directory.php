@@ -115,7 +115,8 @@ class Connector_directory extends BasicConnector
 
                     $filePaths = glob('{' . implode(',', $paths) . '}', GLOB_BRACE);
                     if (count($filePaths) === 0) {
-                        $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                        $content = 'Not found';
+                        $connectorResponse->add(404, $propertyRequest, $entityId, $content);
                     } else {
                         $filePath = $filePaths[0];
                         $entityIds[$entityId] = $filePath;
