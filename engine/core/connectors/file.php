@@ -25,12 +25,12 @@ class Connector_file extends BasicConnector
         $this->extension = array_get($settings, 'extension', '*');
     }
 
-    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string
     {
         return array_get($settings, 'path');
     }
 
-    protected function open(connectorRequest $connectorRequest): ConnectorResponse
+    protected function open(connectorRequest &$connectorRequest): ConnectorResponse
     {
         if (!file_exists($this->path)) {// TODO pass an error message?
             if ($connectorRequest->isReadOnly()) {
@@ -52,7 +52,7 @@ class Connector_file extends BasicConnector
         return new ConnectorResponse(200);
     }
 
-    protected function close(connectorRequest $connectorRequest): ConnectorResponse
+    protected function close(connectorRequest &$connectorRequest): ConnectorResponse
     {
         if (!$connectorRequest->isReadOnly()) {
             $parse = $connectorRequest->getFirstPropertyRequest()->getProperty()->getConnectorSetting('parse');
@@ -70,7 +70,7 @@ class Connector_file extends BasicConnector
         return new ConnectorResponse(200);
     }
 
-    protected function head(PropertyRequest $propertyRequest): ConnectorResponse
+    protected function head(PropertyRequest &$propertyRequest): ConnectorResponse
     {
         return new ConnectorResponse();
     }

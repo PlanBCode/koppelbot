@@ -30,7 +30,7 @@ function getSingleSetting($name, &$settings, &$rootSettings)
 function mergeSubSettings(array &$customSubSettings, array &$defaultSubSettings): array
 {
     //TODO handle access and connector merges better
-    foreach ($defaultSubSettings as $subSettingName => $subSetting) {
+    foreach ($defaultSubSettings as $subSettingName => &$subSetting) {
         if (!array_key_exists($subSettingName, $customSubSettings)) {
             $customSubSettings[$subSettingName] = $subSetting;
         }
@@ -60,22 +60,24 @@ class  PropertyRequest
 
     public function __construct(int $status, RequestObject &$requestObject, string $entityClassName, string $entityIdList, $propertyOrError, array &$propertyPath, &$propertyContent)
     {
-        $this->requestObject =& $requestObject;
+
+
+        $this->requestObject = $requestObject;
         $this->entityIdList = $entityIdList;
         $this->entityClassName = $entityClassName;
-        $this->propertyPath =& $propertyPath;
+        $this->propertyPath = $propertyPath;
 
         if ($status !== 200) {
             $this->status = $status;
             $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
-            $this->content =& $propertyOrError;
+            $this->content = $propertyOrError;
         } elseif (is_string($propertyOrError)) {
             $this->status = 500;
             $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
-            $this->content =& $propertyOrError;
+            $this->content = $propertyOrError;
         } else {
             $this->property = $propertyOrError;
-            $this->content =& $propertyContent;
+            $this->content = $propertyContent;
             $this->status = 200;
             $connectorSettings = $this->property->getConnectorSettings();
             $connectorType = array_get($connectorSettings, 'type');
@@ -256,8 +258,8 @@ class PropertyHandle
 
     public function createPropertyRequest(RequestObject &$requestObject, string $entityClassName, string $entityId, &$entityIdContent): PropertyRequest
     {
-        $propertyContent =& $entityIdContent;
-        foreach ($this->propertyPath as $subPropertyName) {
+        $propertyContent = $entityIdContent;
+        foreach ($this->propertyPath as &$subPropertyName) {
             $propertyContent = array_null_get($propertyContent, $subPropertyName);
         }
         $propertyOrError = $this->status === 200 ? $this->property : $this->error;
@@ -328,7 +330,7 @@ class Property
             $signature = $this->typeClass::signature($this->settings);
             // TODO check if all required props for the signature are there
 
-            foreach ($customSignatureSettings as $subPropertyName => $customSubSettings) {
+            foreach ($customSignatureSettings as $subPropertyName => &$customSubSettings) {
                 if (!array_key_exists($subPropertyName, $signature)) {
                     echo 'ERROR Incorrect signature!';
                     //TODO error
@@ -447,7 +449,7 @@ class Property
         } elseif ($this->isPrimitive()) {
             return $this->isId() && $this->typeName !== 'id';
         } else {
-            foreach ($this->subProperties as $subProperty) {
+            foreach ($this->subProperties as &$subProperty) {
                 if ($subProperty->isRequired()) {
                     return true;
                 }

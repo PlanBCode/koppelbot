@@ -51,18 +51,16 @@ abstract class Connector
 
      */
 
-    public
-    static function createErrorResponse(connectorRequest $connectorRequest): ConnectorResponse
+    public static function createErrorResponse(connectorRequest &$connectorRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-            $connectorResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityId(), $propertyRequest->getContent());
+            $connectorResponse->add($propertyRequest->getStatus(), $propertyRequest, $propertyRequest->getEntityIdList(), $propertyRequest->getContent());
         }
         return $connectorResponse;
     }
 
-    public
-    static function addConnector(string $typeName, array $connectorSettings, RequestObject &$requestObject, string $entityClass, string $entityId, array $propertyPath): string
+    public static function addConnector(string $typeName, array &$connectorSettings, RequestObject &$requestObject, string $entityClass, string $entityId, array &$propertyPath): string
     {
         $query = $requestObject->getQuery();
         $method = $requestObject->getMethod();
@@ -80,8 +78,7 @@ abstract class Connector
         return $connectorString;
     }
 
-    public
-    static function getConnectorResponse(ConnectorRequest $connectorRequest): ConnectorResponse
+    public static function getConnectorResponse(ConnectorRequest &$connectorRequest): ConnectorResponse
     {
         $propertyRequests = $connectorRequest->getPropertyRequests();
         /** @var PropertyRequest|null $propertyRequest */
@@ -121,14 +118,14 @@ abstract class Connector
         }
     }
 
-    abstract static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string;
+    abstract static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string;
 
     /**
      * TODO
      * @param {ConnectorRequest} $connectorRequest TODO
      * @return {connectorResponse} TODO
      */
-    abstract public function createResponse(ConnectorRequest $connectorRequest): ConnectorResponse;
+    abstract public function createResponse(ConnectorRequest &$connectorRequest): ConnectorResponse;
 
     abstract protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string;
 }

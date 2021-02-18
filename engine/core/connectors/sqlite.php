@@ -22,7 +22,7 @@ class Connector_sqlite extends Connector
     }
 
     //TODO &
-    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string
     {
         return $method.'_'.array_get($settings, 'path');
     }
@@ -97,7 +97,7 @@ class Connector_sqlite extends Connector
       }
     }
 
-    public function createResponse(connectorRequest $connectorRequest): ConnectorResponse
+    public function createResponse(connectorRequest &$connectorRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
 

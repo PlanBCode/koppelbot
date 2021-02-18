@@ -82,11 +82,8 @@ function addRequestResponse(ConnectorRequest &$connectorRequest, array &$request
 {
   $connectorResponse = Connector::getConnectorResponse($connectorRequest);
   foreach ($connectorResponse->getRequestResponses() as $requestId => &$requestResponse) {
-      if (!array_key_exists($requestId, $requestResponses)) {
-          $requestResponses[$requestId] = $requestResponse;
-      } else {
-          $requestResponses[$requestId]->merge($requestResponse);
-      }
+      if (!array_key_exists($requestId, $requestResponses)) $requestResponses[$requestId] = $requestResponse;
+      else $requestResponses[$requestId]->merge($requestResponse);
   }
 }
 
@@ -97,7 +94,7 @@ function getRequestResponses(array &$connectorRequests): array
     $remappedAutoIncrementedUris = [];
 
     // first handle all POST requests that contain the id property, the id value is required for remaining connector requests
-    foreach ($connectorRequests as $connectorRequest) {
+    foreach ($connectorRequests as &$connectorRequest) {
         $postIdPropertyRequests = $connectorRequest->getPostIdPropertyRequests();
         if(!empty($postIdPropertyRequests)){
           addRequestResponse($connectorRequest, $requestResponses); // need to track which id's have been added
@@ -280,6 +277,11 @@ class ApiRequest extends HttpRequest2
 
             /** @var RequestResponse */
             $requestResponse = array_values($queryRequestResponses)[0];
+            $status =   $requestResponse->getStatus();
+            if($status !== 200){
+              $this->addError($status, 'Bad filter request');
+              return [];
+            }
             $data = $requestResponse->getContent();
 
             //TODO handle failure
@@ -351,7 +353,7 @@ class ApiRequest extends HttpRequest2
         }
     }
 
-    protected function getStatus(array &$requestResponses)
+    protected function getStatus(array &$requestResponses): int
     {
         $count = count($requestResponses);
         if ($count == 0) {
@@ -362,8 +364,30 @@ class ApiRequest extends HttpRequest2
             return $requestResponse->getStatus();
         }
     }
+    protected function nullifyHead207Response(&$content): void
+    {
+      foreach($content as $key=>&$value){
+        if($value['status']===207){
+          $this->nullifyHead207Response($value['content']);
+        }else $value['content']='';
+      }
+    }
 
-    public function createResponse()
+    protected function createHeadResponse(int $status, array &$requestResponses): HttpResponse2
+    {
+      $headers = [];
+      if($status === 207){
+        $content = $this->createNonSingularContent($requestResponses);
+        $this->nullifyHead207Response($content);
+        $content = $this->stringifyContent($content, $status);
+        return new HttpResponse2($status, $content, $headers);
+      }else{
+        $content = '';
+        return new HttpResponse2($status, $content, $headers);
+      }
+    }
+
+    public function createResponse(): HttpResponse2
     {
         if ($this->uri === '') {
           require_once 'landing.php';
@@ -372,14 +396,13 @@ class ApiRequest extends HttpRequest2
         $requestResponses = $this->getRequestResponses();
         $status = $this->getStatus($requestResponses);
 
-        if ($this->method === 'HEAD') {
-            return new HttpResponse2($status, '', []);
-        } else {
+        if ($this->method === 'HEAD') return $this->createHeadResponse($status,$requestResponses);
+        else {
             $content = $this->createNonSingularContent($requestResponses);
 
             if (count($this->errors)) {
                 $stringContent = '';
-                foreach ($this->errors as $error) {
+                foreach ($this->errors as &$error) {
                     $path = $error->getPath();
                     if (count($path) === 0) {
                         $stringContent .= $error->getErrorMessage();
@@ -394,7 +417,11 @@ class ApiRequest extends HttpRequest2
                         }
                     }
                 }
-                if ($stringContent !== '') return new HttpResponse2(400, $stringContent, []);
+
+                if ($stringContent !== '') {
+                  $headers = [];
+                  return new HttpResponse2(400, $stringContent, $headers);
+                }
             }
 
             if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'

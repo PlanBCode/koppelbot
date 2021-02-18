@@ -159,7 +159,8 @@ abstract class Type
         //TODO Content-Type: text/html; charset=UTF-8
         //Content-Type: multipart/form-data; boundary=something
         $stringContent = json_simpleEncode($content);
-        return new HttpResponse2($status, $stringContent, ['Content-Type' => 'application/json']);
+        $headers =['Content-Type' => 'application/json'];
+        return new HttpResponse2($status, $stringContent, $headers);
     }
 }
 

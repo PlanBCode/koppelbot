@@ -195,9 +195,9 @@ class Query
     {
         $propertyNames = [];
         foreach ($this->queryStatements as $queryStatement) {
-            $propertyNamesUsdByStatement = $queryStatement->getAllUsedPropertyNames();
-            if (count($propertyNamesUsdByStatement) > 0) {
-                array_push($propertyNames, ...$propertyNamesUsdByStatement);
+            $propertyNamesUsedByStatement = $queryStatement->getAllUsedPropertyNames();
+            if (count($propertyNamesUsedByStatement) > 0) {
+                array_push($propertyNames, ...$propertyNamesUsedByStatement);
             }
         }
         return array_unique($propertyNames);

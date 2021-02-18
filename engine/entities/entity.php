@@ -43,7 +43,7 @@ class EntityClass
     {
         $this->entityClassName = $entityClassName;
         $rootSettings = array_get($meta, '_', []);
-        foreach ($meta as $propertyName => $settings) {
+        foreach ($meta as $propertyName => &$settings) {
             if ($propertyName !== '_') {
                 $this->properties[$propertyName] = new Property($this, 0, $propertyName, $settings, $rootSettings);
             }
@@ -52,7 +52,7 @@ class EntityClass
 
     public function getIdPropertyName(): ?string
     {
-      foreach ($this->properties as $property){
+      foreach ($this->properties as &$property){
         if($property->isId()) return $property->getName();
       }
       return null;
@@ -83,7 +83,7 @@ class EntityClass
             $propertyNames = explode(',', $propertyList);
         }
         $propertyHandles = [];
-        foreach ($propertyNames as $propertyName) {
+        foreach ($propertyNames as &$propertyName) {
             $propertyPathSingular = $propertyPath;
             $propertyPathSingular[0] = $propertyName;
             if (!array_key_exists($propertyName, $this->properties)) {
@@ -105,7 +105,7 @@ class EntityClass
     {
         $method = $requestObject->getMethod();
         if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
-            foreach ($this->properties as $propertyName => $property) {
+            foreach ($this->properties as $propertyName => &$property) {
                 $propertyContent = array_null_get($entityIdContent, $propertyName);
                 $propertyPath = [$propertyName];
                 if (!is_null($propertyContent)) {
@@ -165,7 +165,7 @@ class EntityClass
 
         if ($method === 'HEAD' || $method === 'GET' || $method === 'DELETE' ) {
           $entityIdContent = null;
-          foreach ($propertyHandles as $propertyHandle) {
+          foreach ($propertyHandles as &$propertyHandle) {
             $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityIdList, $entityIdContent);
           }
         }else{ // for write methods entityIdList is expanded to separate requests
@@ -174,7 +174,7 @@ class EntityClass
 
               $this->validateAndCheckRequired($requestObject, $entityId, $entityIdContent, $errorPropertyRequests);
 
-              foreach ($propertyHandles as $propertyHandle) {
+              foreach ($propertyHandles as&$propertyHandle) {
                   $propertyRequests[] = $propertyHandle->createPropertyRequest($requestObject, $this->entityClassName, $entityId, $entityIdContent);
               }
           }
@@ -194,7 +194,7 @@ class EntityClass
 
         /** @var ConnectorRequest[] */
         $connectorRequests = [];
-        foreach ($propertyRequests as $propertyRequest) {
+        foreach ($propertyRequests as &$propertyRequest) {
             $connectorString = $propertyRequest->getConnectorString();
             if (!array_key_exists($connectorString, $connectorRequests)) {
                 $connectorRequests[$connectorString] = new ConnectorRequest();
@@ -267,7 +267,7 @@ class EntityResponse extends Response
     public function merge(EntityResponse &$entityResponse)
     {
         $this->addStatus($entityResponse->getStatus());
-        foreach ($entityResponse->propertyResponses as $propertyResponse) {
+        foreach ($entityResponse->propertyResponses as &$propertyResponse) {
             $this->propertyResponses[] = $propertyResponse; //TODO check for duplicate responses for propertyName ?
         }
     }
@@ -285,7 +285,7 @@ class EntityResponse extends Response
     private function collapseContent(&$content)
     {
         $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);
-        foreach ($requestPropertyPath as $subPropertyName) {
+        foreach ($requestPropertyPath as &$subPropertyName) {
             if (count($content) > 1) {
                 break;
             } elseif (array_key_exists($subPropertyName, $content)) {
@@ -305,10 +305,10 @@ class EntityResponse extends Response
     public function getContent()
     {
         $content = [];
-        foreach ($this->propertyResponses as $propertyResponse) {
+        foreach ($this->propertyResponses as &$propertyResponse) {
             $propertyPath = $propertyResponse->getPropertyPath();
             $wrapperIterator =& $content;
-            foreach ($propertyPath as $depth => $subPropertyName) {
+            foreach ($propertyPath as $depth => &$subPropertyName) {
                 $subStatus = $propertyResponse->getStatus();
                 if ($depth === count($propertyPath) - 1) { // outer leaf
                     $subContent = $propertyResponse->getContent();
@@ -369,7 +369,7 @@ class EntityClassResponse extends Response
     public function merge(EntityClassResponse &$entityClassResponse)
     {
         $this->addStatus($entityClassResponse->getStatus());
-        foreach ($entityClassResponse->entityResponses as $entityId => $entityResponse) {
+        foreach ($entityClassResponse->entityResponses as $entityId => &$entityResponse) {
             if (!array_key_exists($entityId, $this->entityResponses)) {
                 $this->entityResponses[$entityId] = $entityResponse;
             } else {
@@ -397,7 +397,7 @@ class EntityClassResponse extends Response
             }
         }
         $content = [];
-        foreach ($this->entityResponses as $entityId => $entityResponse) {
+        foreach ($this->entityResponses as $entityId => &$entityResponse) {
             if ($this->status == 207) {
                 $content[$entityId] = [
                     "status" => $entityResponse->getStatus(),

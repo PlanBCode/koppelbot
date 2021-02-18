@@ -4,42 +4,52 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
 {
     $userName = $propertyRequest->getEntityIdList(); // TODO explode
     $submittedPasswordArray = $propertyRequest->getContent();
-
-    if (!is_array($submittedPasswordArray) || !array_key_exists('password', $submittedPasswordArray)) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+    if (!is_array($submittedPasswordArray) || !array_key_exists('password', $submittedPasswordArray)) {
+      $error = 'Incorrect user-password combination.';
+      return $connectorResponse->add(403, $propertyRequest, $userName, $error);
+    }
 
     $accessGroups = ['/group/system'];
     $headers = [];
     $accountsMatchingUserName = request('/account/*/password,groups?username==' . $userName, 'GET', '', $headers, $accessGroups)->getResultsById();
-    if (count($accountsMatchingUserName) === 0) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination1.');
+    if (count($accountsMatchingUserName) === 0) {
+      $content = 'Incorrect user-password combination.';
+      return $connectorResponse->add(403, $propertyRequest, $userName, $content);
+    }
 
     /** @var InternalEntityResponse */
     $account = array_values($accountsMatchingUserName)[0];
     /** @var InternalPropertyResponse */
     $passwordResponse = $account->get('password');
-    if ($passwordResponse->getStatus() !== 200) return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.'.$passwordResponse->getStatus().' '.$userName );
+    if ($passwordResponse->getStatus() !== 200) {
+      $content = 'Incorrect user-password combination.'.$passwordResponse->getStatus().' '.$userName;
+      return $connectorResponse->add(403, $propertyRequest, $userName, $content);
+    }
 
     $submittedPassword = $submittedPasswordArray['password'];
     $storedPasswordHash = $passwordResponse->getContent();
 
     if (!password_verify($submittedPassword, $storedPasswordHash)) {
-        return $connectorResponse->add(403, $propertyRequest, $userName, 'Incorrect user-password combination.');
+        $content = 'Incorrect user-password combination.';
+        return $connectorResponse->add(403, $propertyRequest, $userName, $content);
     }
     if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
     $groupsResponse = $account->get('groups');
     $groups = $groupsResponse->getStatus() !== 200 ? [] : $groupsResponse->getContent();
     $groups[] = '/group/user:' . $userName;
     $_SESSION['content'][$userName] = ['groups' => $groups];
-    return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'login successful;'
+    $content = null;
+    return $connectorResponse->add(200, $propertyRequest, $userName, $content); //TODO 'login successful;'
 }
 
 class Connector_session extends Connector
 {
-    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string
     {
         return $method;
     }
 
-    public function createResponse(connectorRequest $connectorRequest): ConnectorResponse
+    public function createResponse(connectorRequest &$connectorRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
@@ -61,7 +71,8 @@ class Connector_session extends Connector
             default:
         }
         $connectorResponse = new ConnectorResponse();
-        $connectorResponse->add(400, $propertyRequest, '*', 'Illegal session method');
+        $content = 'Illegal session method';
+        $connectorResponse->add(400, $propertyRequest, '*', $content);
         return $connectorResponse;
     }
 
@@ -72,7 +83,8 @@ class Connector_session extends Connector
         $userName = $propertyRequest->getEntityIdList();//TODO explode
 
         if ($userName === '*') {
-            return $connectorResponse->add(400, $propertyRequest, $userName, 'Session not defined.');
+            $content = 'Session not defined.';
+            return $connectorResponse->add(400, $propertyRequest, $userName, $content);
         } elseif ($propertyName === 'login') { //TODO should not rely on name but should use type instead
             return handleLogin($propertyRequest, $connectorResponse);
         } else if (array_key_exists('content', $_SESSION) && array_key_exists($userName, $_SESSION['content'])) {
@@ -95,12 +107,15 @@ class Connector_session extends Connector
             $newContent = $processResponse->getContent();
             $jsonActionResponseSet = json_set($_SESSION, $keyPath, $newContent);
             if ($jsonActionResponseSet->succeeded()) {
-                return $connectorResponse->add(200, $propertyRequest, $userName, null);
+                $content = null;
+                return $connectorResponse->add(200, $propertyRequest, $userName, $content);
             } else {
-                return $connectorResponse->add(500, $propertyRequest, $userName, 'Data could not be stored.');
+                $error = 'Data could not be stored.';
+                return $connectorResponse->add(500, $propertyRequest, $userName, $error);
             }
         } else {
-            return $connectorResponse->add(403, $propertyRequest, $userName, 'Forbidden.');
+            $error = 'Forbidden.';
+            return $connectorResponse->add(403, $propertyRequest, $userName, $error);
         }
     }
 
@@ -111,16 +126,17 @@ class Connector_session extends Connector
         if ($userName === '*') {
             $_SESSION['content'] = [];
             if (!session_id()) session_destroy();
-
-            return $connectorResponse->add(200, $propertyRequest, '*', null);//TODO 'Successfully logged out.'
+            $content = null;
+            return $connectorResponse->add(200, $propertyRequest, '*', $content);//TODO 'Successfully logged out.'
         }
         if (!array_key_exists($userName, $_SESSION['content'])) {
-            return $connectorResponse->add(404, $propertyRequest, $userName, 'Not found.');
+            $content = 'Not found.';
+            return $connectorResponse->add(404, $propertyRequest, $userName, $content);
         }
         unset($_SESSION['content'][$userName]);
         if (empty($_SESSION['content']) && !session_id()) session_destroy();
-
-        return $connectorResponse->add(200, $propertyRequest, $userName, null); //TODO 'Successfully logged out.'
+        $content = null;
+        return $connectorResponse->add(200, $propertyRequest, $userName, $content); //TODO 'Successfully logged out.'
     }
 
     protected function getSession(PropertyRequest &$propertyRequest): ConnectorResponse
@@ -130,7 +146,8 @@ class Connector_session extends Connector
         $userNameList = $propertyRequest->getEntityIdList();
         if (!array_key_exists('content', $_SESSION)) {
             if ($userNameList !== '*') {
-                $connectorResponse->add(404, $propertyRequest, $userNameList, 'Not found');
+                $content = 'Not found.';
+                $connectorResponse->add(404, $propertyRequest, $userNameList, $content);
             }
             return $connectorResponse;
         }
@@ -140,12 +157,14 @@ class Connector_session extends Connector
             : explode(',', $userNameList);
         foreach ($userNames as $userName) {
             if (!array_key_exists($userName, $_SESSION['content'])) {
-                $connectorResponse->add(404, $propertyRequest, $userName, 'Not found');
+                $content = 'Not found.';
+                $connectorResponse->add(404, $propertyRequest, $userName, $content);
                 continue;
             }
 
             if ($propertyName === 'login') { // TODO should not rely on name but use type instead
-                $connectorResponse->add(200, $propertyRequest, $userName, ['username' => $userName, 'password' => '***']);
+                $contnet = ['username' => $userName, 'password' => '***'];
+                $connectorResponse->add(200, $propertyRequest, $userName,  $content);
                 continue;
             }
             $keyPath = array_merge([$userName], $propertyRequest->getPropertyPath());
@@ -154,7 +173,8 @@ class Connector_session extends Connector
                 $connectorResponse->add(200, $propertyRequest, $userName, $jsonActionResponse->content);
             } else {
                 //TODO use $jsonActionResponse errors
-                $connectorResponse->add(500, $propertyRequest, $userName, 'Data could not be retrieved.');
+                $content = 'Data could not be retrieved.';
+                $connectorResponse->add(500, $propertyRequest, $userName, $content);
             }
         }
         return $connectorResponse;

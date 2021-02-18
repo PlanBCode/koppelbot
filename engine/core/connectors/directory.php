@@ -47,7 +47,7 @@ class Connector_directory extends BasicConnector
         return $path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
     }
 
-    static protected function getConnectorString(array $settings, string $method, string $entityClass, string $entityId, array $propertyPath, Query $query): string
+    static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string
     {
         $path = array_get($settings, 'path');
         $extension = array_get($settings, 'extension', '*');
@@ -90,7 +90,7 @@ class Connector_directory extends BasicConnector
         return $max;
     }
 
-    protected function open(connectorRequest $connectorRequest): ConnectorResponse
+    protected function open(connectorRequest &$connectorRequest): ConnectorResponse
     {
         $connectorResponse = new ConnectorResponse();
         //TODO loop through property requests only if other property than id, or timestamp is requested then open the file
@@ -144,7 +144,7 @@ class Connector_directory extends BasicConnector
         return $connectorResponse;
     }
 
-    protected function close(ConnectorRequest $connectorRequest): ConnectorResponse
+    protected function close(ConnectorRequest &$connectorRequest): ConnectorResponse
     {
         $propertyRequest = $connectorRequest->getFirstPropertyRequest();
 
@@ -184,7 +184,7 @@ class Connector_directory extends BasicConnector
         return new ConnectorResponse(200);
     }
 
-    protected function head(PropertyRequest $propertyRequest): ConnectorResponse
+    protected function head(PropertyRequest &$propertyRequest): ConnectorResponse
     {
         //TODO
         return new ConnectorResponse();

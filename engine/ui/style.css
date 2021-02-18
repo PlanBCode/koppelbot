@@ -255,24 +255,6 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
 }@charset "UTF-8";
 
 /*!
@@ -512,7 +494,25 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
-.xyz-login a {
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}.xyz-login a {
   color: blue;
   cursor: pointer;
   margin: 5px;
