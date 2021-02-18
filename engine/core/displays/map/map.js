@@ -41,6 +41,7 @@ function initializeOpenLayers (display) {
   });
 
   const map = new ol.Map({
+    theme: null,
     layers: [rasterLayer, vectorLayer],
     target: WRAPPER,
     view: new ol.View({ // TODO parametrize
