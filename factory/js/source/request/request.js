@@ -81,7 +81,14 @@ const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, c
   // console.log(method + ' request: ' + uri + ' ' + requestStringContent);
   request(method, uri, requestStringContent, (status, responseStringContent) => {
     // console.log(method + ' response:' + responseStringContent, uri);
-    const responseObjectContent = JSON.parse(responseStringContent);
+    let responseObjectContent;
+    try {
+      responseObjectContent = JSON.parse(responseStringContent);
+    } catch (e) {
+      console.log(responseStringContent);
+      console.error(e);
+      return;
+    }
     const state = entity.handleInput(method, uri, status, responseObjectContent, requestObjectContent, entityClasses);
     if (typeof callback === 'function') callback(state);
   });
