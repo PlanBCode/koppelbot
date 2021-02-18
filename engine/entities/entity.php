@@ -104,12 +104,17 @@ class EntityClass
     protected function validateAndCheckRequired(RequestObject &$requestObject, string $entityIdList, &$entityIdContent, array &$errorPropertyRequests)
     {
         $method = $requestObject->getMethod();
+
         if ($method === 'PATCH' || $method === 'PUT' || $method === 'POST') {
             foreach ($this->properties as $propertyName => &$property) {
                 $propertyContent = array_null_get($entityIdContent, $propertyName);
                 $propertyPath = [$propertyName];
                 if (!is_null($propertyContent)) {
-                    if ($property->getTypeName() === 'id' && $method === 'POST') {
+                  if($method === 'PUT' && $property->isId() && $propertyContent !== $entityIdList ){
+                    $error = '/' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName . ' is an id and should not be supplied.';
+                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
+                    $errorPropertyRequests[] = $errorPropertyRequest;
+                  } else if ( $method === 'POST' && $property->isId()) {
                         $error = '/' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName . ' is an auto incremented id and should not be supplied.';
                         $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
                         $errorPropertyRequests[] = $errorPropertyRequest;
@@ -120,9 +125,13 @@ class EntityClass
                     }
                 } elseif
                 (($method === 'PUT' || $method === 'POST') && $property->isRequired()) {
-                    $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName;
-                    $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
-                    $errorPropertyRequests[] = $errorPropertyRequest;
+                    if($method === 'PUT' && $property->isId()){
+                      $entityIdContent[$propertyName] =  $entityIdList;
+                    }else{
+                      $error = 'Missing content for required /' . $this->entityClassName . '/' . $entityIdList . '/' . $propertyName;
+                      $errorPropertyRequest = new PropertyRequest(400, $requestObject, $this->entityClassName, $entityIdList, $error, $propertyPath, $propertyContent);
+                      $errorPropertyRequests[] = $errorPropertyRequest;
+                    }
                 }
             }
         }
