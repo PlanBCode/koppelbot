@@ -191,6 +191,27 @@ td.xyz-list-icon {
   width: 30px;
   max-width: 30px;
 }
+.xyz-map-wrapper {
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-zoom-fit {
+  height: 2em;
+  width: 2em;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+
+.ol-rotate-reset,
+.ol-attribution {
+  display: none;
+}
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -250,28 +271,7 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}.xyz-map-wrapper {
-}
-
-.ol-zoom-in,
-.ol-zoom-out,
-.ol-zoom-fit {
-  height: 2em;
-  width: 2em;
-  margin: 2px;
-  float: left;
-  background-color: darkslateblue;
-  color: white;
-  border: none;
-  outline: none;
-  border-radius: 5px;
-}
-
-.ol-rotate-reset,
-.ol-attribution {
-  display: none;
-}
-@charset "UTF-8";
+}@charset "UTF-8";
 
 /*!
  * Pikaday

@@ -25,6 +25,7 @@ function getQueryParameters (filter = false, queryString = undefined) {
     .forEach(keyValuePair => {
       const [key, operator, value] = splitKeyValuePair(keyValuePair); // 'a=1' -> ['a','=','1']
       if (operator === '=' && !filter) queryParameters[decodeURIComponent(key)] = decodeURIComponent(value);
+      else if (!operator && !filter) queryParameters[decodeURIComponent(key)] = 'true';
       else if (operator !== '=' && filter) queryParameters[decodeURIComponent(key)] = [operator, decodeURIComponent(value)];
     });
   return queryParameters;
@@ -46,8 +47,9 @@ function updateQueryParameter (queryParameterName, value, operator = '=') {
   let changed = false;
   for (let i = 0; i < keyValuePairs.length; ++i) {
     const [otherKey, otherOperator, otherValue] = splitKeyValuePair(keyValuePairs[i]); // 'a=1' -> ['a','=']
-    if (otherKey === encodeURIComponent(queryParameterName) && otherOperator === operator) {
+    if (otherKey === encodeURIComponent(queryParameterName) && (otherOperator === operator || (operator === '=' && !otherOperator))) {
       if (typeof value === 'undefined' || value === '') keyValuePairs.splice(i, 1); // remove keyValuePair
+      else if (operator === '=' && value === 'true') keyValuePairs[i] = encodeURIComponent(queryParameterName);
       else keyValuePairs[i] = [encodeURIComponent(queryParameterName), encodeURIComponent(value)].join(operator); // 'a=value'
       found = true;
       if (encodeURIComponent(value) !== otherValue) changed = true;
@@ -56,7 +58,9 @@ function updateQueryParameter (queryParameterName, value, operator = '=') {
   }
 
   if (!found && typeof value !== 'undefined') {
-    keyValuePairs.push([encodeURIComponent(queryParameterName), encodeURIComponent(value)].join(operator));
+    if (operator === '=' && value === 'true') keyValuePairs.push(encodeURIComponent(queryParameterName));
+    else keyValuePairs.push([encodeURIComponent(queryParameterName), encodeURIComponent(value)].join(operator));
+
     changed = true;
   }
 
