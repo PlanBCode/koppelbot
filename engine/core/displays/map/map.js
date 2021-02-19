@@ -121,7 +121,6 @@ function initializeOpenLayers (callback) {
     SCRIPT = document.createElement('script');
     SCRIPT.src = 'https://openlayers.org/en/v6.5.0/build/ol.js';
     SCRIPT.onload = callback;
-    console.log(SCRIPT);
     document.head.append(SCRIPT);
   } else callback();
 }

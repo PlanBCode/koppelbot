@@ -1,4 +1,5 @@
 <?php
+require('mime.php');
 
 function replaceXyzTag($fileContent): string
 {
@@ -59,36 +60,34 @@ function isCustomContent(string $uri)
 
 class ContentRequest extends HttpRequest2
 {
+    protected function getContentFileResponse(string $fileName, int $status = 200)
+    {
+      $mime = getMimeContentType($fileName);
+      $headers = ['Content-Type'=>$mime];
+      $fileContent = file_get_contents($fileName);
+      //TODO insert sitemap into html header
+      if(pathinfo($fileName, PATHINFO_EXTENSION) === 'html') $fileContent = replaceXyzTag($fileContent);
+      return new ContentResponse($status, $fileContent, $headers);
+    }
+
     public function createResponse(): ContentResponse
     {
         if ($this->uri === '') {
             if (file_exists('custom/main/content/index.html')) {
-                $fileContent = file_get_contents('custom/main/content/index.html');
-                return new ContentResponse(200, replaceXyzTag($fileContent));
+                return $this->getContentFileResponse('custom/main/content/index.html', true);
             } else {
                 return new ContentResponse(200, 'Hello World');
             }
         } elseif (endsWith($this->uri, '/xyz-style.css')) {
-            $fileContent = file_get_contents('engine/ui/style.css');
-            return new ContentResponse(200, $fileContent);
+            return $this->getContentFileResponse('engine/ui/style.css');
         } elseif (endsWith($this->uri, '/xyz-ui.js')) {
-            $fileContent = file_get_contents('engine/ui/xyz-ui.webpacked.js');
-            return new ContentResponse(200, $fileContent);
+            return $this->getContentFileResponse('engine/ui/xyz-ui.webpacked.js');
         } elseif ($fileName = isCustomContent($this->uri)) {
-            $fileContent = file_get_contents($fileName);//TODO make safe!
-            if (pathinfo($fileName, PATHINFO_EXTENSION) === 'html') {
-                $fileContent = replaceXyzTag($fileContent);
-            }
-            return new ContentResponse(200, $fileContent);
+            return $this->getContentFileResponse($fileName);//TODO make safe!
         } elseif (file_exists('custom/main/content' . $this->uri)) {
-            $fileContent = file_get_contents('custom/main/content' . $this->uri);//TODO make safe!
-            if (pathinfo('custom/main/content' . $this->uri, PATHINFO_EXTENSION) === 'html') {
-                $fileContent = replaceXyzTag($fileContent);
-            }
-            return new ContentResponse(200, $fileContent);
+            return $this->getContentFileResponse('custom/main/content' . $this->uri);//TODO make safe!
         } elseif (file_exists('custom/main/content/404.html')) {
-            $fileContent = file_get_contents('custom/main/content/404.html');
-            return new ContentResponse(404, $fileContent);
+            return $this->getContentFileResponse('custom/main/content/404.html',404);
         } else {
             return new ContentResponse(404, 'Page Not Found');//TODO use (default) error page
         }
@@ -97,8 +96,8 @@ class ContentRequest extends HttpRequest2
 
 class ContentResponse extends HttpResponse2
 {
-    public function __construct(int $status, string $content)
+    public function __construct(int $status, string $content, array &$headers=[])
     {
-        parent::__construct($status, $content);
+        parent::__construct($status, $content, $headers);
     }
 }

@@ -46,13 +46,28 @@ class DocResponse extends HttpResponse2
         'map' => "Site Map",
     ];
 
-    protected function getSiteMap(string $rootUri): string
+    protected function getSiteMap(string $rootUri, Query &$query): string
     {
-      //TODO create a xml robots site map
-      $map = '<A href="' . $rootUri . '">Home</a><br/><br/>';
+      $xml = $query->getOption('output')==='xml';
+       if($xml){
+        $map = '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+         xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>' . $rootUri . '</loc>
+   </url>
+';
+//      <lastmod>2005-01-01</lastmod>
+//      <changefreq>monthly</changefreq>
+// <priority>0.8</priority>
+
+      }else{
+        $map = '<A href="' . $rootUri . '">Home</a><br/><br/>';
+      }
 
       foreach (glob('{./engine/core,./custom/*}/content/**.html', GLOB_BRACE) as $file) {
-
         $path = explode('/',$file);
         $plugin = $path[2];
         $base =  $path[count($path)-1];
@@ -62,34 +77,50 @@ class DocResponse extends HttpResponse2
             $depth = substr_count($file, '/')-3;
             $uri = $uri;
             if($depth === 1) continue;
-            $uri = $base; //TODO handle nested
+            $uri = implode('/', array_slice($path,3,count($path)-5));
             $title = $plugin; //TODO handle nested
           }else{
-            if($base==='404.html'||$base==='403.html') continue;
+            if($base==='404.html' || $base==='403.html') continue;
             $depth = substr_count($file, '/')-3;
             $uri = $base; //TODO handle nested
-            $title = $base; //TODO handle nested
+            $title = $base;
           }
         }else if($base === 'index.html'){
           $depth = substr_count($file, '/')-3;
-          $uri = $plugin.'/'.$base; //TODO handle nested
+          $uri = $plugin . implode('/', array_slice($path,3,count($path)-5));
           $title =  $plugin; //TODO handle nested
         }else{
           $depth = substr_count($file, '/')-2;
           $uri = $plugin.'/'.$base; //TODO handle nested
-          $title =  $base; //TODO handle nested
+          $title =  $base;
         }
-        $A = '<a href="' . $rootUri . $uri . '">' . $title . '</a>';
-        $map.= str_repeat('&nbsp;', 2 * $depth) . $A .'<br/>';
+        if($xml){
+          $map.='   <url>
+      <loc>' . $rootUri. $uri . '</loc>
+   </url>
+';
+        }else{
+          $A = '<a href="' . $rootUri . $uri . '">' . $uri . '</a>';
+          $map.= str_repeat('&nbsp;', 2 * $depth) . $A .'<br/>';
+        }
       }
 
 
       foreach (self::$menuItems as $uri => $menuItem) {
         $depth = substr_count($uri, '/')+1;
-        if($depth===1) $map .='<br/>';
-        $A = '<A href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
-        $map .=  str_repeat('&nbsp;', 2 * $depth) . $A . '<br/>';
+          if($xml){
+            $map.='   <url>
+      <loc>' . $rootUri. $uri . '</loc>
+   </url>
+';
+          }else{
+            if($depth===1) $map .='<br/>';
+            $A = '<A href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
+            $map .=  str_repeat('&nbsp;', 2 * $depth) . $A . '<br/>';
+          }
       }
+      if($xml) $map.='</urlset>';
+
       return $map;
     }
 
@@ -97,21 +128,27 @@ class DocResponse extends HttpResponse2
     {
         $rootUri = 'http://localhost:8000/';//TODO proper location
 
-        if($query->checkToggle('embed')){
-          $content =
-              '<html>
-              <head>
-                  <title> ' . $title . '</title >
-                  <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
-                  <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
-              </head>
-              <body>
-              <div class="xyz-page-content">' . $content . '</div>
-              </body>
-          </html>';
-        } else {
+        if($query->getOption('output')==='xml' && $currentUri === 'map'){
+            $content = $this->getSiteMap($rootUri, $query);
+        }else {
 
-            $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
+          $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
+          $head = '<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <title>' . $title . '</title >
+      <link rel="sitemap" type="application/xml" title="Sitemap" href="' . $rootUri . 'map?output=xml" />
+      <link rel="stylesheet" type = "text/css" href="' . $rootUri . 'xyz-style.css" />
+      <script src="' . $rootUri . 'xyz-ui.js" ></script >
+    </head>';
+          if($query->checkToggle('embed')){
+            $content =
+    $head. '
+    <body>
+    <div class="xyz-page-content">' . $content . '</div>
+    </body>
+    </html>';
+          } else {
             $currentDepth = substr_count($currentUri, '/');
             $path = explode('/',$currentUri);
             $parentUri = implode('/',array_slice($path,0, count($path)-1));
@@ -122,9 +159,7 @@ class DocResponse extends HttpResponse2
                 if($depth >= $currentDepth && substr($uri,0, strlen($parentUri)) !== $parentUri) continue;
                 if($depth > $currentDepth && substr($uri,0, strlen($currentUri)) !== $currentUri) continue;
 
-                $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current"' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
-
-
+                $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current" ' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
 
                 if ($depth === 0) {
                     $navigation .= '<li class="xyz-page-navigation-depth-0">' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
@@ -132,23 +167,18 @@ class DocResponse extends HttpResponse2
                     $navigation .= '<li>' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
                 }
             }
-            if($currentUri === 'map') $content = $this->getSiteMap($rootUri);
+            if($currentUri === 'map') $content = $this->getSiteMap($rootUri, $query);
 
             $navigation .= '</ul>';
-            $content =
-                '<html>
-                <head>
-                    <title> ' . $title . '</title >
-                    <link rel = "stylesheet" type = "text/css" href = "' . $rootUri . 'xyz-style.css" />
-                    <script type = "text/javascript" src = "' . $rootUri . 'xyz-ui.js" ></script >
-                </head>
-                <body>
-                <div class="xyz-page-header">' . $title . '</div>
-                <div class="xyz-page-navigation">' . $navigation . '</div>
-                <div class="xyz-page-content">' . $content . '</div>
-                </body>
-            </html>';
+            $content = $head.
+'  <body>
+    <div class="xyz-page-header">' . $title . '</div>
+    <div class="xyz-page-navigation">' . $navigation . '</div>
+    <div class="xyz-page-content">' . $content . '</div>
+  </body>
+</html>';
         }
-        parent::__construct($status, replaceXyzTag($content), $headers);
     }
+    parent::__construct($status, replaceXyzTag($content), $headers);
+  }
 }
