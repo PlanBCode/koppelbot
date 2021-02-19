@@ -161,7 +161,7 @@ const generateDocs = gulp.parallel(
   generateDoc('../../engine/connectors/connector.php', 'Connector', 'connector/connector'),
 
   generateDoc('../../engine/core/displays/item/item.js', 'Display', 'display/display'),
-  generateDoc('./source/render/display.js', 'DisplayItem', 'display/item'),
+  generateDoc('./source/render/displayItem.js', 'DisplayItem', 'display/item'),
 
   generateDoc('../../engine/core/types/type/type.js', 'Type', 'type/type_js'),
   generateDoc('../../engine/core/types/type/type.php', 'Type', 'type/type_php'),
