@@ -143,7 +143,135 @@ DOC
   background-color: lightgreen;
 }
 .xyz-doc-tryIt::before { content: "Try it!"; }
-@charset "UTF-8";
+table.xyz-create,
+table.xyz-item,
+table.xyz-list {
+  /* border: 1px solid lightgrey;
+    margin-bottom: 5px; */
+  padding: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background-color: white;
+}
+
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
+table tbody:first-child tr.xyz-create-header,
+table tbody:first-child tr.xyz-list-header,
+table tbody:first-child tr.xyz-item-header {
+  background-color: darkslateblue;
+  color: white;
+}
+
+table.xyz-create tr:nth-child(even),
+table.xyz-item tr:nth-child(even),
+table.xyz-list tr:nth-child(even) {
+  background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-list,
+.xyz-item {
+  width: 100%;
+}
+
+table.xyz-list tr.xyz-list-selectable {
+  cursor: pointer;
+}
+
+table.xyz-list tr.xyz-list-selectable:hover {
+  background-color: lightblue;
+}
+
+table.xyz-list tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
+.xyz-map-wrapper {
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-zoom-fit {
+  height: 2em;
+  width: 2em;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+
+.ol-rotate-reset,
+.ol-attribution {
+  display: none;
+}
+div.xyz-timeline-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+div.xyz-timeline-node {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background-color: green;
+}
+
+div.xyz-timeline-connector {
+    z-index:1;
+    position: absolute;
+    width: 100px;
+    height: 4px;
+    background-color: green;
+}
+
+div.xyz-timeline-label {
+    z-index:2;
+    position: absolute;
+    padding:10px;
+    color:white;
+    border-radius: 10px;
+    background-color: green;
+}
+
+div.xyz-timeline-label:hover {
+    cursor: pointer;
+    background-color: rgb(0,200,0);
+}
+div.xyz-timeline-label.xyz-list-selected {
+    color:black;
+    background-color: yellow;
+}
+
+div.xyz-timeline-line-creator {
+    position: absolute;
+    width:10px;
+    height:10px;
+    pointer-events: none;
+    cursor: none;
+    /*display: none;*/
+}
+
+
+div.xyz-timeline-line {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top:50%;
+    left:50%;
+    height: 100%;
+    width:2px;
+    background-color: black;
+}@charset "UTF-8";
 
 /*!
  * Pikaday
@@ -442,131 +570,4 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
-}table.xyz-create,
-table.xyz-item,
-table.xyz-list {
-  /* border: 1px solid lightgrey;
-    margin-bottom: 5px; */
-  padding: 0;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background-color: white;
-}
-
-.xyz-list-header,
-.xyz-create-header,
-.xyz-item-header,
-table tbody:first-child tr.xyz-create-header,
-table tbody:first-child tr.xyz-list-header,
-table tbody:first-child tr.xyz-item-header {
-  background-color: darkslateblue;
-  color: white;
-}
-
-table.xyz-create tr:nth-child(even),
-table.xyz-item tr:nth-child(even),
-table.xyz-list tr:nth-child(even) {
-  background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-list,
-.xyz-item {
-  width: 100%;
-}
-
-table.xyz-list tr.xyz-list-selectable {
-  cursor: pointer;
-}
-
-table.xyz-list tr.xyz-list-selectable:hover {
-  background-color: lightblue;
-}
-
-table.xyz-list tr.xyz-list-selected {
-  background-color: yellow;
-}
-
-td.xyz-list-icon {
-  width: 30px;
-  max-width: 30px;
-}
-.xyz-map-wrapper {
-  border-color: black;
-
-  /* b ackground-color: lightgreen; */
-}
-
-.ol-zoom-in,
-.ol-zoom-out {
-  float: right;
-  background-color: darkslateblue;
-  color: white;
-  border: none;
-  outline: none;
-  border-radius: 5px;
-}
-
-.ol-rotate-reset,
-.ol-attribution {
-  display: none;
-}
-div.xyz-timeline-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-div.xyz-timeline-node {
-    transform: translate(-50%,-50%);
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
-    background-color: green;
-}
-
-div.xyz-timeline-connector {
-    z-index:1;
-    position: absolute;
-    width: 100px;
-    height: 4px;
-    background-color: green;
-}
-
-div.xyz-timeline-label {
-    z-index:2;
-    position: absolute;
-    padding:10px;
-    color:white;
-    border-radius: 10px;
-    background-color: green;
-}
-
-div.xyz-timeline-label:hover {
-    cursor: pointer;
-    background-color: rgb(0,200,0);
-}
-div.xyz-timeline-label.xyz-list-selected {
-    color:black;
-    background-color: yellow;
-}
-
-div.xyz-timeline-line-creator {
-    position: absolute;
-    width:10px;
-    height:10px;
-    pointer-events: none;
-    cursor: none;
-    /*display: none;*/
-}
-
-
-div.xyz-timeline-line {
-    transform: translate(-50%,-50%);
-    position: absolute;
-    top:50%;
-    left:50%;
-    height: 100%;
-    width:2px;
-    background-color: black;
 }

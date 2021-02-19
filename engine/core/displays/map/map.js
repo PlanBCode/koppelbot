@@ -1,3 +1,5 @@
+/* global ol */
+
 /*
 TODO?label  define a label property to use
 - mark user location
@@ -6,7 +8,7 @@ TODO?label  define a label property to use
 
 let SCRIPT; // to dynamically load dependency;
 
-function initializeOpenLayers (display) {
+function initializeMap (display) {
   const WRAPPER = display.getWRAPPER();
 
   if (WRAPPER.vectorLayer) { // map is already created, to reinitialize we clear all features
@@ -105,76 +107,97 @@ function initializeOpenLayers (display) {
       console.error(error);// TODO enable when mock is done
     }); */
   }
+  const BUTTON_zoomin = document.getElementsByClassName('ol-zoom-in')[0];
+  const BUTTON_zoomfit = document.createElement('button');
+  BUTTON_zoomfit.innerHTML = '&boxplus;';
+  BUTTON_zoomfit.className = 'ol-zoom-fit';
+  BUTTON_zoomfit.onclick = () => zoomToFit(WRAPPER);
+  const DIV_buttons = BUTTON_zoomin.parentNode;
+  DIV_buttons.insertBefore(BUTTON_zoomfit, BUTTON_zoomin);
+}
+
+function initializeOpenLayers (callback) {
+  if (!SCRIPT) {
+    SCRIPT = document.createElement('script');
+    SCRIPT.src = 'https://openlayers.org/en/v6.5.0/build/ol.js';
+    SCRIPT.onload = callback;
+    console.log(SCRIPT);
+    document.head.append(SCRIPT);
+  } else callback();
+}
+
+function zoomToFit (WRAPPER) {
+  const extent = ol.extent.createEmpty();
+  ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
+  WRAPPER.map.getView().fit(extent, WRAPPER.map.getSize());
 }
 
 exports.display = {
-  waitingForInput: display => {
-    if (!SCRIPT) {
-      SCRIPT = document.createElement('script');
-      SCRIPT.src = 'https://openlayers.org/en/v6.5.0/build/ol.js';
-      SCRIPT.onload = () => initializeOpenLayers(display);
-      document.head.append(SCRIPT);
-    } else initializeOpenLayers(display);
+  waitingForInput: displayItem => {
+    initializeOpenLayers(() => initializeMap(displayItem));
   },
-  waitingForData: display => {
-    const WRAPPER = display.getWRAPPER();
+  waitingForData: displayItem => {
+    const WRAPPER = displayItem.getWRAPPER();
     const DIV_message = WRAPPER.firstChild;
     if (DIV_message) DIV_message.innerText = 'Waiting for data...';
   },
-  empty: display => {
-    const WRAPPER = display.getWRAPPER();
+  empty: displayItem => {
+    const WRAPPER = displayItem.getWRAPPER();
     const DIV_message = WRAPPER.firstChild;
     if (DIV_message) DIV_message.innerText = '';
     if (WRAPPER.vectorSource) WRAPPER.vectorSource.clear();
   },
 
-  first: display => {},
+  first: displayItem => {},
 
-  entity: display => {
-    const locationPropertyName = display.getOption('location') || 'geojson';
-    const WRAPPER = display.getWRAPPER();
+  entity: displayItem => {
+    initializeOpenLayers(() => {
+      const locationPropertyName = displayItem.getOption('location') || 'geojson';
+      const WRAPPER = displayItem.getWRAPPER();
+      const DIV_message = WRAPPER.firstChild;
+      if (DIV_message) DIV_message.innerText = '';
 
-    // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
-    // TODO maybe pass label to svg entity?
+      // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
+      // TODO maybe pass label to svg entity?
 
-    /* const feature = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, display: 'map'});
+      /* const feature = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, display: 'map'});
     feature.onclick = () => display.select();
 
     WRAPPER.vectorLayer.getSource().addFeature(feature);
     return; */
-    const format = new ol.format.GeoJSON(); // TODO parametrize
-    const data = display.getNode(locationPropertyName).getContent();
+      const format = new ol.format.GeoJSON(); // TODO parametrize
+      const data = displayItem.getNode(locationPropertyName).getContent();
 
-    if (data) {
-      const features = format.readFeatures(data);
-      const feature = features[0]; // TODO handle multiple features?
-      if (feature) { // TODO check
-        if (data.geometry.type === 'Point') {
-        // https://openlayers.org/en/latest/examples/polygon-styles.html
-          const color = display.getColor();
-          const style = new ol.style.Style({
-            image: new ol.style.Circle({
-              radius: 5,
+      if (data) {
+        const features = format.readFeatures(data);
+        const feature = features[0]; // TODO handle multiple features?
+        if (feature) { // TODO check
+          if (data.geometry.type === 'Point') {
+            // https://openlayers.org/en/latest/examples/polygon-styles.html
+            const color = displayItem.getColor();
+            const style = new ol.style.Style({
+              image: new ol.style.Circle({
+                radius: 5,
+                fill: new ol.style.Fill({
+                  color
+                })
+              })
+            });
+            feature.setStyle(style);
+          } else {
+            const color = displayItem.getColor();
+            const style = new ol.style.Style({
+              stroke: new ol.style.Stroke({
+                color,
+                width: 1
+              }),
               fill: new ol.style.Fill({
                 color
               })
-            })
-          });
-          feature.setStyle(style);
-        } else {
-          const color = display.getColor();
-          const style = new ol.style.Style({
-            stroke: new ol.style.Stroke({
-              color,
-              width: 1
-            }),
-            fill: new ol.style.Fill({
-              color
-            })
-          });
-          feature.setStyle(style);
-        }
-        /*
+            });
+            feature.setStyle(style);
+          }
+          /*
         fillColor
         fillOpacity
         strokeColor
@@ -183,9 +206,9 @@ exports.display = {
         strokeLinecap
         strokeDashstyle */
 
-        // TODO if feature is point
-        // const color = display.getColor();
-        /* feature.setStyle(
+          // TODO if feature is point
+          // const color = display.getColor();
+          /* feature.setStyle(
           new ol.style.Style({
             image: new ol.style.Icon({
               color,
@@ -195,20 +218,20 @@ exports.display = {
             })
           })
         ); */
-        feature.onclick = () => display.select();
+          feature.onclick = () => displayItem.select();
 
-        // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
-        // TODO how do we handle changes to feature?
-        WRAPPER.vectorLayer.getSource().addFeature(feature);
+          // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
+          // TODO how do we handle changes to feature?
+          WRAPPER.vectorLayer.getSource().addFeature(feature);
 
-        const extent = ol.extent.createEmpty();
-        ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
-        WRAPPER.map.getView().fit(extent, WRAPPER.map.getSize());
+          zoomToFit(WRAPPER);
+        }
       }
-    }
+    });
   },
-  remove: display => {
-    const WRAPPER = display.getWRAPPER();
-    const entityId = display.getEntityId();
+  remove: displayItem => {
+    const WRAPPER = displayItem.getWRAPPER();
+    const entityId = displayItem.getEntityId();
+    // TODO
   }
 };
