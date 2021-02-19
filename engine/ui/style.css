@@ -191,27 +191,6 @@ td.xyz-list-icon {
   width: 30px;
   max-width: 30px;
 }
-.xyz-map-wrapper {
-}
-
-.ol-zoom-in,
-.ol-zoom-out,
-.ol-zoom-fit {
-  height: 2em;
-  width: 2em;
-  margin: 2px;
-  float: left;
-  background-color: darkslateblue;
-  color: white;
-  border: none;
-  outline: none;
-  border-radius: 5px;
-}
-
-.ol-rotate-reset,
-.ol-attribution {
-  display: none;
-}
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -510,25 +489,28 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
-
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
+.xyz-map-wrapper {
 }
 
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}.xyz-login a {
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-zoom-fit {
+  height: 2em;
+  width: 2em;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+
+.ol-rotate-reset,
+.ol-attribution {
+  display: none;
+}
+.xyz-login a {
   color: blue;
   cursor: pointer;
   margin: 5px;
@@ -570,4 +552,22 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
+}
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
 }

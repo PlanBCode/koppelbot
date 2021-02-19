@@ -10,8 +10,8 @@ function APILandingHtml($full = true){
   <tr><td>id(s)</td><td><input id="xyz-api-entityId" value=""/> </td></tr>
   <tr><td>properties</td><td><input id="xyz-api-property" value=""/> </td></tr>
 
-  <tr><td>filters</td><td> TODO </td></tr>
-  <tr><td>query options</td><td> TODO</td></tr>';
+  <tr><td>filters</td><td id="xyz-api-filters">  </td></tr>
+  <tr class="xyz-list-header" id="xyz-api-apiOptions"><td>Query Option</td><td>Description</td><td>Value</td></tr>';
 
   if($full){
 
@@ -43,6 +43,9 @@ function APILandingHtml($full = true){
   <tr><td style="font-family: monospace; white-space: pre-wrap;" id="xyz-api-result" colspan="2"> </td></tr>';
   }
   $html.='</table>
+  <script>
+  const apiOptions = '.file_get_contents('./engine/api/api.json').';
+  </script>
   <script>
   '.file_get_contents('./engine/api/api.js').'
   </script>';

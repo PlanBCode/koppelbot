@@ -1,3 +1,4 @@
+/* global apiOptions */
 const INPUT_uri = document.getElementById('xyz-api-uri');
 const INPUT_entityId = document.getElementById('xyz-api-entityId');
 const INPUT_property = document.getElementById('xyz-api-property');
@@ -29,7 +30,28 @@ if (ui) {
   if (document.activeElement !== INPUT_data) INPUT_data.value = xyz.getQueryParameter('data') || '';
 }
 
-INPUT_uri.oninput = INPUT_uri.onpaste = () => {
+const TD_filters = document.getElementById('xyz-api-filters');
+TD_filters.innerHTML = '';
+
+const TR_apiOptions = document.getElementById('xyz-api-apiOptions');
+const TABLE = TR_apiOptions.parentNode;
+const TR_before = TR_apiOptions.nextSibling;
+for (const key in apiOptions) {
+  const info = apiOptions[key].info || '<i>No description available.</i>';
+  const TR = document.createElement('TR');
+  const TD_key = document.createElement('TD');
+  const TD_info = document.createElement('TD');
+  const TD_input = document.createElement('TD');
+  xyz.ui({display: 'input', name: key, showLabel: false}, TD_input);
+  TD_key.innerText = key;
+  TD_info.innerText = info;
+  TR.appendChild(TD_key);
+  TR.appendChild(TD_info);
+  TR.appendChild(TD_input);
+  TABLE.insertBefore(TR, TR_before);
+}
+
+INPUT_uri.onchange = () => {
   const uri = INPUT_uri.value;
   const path = uri.substr(1).split('/');
   const entityClass = path[0] || '';
@@ -52,6 +74,7 @@ function onPathChange () {
   if (property) uri += '/' + property;
   if (document.activeElement !== INPUT_uri) INPUT_uri.value = uri;
   if (onUiChange) onUiChange(); // ./engine/ui/ui.js
+
   onCommandChange();
 }
 
@@ -160,9 +183,9 @@ function execute () {
   xhr.send(data);
 }
 
-INPUT_entityId.oninput = INPUT_entityId.onpaste = onPathChange;
-INPUT_property.oninput = INPUT_property.onpaste = onPathChange;
-if (!ui) INPUT_data.oninput = INPUT_data.onpaste = onCommandChange;
+INPUT_entityId.onchange = onPathChange;
+INPUT_property.onchange = onPathChange;
+if (!ui) INPUT_data.onchange = onCommandChange;
 
 xyz.onVariable('entityClass', onPathChange);
 onPathChange();

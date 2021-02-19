@@ -47,7 +47,7 @@ function updateQueryParameter (queryParameterName, value, operator = '=') {
   for (let i = 0; i < keyValuePairs.length; ++i) {
     const [otherKey, otherOperator, otherValue] = splitKeyValuePair(keyValuePairs[i]); // 'a=1' -> ['a','=']
     if (otherKey === encodeURIComponent(queryParameterName) && otherOperator === operator) {
-      if (typeof value === 'undefined') keyValuePairs.splice(i, 1); // remove keyValuePair
+      if (typeof value === 'undefined' || value === '') keyValuePairs.splice(i, 1); // remove keyValuePair
       else keyValuePairs[i] = [encodeURIComponent(queryParameterName), encodeURIComponent(value)].join(operator); // 'a=value'
       found = true;
       if (encodeURIComponent(value) !== otherValue) changed = true;

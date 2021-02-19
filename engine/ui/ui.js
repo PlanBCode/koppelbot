@@ -1,4 +1,5 @@
-//  optionSchemas is defined in /engine/ui.php
+/* global optionSchemas  */ // is defined in /engine/ui.php
+
 const SELECT_macroFlavor = document.getElementById('xyz-ui-display-macroFlavor');
 const PRE_macro = document.getElementById('xyz-ui-display-macro');
 const TABLE_variables = document.getElementById('xyz-ui-display-variables');
