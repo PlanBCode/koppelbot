@@ -86,9 +86,27 @@ function onMethodChange () {
   onCommandChange();
 }
 
+function getUri () {
+  let uri = INPUT_uri.value;
+  const queryParameters = xyz.getQueryParameters();
+  for (const key in queryParameters) {
+    if (apiOptions.hasOwnProperty(key)) {
+      const value = queryParameters[key];
+      if (value === 'true') uri += (uri.includes('?') ? '&' : '?') + key;
+      else uri += (uri.includes('?') ? '&' : '?') + key + '=' + value;
+    }
+  }
+  const queryFilters = xyz.getQueryFilters();
+  for (const key in queryFilters) {
+    const [operator, value] = queryFilters[key];
+    uri += (uri.includes('?') ? '&' : '?') + key + operator + value;
+  }
+  return uri;
+}
+
 function onCommandChange () {
   if (ui) return;
-  const uri = INPUT_uri.value;
+  const uri = getUri();
   let method = SELECT_method.value;
   let data = INPUT_data.value;
   const path = uri.substr(1).split('/');
@@ -97,11 +115,17 @@ function onCommandChange () {
   const flavor = SELECT_commandFlavor.value;
 
   xyz.setQueryParameter('data', data);
-  xyz.setQueryParameter('uri', uri);
+  if (uri === '/') xyz.setQueryParameter('uri');
+  else xyz.setQueryParameter('uri', uri);
   xyz.setQueryParameter('entityId', entityId);
   xyz.setQueryParameter('property', property);
-  xyz.setQueryParameter('method', method);
-  xyz.setQueryParameter('commandFlavor', flavor);
+
+  if (flavor === 'url') xyz.setQueryParameter('commandFlavor');
+  else xyz.setQueryParameter('commandFlavor', flavor);
+
+  if (method === 'GET') xyz.setQueryParameter('method');
+  else xyz.setQueryParameter('method', method);
+
   // TODO add querystring
   switch (flavor) {
     case 'curl' :
@@ -149,7 +173,7 @@ function onCommandChange () {
 }
 
 function execute () {
-  const uri = INPUT_uri.value;
+  const uri = getUri();
   const method = SELECT_method.value;
   const data = INPUT_data.value;
   const xhr = new window.XMLHttpRequest();
@@ -190,3 +214,5 @@ if (!ui) INPUT_data.onchange = onCommandChange;
 xyz.onVariable('entityClass', onPathChange);
 onPathChange();
 onMethodChange();
+
+if (!ui && xyz.getVariable('execute') === 'true') execute();
