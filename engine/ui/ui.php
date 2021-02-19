@@ -88,7 +88,7 @@ class UiRequest extends HttpRequest2
               <option value="embed">embed</option>
             </select>
             </td></tr>
-            <tr><td style="padding:1cm;" ><pre id="xyz-ui-display-macro"></pre></td></tr>
+            <tr><td style="padding:1cm;" ><pre id="xyz-ui-display-macro"style=" white-space: normal;"></pre></td></tr>
             <tr><td><table  class="xyz-list" id="xyz-ui-display-variables"></table></td></tr>
           </table>
           <script>

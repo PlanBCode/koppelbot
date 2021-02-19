@@ -32,11 +32,26 @@ if (ui) {
   if (document.activeElement !== INPUT_data) INPUT_data.value = xyz.getQueryParameter('data') || '';
 }
 
-const TD_filters = document.getElementById('xyz-api-filters');
-TD_filters.innerHTML = '';
+const TR_filters = document.getElementById('xyz-api-filters');
+const TABLE = TR_filters.parentNode;
+const TR_before2 = TR_filters.nextSibling;
+const queryFilters = xyz.getQueryFilters();
+for (const key in queryFilters) {
+  const [operator, value] = queryFilters[key];
+  const TR = document.createElement('TR');
+  const TD_key = document.createElement('TD');
+  const TD_operator = document.createElement('TD');
+  const TD_value = document.createElement('TD');
+  TD_key.innerText = key;
+  TD_operator.innerHTML = operator;
+  TD_value.innerHTML = value;
+  TR.appendChild(TD_key);
+  TR.appendChild(TD_operator);
+  TR.appendChild(TD_value);
+  TABLE.insertBefore(TR, TR_before2);
+}
 
 const TR_apiOptions = document.getElementById('xyz-api-apiOptions');
-const TABLE = TR_apiOptions.parentNode;
 const TR_before = TR_apiOptions.nextSibling;
 for (const key in apiOptions) {
   const info = apiOptions[key].info || '<i>No description available.</i>';
