@@ -18,7 +18,9 @@ if (ui) {
   const path = uri.substr(1).split('/'); // '/a/b/c/' -> ['a','b','c']
 
   if (document.activeElement !== INPUT_uri) INPUT_uri.value = uri;
-  xyz.setVariable('entityClass', path[0]);
+  const entityClass = path[0];
+  if (entityClass) xyz.setVariable('entityClass', entityClass);
+  else xyz.setVariable('entityClass');
   if (document.activeElement !== INPUT_entityId) INPUT_entityId.value = path[1] || '';
   if (document.activeElement !== INPUT_property) INPUT_property.value = path.slice(2).join('/');
 } else {
@@ -57,7 +59,8 @@ INPUT_uri.onchange = () => {
   const entityClass = path[0] || '';
   const entityId = path[1] || '';
   const property = path.slice(2).join('/');
-  xyz.setVariable('entityClass', entityClass);
+  if (entityClass) xyz.setVariable('entityClass', entityClass);
+  else xyz.setVariable('entityClass');
   if (document.activeElement !== INPUT_entityId) INPUT_entityId.value = entityId;
   if (document.activeElement !== INPUT_property) INPUT_property.value = property;
   if (onUiChange) onUiChange(); // ./engine/ui/ui.js
