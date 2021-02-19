@@ -12,6 +12,11 @@ class QueryStatement
       }
     }
 
+    static protected function eqq($lhs, $rhs): bool
+    {
+      return $lhs == $rhs;
+    }
+
     static protected function neq($lhs, $rhs): bool
     {
       if(is_string($rhs)){
@@ -43,6 +48,7 @@ class QueryStatement
 
     static protected $comparisonOperators = [
         '==' => 'eq',
+        '===' => 'eqq',
         '!=' => 'neq',
         '<' => 'lt',
         '>' => 'gt',
