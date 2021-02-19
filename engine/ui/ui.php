@@ -59,9 +59,9 @@ class UiRequest extends HttpRequest2
 
           require_once __DIR__ . '/../api/landing.php';
 
-          $body = 'This page offers and interface to create and test XYZ data displays.
+          $body = '<p>This page offers an interface to create and test XYZ data displays.
 
-          For more information please visit: <a href="../doc/ui">UI reference</a>.';
+          For more information please visit: <a href="../doc/ui">UI reference</a>.</p>';
 
           $body .= '<table class="xyz-list">
             <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
