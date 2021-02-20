@@ -40,7 +40,7 @@ elif [ "$1" = "build" ]; then
 
 else
   prefix=$( echo "$1" |cut -c1 );
-  if [ "$prefix" = "-" ] || [ "$prefix" = "/" ]; then
+  if [ -z "$1" ] || [ "$prefix" = "-" ] || [ "$prefix" = "/" ]; then
     php -f "$XYZ_HOME/index.php" -- $@
   elif [ -e "$XYZ_HOME/engine/cli/commands/$1.sh" ]; then
     file="$XYZ_HOME/engine/cli/commands/$1.sh"
