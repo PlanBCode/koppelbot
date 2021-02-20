@@ -62,10 +62,12 @@ class ContentRequest extends HttpRequest2
 {
     protected function getContentFileResponse(string $fileName, int $status = 200)
     {
+      if(strpos($fileName,'..') !== false) return new ContentResponse(403, 'Forbidden');
       $mime = getMimeContentType($fileName);
       $headers = ['Content-Type'=>$mime];
       $fileContent = file_get_contents($fileName);
       //TODO insert sitemap into html header
+      //TODO insert xyz js (only if there are xyz tags)
       if(pathinfo($fileName, PATHINFO_EXTENSION) === 'html') $fileContent = replaceXyzTag($fileContent);
       return new ContentResponse($status, $fileContent, $headers);
     }
