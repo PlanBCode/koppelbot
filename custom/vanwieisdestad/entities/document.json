@@ -23,6 +23,7 @@
     }
   },
   "Bron" : {
+    "title":true,
     "type": "string",
     "connector": {
       "key": "Bron"
@@ -35,6 +36,7 @@
     }
   },
   "Bestand" : {
+    "title":true,
     "type": "string",
     "connector": {
       "key": "Bestand"

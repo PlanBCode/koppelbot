@@ -73,7 +73,9 @@ exports.display = {
       } else {
         for (const flatPropertyName in columns) {
           const TD_header = document.createElement('TD');
-          TD_header.innerHTML = flatPropertyName;
+          const labels = display.getOption('labels');
+          if (labels && labels.hasOwnProperty(flatPropertyName)) TD_header.innerText = labels[flatPropertyName];
+          else TD_header.innerText = flatPropertyName;
           TR_header.appendChild(TD_header);
         }
       }

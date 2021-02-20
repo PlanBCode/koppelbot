@@ -138,7 +138,9 @@ exports.display = {
           const [aggregator, propertyName] = aggregation;
           const label = aggregator + '(' + propertyName + ')';
           const TD = document.createElement('TD');
-          TD.innerText = label;
+          const labels = display.getOption('labels');
+          if (labels && labels.hasOwnProperty(label)) TD.innerText = labels[label];
+          else TD.innerText = label;
           TR.appendChild(TD);
         }
         TABLE.appendChild(TR);

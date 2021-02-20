@@ -58,11 +58,16 @@ function parseAggregationFromUri (uri) {
   const aggregations = [];
 
   const path = pathFromUri(uri);
-  if (path.length < 3 || path.length[2] === '*' || !path[2].includes('(')) return {uri, aggregations};
+  if (path.length < 3 || path.length[2] === '*' || (!path[2].includes('(') && !path[2].includes('='))) return {uri, aggregations};
   const parts = path[2].split(',');
   const propertyNameList = [];
-
+  const labels = {};
   for (let part of parts) { // TODO parse aggregations with multiple parameters?  "join(x,',')"
+    if (part.includes('=')) {
+      let label;
+      [label, part] = part.split('=');
+      labels[part] = label;
+    }
     if (part.endsWith(')')) {
       part = part.substr(0, part.length - 1); // 'sum(x)' -> 'sum(x'
       const aggregation = part.split('('); // 'sum(x' -> ['sum','x']
@@ -72,7 +77,8 @@ function parseAggregationFromUri (uri) {
     } else if (!propertyNameList.includes(part)) propertyNameList.push(part);
   }
   uri = '/' + path.slice(0, 2).join('/') + '/' + propertyNameList.join(',') + (queryString ? '?' + queryString : '');
-  return {uri, aggregations};
+
+  return {uri, aggregations, labels};
 }
 
 const variableRegex = /\$(\w+|\{\w+\})/g;

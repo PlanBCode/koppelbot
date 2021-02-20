@@ -37,7 +37,7 @@
     }
   },
   "Oppervlakte" : {
-    "type": "string",
+    "type": "number",
     "connector": {
       "key": "geojson.properties.kadastraleGrootteWaarde"
     }

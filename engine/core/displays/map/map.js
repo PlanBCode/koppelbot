@@ -169,7 +169,7 @@ exports.display = {
                 image: new ol.style.Circle({
                   stroke: new ol.style.Stroke({
                     color: isSelected ? 'yellow' : 'color',
-                    width: 1
+                    width: isSelected ? 3 : 1
                   }),
                   radius: 5,
                   fill: new ol.style.Fill({
@@ -182,7 +182,7 @@ exports.display = {
               const style = new ol.style.Style({
                 stroke: new ol.style.Stroke({
                   color: isSelected ? 'yellow' : 'color',
-                  width: 1
+                  width: isSelected ? 3 : 1
                 }),
                 fill: new ol.style.Fill({
                   color

@@ -92,9 +92,9 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
 };
 
 const renderUiElement = (xyz, options, WRAPPER) => {
-  const {uri, aggregations} = uriTools.parseAggregationFromUri(options.uri);
-
+  const {uri, aggregations, labels} = uriTools.parseAggregationFromUri(options.uri);
   options.uri = uri;
+  options.labels = labels;
   options.aggregations = aggregations;
 
   const displayName = options.display || DEFAULT_DISPLAYNAME;
