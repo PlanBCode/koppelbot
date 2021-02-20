@@ -19,3 +19,16 @@
 .ol-attribution {
   display: none;
 }
+
+.xyz-map {
+  position: relative;
+}
+
+.xyz-map-message {
+  position: absolute;
+  z-index: 100;
+  right: 0;
+  top: 3px;
+  text-shadow: 1px 1px black;
+  color: white;
+}

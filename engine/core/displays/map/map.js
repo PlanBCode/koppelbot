@@ -10,6 +10,7 @@ let SCRIPT; // to dynamically load dependency;
 
 function initializeMap (display) {
   const WRAPPER = display.getWRAPPER();
+  WRAPPER.className = 'xyz-map';
 
   if (WRAPPER.vectorLayer) { // map is already created, to reinitialize we clear all features
     const DIV_message = WRAPPER.firstChild;
@@ -25,6 +26,7 @@ function initializeMap (display) {
 
   WRAPPER.innerHTML = '';
   const DIV_message = document.createElement('DIV');
+  DIV_message.className = 'xyz-map-message';
   DIV_message.innerText = 'Waiting for input...';
   WRAPPER.appendChild(DIV_message);
   WRAPPER.style.height = '500px';
