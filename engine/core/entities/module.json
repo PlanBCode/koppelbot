@@ -1,0 +1,21 @@
+{
+  "_": {
+    "connector": {
+      "type": "directory",
+      "parse": "json",
+      "path": "custom/*/:engine/core/",
+      "basename": "xyz.json"
+    },
+    "access": {
+      "read": [
+        "/group/guest"
+      ]
+    }
+  },
+  "id": {
+    "index": true
+  },
+  "version": {
+    "type": "string"
+  }
+}
