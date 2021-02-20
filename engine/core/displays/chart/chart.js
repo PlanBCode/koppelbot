@@ -18,12 +18,12 @@ function getBaseValue (aggregator) {
 function aggregate (aggregator, aggregation, value, count) {
   switch (aggregator) {
     // TODO avg, count_distinct, var(iance), stdev??
-    case 'sum' : return aggregation + value;
+    case 'sum' : return Number(aggregation) + Number(value);
     case 'join' : return aggregation + value; // TODO or concat, add seperator
     case 'first' : return count === 1 ? value : aggregation;
     case 'last' : return value;
     // TODO nth(x,1)
-    case 'count' : return aggregation + 1;
+    case 'count' : return Number(aggregation) + 1;
     case 'max' : return typeof aggregation === 'undefined' ? value : Math.max(aggregation, value);
     case 'min' : return typeof aggregation === 'undefined' ? value : Math.min(aggregation, value);
     default: return undefined;
@@ -202,6 +202,7 @@ exports.display = {
     const columns = display.getFlatNodes();
 
     const aggregations = display.getOption('aggregations');
+
     let groupId = '*';
     let groupBy = '*';
     if (display.hasOption('groupby')) {
