@@ -301,6 +301,9 @@ class Property
         $this->depth = $depth;
 
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
+
+        if(is_null($this->typeName) && getSingleSetting('index', $settings, $rootSettings)) $this->typeName = 'id';
+        
         if (!is_string($this->typeName)) {
             echo "ERROR: invalid typename";
             //TODO error
