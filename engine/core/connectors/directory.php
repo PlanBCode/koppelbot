@@ -5,15 +5,20 @@ require_once './engine/core/connectors/basic.php';
     general connector settings
       path        "/path/to/directory/"
       extension    "json"|"*"
+      basename    "filename.json" (use the parent dir as entityId
       parse "json" (todo xml, yaml)
 
     property connector settings:
+      key: "key" -> default for index type
       key: "content"
       key: "basename"
       key: "filename"
       key: "path"
       key: "extension"
+      key: "size"
+      key: "mime"
       key: "content.a.b"
+
    TODO modified/created = timestamps
 TODO include hidden
 TODO include directories
@@ -26,6 +31,7 @@ class Connector_directory extends BasicConnector
 
     protected $paths;  // : separated paths
     protected $extension;
+    protected $basename;
     protected $data;
     protected $meta;
     protected $settings;
@@ -38,32 +44,60 @@ class Connector_directory extends BasicConnector
         // TODO create directories if required
         $this->paths = explode(':', array_get($settings, 'path'));
         $this->extension = array_get($settings, 'extension', '*');
+        $this->basename = array_get($settings, 'basename');
         $this->settings = $settings;
     }
 
     protected function createFilePath(string $entityId, string $path = null)
     {
-        if (is_null($path)) $path = $this->paths[0]; //TODO check if length >0
-        return $path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
+        if(is_null($this->basename)){
+          if (is_null($path)) $path = $this->paths[0]; //TODO check if length >0
+          return $path . $entityId . ($this->extension != '*' ? ('.' . $this->extension) : ''); //TODO join paths properly
+        } else {
+          foreach($this->paths as $path){
+            $dirPath = implode('/',array_slice(explode('/',$path),0,-2));//TODO join paths properly
+            $filePath = $dirPath. '/'. $entityId .'/'. $this->basename; //TODO join paths properly
+            if(file_exists($filePath)) return $filePath;
+          }
+          $dirPath = implode('/',array_slice(explode('/',$this->paths[0]),0,-2));//TODO join paths properly
+          $filePath = $dirPath. '/'. $entityId .'/'. $this->basename; //TODO join paths properly
+          return $filePath;
+        }
     }
 
     static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string
     {
         $path = array_get($settings, 'path');
-        $extension = array_get($settings, 'extension', '*');
-        return $path . '*.' . $extension;
+        if(array_key_exists('basename',$settings)){
+          return $path . '*.' . array_get($settings,'basename');
+        }else{
+          $extension = array_get($settings, 'extension', '*');
+          return $path . '*.' . $extension;
+        }
     }
 
     protected function getAllEntityIds(): array
     {
         $entityIds = [];
-        foreach ($this->paths as $path) {
-            foreach (glob($this->createFilePath('*', $path)) as $filePath) {// TODO use glob('{a,b}', GLOB_BRACE)
-                if (!is_dir($filePath)) {
-                    $entityId = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
-                    $entityIds[$entityId] = $filePath;
-                }
+        if(is_null($this->basename)){
+          foreach ($this->paths as $path) {
+              foreach (glob($this->createFilePath('*', $path)) as $filePath) {// TODO use glob('{a,b}', GLOB_BRACE)
+                  if (!is_dir($filePath)) {
+                      $entityId = $this->extension === '*' ? basename($filePath) : basename($filePath, '.' . $this->extension);
+                      $entityIds[$entityId] = $filePath;
+                  }
+              }
+          }
+        } else {
+          foreach ($this->paths as $path) {
+            foreach (glob($path) as $dirPath) {// TODO use glob('{a,b}', GLOB_BRACE)
+              $filePath = $dirPath.$this->basename;
+              if(is_dir($dirPath) && file_exists($filePath) && !is_dir($filePath)){
+                $entityId = explode('/',$dirPath)[1]; // 'custom/$entityId' -> '$entityId'
+                $entityIds[$entityId] = $filePath;
+              }
             }
+          }
         }
         return $entityIds;
     }
@@ -107,12 +141,12 @@ class Connector_directory extends BasicConnector
                 $entityIds = $this->getAllEntityIds();
                 break;
             } else {
+                //TODO BASENAME!
                 $moreEntityIds = explode(',', $entityIdList);
                 foreach ($moreEntityIds as $entityId) {
                     $paths = array_map(function ($path) use ($entityId) {
                         return $this->createFilePath($entityId, $path);
                     }, $this->paths);
-
                     $filePaths = glob('{' . implode(',', $paths) . '}', GLOB_BRACE);
                     if (count($filePaths) === 0) {
                         $content = 'Not found';
@@ -161,11 +195,11 @@ class Connector_directory extends BasicConnector
                     $fileContent = $data;
                 }
                 if ($fileContent) {
-                    if ($this->meta[$entityId]['path']) {
-                        $filePath = $this->meta[$entityId]['path'];
-                    } else {
-                        $filePath = $this->createFilePath($entityId);
-                    }
+
+                    $filePath = $this->meta[$entityId]['path']
+                      ? $this->meta[$entityId]['path']
+                      : $this->createFilePath($entityId);
+
                     $path = dirname($filePath);
                     if(!is_dir($path)){
                       $success = mkdir($path, 0777, true);
