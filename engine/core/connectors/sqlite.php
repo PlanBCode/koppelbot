@@ -41,13 +41,22 @@ class Connector_sqlite extends Connector
     protected function constructQueryString(string $method, array &$keys, string $idKey, array &$entityIds, string $table): string
     {
       $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN ('. implode(',',array_keys($entityIds)).')');
-
       if($method === 'GET'){
         $queryString = 'SELECT '.$idKey;
         foreach($keys as $key=>$propertyRequest){
           $propertyPath = $propertyRequest->getPropertyPath();
           $propertyName = $propertyPath[0]; //TODO check
-          $queryString .= ',' . ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
+          //echo "hoi ".$propertyName;
+          $queryString .= ', ';
+          if(strpos($key,'.')!== false){
+            $keyPath = explode('.',$key);
+            $baseKey = $keyPath[0];
+            $subKeyPath = array_slice($keyPath,1);
+            $subKey = implode('.',$subKeyPath);
+            $queryString .= 'json_extract('.$baseKey.', \'$.'.$subKey.'\') AS '.$propertyName;
+          }else{
+            $queryString .= ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
+          }
         }
         $queryString .=' FROM '.$table . $whereString;
       } else if($method === 'DELETE'){
@@ -58,7 +67,6 @@ class Connector_sqlite extends Connector
       //TODO PUT/POST ->insert
       // TODO PATCH -> update
       //TODO sort, order left join
-
       return $queryString;
     }
 
