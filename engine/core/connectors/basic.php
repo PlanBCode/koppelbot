@@ -73,12 +73,13 @@ abstract class BasicConnector extends Connector
 
         $property = $propertyRequest->getProperty();
         $propertyName = $property->getName();
-        $key = $propertyRequest->getProperty()->getConnectorSetting('key', '.' . $propertyName);
 
+        $key = $propertyRequest->getProperty()->getConnectorSetting('key', '.' . $propertyName);
+        $isId = $propertyRequest->getProperty()->isId() || $key === 'basename' || $key === 'key';
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (array_key_exists($entityId, $this->data)) {
-                if ($key === 'basename' || $key === 'key') {
+                if ($isId) {
                     $content = $entityId;
                     $connectorResponse->add(200, $propertyRequest, $entityId, $content);
                 } else {
@@ -92,7 +93,8 @@ abstract class BasicConnector extends Connector
                         $entity =& $this->meta[$entityId];
                         $keyPath = explode('.', $key);
                     } else {
-                        $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
+                        $content = 'Incorrect connector setting key="' . $key . '".';
+                        $connectorResponse->add(500, $propertyRequest, $entityId, $content);
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
@@ -104,7 +106,8 @@ abstract class BasicConnector extends Connector
                     } else {
                         //TODO use $jsonActionResponse->getErrorMessage()
                         //TODO might result in 404 or 500
-                        $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                        $content = 'Not found';
+                        $connectorResponse->add(404, $propertyRequest, $entityId, $content);
                     }
                 }
             } else {
@@ -125,18 +128,19 @@ abstract class BasicConnector extends Connector
         $property = $propertyRequest->getProperty();
         $propertyName = $property->getName();
         $key = $propertyRequest->getProperty()->getConnectorSetting('key', '.' . $propertyName);
+        $isId = $propertyRequest->getProperty()->isId() || $key === 'basename' || $key === 'key';
 
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (!array_key_exists($entityId, $this->data)) {
                 $this->data[$entityId] = [];
             }
-            if ($key === "basename" || $key === "key") { //TODO or filename?
-                if ($propertyRequest->getMethod() === 'POST') {
-                    $newContent = $entityId;
-                } else {
-                    $newContent = $propertyRequest->getContent();
-                }
+            if ($isId) { //TODO or filename?
+
+                $newContent = $propertyRequest->getMethod() === 'POST'
+                ? $entityId
+                : $propertyRequest->getContent();
+
                 //TODO or extension is mixed extensions for example "json|xml"
                 $newContent = $this->extension === '*' ? $newContent : basename($newContent, '.' . $this->extension);
                 if ($newContent !== $entityId) {
@@ -154,7 +158,8 @@ abstract class BasicConnector extends Connector
                 } else if (is_string($key) && substr($key, 0, 1) === '.') {
                     $keyPath = explode('.', substr($key, 1));
                 } else {
-                    $connectorResponse->add(500, $propertyRequest, $entityId, 'Incorrect connector setting key="' . $key . '".');//TODO
+                    $content = 'Incorrect connector setting key="' . $key . '".';
+                    $connectorResponse->add(500, $propertyRequest, $entityId, $content);//TODO
                     continue;
                 }
                 $entity =& $this->data[$entityId];
@@ -180,7 +185,8 @@ abstract class BasicConnector extends Connector
                 } else {
                     //TODO use $jsonActionResponseSet->getErrorMessage()
                     //TODO might result in 404 or 500
-                    $connectorResponse->add(404, $propertyRequest, $entityId, 'Not found');
+                    $content =  'Not found';
+                    $connectorResponse->add(404, $propertyRequest, $entityId,$content);
                 }
             }
         }
@@ -196,11 +202,11 @@ abstract class BasicConnector extends Connector
         $property = $propertyRequest->getProperty();
         $propertyName = $property->getName();
         $key = $propertyRequest->getProperty()->getConnectorSetting('key', '.' . $propertyName);
-
+        $isId = $propertyRequest->getProperty()->isId() || $key === 'basename' || $key === 'key';
         //Loop through entityIds and add properties
         foreach ($entityIds as $entityId) {
             if (array_key_exists($entityId, $this->data)) {
-                if ($key === 'basename' || $key === 'key') {
+                if ($isId) {
                     unset($this->data[$entityId]);
                     $content = null;
                     $connectorResponse->add(200, $propertyRequest, $entityId, $content);
