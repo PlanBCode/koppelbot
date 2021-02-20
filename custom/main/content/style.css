@@ -1,60 +1,91 @@
-html, body {
-    padding: 0;
-    margin: 0;
+
+body {
+  font-family: Palanquin, sans-serif;
 }
 
-#main tr.header > td {
-    font-weight: normal;
-    color: black;
-    padding: 15px;
-    height: 2em;
-    background-color: white;
-    border-bottom: gray solid 1px;
+nav {
+  background-color: white;
+  display: block;
+  width: 100vw;
+  height: 100px;
 }
 
-h1 {
-    font-size: 1.4em;
-    font-weight: normal;
+nav > a,
+nav > a:visited {
+  text-decoration: none;
+  height: 25px;
+  float: right;
+  color: black;
+  padding-top: 2px;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 35px;
 }
 
-h3 {
-    font-size: 1em;
-    font-weight: bold;
+nav > a:hover {
+  color: darkblue;
 }
 
-#main tr td#sources {
-    padding: 5px;
-    border-right: white solid 1px;
-    background-color: rgb(240, 240, 240);
+li:first-child {
+  list-style-image: url('./purple-bullet.png');
 }
 
-#main tr td#facts {
-    padding: 5px;
-    border-left: white solid 1px;
-    background-color: rgb(240, 240, 240);
+li:nth-child(2) {
+  list-style-image: url('./green-bullet.png');
 }
 
-#main {
-    border-collapse: collapse;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
+li:nth-child(3) {
+  list-style-image: url('./red-bullet.png');
 }
 
-#main td {
-    padding: 0;
+li:nth-child(4) {
+  list-style-image: url('./yellow-bullet.png');
 }
 
-.header td:nth-child(2) {
-    text-align: right;
+nav > a:first-child {
+  font-weight: bold;
+  float: left;
+  background-image: url('./logo.png');
+  background-size: 40px 40px;
+  height: 40px;
+  padding-top: 5px;
+  background-position: left middle;
+  background-repeat: no-repeat;
+  padding-left: 50px;
 }
 
-#view {
-    background-color: darkgray;
-    max-height: 70vh;
+nav > a:nth-child(2) {
+  background-image: url('./github.png');
+  background-size: 20px 20px;
+  background-position: left 6px;
+  background-repeat: no-repeat;
+  padding-left: 22px;
 }
 
-#timeline {
-    height: 90%;
+div#background {
+  width: 100vw;
+  height: 100%;
+  position: fixed;
+  z-index: -100;
+  top: 0;
+  left: 0;
+  background-image: url('./background.jpg');
+}
+
+div#content {
+  background: rgb(2, 0, 36, 0.5);
+  background: linear-gradient(-45deg, rgba(2, 0, 36, 0.5) 0%, rgba(212, 212, 255, 0.9) 100%);
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+div#content > div {
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
+  background-color: rgba(255, 255, 255, 0.85);
+  width: 75vh;
+  margin: 0  auto 50px;
+  padding: 50px;
 }

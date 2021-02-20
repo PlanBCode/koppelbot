@@ -7,38 +7,42 @@
     <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
 <body>
-<table id="main">
-    <tr class="header">
-        <td colspan="2">Koppelbot</td>
-        <td>
-            <xyz uri="/session" display="login"/>
-        </td>
-    </tr>
-    <tr>
-        <td rowspan="2" id="sources" width="20%" valign="top">
-            <h3>Sources</h3>
-            <xyz uri="/source/*/file/id" createButtonText="Add source" display="list" select="source" showHeader="false"/>
-        </td>
-        <td id="view" valign="top">
-            <xyz uri="/source/$source" showLabels="false" showTitle="true" showEditButton="true" showDeleteButton="true"/>
-        </td>
-        <td rowspan="2" id="facts" width="20%" valign="top">
-            <h3>Facts</h3>
-            <xyz id="timeline" uri="/fact/*" createButtonText="Add fact" display="timeline" horizontal="false" select="fact" showHeader="false"/>
-        </td>
-    </tr>
-    <tr>
-        <td valign="top">
-           <xyz
-                   uri="/fact/$fact/*"
-                   showLabels="true"
-                   showTitle="true"
-                   showEditButton="true"
-                   showDeleteButton="true"
-                   sources_select="source"
-           />
-        </td>
-    </tr>
-</table>
+<nav>
+  <a disabled>Koppelbot</a>
+
+  <a href="https://github.com/PlanBCode/koppelbot">Github</a>
+  <a>About</a>
+  <a href="./doc">Docs</a>
+</nav>
+<div id="background"></div>
+<div id="content">
+  <div>
+  <h2>Intro</h2>
+  <ul>
+    <li>Data oriented CMS</li>
+    <li>API first design</li>
+    <li>Dashboards</li>
+    <li>Edit, manage and present data.</li>
+  </ul>
+  </div>
+
+  <div>
+  <h2>Examples</h2>
+
+  <xyz uri="/fruit/*/name,color,size" color="color" display="list" />
+
+  <xyz uri="/fruit/*/count(name),color" color="color" groupby="color" flavor="doughnut" display="chart" />
+
+  </div>
+
+  <div>
+  <h2>Features</h2>
+  <ul>
+    <li>interactive</li>
+  <li>modular</li>
+  <li>front-back end synergy</li>
+  </div>
+</div>
+
 </body>
 </html>

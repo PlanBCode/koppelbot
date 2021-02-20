@@ -1,10 +1,22 @@
 /* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */
 
+@font-face {
+  font-display: swap;
+  font-family: 'Palanquin';
+  src: url("../fonts/Palanquin-Regular.eot");
+  src:
+    url("./fonts/Palanquin-Regular.eot?#iefix") format("embedded-opentype"),
+    url("./fonts/Palanquin-Regular.woff2") format("woff2"),
+    url("./fonts/Palanquin-Regular.woff") format("woff"),
+    url("./fonts/Palanquin-Regular.ttf") format("truetype"),
+    url("./fonts/Palanquin-Regular.svg#Palanquin-Regular");
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: sans-serif;
+  font-family: Palanquin, sans-serif;
 }
 
 input[type='submit'] {

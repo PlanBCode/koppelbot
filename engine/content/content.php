@@ -88,6 +88,8 @@ class ContentRequest extends HttpRequest2
             return $this->getContentFileResponse($fileName);//TODO make safe!
         } elseif (file_exists('custom/main/content' . $this->uri)) {
             return $this->getContentFileResponse('custom/main/content' . $this->uri);//TODO make safe!
+          } elseif (file_exists('engine/core/content' . $this->uri)) {
+              return $this->getContentFileResponse('engine/core/content' . $this->uri);//TODO make safe!
         } elseif (file_exists('custom/main/content/404.html')) {
             return $this->getContentFileResponse('custom/main/content/404.html',404);
         } else {
