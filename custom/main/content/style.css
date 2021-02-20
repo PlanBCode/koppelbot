@@ -19,27 +19,11 @@ nav > a:visited {
   padding-top: 2px;
   margin-left: 15px;
   margin-right: 15px;
-  margin-top: 35px;
+  margin-top: 45px;
 }
 
 nav > a:hover {
   color: darkblue;
-}
-
-li:first-child {
-  list-style-image: url('./purple-bullet.png');
-}
-
-li:nth-child(2) {
-  list-style-image: url('./green-bullet.png');
-}
-
-li:nth-child(3) {
-  list-style-image: url('./red-bullet.png');
-}
-
-li:nth-child(4) {
-  list-style-image: url('./yellow-bullet.png');
 }
 
 nav > a:first-child {

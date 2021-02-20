@@ -132,7 +132,7 @@ class DocResponse extends HttpResponse2
             $content = $this->getSiteMap($rootUri, $query);
         }else {
 
-          $title = 'XYZ - ' . array_get(self::$menuItems, $currentUri, '');
+          $title = 'Koppelbot - ' . array_get(self::$menuItems, $currentUri, '');
           $head = '<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -172,8 +172,8 @@ class DocResponse extends HttpResponse2
             $navigation .= '</ul>';
             $content = $head.
 '  <body>
-    <div class="xyz-page-header">' . $title . '</div>
-    <div class="xyz-page-navigation">' . $navigation . '</div>
+    <div class="xyz-page-header"><a class="xyz-logo"></a>' . $title . '</div>
+    <div class="xyz-page-navigation"><div class="xyz-page-navigation-background"></div>' . $navigation . '</div>
     <div class="xyz-page-content">' . $content . '</div>
   </body>
 </html>';

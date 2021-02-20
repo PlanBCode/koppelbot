@@ -2,7 +2,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: sans-serif;
+  font-family: Palanquin, sans-serif;
 }
 
 input[type='submit'] {
@@ -64,16 +64,27 @@ PAGE
   background-color: white;
   color: black;
   border-bottom: 1px solid rgb(230, 230, 230);
-  font-size: xx-large;
+  font-weight: bold;
 }
 
 .xyz-page-navigation {
   padding-top: 20px;
-  height: calc(100vh - 100px);
+  height: calc(100% - 100px);
   width: 200px;
-  background-color: rgb(247, 247, 247);
-  display: inline-block;
+  background: linear-gradient(-45deg, rgba(2, 0, 36, 0.5) 0%, rgba(232, 232, 255, 0.9) 100%);
+  display: block;
   float: left;
+  position: relative;
+}
+
+.xyz-page-navigation-background {
+  background-image: url('./background.jpg');
+  opacity: 0.2;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -100;
+  top: 0;
 }
 
 .xyz-page-navigation ul,
@@ -81,9 +92,10 @@ PAGE
   list-style-type: none;
 }
 
-.xyz-page-navigation li {
+body > .xyz-page-navigation li:not(.xyz-page-navigation-depth-0) {
+  list-style-image: none;
   margin-bottom: 25px;
-  color: rgb(100, 100, 100);
+  color: black;
 }
 
 .xyz-page-navigation a {
@@ -92,10 +104,11 @@ PAGE
 }
 
 a.xyz-page-navigation-current {
-  color: darkgoldenrod;
+  color: white;
 }
 
 li.xyz-page-navigation-depth-0 {
+  margin-bottom: 25px;
   margin-top: 40px;
   font-weight: bold;
   color: black;
@@ -112,6 +125,30 @@ li.xyz-page-navigation-depth-0 {
 /* ====================================================================================================
 DOC
 ==================================================================================================== */
+
+@font-face {
+  font-display: swap;
+  font-family: 'Palanquin';
+  src: url("../fonts/Palanquin-Regular.eot");
+  src:
+    url("./fonts/Palanquin-Regular.eot?#iefix") format("embedded-opentype"),
+    url("./fonts/Palanquin-Regular.woff2") format("woff2"),
+    url("./fonts/Palanquin-Regular.woff") format("woff"),
+    url("./fonts/Palanquin-Regular.ttf") format("truetype"),
+    url("./fonts/Palanquin-Regular.svg#Palanquin-Regular");
+}
+
+.xyz-logo {
+  font-weight: bold;
+  float: left;
+  background-image: url('./logo.png');
+  background-size: 40px 40px;
+  height: 40px;
+  padding-top: 5px;
+  background-position: left middle;
+  background-repeat: no-repeat;
+  padding-left: 50px;
+}
 
 .xyz-doc-wrapper {
   background-color: darkgrey;
@@ -141,3 +178,23 @@ DOC
   background-color: lightgreen;
 }
 .xyz-doc-tryIt::before { content: "Try it!"; }
+
+li:nth-child(5n+0) {
+  list-style-image: url('./purple-bullet.png');
+}
+
+li:nth-child(5n+1) {
+  list-style-image: url('./green-bullet.png');
+}
+
+li:nth-child(5n+2) {
+  list-style-image: url('./red-bullet.png');
+}
+
+li:nth-child(5n+3) {
+  list-style-image: url('./yellow-bullet.png');
+}
+
+li:nth-child(5n+4) {
+  list-style-image: url('./orange-bullet.png');
+}
