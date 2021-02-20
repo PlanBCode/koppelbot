@@ -23,7 +23,7 @@ mkdir -p "$XYZ_HOME/custom/$NAME/content"
 echo "Hello world!" > "$XYZ_HOME/custom/$NAME/content/index.html"
 
 #TODO version
-VERSION="$(date '+%Y.%m.%d').0"
+VERSION="$(date '+%Y.%m.%d').1"
 echo "{
   \"name\":\"$NAME\",
   \"version\":\"$VERSION\"
