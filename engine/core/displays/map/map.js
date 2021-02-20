@@ -2,8 +2,6 @@
 
 /*
 TODO?label  define a label property to use
-- mark user location
-
  */
 
 let SCRIPT; // to dynamically load dependency;
@@ -29,8 +27,6 @@ function initializeMap (display) {
   DIV_message.className = 'xyz-map-message';
   DIV_message.innerText = 'Waiting for input...';
   WRAPPER.appendChild(DIV_message);
-  WRAPPER.style.height = '500px';
-  WRAPPER.style.width = '100%';
 
   const vectorLayer = new ol.layer.Vector({
     source: vectorSource
@@ -158,11 +154,6 @@ exports.display = {
       // TODO maybe const SPAN_label = content[labelPropertyName].render(display.getAction(), display.getSubOptions(labelPropertyName));
       // TODO maybe pass label to svg entity?
 
-      /* const feature = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, display: 'map'});
-    feature.onclick = () => display.select();
-
-    WRAPPER.vectorLayer.getSource().addFeature(feature);
-    return; */
       const format = new ol.format.GeoJSON(); // TODO parametrize
       const data = displayItem.getNode(locationPropertyName).getContent();
 
@@ -170,31 +161,37 @@ exports.display = {
         const features = format.readFeatures(data);
         const feature = features[0]; // TODO handle multiple features?
         if (feature) { // TODO check
-          if (data.geometry.type === 'Point') {
-            // https://openlayers.org/en/latest/examples/polygon-styles.html
-            const color = displayItem.getColor();
-            const style = new ol.style.Style({
-              image: new ol.style.Circle({
-                radius: 5,
+          const color = displayItem.getColor();
+          const setStyle = isSelected => {
+            if (data.geometry.type === 'Point') {
+              // https://openlayers.org/en/latest/examples/polygon-styles.html
+              const style = new ol.style.Style({
+                image: new ol.style.Circle({
+                  stroke: new ol.style.Stroke({
+                    color: isSelected ? 'yellow' : 'color',
+                    width: 1
+                  }),
+                  radius: 5,
+                  fill: new ol.style.Fill({
+                    color
+                  })
+                })
+              });
+              feature.setStyle(style);
+            } else {
+              const style = new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                  color: isSelected ? 'yellow' : 'color',
+                  width: 1
+                }),
                 fill: new ol.style.Fill({
                   color
                 })
-              })
-            });
-            feature.setStyle(style);
-          } else {
-            const color = displayItem.getColor();
-            const style = new ol.style.Style({
-              stroke: new ol.style.Stroke({
-                color,
-                width: 1
-              }),
-              fill: new ol.style.Fill({
-                color
-              })
-            });
-            feature.setStyle(style);
-          }
+              });
+              feature.setStyle(style);
+            }
+          };
+          setStyle(displayItem.isSelected());
           /*
         fillColor
         fillOpacity
@@ -204,19 +201,10 @@ exports.display = {
         strokeLinecap
         strokeDashstyle */
 
-          // TODO if feature is point
-          // const color = display.getColor();
-          /* feature.setStyle(
-          new ol.style.Style({
-            image: new ol.style.Icon({
-              color,
-              crossOrigin: 'anonymous',
-              src: 'vanwieisdestad/bigdot.png', // TODO parametrize
-              scale: 0.2 // TODO parametrize
-            })
-          })
-        ); */
-          feature.onclick = () => displayItem.select();
+          feature.onclick = () => {
+            setStyle(true);
+            displayItem.select();
+          };
 
           // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
           // TODO how do we handle changes to feature?
