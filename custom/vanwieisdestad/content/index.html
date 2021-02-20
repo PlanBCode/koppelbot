@@ -18,10 +18,10 @@
     <tr><td colspan="2"><h1>Van wie is de stad?</h1></td></tr>
     <tr>
       <td style="text-align:center;">
-        <xyz uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
+        <xyz uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
       </td>
       <td valign="top" width="25%" style="background-color:#EFEFEF;">
-        <xyz uri="/locatie/*/count(EigenaarID)" color="EigenaarID" groupby="EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:50vh; overflow-y:scroll;"/>
+        <xyz uri="/locatie/*/count(EigenaarID),sum(Oppervlakte)" color="EigenaarID" groupby="EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:50vh; overflow-y:scroll;"/>
       </td>
     </tr>
     <tr>
