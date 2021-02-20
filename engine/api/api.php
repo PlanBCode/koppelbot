@@ -423,18 +423,21 @@ class ApiRequest extends HttpRequest2
                   return new HttpResponse2(400, $stringContent, $headers);
                 }
             }
-
+            $headers = [];
             if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
                 $entityClassName = $this->path[0];
                 $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
+                if(is_null($entityClass)){
+                  $stringContent = 'Unknown entity '.$entityClassName;
+                  return new HttpResponse2($status, $stringContent, $headers);
+                }
                 $propertyPath = array_slice($this->path, 2);
                 /** @var Property */
                 $property = $entityClass->getProperty($propertyPath);
-                if(is_null($property)) return  new HttpResponse2($status, $content, []);
+                if(is_null($property)) return  new HttpResponse2($status, $content, $headers);
                 return $property->serveContent($status, $content);
             } else {
                 $stringContent = $this->stringifyContent($content, $status);
-                $headers = [];
                 return new HttpResponse2($status, $stringContent, $headers);
             }
         }

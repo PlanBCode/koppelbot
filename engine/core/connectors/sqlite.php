@@ -40,13 +40,12 @@ class Connector_sqlite extends Connector
 
     protected function constructQueryString(string $method, array &$keys, string $idKey, array &$entityIds, string $table): string
     {
-      $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN ('. implode(',',array_keys($entityIds)).')');
+      $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN (\''. implode('\',\'',array_keys($entityIds)).'\')');
       if($method === 'GET'){
         $queryString = 'SELECT '.$idKey;
         foreach($keys as $key=>$propertyRequest){
           $propertyPath = $propertyRequest->getPropertyPath();
           $propertyName = $propertyPath[0]; //TODO check
-          //echo "hoi ".$propertyName;
           $queryString .= ', ';
           if(strpos($key,'.')!== false){
             $keyPath = explode('.',$key);
@@ -74,7 +73,9 @@ class Connector_sqlite extends Connector
     {
       if(!$result){
         $error = $this->db->lastErrorMsg();
-        $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.'.$error);
+        $content = 'Could not retrieve data.'.$error;
+        $propertyRequest = $connectorRequest->getFirstPropertyRequest();
+        $connectorResponse->add(500, $propertyRequest, '*', $content);
       }else if($method === 'GET'){
         while($row = $result->fetchArray()){
           foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
@@ -101,7 +102,8 @@ class Connector_sqlite extends Connector
           }
         }
       }else{//TODO DELETE, PATCH, PUT,POST
-        $connectorResponse->add(500, $propertyRequest, '*', 'Method not yet supported');
+        $content = 'Method not yet supported';
+        $connectorResponse->add(500, $propertyRequest, '*', $content);
       }
     }
 
@@ -111,7 +113,8 @@ class Connector_sqlite extends Connector
 
         $method = $connectorRequest->getFirstPropertyRequest()->getMethod();
         if($method !== 'GET' && $method !== 'HEAD') { //TODO DELETE,POST,PUT,PATCH
-          $connectorResponse->add(400, $connectorRequest->getFirstPropertyRequest(), '*', 'Method not yet supported');
+          $content = 'Method not yet supported';
+          $connectorResponse->add(400, $connectorRequest->getFirstPropertyRequest(), '*', $content);
           return $connectorResponse;
         }
 
@@ -139,7 +142,8 @@ class Connector_sqlite extends Connector
 
         if( !$this->open() ) {
           $error = $this->db->lastErrorMsg();
-          $connectorResponse->add(500, $propertyRequest, '*', 'Could not retrieve data.' . $error); //TODO check
+          $content = 'Could not retrieve data.' . $error;
+          $connectorResponse->add(500, $propertyRequest, '*', $content); //TODO check
           return $connectorResponse;
         }
 
@@ -148,6 +152,7 @@ class Connector_sqlite extends Connector
           $entityIds = $entityIdsPerTable[$table];
           $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table);
           $result = $this->db->query($queryString);
+
           $this->handleResults($method, $idKey, $result, $connectorRequest, $connectorResponse);
         }
         $this->close();
