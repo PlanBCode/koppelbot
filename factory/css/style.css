@@ -175,6 +175,37 @@ DOC
   color: white;
 }
 
+.xyz-doc-block {
+  margin-bottom: 15px;
+  display: block;
+  padding: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-color: grey;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 5px;
+}
+
+.xyz-doc-block:hover {
+  background-color: rgb(240, 240, 255);
+}
+
+div.xyz-doc-block code {
+  padding: 5px;
+  display: block;
+  background-color: rgb(240, 240, 240);
+}
+
+div.xyz-doc-block a {
+  color: black;
+  text-decoration: none;
+}
+
+div.xyz-doc-block h3 {
+  margin-top: 0;
+}
+
 .xyz-doc-tryIt:hover {
   background-color: lightgreen;
 }
