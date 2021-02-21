@@ -4,6 +4,7 @@ const web = require('./web/web.js');
 const on = require('./request/on').on;
 const ui = require('./render/ui').ui;
 const variables = require('./variables/variables');
+require('./web/ui');
 
 function XYZ () {
   const entityClasses = {};

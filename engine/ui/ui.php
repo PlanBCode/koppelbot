@@ -64,12 +64,12 @@ class UiRequest extends HttpRequest2
           For more information please visit: <a href="/doc/ui">UI reference</a>.</p>';
 
           $body .= '<table class="xyz-list">
-            <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
-            <tr><td colspan="2" style="overflow: scroll; padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"></div></td></tr>';
+            <tr id="xyz-ui-result-header" class="xyz-list-header xyz-list-foldable"><td colspan="2" >Result</td></tr>
+            <tr><td colspan="2" style="overflow: scroll; padding:1cm;background-color:darkgrey;"><div id="xyz-ui-display"><div style="text-align:center;color:grey;">Waiting for input</div></div></td></tr>';
 
           $inputs = renderInputs($this->uri.'?'.$this->queryString);
           if($inputs){
-          $body .= '<tr class="xyz-list-header"><td colspan="2">Inputs</td></tr>'
+          $body .= '<tr class="xyz-list-header xyz-list-foldable xyz-list-folded"><td colspan="2">Inputs</td></tr>'
                 . $inputs;
           }
 
@@ -78,9 +78,9 @@ class UiRequest extends HttpRequest2
 
           '.APILandingHtml(false).'
 
-          <table id="xyz-ui-display-options" class="xyz-list"></table>
+          <table id="xyz-ui-display-options" class="xyz-list"><tr class="xyz-list-header xyz-list-foldable xyz-list-folded" id="xyz-ui-options-header"><td>Display Option</td><td>Description</td><td>Value</td></tr></table>
           <table class="xyz-list">
-            <tr class="xyz-list-header"><td>UI Macro</td></tr>
+            <tr id="xyz-ui-macro-header" class="xyz-list-header xyz-list-foldable xyz-list-folded"><td>UI Macro</td></tr>
             <tr><td>
             <select id="xyz-ui-display-macroFlavor" onchange="onUiChange();">
               <option value="ui">ui</option>

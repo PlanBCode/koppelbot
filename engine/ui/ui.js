@@ -96,7 +96,10 @@ onUiChange = (content, optionName) => { // declared in /engine/api/api.js
 
 function updateOptions () {
   const TABLE = document.getElementById('xyz-ui-display-options');
-  TABLE.innerHTML = '<tr class="xyz-list-header"><td>Display Option</td><td>Description</td><td>Value</td></tr>';
+  for (const TR of [...TABLE.firstElementChild.children]) {
+    if (!TR.classList.contains('xyz-list-header')) TABLE.removeChild(TR);
+  }
+
   if (!displayName) displayName = 'list';
   for (const optionName in optionSchemas[displayName].options) {
     const settings = optionSchemas[displayName].options[optionName];
@@ -115,7 +118,7 @@ function updateOptions () {
     TR.innerHTML = `<td>${optionName}</td><td>${info}</td>`;
     const TD = document.createElement('TD');
     TR.appendChild(TD);
-    TABLE.appendChild(TR);
+    TABLE.firstElementChild.appendChild(TR);
     xyz.ui(uiOptions, TD);
   }
 }

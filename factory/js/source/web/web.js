@@ -1,11 +1,11 @@
-exports.setCookie = function (keyValues, expiresInDays) {
+const setCookie = function (keyValues, expiresInDays) {
   const date = new Date();
   date.setTime(date.getTime() + (expiresInDays * 24 * 60 * 60 * 1000));
   const expires = 'expires=' + date.toUTCString();
   for (const key in keyValues) { document.cookie = key + '=' + keyValues[key] + ';' + expires + ';path=/'; }
 };
 
-exports.getCookie = function () {
+const getCookie = function () {
   if (document.cookie === '') return null;
   const keyValuesPairs = document.cookie.split(';');
   const cookie = {};
@@ -15,6 +15,21 @@ exports.getCookie = function () {
   }
   return cookie;
 };
+
+exports.getCookieValue = key => {
+  const cookie = getCookie();
+  return cookie === null ? null : cookie[key];
+};
+
+exports.setCookieValue = (key, value) => {
+  let cookie = getCookie();
+  if (cookie === null) cookie = {};
+  cookie[key] = value;
+  setCookie(cookie);
+};
+
+exports.getCookie = getCookie;
+exports.setCookie = setCookie;
 
 function getQueryParameters (filter = false, queryString = undefined) {
   const queryParameters = {};

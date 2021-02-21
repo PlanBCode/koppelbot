@@ -249,6 +249,18 @@ td.xyz-list-icon {
   width: 30px;
   max-width: 30px;
 }
+
+tr.xyz-list-foldable {
+  cursor: pointer;
+}
+
+tr.xyz-list-foldable td:first-child::before {
+  content: "\00A0-\00A0";
+}
+
+tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
+  content: "\00A0+\00A0";
+}
 .xyz-map-wrapper {
 }
 
