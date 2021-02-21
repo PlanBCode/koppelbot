@@ -53,6 +53,8 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
     return content;
   };
 
+  this.hasSetting = settingName => settings.hasOwnProperty(settingName);
+  this.getSetting = settingName => settings[settingName];
   this.getSettings = () => settings;
 
   this.getUri = entityId => parent.getUri(entityId) + '/' + propertyName;

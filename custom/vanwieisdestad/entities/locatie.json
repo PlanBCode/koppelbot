@@ -38,6 +38,7 @@
   },
   "Oppervlakte" : {
     "type": "number",
+    "unit": "m^2",
     "connector": {
       "key": "geojson.properties.kadastraleGrootteWaarde"
     }

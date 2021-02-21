@@ -1,3 +1,5 @@
+const Property = require('./property').constructor;
+
 function extractContentFromNode (contentOrNode) {
   if (contentOrNode instanceof Node) {
     return [
@@ -82,11 +84,7 @@ function Node (object, entityId, status_, content_, errors_, method_) {
   const content = content_;
   const errors = errors_;
   const method = method_;
-  /*
-    TODO object can be empty  maybe need to fix that?
-    this.hasSetting = settingName => object.getSettings().hasOwnProperty(settingName);
-    this.getSetting = settingName => object.getSettings()[settingName];
-    this.getSettings = () => object.getSettings(); */
+
   this.getObject = () => object; // TODO need private
   this.getEntityId = () => entityId;
   this.getMethod = () => method;
@@ -94,6 +92,19 @@ function Node (object, entityId, status_, content_, errors_, method_) {
   this.getContent = () => content;
   this.hasErrors = () => !((status >= 200 && status <= 299) || status === 304) || (errors instanceof Array && errors.length > 0);
   this.getErrors = () => errors;
+  this.hasSetting = settingName => {
+    if (object instanceof Property) return object.hasSetting(settingName);
+    else return false;
+  };
+  this.getSetting = settingName => {
+    if (object instanceof Property) return object.getSetting(settingName);
+    else return undefined;
+  };
+  this.getSettings = () => {
+    if (object instanceof Property) return object.getSettings();
+    else return {};
+  };
+
   this.render = (action, options, subPath) => {
     let subOptions = options;
     if (typeof options === 'object' && options !== null &&

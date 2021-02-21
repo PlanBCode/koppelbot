@@ -1,5 +1,6 @@
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
+const {renderUnit} = require('../../types/number/number');
 
 // TODO mixed
 const CHART_TYPES = require('./chart.json').options.flavor.choices;
@@ -141,11 +142,17 @@ exports.display = {
           const label = aggregator + '(' + propertyName + ')';
           const TD = document.createElement('TD');
           const labels = display.getOption('labels');
-          if (labels && labels.hasOwnProperty(label)) TD.innerText = display.getDisplayName(label);
+          let title;
+          if (labels && labels.hasOwnProperty(label)) title = display.getDisplayName(label);
           else {
             const displayLabel = aggregator + '(' + display.getDisplayName(propertyName) + ')';
-            TD.innerText = displayLabel;
+            title = displayLabel;
           }
+          const propertyNode = display.getNode(propertyName);
+          if (propertyNode.hasSetting('unit')) {
+            title += '&nbsp;(' + renderUnit(propertyNode.getSetting('unit')) + ')';
+          }
+          TD.innerHTML = title;
           TR.appendChild(TD);
         }
         TABLE.appendChild(TR);

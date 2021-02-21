@@ -12,6 +12,10 @@
   "step" : {
     "type": "number"
   },
+  "unit" : {
+    "type": "string",
+    "default":""
+  },
   "leadingZeroes" : {
     "type": "bool",
     "default" : false
