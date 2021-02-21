@@ -43,6 +43,7 @@ class DocResponse extends HttpResponse2
         'doc/dev/xyz' => "XYZ Class",
         'doc/dev/javascript' => "Javascript packing",
         'doc/download' => "Download",
+        'doc/tutorial' => "Tutorial",
         'map' => "Site Map"
 
     ];

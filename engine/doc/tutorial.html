@@ -1,0 +1,341 @@
+
+<h3> Installation</h3>
+
+<p>1. Download the source from github:</p>
+
+    <a href="https://github.com/PlanBCode/koppelbot/archive/master.zip">https://github.com/PlanBCode/koppelbot/archive/master.zip</a>
+
+  <p>or clone using git:</p>
+
+
+  <div class="xyz-doc-wrapper">
+    <code>
+    $ git clone https://github.com/PlanBCode/koppelbot.git
+    </code></div>
+
+<p>2. Open your terminal and go to the directory. If you run a <code>ls</code>  list command you should see the following content:</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+$ ls
+README.md	data		factory		tutorial.md
+custom		engine		index.php	xyz
+</pre></div>
+
+<ul>
+<li>  <code>custom</code>  : the place to store custom data model definitions and other plugins</li>
+<li>  <code>data</code>  : in this folder all data is stored.</li>
+<li>  <code>engine</code>  : the server code that uses the custom definitions to build the interfaces.</li>
+<li>  <code>factory</code>  : code used to generate the server code. Only required for developers, out of scope for this tutorial.</li>
+
+<li>  <code>index.php</code>  : the main entry point for the server</li>
+
+<li>  <code>xyz</code>  : the command to interact with your server from the command line.
+</ul>
+
+<h3>First commands</h3>
+
+<p>3.  Run your first server command. If you enter <code>./xyz</code>  the help information will be shown:</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+$ ./xyz
+Usage: xyz [options] uri [content]
+   xyz "/fruit/apple"
+   xyz "/fruit/*/color"
+   xyz "/fruit/*?color==green"
+   xyz --method PATCH "/fruit/melon/size" large
+
+  -m  --method <arg>      Set HTTP method. (Default = GET)
+  -V  --verbose           Set verbose output. (Default = false)
+  -S  --server <arg>      Run local server. (Default = localhost:8000)
+</pre></div>
+
+<p>4. Try the first suggestion:  (note the <code>./</code>  at the start)</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+$ ./xyz "/fruit/apple"
+{
+    "color": "red",
+    "size": "medium",
+    "name": "apple"
+}
+</pre></div>
+
+ <p>This will give the data for apple.</p>
+
+<p>5. Try the second suggestion</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+$ ./xyz "/fruit/*/color"
+{
+    "grape": "purple",
+    "melon": "green",
+    "apple": "red",
+    "orange": "orange"
+}
+</pre></div>
+
+<p>This will give the color property for all fruits</p>
+
+<p>6. Try the third suggestion (Note the double <code>=</code>  sign)</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+$ ./xyz "/fruit/*?color==green"
+{
+    "melon": {
+        "color": "green",
+        "size": "small",
+        "name": "melon"
+    }
+}
+</pre></div>
+
+<p>This will give all the data for the fruits which have a green color.</p>
+
+<p>7. The size for melon is small. That doesn't seem right. Let's fix that using the fourth suggestion:</p>
+
+
+<div class="xyz-doc-wrapper">
+  <code>
+$ ./xyz --method PATCH "/fruit/melon/size" large
+</code></div>
+
+<p>And let's check if it's correct now:</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+$ ./xyz "/fruit/melon"
+{
+    "color": "green",
+    "size": "large",
+    "name": "melon"
+}
+</pre></div>
+
+<p>That's looks better.</p>
+
+<h3> Running a local server</h3>
+
+<p>7. Now we want to use the server through the browser. To start your server locally run <code>./xyz -S</code> .
+This will start a local test server. It will act like the regular server but without the need for Apache software and
+it won't be available through the internet for other users.</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+   $ ./xyz -S
+   Starting server on localhost:8000
+   PHP 7.3.11 Development Server started at Mon Feb 17 11:10:20 2020
+   Listening on http://localhost:8000
+   Document root is /your/local/server/path/
+   Press Ctrl-C to quit.
+   </pre></div>
+<p>If you close the terminal or press Control + C the server will be stopped.</p>
+
+<p>8. Browse to the following - probably familiar looking - places:</p>
+
+<ul>
+<li><a href="http://localhost:8000/api/fruit/apple">http://localhost:8000/api/fruit/apple</a></li>
+<li><a href="http://localhost:8000/api/fruit/*/color">http://localhost:8000/api/fruit/*/color</a></li>
+<li><a href="http://localhost:8000/api/fruit/*?color==green">http://localhost:8000/api/fruit/*?color==green</a></li>
+</ul>
+
+<h3> Templates</h3>
+
+<p>9. With your a text editor open the file <code>./custom/tutorial/content/index.html</code>
+(or run <code>cat ./custom/tutorial/content/index.html</code>  in your terminal to view it.)</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+<&#8203;html>
+<&#8203;head>
+    <&#8203;script type="text/javascript" src="./xyz-ui.js"><&#8203;/script>
+    <&#8203;link rel="stylesheet" type="text/css" href="./xyz-style.css"/>
+    <&#8203;title>xyz - tutorial<&#8203;/title>
+<&#8203;/head>
+<&#8203;body style="padding: 1cm 3cm 3cm 3cm">
+    <&#8203;h1>xyz - Tutorial<&#8203;/h1>
+
+    <&#8203;h3>List of fruits<&#8203;/h3>
+
+    <&#8203;xyz uri="/fruit/*/name" display="list" select="myFruit"/>
+
+    <&#8203;h3>Selected fruit<&#8203;/h3>
+
+    <&#8203;xyz uri="$myFruit" display="item"/>
+
+<&#8203;/body>
+<&#8203;/html>
+</pre>
+</div>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+    <&#8203;script type="text/javascript" src="./xyz-ui.js"><&#8203;/script>
+  </pre>
+</div>
+
+<p>Includes the <code>xyz-ui.js</code>  script. A JavaScript file that handles the client side rendering of the data.</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+    <&#8203;link rel="stylesheet" type="text/css" href="./xyz-style.css"/>
+  </pre>
+</div>
+
+<p>Includes the <code>xyz-style.css</code>  style sheet. A CSS file that handles the  styling of the components.</p>
+
+<div class="xyz-doc-wrapper">
+  <code><pre>
+    <&#8203;xyz uri="/fruit/*/name" display="list" select="myFruit"/>
+  </pre>
+</code></div>
+
+<p>This retrieves all fruit names and displays them in a list. If you select one. That selection will be stored in the
+</code> myFruit</code>  variable.</p>
+
+
+<div class="xyz-doc-wrapper">
+  <code><pre>
+    <&#8203;xyz uri="$myFruit" display="item"/>
+  </pre>
+</code></div>
+
+<p>When the <code>myFruit</code>  variable is not empty this will retrieve the specified fruit and display it.</p>
+
+<p>10. Now browse to <a href="http://localhost:8000/tutorial">http://localhost:8000/tutorial</a></p>
+
+<p>11. Press the <code>+</code>  Button below the list to unfold the creation interface. Try to add a fruit.</p>
+
+<p>12. Open the <code>./custom/tutorial/content/index.html</code>  file in your text editor and change the</p>
+
+<div class="xyz-doc-wrapper">
+  <code><pre>
+    <&#8203;xyz uri="$myFruit" display="item"/>
+  </pre>
+</code></div>
+
+<p>Into:</p>
+
+<div class="xyz-doc-wrapper">
+  <code><pre>
+    <&#8203;xyz uri="$myFruit" display="edit"/>
+  </pre>
+</code></div>
+
+<p>This will display an editor instead of an item viewer. Browse to <a href="http://localhost:8000/tutorial">http://localhost:8000/tutorial</a> again to edit
+the selected piece of fruit.</p>
+
+<p>13. Now view <code>./custom/main/entities/fruit.json</code>  in your text editor.
+(or run <code>cat ./custom/main/entities/fruit.json</code>  in your terminal to view it.)</p>
+
+<div class="xyz-doc-wrapper">
+  <code>
+{
+  "_": {
+    "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/fruits.json"
+    }
+  },
+  "color": {
+    "type": "string",
+    "default" : "green"
+  },
+  "size": {
+    "type": "enum",
+    "choices" : ["small","medium","large"]
+  },
+  "name": {
+    "type": "string",
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+}
+</code></div>
+
+<p>This file shows the property definitions for the fruit entity.</p>
+
+<div class="xyz-doc-wrapper">
+  <code><pre>
+  "_": {
+  </pre>
+</code></div>
+
+<p>Root properties, indicated by the underscore, are used for all properties.</p>
+
+
+<div class="xyz-doc-wrapper">
+  <pre>
+ "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/fruits.json"
+    }
+</pre></div>
+
+<p>The connector settings define the way the data is stored.</p>
+
+<div class="xyz-doc-wrapper">
+  <pre>
+"color": {
+    "type": "string",
+    "default" : "green"
+  },
+</pre></div>
+
+<p>color is a string that defaults to green.</p>
+
+<div class="xyz-doc-wrapper">
+  <pre>
+"size": {
+    "type": "enum",
+    "choices" : ["small","medium","large"]
+  },
+</pre></div>
+
+<p>The size of a fruit is one of the choices in the list small, medium or large.</p>
+
+<div class="xyz-doc-wrapper">
+  <pre>
+  "name": {
+    "type": "string",
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+</pre></div>
+
+<p>The name is used as the key by the connector.<p>
+
+<p>14. Now view <code>./data/fruits.json</code>  in your text editor.
+(or run <code>cat ./data/fruits.json</code>  in your terminal to view it.)</p>
+
+<div class="xyz-doc-wrapper">
+  <pre>
+{
+  "grape":{"color":"green","size":"small"},
+  "melon":{"color":"green","size":"large"},
+  "apple":{"color":"red","size":"medium"},
+  "orange":{"color":"orange","size":"medium"}
+}
+</pre></div>
+
+<p>This is the raw data for the fruit entities.</p>
