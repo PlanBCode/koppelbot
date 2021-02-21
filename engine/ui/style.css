@@ -1,5 +1,65 @@
 /* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */
 
+table.xyz-create,
+table.xyz-item,
+table.xyz-list {
+  /* border: 1px solid lightgrey;
+    margin-bottom: 5px; */
+  padding: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background-color: white;
+}
+
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
+table tbody:first-child tr.xyz-create-header,
+table tbody:first-child tr.xyz-list-header,
+table tbody:first-child tr.xyz-item-header {
+  background-color: darkslateblue;
+  color: white;
+}
+
+table.xyz-create tr:nth-child(even),
+table.xyz-item tr:nth-child(even),
+table.xyz-list tr:nth-child(even) {
+  background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-list,
+.xyz-item {
+  width: 100%;
+}
+
+table.xyz-list tr.xyz-list-selectable {
+  cursor: pointer;
+}
+
+table.xyz-list tr.xyz-list-selectable:hover {
+  background-color: lightblue;
+}
+
+table.xyz-list tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
+
+tr.xyz-list-foldable {
+  cursor: pointer;
+}
+
+tr.xyz-list-foldable td:first-child::before {
+  content: "\00A0-\00A0";
+}
+
+tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
+  content: "\00A0+\00A0";
+}
 html,
 body {
   padding: 0;
@@ -200,66 +260,6 @@ li:nth-child(5n+3) {
 
 li:nth-child(5n+4) {
   list-style-image: url('./orange-bullet.png');
-}
-table.xyz-create,
-table.xyz-item,
-table.xyz-list {
-  /* border: 1px solid lightgrey;
-    margin-bottom: 5px; */
-  padding: 0;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background-color: white;
-}
-
-.xyz-list-header,
-.xyz-create-header,
-.xyz-item-header,
-table tbody:first-child tr.xyz-create-header,
-table tbody:first-child tr.xyz-list-header,
-table tbody:first-child tr.xyz-item-header {
-  background-color: darkslateblue;
-  color: white;
-}
-
-table.xyz-create tr:nth-child(even),
-table.xyz-item tr:nth-child(even),
-table.xyz-list tr:nth-child(even) {
-  background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-list,
-.xyz-item {
-  width: 100%;
-}
-
-table.xyz-list tr.xyz-list-selectable {
-  cursor: pointer;
-}
-
-table.xyz-list tr.xyz-list-selectable:hover {
-  background-color: lightblue;
-}
-
-table.xyz-list tr.xyz-list-selected {
-  background-color: yellow;
-}
-
-td.xyz-list-icon {
-  width: 30px;
-  max-width: 30px;
-}
-
-tr.xyz-list-foldable {
-  cursor: pointer;
-}
-
-tr.xyz-list-foldable td:first-child::before {
-  content: "\00A0-\00A0";
-}
-
-tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
-  content: "\00A0+\00A0";
 }
 .xyz-map-wrapper {
 }
