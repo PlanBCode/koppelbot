@@ -9,8 +9,8 @@ Using data models and html templates you can quickly build your web based applic
 For a full introduction check tutorial.md
 
 ### Web server
-To install for Apache web server: copy the repo to the server folder. the `.htaccess` file
-will rout all requests to index.php;  
+To install for Apache web server: copy the repo to the server folder. The `.htaccess` file
+will rout all requests to index.php.
 
 ### Local test server
 

@@ -13,7 +13,7 @@ class DocRequest extends HttpRequest2
 
 class DocResponse extends HttpResponse2
 {
-    static protected $menuItems = [
+    static public $menuItems = [
         'api' => "Rest API",
         'ui' => "User Interface",
         'doc' => "Documentation",
@@ -42,8 +42,9 @@ class DocResponse extends HttpResponse2
         'doc/dev/connector/connector' => "Connector Class",
         'doc/dev/xyz' => "XYZ Class",
         'doc/dev/javascript' => "Javascript packing",
+        'doc/download' => "Download",
+        'map' => "Site Map"
 
-        'map' => "Site Map",
     ];
 
     protected function getSiteMap(Query &$query): string
