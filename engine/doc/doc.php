@@ -46,8 +46,11 @@ class DocResponse extends HttpResponse2
         'map' => "Site Map",
     ];
 
-    protected function getSiteMap(string $rootUri, Query &$query): string
+    protected function getSiteMap(Query &$query): string
     {
+      $protocol = isset($_SERVER["HTTPS"]) ? 'https' : 'http';
+      $baseUri = $protocol.'://'.$_SERVER['HTTP_HOST'];
+
       $xml = $query->getOption('output')==='xml';
        if($xml){
         $map = '<?xml version="1.0" encoding="UTF-8"?>
@@ -56,7 +59,7 @@ class DocResponse extends HttpResponse2
          http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
          xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
    <url>
-      <loc>' . $rootUri . '</loc>
+      <loc>' . $baseUri . '</loc>
    </url>
 ';
 //      <lastmod>2005-01-01</lastmod>
@@ -64,7 +67,7 @@ class DocResponse extends HttpResponse2
 // <priority>0.8</priority>
 
       }else{
-        $map = '<A href="' . $rootUri . '">Home</a><br/><br/>';
+        $map = '<A href="/">Home</a><br/><br/>';
       }
 
       foreach (glob('{./engine/core,./custom/*}/content/**.html', GLOB_BRACE) as $file) {
@@ -96,11 +99,11 @@ class DocResponse extends HttpResponse2
         }
         if($xml){
           $map.='   <url>
-      <loc>' . $rootUri. $uri . '</loc>
+      <loc>' . $baseUri. $uri . '</loc>
    </url>
 ';
         }else{
-          $A = '<a href="' . $rootUri . $uri . '">' . $uri . '</a>';
+          $A = '<a href="' . $uri . '">' . $uri . '</a>';
           $map.= str_repeat('&nbsp;', 2 * $depth) . $A .'<br/>';
         }
       }
@@ -110,12 +113,12 @@ class DocResponse extends HttpResponse2
         $depth = substr_count($uri, '/')+1;
           if($xml){
             $map.='   <url>
-      <loc>' . $rootUri. $uri . '</loc>
+      <loc>' . $baseUri. $uri . '</loc>
    </url>
 ';
           }else{
             if($depth===1) $map .='<br/>';
-            $A = '<A href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
+            $A = '<A href="' . $uri . '">' . $menuItem . '</a>';
             $map .=  str_repeat('&nbsp;', 2 * $depth) . $A . '<br/>';
           }
       }
@@ -126,10 +129,9 @@ class DocResponse extends HttpResponse2
 
     public function __construct(string $currentUri, Query &$query, $content, int $status = 200, array $headers = [])
     {
-        $rootUri = 'http://localhost:8000/';//TODO proper location
 
         if($query->getOption('output')==='xml' && $currentUri === 'map'){
-            $content = $this->getSiteMap($rootUri, $query);
+            $content = $this->getSiteMap($query);
         }else {
 
           $title = 'Koppelbot - ' . array_get(self::$menuItems, $currentUri, '');
@@ -137,9 +139,9 @@ class DocResponse extends HttpResponse2
     <html lang="en">
     <head>
       <title>' . $title . '</title >
-      <link rel="sitemap" type="application/xml" title="Sitemap" href="' . $rootUri . 'map?output=xml" />
-      <link rel="stylesheet" type = "text/css" href="' . $rootUri . 'xyz-style.css" />
-      <script src="' . $rootUri . 'xyz-ui.js" ></script >
+      <link rel="sitemap" type="application/xml" title="Sitemap" href="/map?output=xml" />
+      <link rel="stylesheet" type = "text/css" href="/xyz-style.css" />
+      <script src="/xyz-ui.js" ></script >
     </head>';
           if($query->checkToggle('embed')){
             $content =
@@ -159,7 +161,7 @@ class DocResponse extends HttpResponse2
                 if($depth >= $currentDepth && substr($uri,0, strlen($parentUri)) !== $parentUri) continue;
                 if($depth > $currentDepth && substr($uri,0, strlen($currentUri)) !== $currentUri) continue;
 
-                $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current" ' : '') . 'href="' . $rootUri . $uri . '">' . $menuItem . '</a>';
+                $A = '<A ' . ($uri === $currentUri ? 'class="xyz-page-navigation-current" ' : '') . 'href="/' .  $uri . '">' . $menuItem . '</a>';
 
                 if ($depth === 0) {
                     $navigation .= '<li class="xyz-page-navigation-depth-0">' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
@@ -167,12 +169,12 @@ class DocResponse extends HttpResponse2
                     $navigation .= '<li>' . str_repeat('&nbsp;', 2 * $depth) . $A . '</li>';
                 }
             }
-            if($currentUri === 'map') $content = $this->getSiteMap($rootUri, $query);
+            if($currentUri === 'map') $content = $this->getSiteMap($query);
 
             $navigation .= '</ul>';
             $content = $head.
 '  <body>
-    <div class="xyz-page-header"><a class="xyz-logo"></a>' . $title . '</div>
+    <div class="xyz-page-header"><a href="/" class="xyz-logo"></a>' . $title . '</div>
     <div class="xyz-page-navigation"><div class="xyz-page-navigation-background"></div>' . $navigation . '</div>
     <div class="xyz-page-content">' . $content . '</div>
   </body>

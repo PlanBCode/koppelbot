@@ -160,7 +160,7 @@ function onCommandChange () {
         if (method === 'DELETE') d = 'delete';
         if (method === 'POST' || method === 'PUT') d = 'create';
         if (method === 'PATCH') d = 'edit';
-        SPAN_command.innerHTML = '&lt;xyz uri="' + uri + '" display="' + d + '"/&gt; <a target="_blank" href="./ui' + uri + '">More...</a>';
+        SPAN_command.innerHTML = '&lt;xyz uri="' + uri + '" display="' + d + '"/&gt; <a target="_blank" href="/ui' + uri + '">More...</a>';
       }
       break;
     case 'url' :

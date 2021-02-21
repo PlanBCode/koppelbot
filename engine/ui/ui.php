@@ -61,7 +61,7 @@ class UiRequest extends HttpRequest2
 
           $body = '<p>This page offers an interface to create and test XYZ data displays.
 
-          For more information please visit: <a href="../doc/ui">UI reference</a>.</p>';
+          For more information please visit: <a href="/doc/ui">UI reference</a>.</p>';
 
           $body .= '<table class="xyz-list">
             <tr class="xyz-list-header"><td colspan="2" >Result</td></tr>
