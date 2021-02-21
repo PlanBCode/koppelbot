@@ -28,7 +28,7 @@
         <xyz style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
       </td>
       <td valign="top" width="30%" style="background-color:#EFEFEF;">
-        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" color="EigenaarID" groupby="EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:60vh; overflow-y:scroll; overflow-x:hidden;"/>
+        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:60vh; overflow-y:scroll; overflow-x:hidden;"/>
       </td>
     </tr>
     <tr>
@@ -39,7 +39,7 @@
     <tr><td style="text-align:right;font-size: 10pt; vertical-align: bottom; padding-right: 10px;"><i><a href="https://koppelbot.org">Powered by Koppelbot</a></i></td></tr>
   </table>
   <img id="logo" src="./vanwieisdestad/vanwieisamersfoort.png"/>
-  <xyz id="locatie" uri="/locatie/$locatie/Type,DocumentID,EigenaarID,Oppervlakte" display="item"/>
+  <xyz id="locatie" uri="/locatie/$locatie/Type,Document=DocumentID,Eigenaar=EigenaarID,Oppervlakte" display="item"/>
 
 </body>
 </html>

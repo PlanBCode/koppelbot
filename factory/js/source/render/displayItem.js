@@ -124,7 +124,12 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @return {string}              TODO
    */
 
-  this.getDisplayName = propertyPath => xyz.getDisplayName(entityClassName, propertyPath);
+  this.getDisplayName = propertyPath => {
+    if (typeof propertyPath === 'string')propertyPath = [propertyPath];
+    const labels = this.getOption('labels');
+    if (labels && labels.hasOwnProperty(propertyPath[0])) return labels[propertyPath[0]];
+    else return xyz.getDisplayName(entityClassName, propertyPath);
+  };
   /**
    * [getPropertyPath description]
    * @returns {Array} TODO

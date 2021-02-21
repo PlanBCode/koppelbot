@@ -119,8 +119,9 @@ exports.display = {
           TR.appendChild(TD);
         }
         if (display.hasOption('groupby')) {
-          const groupBy = display.getOption('groupby');
+          let groupBy = display.getOption('groupby');
           const TD = document.createElement('TD');
+          if (groupBy.includes('=')) groupBy = groupBy.split('=')[0]; // use defined label
           TD.innerText = groupBy;
           TR.appendChild(TD);
         }
@@ -140,8 +141,11 @@ exports.display = {
           const label = aggregator + '(' + propertyName + ')';
           const TD = document.createElement('TD');
           const labels = display.getOption('labels');
-          if (labels && labels.hasOwnProperty(label)) TD.innerText = labels[label];
-          else TD.innerText = label;
+          if (labels && labels.hasOwnProperty(label)) TD.innerText = display.getDisplayName(label);
+          else {
+            const displayLabel = aggregator + '(' + display.getDisplayName(propertyName) + ')';
+            TD.innerText = displayLabel;
+          }
           TR.appendChild(TD);
         }
         TABLE.appendChild(TR);
@@ -207,10 +211,11 @@ exports.display = {
     const aggregations = display.getOption('aggregations');
 
     let groupId = '*';
-    let groupBy = '*';
+    let groupByPropertyName = '*';
     if (display.hasOption('groupby')) {
-      groupBy = display.getOption('groupby');
-      groupId = display.getNode(groupBy).getContent();
+      groupByPropertyName = display.getOption('groupby');
+      if (groupByPropertyName.includes('=')) groupByPropertyName = groupByPropertyName.split('=')[1];
+      groupId = display.getNode(groupByPropertyName).getContent();
     }
 
     if (!groups.hasOwnProperty(groupId)) {
@@ -297,14 +302,11 @@ exports.display = {
 
           if (display.hasOption('groupby')) {
             const TD = document.createElement('TD');
-            const groupByPropertyName = display.getOption('groupby');
             const groupByNode = display.getNode(groupByPropertyName);
             if (groupByNode) {
               const TAG = groupByNode.render('view', {display: 'title'});
               TD.appendChild(TAG);
-            } else {
-              TD.innerText = groupId;
-            }
+            } else TD.innerText = groupId;
             TR.appendChild(TD);
           }
 
@@ -313,6 +315,7 @@ exports.display = {
             const [aggregator, propertyName] = aggregation;
             const label = aggregator + '(' + propertyName + ')';
             const TD = document.createElement('TD');
+            TD.style.textAlign = 'right';
             TD.innerText = group[label];
             TR.appendChild(TD);
           }
@@ -327,7 +330,7 @@ exports.display = {
         const [aggregator, propertyName] = aggregation;
         const label = aggregator + '(' + propertyName + ')';
         const data = Object.keys(groups).map(groupId => groups[groupId][label]);
-        const labels = entityClassName + ' ' + label + (groupBy === '*' ? '' : ' by ' + groupBy); // TODO parametrize
+        const labels = entityClassName + ' ' + label + (groupByPropertyName === '*' ? '' : ' by ' + groupByPropertyName); // TODO parametrize
         const backgroundColor = Object.keys(groups).map(groupId => display.getColor(groupId));
         const borderColor = Object.keys(groups).map(groupId => display.hasOption('select') && display.isSelected(undefined, groupId) ? 'yellow' : 'white');
         const dataset = {
