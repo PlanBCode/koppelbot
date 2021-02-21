@@ -254,7 +254,9 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @param  {string} [entityId_]        TODO
    * @returns {Boolean}                 TODO
    */
-  this.isMultiSelected = (entityClassName_, entityId_) => variables.isSelected(entityClassName_ || entityClassName, entityId_ || entityId, this.getOption('multiSelect'));
+  this.isMultiSelected = (entityClassName_, entityId_) =>
+    variables.isSelected(entityClassName_ || entityClassName, entityId_ || entityId, this.getOption('multiSelect')) ||
+    variables.isSelected(entityClassName_ || entityClassName, '*', this.getOption('multiSelect'));
   /**
    * Whether to show an interface to create new entity
    * @returns {void}

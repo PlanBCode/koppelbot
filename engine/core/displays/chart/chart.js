@@ -85,6 +85,7 @@ exports.display = {
           TD_checkbox.className = 'xyz-list-icon';
           const INPUT_checkAll = document.createElement('INPUT');
           INPUT_checkAll.type = 'checkbox';
+          if (display.isMultiSelected(undefined, '*')) INPUT_checkAll.checked = true;
           INPUT_checkAll.onclick = () => {
             if (INPUT_checkAll.checked) display.multiSelectAll();
             else display.multiSelectNone();
