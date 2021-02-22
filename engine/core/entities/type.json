@@ -7,7 +7,7 @@
       "extension": "json"
     },
     "access" : {
-      "read" : ["/group/guest"]
+      "read" : ["guest"]
     }
   },
   "name": {

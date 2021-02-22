@@ -9,7 +9,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
       return $connectorResponse->add(403, $propertyRequest, $userName, $error);
     }
 
-    $accessGroups = ['/group/system'];
+    $accessGroups = ['system'];
     $headers = [];
     $accountsMatchingUserName = request('/account/*/password,groups?username==' . $userName, 'GET', '', $headers, $accessGroups)->getResultsById();
     if (count($accountsMatchingUserName) === 0) {
@@ -36,7 +36,7 @@ function handleLogin(PropertyRequest &$propertyRequest, ConnectorResponse &$conn
     if (!array_key_exists('content', $_SESSION)) $_SESSION['content'] = [];
     $groupsResponse = $account->get('groups');
     $groups = $groupsResponse->getStatus() !== 200 ? [] : $groupsResponse->getContent();
-    $groups[] = '/group/user:' . $userName;
+    $groups[] = 'user:' . $userName;
     $_SESSION['content'][$userName] = ['groups' => $groups];
     $content = null;
     return $connectorResponse->add(200, $propertyRequest, $userName, $content); //TODO 'login successful;'

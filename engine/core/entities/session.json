@@ -5,7 +5,7 @@
     },
     "access": {
       "create": [
-        "/group/guest"
+        "guest"
       ]
     }
   },
@@ -17,7 +17,7 @@
     "type": "array",
     "subType" : {"type": "string"},
     "access": {
-      "read": ["/group/guest"]
+      "read": ["guest"]
     }
   }
 }

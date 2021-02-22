@@ -6,7 +6,8 @@
       "path": "data/fruits.json"
     },
     "access" : {
-      "write" : ["/group/guest"]
+      "read" : ["guest"],
+      "write" : ["local"]
     }
   },
   "color": {

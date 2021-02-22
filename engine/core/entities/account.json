@@ -6,7 +6,7 @@
       "path": "data/accounts.json"
     },
     "access": {
-      "head" : ["/group/guest","/group/system"]
+      "head" : ["guest","system"]
     }
   },
   "email": {
@@ -15,29 +15,29 @@
     "regex": "^TODO$",
     "default": "hello@default.com",
     "access" : {
-      "read" : ["/group/system"],
-      "createBlind" : ["/group/guest"],
-      "write" : ["/group/user:$username"],
-      "delete" : ["/group/admin"]
+      "read" : ["system"],
+      "createBlind" : ["guest"],
+      "write" : ["user:$username"],
+      "delete" : ["admin"]
     }
   },
   "password": {
     "type": "password",
     "minLength":"5",
     "access" : {
-      "read" : ["/group/system"],
-      "createBlind" : ["/group/guest"],
-      "writeBlind" : ["/group/user:$username"],
-      "delete" : ["/group/admin"]
+      "read" : ["system"],
+      "createBlind" : ["guest"],
+      "writeBlind" : ["user:$username"],
+      "delete" : ["admin"]
     }
   },
   "username": {
     "type": "string",
     "minLength": 3,
     "access" : {
-      "read" : ["/group/system"],
-      "createBlind" : ["/group/guest"],
-      "delete" : ["/group/admin"]
+      "read" : ["system"],
+      "createBlind" : ["guest"],
+      "delete" : ["admin"]
     },
     "connector": {
       "key": "key"
@@ -46,14 +46,14 @@
   "groups" : {
     "auto" : true,
     "type" : "array",
-    "default" : ["/group/guest"],
+    "default" : ["guest"],
     "subType" : {
       "type" : "reference",
-      "uri": "/group/*/name"
+      "uri": "*/name"
     },
     "access" : {
-      "read" : ["/group/user:$username","/group/system"],
-      "moderate" : ["/group/admin"]
+      "read" : ["user:$username","system"],
+      "moderate" : ["admin"]
     }
   }
 }

@@ -55,6 +55,6 @@
     ]
   },
   "defaultGroups": [
-    "/group/guest"
+    "guest"
   ]
 }

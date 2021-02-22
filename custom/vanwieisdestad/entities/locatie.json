@@ -6,7 +6,7 @@
       "table": "Locaties"
     },
     "access" : {
-      "read" : ["/group/guest"]
+      "read" : ["guest"]
     }
   },
   "id": {

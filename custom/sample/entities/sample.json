@@ -7,7 +7,7 @@
       "extension": "json"
     },
     "access" : {
-      "write" : ["admin"]
+      "write" : ["local"]
     }
   },
   "id": {

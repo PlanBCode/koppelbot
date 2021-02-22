@@ -79,6 +79,13 @@ if ($isCli) {
 
 if (strpos($uri, '/api/') === 0 || $uri === '/api') {
     $accessGroups = $GLOBALS['constants']['defaultGroups'];
+
+    function isLocalhost($whitelist = ['127.0.0.1', '::1']) {
+        return in_array($_SERVER['REMOTE_ADDR'], $whitelist);
+    }
+
+    if($isCli || isLocalhost())  $accessGroups[] = 'local';
+
     if (array_key_exists('content', $_SESSION)) {
         foreach ($_SESSION['content'] as $userName => $session) {
             $accessGroups = array_merge($accessGroups, $session['groups']);

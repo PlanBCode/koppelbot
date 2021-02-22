@@ -6,7 +6,7 @@
       "table": "Eigenaren"
     },
     "access" : {
-      "read" : ["/group/guest"]
+      "read" : ["guest"]
     }
   },
   "id": {
