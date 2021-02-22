@@ -18,7 +18,6 @@ function extractContentFromNode (contentOrNode) {
     let subObject, subStatus, subContent, subErrors;
     for (const propertyName in contentOrNode) {
       [subObject, entityId, subStatus, subContent, subErrors, method] = extractContentFromNode(contentOrNode[propertyName]);
-
       if (typeof status === 'undefined') {
         status = subStatus;
       } else if (status !== subStatus) {
@@ -84,6 +83,7 @@ function Node (object, entityId, status_, content_, errors_, method_) {
   const content = content_;
   const errors = errors_;
   const method = method_;
+  this.getUri = () => object ? object.getUri(entityId) : undefined;
 
   this.getObject = () => object; // TODO need private
   this.getEntityId = () => entityId;
@@ -116,6 +116,20 @@ function Node (object, entityId, status_, content_, errors_, method_) {
     return object.render(action, subOptions, entityId, subPath);
   };
   this.getSubNode = subPath => getSubNodeFromNode(subPath, object, entityId, status, content, errors);
+  /*
+  this.select = (entityClassName, entityId)
+  this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit, displayMessage) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit, displayMessage);
+  this.onChange = callback => {
+    this.validateContent = (content_, settings_) => {
+  this.ui = xyz.ui;
+  this.patch = (newContent, additionalSubPropertyPath) => {
+    this.delete = subPropertyPath => {
+      this.renderSubElement = (action, additionalSubPropertyPath, status, content, settings, options_) => {
+      this.getOption
+      this.hasOption
+      this.getOptions
+
+   */
 }
 
 function getSubNode (node, subPath) {

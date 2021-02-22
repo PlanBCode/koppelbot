@@ -1,7 +1,7 @@
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
 const {renderUnit} = require('../../types/number/number');
-
+const {sortTableOnClick} = require('../list/list');
 // TODO mixed
 const CHART_TYPES = require('./chart.json').options.flavor.choices;
 
@@ -16,6 +16,18 @@ function getBaseValue (aggregator) {
     default: return undefined;
   }
 }
+
+function getAggregationType (aggregator) {
+  switch (aggregator) {
+    case 'min' : return 'number';
+    case 'max' : return 'number';
+    case 'count' : return 'number';
+    case 'sum' : return 'number';
+    case 'join' : return 'string';
+    default: return undefined;
+  }
+}
+
 function aggregate (aggregator, aggregation, value, count) {
   switch (aggregator) {
     // TODO avg, count_distinct, var(iance), stdev??
@@ -47,12 +59,8 @@ exports.display = {
     const errors = [];
     for (const aggregation of aggregations) {
       const [aggregator, propertyName] = aggregation;
-      if (!AGGREGATORS.includes(aggregator)) errors.push(`Unknown aggregator: '${aggregator}'.`);
+      if (!AGGREGATORS.includes(aggregator)) errors.push(`Unknown aggregator: '${aggregator}' for '${aggregator}(${propertyName})'.`);
       // TODO error if type are not numbers
-    }
-    if (display.hasOption('groupby')) {
-      const groupBy = display.getOption('groupby');
-      // TODO check if groupBy exists in flatContent
     }
 
     if (errors.length) {
@@ -79,8 +87,8 @@ exports.display = {
       const TABLE = document.createElement('TABLE');
       TABLE.className = 'xyz-list';
       if (display.getOption('showHeader') !== false) {
-        const TR = document.createElement('TR');
-        TR.className = 'xyz-list-header';
+        const TR_header = document.createElement('TR');
+        TR_header.className = 'xyz-list-header';
         if (display.getOption('multiSelect')) {
           const TD_checkbox = document.createElement('TD');
           TD_checkbox.className = 'xyz-list-icon';
@@ -93,7 +101,7 @@ exports.display = {
           };
           TD_checkbox.appendChild(INPUT_checkAll);
 
-          TR.appendChild(TD_checkbox);
+          TR_header.appendChild(TD_checkbox);
 
           display.onMultiSelect(selectEntityIds => {
             selectEntityIds = selectEntityIds ? selectEntityIds.split(',') : [];
@@ -115,23 +123,26 @@ exports.display = {
           });
         } // TODO if color and multi select
         if (display.hasOption('color')) {
-          const TD = document.createElement('TD');
-          TD.className = 'xyz-list-icon';
-          TR.appendChild(TD);
+          const TD_color = document.createElement('TD');
+          TD_color.className = 'xyz-list-icon';
+          TR_header.appendChild(TD_color);
         }
         if (display.hasOption('groupby')) {
-          let groupBy = display.getOption('groupby');
-          const TD = document.createElement('TD');
-          if (groupBy.includes('=')) groupBy = groupBy.split('=')[0]; // use defined label
-          TD.innerText = groupBy;
-          TR.appendChild(TD);
+          let groupByPropertyName = display.getOption('groupby');
+          let groupByLabel = groupByPropertyName;
+          const TD_groupBy = document.createElement('TD');
+          if (groupByPropertyName.includes('=')) [groupByLabel, groupByPropertyName] = groupByPropertyName.split('='); // use defined label
+          TD_groupBy.innerText = groupByLabel;
+          TR_header.appendChild(TD_groupBy);
+          const type = display.getNode(groupByPropertyName).getSetting('type');
+          sortTableOnClick(TABLE, TD_groupBy, type);
         }
         if (display.hasOption('select')) {
           display.onSelect(selectEntityId => {
-            for (const TR of TABLE.childNodes) {
-              const entityId = display.hasOption('groupby') ? TR.groupId : TR.entityId;
-              if (entityId === selectEntityId) TR.classList.add('xyz-list-selected');
-              else TR.classList.remove('xyz-list-selected');
+            for (const TR_entity of TABLE.childNodes) {
+              const entityId = display.hasOption('groupby') ? TR_entity.groupId : TR_entity.entityId;
+              if (entityId === selectEntityId) TR_entity.classList.add('xyz-list-selected');
+              else TR_entity.classList.remove('xyz-list-selected');
             }
           });
         }
@@ -140,7 +151,7 @@ exports.display = {
         for (const aggregation of aggregations) {
           const [aggregator, propertyName] = aggregation;
           const label = aggregator + '(' + propertyName + ')';
-          const TD = document.createElement('TD');
+          const TD_header = document.createElement('TD');
           const labels = display.getOption('labels');
           let title;
           if (labels && labels.hasOwnProperty(label)) title = display.getDisplayName(label);
@@ -152,10 +163,13 @@ exports.display = {
           if (propertyNode.hasSetting('unit')) {
             title += '&nbsp;(' + renderUnit(propertyNode.getSetting('unit')) + ')';
           }
-          TD.innerHTML = title;
-          TR.appendChild(TD);
+          TD_header.innerHTML = title;
+          let type = getAggregationType(aggregator);
+          if (!type) type = display.getNode(propertyName).getSetting('type'); // fallback for untyped aggregations
+          sortTableOnClick(TABLE, TD_header, type);
+          TR_header.appendChild(TD_header);
         }
-        TABLE.appendChild(TR);
+        TABLE.appendChild(TR_header);
       }
 
       WRAPPER.appendChild(TABLE);

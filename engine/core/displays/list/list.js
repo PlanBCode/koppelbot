@@ -5,6 +5,77 @@ options
 - TODO addEditButtons
 - TODO add multiselect tools
  */
+function sortTable (TABLE, columnIndex, ascending, type) {
+  let switching = true;
+  /* Make a loop that will continue until
+  no switching has been done: */
+  while (switching) {
+    // Start by saying: no switching is done:
+    switching = false;
+    const rows = TABLE.rows;
+    /* Loop through all table rows (except the
+    first, which contains table headers): */
+    let shouldSwitch, i;
+    for (i = 1; i < rows.length - 1; i++) {
+      // Start by saying there should be no switching:
+      shouldSwitch = false;
+      /* Get the two elements you want to compare,
+      one from current row and one from the next: */
+      let x = rows[i].getElementsByTagName('TD')[columnIndex].innerHTML;
+      let y = rows[i + 1].getElementsByTagName('TD')[columnIndex].innerHTML;
+      if (type === 'number') {
+        x = Number(x);
+        y = Number(y);
+      } else {
+        x = x.toLowerCase();
+        y = y.toLowerCase();
+      }
+      // Check if the two rows should switch place:
+
+      if ((ascending && x > y) ||
+      (!ascending && x < y)) {
+        // If so, mark as a switch and break the loop:
+        shouldSwitch = true;
+        break;
+      }
+    }
+    if (shouldSwitch) {
+      /* If a switch has been marked, make the switch
+      and mark that a switch has been done: */
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+}
+
+function sortTableOnClick (TABLE, TD_header, type) {
+  TD_header.onclick = () => {
+    let columnIndex;
+    let i = 0;
+    let ascending;
+    const TR_header = TD_header.parentNode.childNodes;
+    for (const TD_other of TR_header) {
+      if (TD_other === TD_header) {
+        columnIndex = i;
+        if (TD_header.classList.contains('xyz-list-sorted-asc')) {
+          ascending = false;
+          TD_other.classList.remove('xyz-list-sorted-asc');
+          TD_header.classList.add('xyz-list-sorted-desc');
+        } else {
+          ascending = true;
+          TD_other.classList.remove('xyz-list-sorted-desc');
+          TD_header.classList.add('xyz-list-sorted-asc');
+        }
+      } else {
+        TD_other.classList.remove('xyz-list-sorted-asc');
+        TD_other.classList.remove('xyz-list-sorted-desc');
+      }
+      ++i;
+    }
+    sortTable(TABLE, columnIndex, ascending, type);
+  };
+}
+exports.sortTableOnClick = sortTableOnClick;
 
 exports.display = {
   waitingForInput: display => {
@@ -26,7 +97,6 @@ exports.display = {
   first: display => {
     if (display.getOption('showHeader') !== false) {
       const WRAPPER = display.getWRAPPER();
-      const columns = display.getFlatNodes();
       const TABLE = WRAPPER.firstChild;
       const TR_header = document.createElement('TR');
       TR_header.className = 'xyz-list-header';
@@ -66,17 +136,24 @@ exports.display = {
         TD.className = 'xyz-list-icon';
         TR_header.appendChild(TD);
       }
-      if (columns.constructor !== Object) {
+
+      const flatNodes = display.getFlatNodes();
+      if (flatNodes.constructor !== Object) {
         const TD_header = document.createElement('TD');
         TD_header.innerHTML = display.getEntityClassName();
         TR_header.appendChild(TD_header);
+        const type = flatNodes.getSetting('type');
+        sortTableOnClick(TABLE, TD_header, type);
       } else {
-        for (const flatPropertyName in columns) {
+        for (const flatPropertyName in flatNodes) {
           const TD_header = document.createElement('TD');
           TD_header.innerText = display.getDisplayName(flatPropertyName);
+          const type = flatNodes[flatPropertyName].getSetting('type');
+          sortTableOnClick(TABLE, TD_header, type);
           TR_header.appendChild(TD_header);
         }
       }
+
       if (display.hasOption('select')) {
         display.onSelect(selectEntityId => {
           for (const TR of TABLE.childNodes) {
