@@ -1,5 +1,9 @@
 php_flag display_errors on
 RewriteEngine On
 
+# Relay all calls to https
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # Relay everything to index.php
 RewriteRule ^(.*)$ index.php [L]
