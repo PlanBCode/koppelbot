@@ -74,7 +74,8 @@ function initializeMap (display) {
 
   const markUserLocation = locationResponse => {
     const format = new ol.format.GeoJSON(); // TODO parametrize
-    const data = {type: 'Feature', geometry: {type: 'Point', coordinates: [locationResponse.coords.latitude, locationResponse.coords.longitude]}, properties: null};
+    const coordinates = [locationResponse.coords.latitude, locationResponse.coords.longitude];
+    const data = {type: 'Feature', geometry: {type: 'Point', coordinates}, properties: null};
 
     const features = format.readFeatures(data);
 
@@ -90,7 +91,14 @@ function initializeMap (display) {
         })
       })
     );
-    iconFeature.onclick = () => display.select();
+    if (DIV_create) {
+      iconFeature.onclick = event => {
+        DIV_create.patch({[locationPropertyName]: {type: 'Point', coordinates}});
+        DIV_create.style.display = 'block';
+        event.stopPropagation();
+        return false;
+      };
+    }
 
     // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
     // TODO how do we handle changes to feature?
@@ -162,7 +170,7 @@ exports.display = {
         const feature = features[0]; // TODO handle multiple features?
         if (feature) { // TODO check
           const color = displayItem.getColor();
-          const setStyle = isSelected => {
+          const setStyle = (isSelected, feature_ = feature) => {
             if (data.geometry.type === 'Point') {
               // https://openlayers.org/en/latest/examples/polygon-styles.html
               const style = new ol.style.Style({
@@ -177,7 +185,7 @@ exports.display = {
                   })
                 })
               });
-              feature.setStyle(style);
+              feature_.setStyle(style);
             } else {
               const style = new ol.style.Style({
                 stroke: new ol.style.Stroke({
@@ -188,7 +196,7 @@ exports.display = {
                   color
                 })
               });
-              feature.setStyle(style);
+              feature_.setStyle(style);
             }
           };
           setStyle(displayItem.isSelected());
@@ -202,6 +210,9 @@ exports.display = {
         strokeDashstyle */
 
           feature.onclick = () => {
+            if (WRAPPER.selectedFeature) setStyle(false, WRAPPER.selectedFeature); // deselect previous selection
+            WRAPPER.selectedFeature = feature;
+
             setStyle(true);
             displayItem.select();
           };
