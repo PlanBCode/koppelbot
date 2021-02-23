@@ -77,6 +77,30 @@ function sortTableOnClick (TABLE, TD_header, type) {
 }
 exports.sortTableOnClick = sortTableOnClick;
 
+function addSearchBox (display, TR_header, TABLE) {
+  if (display.getOption('showSearchBar')) {
+    const TR_search = document.createElement('TR');
+    const TD_search = document.createElement('TD');
+    const INPUT_search = document.createElement('INPUT');
+    INPUT_search.placeholder = 'search';
+    INPUT_search.oninput = INPUT_search.inpaste = () => {
+      const search = INPUT_search.value.toUpperCase();
+      for (const TR of TR_search.parentNode.children) {
+        if (TR !== TR_search && TR !== TR_header) {
+          TR.style.display = search === '' || TR.innerHTML.toUpperCase().includes(search) ? 'table-row' : 'none';
+        }
+      }
+    };
+    TR_search.className = 'xyz-list-search';
+    TD_search.setAttribute('colspan', TR_header.children.length);
+    TD_search.appendChild(INPUT_search);
+    TR_search.appendChild(TD_search);
+    TABLE.appendChild(TR_search);
+  }
+}
+
+exports.addSearchBox = addSearchBox;
+
 exports.display = {
   waitingForInput: display => {
     const WRAPPER = display.getWRAPPER();
@@ -163,6 +187,8 @@ exports.display = {
         });
       }
       TABLE.appendChild(TR_header);
+
+      addSearchBox(display, TR_header, TABLE);
     }
   },
 

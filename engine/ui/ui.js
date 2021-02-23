@@ -97,7 +97,13 @@ onUiChange = (content, optionName) => { // declared in /engine/api/api.js
 function updateOptions () {
   const TABLE = document.getElementById('xyz-ui-display-options');
   for (const TR of [...TABLE.firstElementChild.children]) {
-    if (!TR.classList.contains('xyz-list-header')) TABLE.removeChild(TR);
+    if (!TR.classList.contains('xyz-list-header')) {
+      try {
+        TABLE.removeChild(TR);
+      } catch (e) {
+
+      }
+    }
   }
 
   if (!displayName) displayName = 'list';

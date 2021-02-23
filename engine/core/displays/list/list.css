@@ -66,3 +66,20 @@ tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
 .xyz-list-sorted-desc::before {
   content: "\00A0\21E1\00A0";
 }
+
+tr.xyz-list-search > td {
+  padding: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgrey;
+}
+
+tr.xyz-list-search > td > input {
+  width: 100%;
+  display: block;
+  border-style: none;
+  outline-style: none;
+  padding: 3;
+  font-size: inherit;
+  margin: 0;
+}

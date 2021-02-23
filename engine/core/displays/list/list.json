@@ -6,6 +6,7 @@
     "default" : {"info":"The default selected item.", "type":"string"},
     "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "showHeader" : {"info":"Whether to show the table header.", "type":"bool", "default":true},
+    "showSearchBar" : {"info":"Whether to show a search interface.", "type":"bool", "default":false},
     "showCreateButton" : {"info":"Whether to show a button to a create interface.", "type":"bool", "default":false},
     "createButtonText" : {"info":"Define a custom text for the create button.", "type":"string", "default":"+"}
   }

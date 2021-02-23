@@ -1,7 +1,7 @@
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
 const {renderUnit} = require('../../types/number/number');
-const {sortTableOnClick} = require('../list/list');
+const {sortTableOnClick, addSearchBox} = require('../list/list');
 // TODO mixed
 const CHART_TYPES = require('./chart.json').options.flavor.choices;
 
@@ -170,6 +170,7 @@ exports.display = {
           TR_header.appendChild(TD_header);
         }
         TABLE.appendChild(TR_header);
+        addSearchBox(display, TR_header, TABLE);
       }
 
       WRAPPER.appendChild(TABLE);

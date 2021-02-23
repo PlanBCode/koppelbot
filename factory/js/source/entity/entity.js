@@ -39,6 +39,8 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     properties[propertyName] = new Property(xyz, this, propertyName, settings[propertyName]);
   }
 
+  this.hasSetting = settingName => settings.hasOwnProperty(settingName);
+  this.getSetting = settingName => settings[settingName];
   this.getSettings = () => settings;
 
   this.getEntityClassName = () => entityClassName;
