@@ -21,14 +21,38 @@
     table.xyz-list {
       font-size: 10pt;
     }
+
+    #zoom-to-amersfoort{
+      position: absolute;
+      z-index: 1000;
+      right: 3px;
+      color: white;
+      background-color: darkslateblue;
+      height: 2em;
+      margin: 2px;
+      border-radius: 5px;
+      padding-left: 4px;
+      padding-right: 4px;
+      cursor: pointer;
+    }
     </style>
 </head>
 <body>
 
   <table width="100%" height="100%">
     <tr>
-      <td style="text-align:center;" rowspan="3">
-        <xyz style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
+      <td style="text-align:center; position: relative;" rowspan="3">
+        <div id="zoom-to-amersfoort">Amersfoort</div>
+        <script>
+          const DIV = document.getElementById('zoom-to-amersfoort');
+          DIV.onclick = ()=>{
+            const WRAPPER = document.getElementById('map');
+            WRAPPER.map.getView().setCenter(ol.proj.transform([5.4000, 52.1680], 'EPSG:4326', 'EPSG:3857'));
+            WRAPPER.map.getView().setZoom(13);
+          }
+
+        </script>
+        <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
       </td>
       <td valign="top" width="30%" style="background-color:#EFEFEF;">
         <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:60vh; overflow-y:scroll; overflow-x:hidden;"/>
