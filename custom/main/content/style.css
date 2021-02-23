@@ -75,4 +75,5 @@ div#content > div {
   width: 75vh;
   margin: 0  auto 50px;
   padding: 50px;
+  padding-top: 25px;
 }
