@@ -23,7 +23,7 @@ function array_get(array &$array, $key, $default = null)
     return array_key_exists($key, $array) ? $array[$key] : $default;
 }
 
-function array_null_get(?array &$array, $key)
+function array_null_get(&$array, $key) //TODO ?array
 {
     if (is_null($array)) return null;
     if (array_key_exists($key, $array)) return $array[$key];
@@ -89,7 +89,8 @@ function json_get(&$object, array &$keyPath): JsonActionResponse
         return new JsonActionResponse(false, $object); //TODO add error message
     }
     if (array_key_exists($keyPath[0], $object)) {
-        return json_get($object[$keyPath[0]], array_slice($keyPath, 1));
+        $path = array_slice($keyPath, 1);
+        return json_get($object[$keyPath[0]], $path);
     } else {
         return new JsonActionResponse(false, $object); //TODO add error message
     }

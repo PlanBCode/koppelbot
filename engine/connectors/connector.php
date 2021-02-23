@@ -127,5 +127,5 @@ abstract class Connector
      */
     abstract public function createResponse(ConnectorRequest &$connectorRequest): ConnectorResponse;
 
-    abstract protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string;
+    abstract protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest); //TODO: ?string;
 }

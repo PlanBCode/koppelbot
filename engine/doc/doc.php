@@ -6,7 +6,9 @@ class DocRequest extends HttpRequest2
     {
         if($this->uri === 'map') return new DocResponse($this->uri, $this->getQuery(), '');
         $fileName = $this->uri === 'doc' ? './engine/doc/doc.html' : './engine/'.$this->uri.'.html';
-        if(file_exists($fileName)) return new DocResponse($this->uri, $this->getQuery(), file_get_contents($fileName));
+        $query = $this->getQuery();
+        $content= file_get_contents($fileName);
+        if(file_exists($fileName)) return new DocResponse($this->uri, $query, $content);
         return new DocResponse($this->uri, $this->getQuery(), 'Page Not Found',404);
     }
 }
@@ -183,6 +185,7 @@ class DocResponse extends HttpResponse2
 </html>';
         }
     }
-    parent::__construct($status, replaceXyzTag($content), $headers);
+    $content = replaceXyzTag($content);
+    parent::__construct($status, $content, $headers);
   }
 }

@@ -5,7 +5,7 @@ class Response
     /** @var int */
     protected $status;
 
-    protected function addStatus(int $status): void
+    protected function addStatus(int $status)//TODO : void
     {
         if (isset($this->status)) {
             if ($this->status != $status) {
@@ -39,7 +39,7 @@ class RequestResponse extends Response
         $this->remappedAutoIncrementedUris += $remappedAutoIncrementedUris;
     }
 
-    public function add(int $status, string $entityClassName, string $entityId, array &$propertyPath, &$content, array &$remappedAutoIncrementedUris): void
+    public function add(int $status, string $entityClassName, string $entityId, array &$propertyPath, &$content, array &$remappedAutoIncrementedUris)//TODO : void
     {
         $this->addStatus($status);
         if (!array_key_exists($entityClassName, $this->entityClassResponses)) {
@@ -49,7 +49,7 @@ class RequestResponse extends Response
         $this->entityClassResponses[$entityClassName]->add($status, $entityId, $propertyPath, $content);
     }
 
-    public function merge(RequestResponse &$requestResponse): void
+    public function merge(RequestResponse &$requestResponse)//TODO : void
     {
         $this->remappedAutoIncrementedUris += $requestResponse->remappedAutoIncrementedUris;
         $this->addStatus($requestResponse->getStatus());
@@ -62,7 +62,7 @@ class RequestResponse extends Response
         }
     }
 
-    public function getRemappedAutoIncrementedUri(string &$stubUri): ?string
+    public function getRemappedAutoIncrementedUri(string &$stubUri) //TODO : ?string
     {
       return array_get($this->remappedAutoIncrementedUris, $stubUri, null);
     }
@@ -72,7 +72,7 @@ class RequestResponse extends Response
       return $this->remappedAutoIncrementedUris;
     }
 
-    public function addRemappedAutoIncrementedUris(array &$remappedAutoIncrementedUris): void
+    public function addRemappedAutoIncrementedUris(array &$remappedAutoIncrementedUris)//TODO : void
     {
       $this->remappedAutoIncrementedUris += $remappedAutoIncrementedUris;
     }
@@ -103,7 +103,7 @@ class RequestResponse extends Response
                     "content" => $entityClassResponse->getContent(),
                 ];
             } else {
-                $content[$entityClass] =& $entityClassResponse->getContent();
+                $content[$entityClass] = $entityClassResponse->getContent();
             }
         }
         return $content;
@@ -125,19 +125,19 @@ class HttpResponse2 extends Response
         $this->headers =& $headers;
     }
 
-    private function echoHeaders(): void
+    private function echoHeaders()//TODO : void
     {
         foreach ($this->headers as $key => $value) {
             header($key . ': ' . $value);
         }
     }
 
-    private function echoStatus(): void
+    private function echoStatus()//TODO : void
     {
         http_response_code($this->status);
     }
 
-    private function echoContent(): void
+    private function echoContent()//TODO : void
     {
         echo $this->content;
     }

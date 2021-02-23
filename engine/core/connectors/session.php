@@ -180,7 +180,7 @@ class Connector_session extends Connector
         return $connectorResponse;
     }
 
-    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string
+    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest)//TODO: ?string
     {
       return null;
     }

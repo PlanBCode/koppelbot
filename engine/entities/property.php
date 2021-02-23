@@ -136,7 +136,7 @@ class  PropertyRequest
         return $this->entityIdList;
     }
 
-    public function setEntityId(string $entityIdList): void
+    public function setEntityId(string $entityIdList)//TODO : void
     {
         $this->entityIdList = $entityIdList;
     }
@@ -146,7 +146,7 @@ class  PropertyRequest
         return $this->entityClassName;
     }
 
-    public function getProperty(): ?Property
+    public function getProperty()//TODO : ?Property
     {
         return $this->property;
     }
@@ -181,7 +181,7 @@ class  PropertyRequest
         return $this->property->processBeforeConnector($this->requestObject, $newContent, $currentContent);
     }
 
-    public function updateAutoIncrementedUri(array &$remappedAutoIncrementedUris): void
+    public function updateAutoIncrementedUri(array &$remappedAutoIncrementedUris)//TODO : void
     {
         if($this->getMethod() !== 'POST') return;
         $this->requestObject->setMethod('PUT');
@@ -200,8 +200,8 @@ class PropertyResponse extends Response
     protected $content;
     /** @var string[] */
     protected $propertyPath;
-
-    public function __construct(?Property &$property, RequestObject &$requestObject, int $status, array &$propertyPath, &$content = null)
+    // TODO ?Property
+    public function __construct(&$property, RequestObject &$requestObject, int $status, array &$propertyPath, &$content = null)
     {
         $this->propertyPath = $propertyPath;
         if(is_null($property)){
@@ -303,7 +303,7 @@ class Property
         $this->typeName = getSingleSetting(self::PROPERTY_TYPE, $settings, $rootSettings);
 
         if(is_null($this->typeName) && getSingleSetting('index', $settings, $rootSettings)) $this->typeName = 'id';
-        
+
         if (!is_string($this->typeName)) {
             echo "ERROR: invalid typename";
             //TODO error
@@ -364,7 +364,7 @@ class Property
         return $this->typeClass::serve($status, $content);
     }
 
-    public function getUri(?string $entityId = null): string
+    public function getUri($entityId = null): string //TODO  ?string
     {
         return $this->parent->getUri() . '/' . $this->propertyName;
     }
@@ -384,7 +384,7 @@ class Property
         return empty($this->subProperties);
     }
 
-    public function getProperty(array &$propertyPath): ?Property
+    public function getProperty(array &$propertyPath)//TODO : ?Property
     {
         if (count($propertyPath) === 0) return $this;
         $subPropertyName = $propertyPath[0];

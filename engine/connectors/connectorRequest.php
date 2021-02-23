@@ -5,12 +5,12 @@ class ConnectorRequest
     /** @var PropertyRequest[] */
     protected $propertyRequests = [];
 
-    public function add(PropertyRequest &$propertyRequest): void
+    public function add(PropertyRequest &$propertyRequest)//TODO : void
     {
         $this->propertyRequests[] = $propertyRequest;
     }
 
-    public function merge(ConnectorRequest &$connectorRequest): void
+    public function merge(ConnectorRequest &$connectorRequest)//TODO : void
     {
         array_push($this->propertyRequests, ...$connectorRequest->propertyRequests);
     }
@@ -52,7 +52,7 @@ class ConnectorRequest
       return $postIdPropertyRequests;
     }
 
-    public function updateAutoIncrementedUris(array &$remappedAutoIncrementedUris): void
+    public function updateAutoIncrementedUris(array &$remappedAutoIncrementedUris)//TODO : void
     {
         foreach ($this->propertyRequests as $propertyRequest) {
           $propertyRequest->updateAutoIncrementedUri($remappedAutoIncrementedUris);

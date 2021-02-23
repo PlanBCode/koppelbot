@@ -69,7 +69,7 @@ class Connector_sqlite extends Connector
       return $queryString;
     }
 
-    protected function handleResults(string $method, string $idKey, &$result, ConnectorRequest &$connectorRequest, ConnectorResponse &$connectorResponse): void
+    protected function handleResults(string $method, string $idKey, &$result, ConnectorRequest &$connectorRequest, ConnectorResponse &$connectorResponse)//TODO : void
     {
       if(!$result){
         $error = $this->db->lastErrorMsg();
@@ -159,7 +159,7 @@ class Connector_sqlite extends Connector
         return $connectorResponse;
     }
 
-    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string
+    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest)//TODO: ?string
     {
       $propertyPath = $propertyRequest->getPropertyPath();
       $propertyName = $propertyPath[0]; //TODO check

@@ -75,7 +75,7 @@ class Connector_file extends BasicConnector
         return new ConnectorResponse();
     }
 
-    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string
+    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest)//TODO: ?string
     {
       return null; //TODO for array files
     }

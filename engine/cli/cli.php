@@ -110,12 +110,11 @@ function getCliOptions(array &$cliOptions, int $argc, array $argv): array
 
 function createCliRequestUri($options): string
 {
-    if (empty($options['args'])) return '';
-    $uri = $options['args'][1];
+    $args = array_get($options,'args');
+    if (empty($args)) return '';
+    $uri = $args[1];
     if (substr($uri, 0, 1) === '.') $uri = substr($uri, 1);  // './abc' -> 'abc'
-    if (substr($options['prefix'], -1) === '/' && substr($uri, 0, 1) === '/') {
-        return $options['prefix'] . substr($uri, 1); // '/abc' -> '/prefix/abc'  (not '/prefix//abc'
-    } else {
-        return $options['prefix'] . $uri; // '/abc' -> '/prefix/abc'
-    }
+    $prefix = array_get($options,'prefix','/api');
+    if (substr($prefix, -1) === '/' && substr($uri, 0, 1) === '/') return $prefix . substr($uri, 1); // '/abc' -> '/prefix/abc'  (not '/prefix//abc'
+    else return $prefix . $uri; // '/abc' -> '/prefix/abc'    
 }

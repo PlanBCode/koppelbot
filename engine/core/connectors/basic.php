@@ -6,9 +6,11 @@ abstract class BasicConnector extends Connector
     {
         $connectorResponse = $this->open($connectorRequest);
         foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
-            $connectorResponse->merge($this->createPropertyResponse($propertyRequest));
+            $propertyResponse = $this->createPropertyResponse($propertyRequest);
+            $connectorResponse->merge($propertyResponse);
         }
-        return $connectorResponse->merge($this->close($connectorRequest));
+        $closedConnectorResponse = $this->close($connectorRequest);
+        return $connectorResponse->merge($closedConnectorResponse);
     }
 
     /**
@@ -98,8 +100,8 @@ abstract class BasicConnector extends Connector
                         continue;
                     }
                     $subPropertyPath = array_slice($propertyRequest->getPropertyPath(), 1 + $property->getDepth());
-
-                    $jsonActionResponse = json_get($entity, array_merge($keyPath, $subPropertyPath));
+                    $mergedPath = array_merge($keyPath, $subPropertyPath);
+                    $jsonActionResponse = json_get($entity, $mergedPath);
                     if ($jsonActionResponse->succeeded()) {
                         $content = $head ? null : $jsonActionResponse->content;
                         $connectorResponse->add(200, $propertyRequest, $entityId, $content);

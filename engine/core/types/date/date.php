@@ -4,7 +4,7 @@ class Type_date extends Type
 {
     static protected $formats;
 
-    static protected function loadFormats(): void
+    static protected function loadFormats()//TODO : void
     {
         if (!isset(self::$formats)) {
             $formatFileContent = file_get_contents('./engine/core/types/date/formats.json');

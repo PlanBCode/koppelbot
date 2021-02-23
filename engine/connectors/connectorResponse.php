@@ -12,7 +12,7 @@ class ConnectorResponse extends Response
         if (!is_null($status)) $this->addStatus($status);
     }
 
-    public function remapAutoIncrementedUris(array &$remappedAutoIncrementedUris): void
+    public function remapAutoIncrementedUris(array &$remappedAutoIncrementedUris)//TODO : void
     {
       $this->remappedAutoIncrementedUris += $remappedAutoIncrementedUris;
       foreach($this->requestResponses as $requestResponse){
@@ -31,7 +31,9 @@ class ConnectorResponse extends Response
             $requestObject = $propertyRequest->getRequestObject();
             $this->requestResponses[$requestId] = new RequestResponse($requestObject, $this->remappedAutoIncrementedUris);
         }
-        $this->requestResponses[$requestId]->add($status, $propertyRequest->getEntityClass(), $entityId, $propertyRequest->getPropertyPath(), $content, $this->remappedAutoIncrementedUris);
+        $entityClass = $propertyRequest->getEntityClass();
+        $propertyPath = $propertyRequest->getPropertyPath();
+        $this->requestResponses[$requestId]->add($status, $entityClass, $entityId, $propertyPath, $content, $this->remappedAutoIncrementedUris);
         return $this;
     }
 

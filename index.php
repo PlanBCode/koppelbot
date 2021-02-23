@@ -36,7 +36,7 @@ if ($isCli) {
    }*/
 
     $options = getCliOptions($cliOptions, $argc, $argv);
-    if ($options['help']) exit(0);
+    if (array_get($options,'help',false)) exit(0);
 
     $headers = [];//TODO from cliOptions
     $requestUri = createCliRequestUri($options);
@@ -72,6 +72,7 @@ if ($isCli) {
 } else {
     $headers = getallheaders();
     $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
+    if(substr($uri,0,1)!=='/') $uri = '/'.$uri;
     $method = $_SERVER['REQUEST_METHOD'];
     $queryString = array_get($_SERVER, 'QUERY_STRING', '');
     $content = @file_get_contents('php://input');

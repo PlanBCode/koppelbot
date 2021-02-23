@@ -102,7 +102,7 @@ class Connector_directory extends BasicConnector
         return $entityIds;
     }
 
-    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest): ?string
+    protected function getAutoIncrementedId(string $entityId, PropertyRequest& $propertyRequest)//TODO: ?string
     {
         if (array_key_exists($entityId, $this->autoIncrementLookup)) {
             return $this->autoIncrementLookup[$entityId];

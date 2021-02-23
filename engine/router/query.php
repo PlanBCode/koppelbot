@@ -66,23 +66,23 @@ class QueryStatement
         $matches = [];
         $operators = array_merge(array_keys(self::$comparisonOperators), ['=']);
         $pattern = '/^([\w.]+)(' . implode('|', $operators) . '|)(.*)$/';
-        preg_match($pattern, $queryStatementString, $matches, PREG_UNMATCHED_AS_NULL);
+        preg_match($pattern, $queryStatementString, $matches);
         $this->lhs = $matches[1];
         $this->operator = $matches[2];
         $this->rhs = $matches[3];
     }
 
-    public function getLhs(): ?string
+    public function getLhs()//TODO : ?string
     {
         return $this->lhs;
     }
 
-    public function getRhs(): ?string
+    public function getRhs()//TODO : ?string
     {
         return $this->rhs;
     }
 
-    public function getOperator(): ?string
+    public function getOperator()//TODO : ?string
     {
         return $this->operator;
     }
@@ -163,7 +163,7 @@ class Query
         return false;
     }
 
-    public function getOption(string $variableName, $default = null): ?string
+    public function getOption(string $variableName, $default = null)//TODO : ?string
     {
         foreach ($this->queryStatements as $queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {

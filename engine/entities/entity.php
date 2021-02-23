@@ -7,7 +7,7 @@ class EntityClass
     /** @var EntityClass[] */
     static $entityClasses = [];
 
-    static public function get(string $entityClassName, array &$accessGroups): ?EntityClass
+    static public function get(string $entityClassName, array &$accessGroups)// TODO: ?EntityClass
     {
 
         if (array_key_exists($entityClassName, self::$entityClasses)) {
@@ -50,7 +50,7 @@ class EntityClass
         }
     }
 
-    public function getIdPropertyName(): ?string
+    public function getIdPropertyName() // TODO : ?string
     {
       foreach ($this->properties as &$property){
         if($property->isId()) return $property->getName();
@@ -58,17 +58,18 @@ class EntityClass
       return null;
     }
 
-    public function getProperty(array &$propertyPath): ?Property
+    public function getProperty(array &$propertyPath)//TODO : ?Property
     {
         if (count($propertyPath) === 0) return null;
         $propertyName = $propertyPath[0];
         if (!is_string($propertyName)) return null;
         $property = array_get($this->properties, $propertyName);
         if (!$property) return null;
-        return $property->getProperty(array_slice($propertyPath, 1));
+        $subPropertyPath = array_slice($propertyPath, 1);
+        return $property->getProperty($subPropertyPath);
     }
 
-    public function getUri(?string $entityId = null): string
+    public function getUri($entityId = null): string // ?string
     {
         return '/' . $this->entityClassName . '/' . (is_null($entityId) ? '*' : $entityId);
     }
@@ -214,7 +215,7 @@ class EntityClass
     }
 }
 
-function cleanWrapping(&$wrapper, int $status): void
+function cleanWrapping(&$wrapper, int $status)//TODO : void
 {
     if (!is_array($wrapper)) {
         return;
@@ -362,7 +363,8 @@ class EntityClassResponse extends Response
 
     public function __construct($entityClassName, RequestObject &$requestObject)
     {
-        $this->entityClass = EntityClass::get($entityClassName, $requestObject->getAccessGroups());
+        $accessGroups = $requestObject->getAccessGroups();
+        $this->entityClass = EntityClass::get($entityClassName, $accessGroups);
         $this->requestObject = $requestObject;
     }
 

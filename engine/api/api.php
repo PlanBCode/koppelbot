@@ -2,7 +2,7 @@
 
 require 'internal.php';
 
-function pathFromUri(string $uri): ?array
+function pathFromUri(string $uri)//TODO: ?array
 {
     if (substr($uri, 0, 1) !== '/') return null;
     return explode('/', substr($uri, 1));
@@ -53,11 +53,12 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
 }
 
 
-function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests, RequestObject &$requestObject, string $entityClassNameList, string $entityIdList, array $propertyPath, $content): void
+function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests, RequestObject &$requestObject, string $entityClassNameList, string $entityIdList, array $propertyPath, $content)//TODO : void
 {
     $entityClassNames = explode(',', $entityClassNameList);
     foreach ($entityClassNames as $entityClassName) {
-        $entityClass = EntityClass::get($entityClassName, $requestObject->getAccessGroups());
+        $accessGroups = $requestObject->getAccessGroups();
+        $entityClass = EntityClass::get($entityClassName, $accessGroups);
         if (is_null($entityClass)) {
             if ($entityClassName === '*') {
                 $apiRequest->addError(400, 'Illegal full wildcard * request. Please specify entities.');
@@ -78,7 +79,7 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
     }
 }
 
-function addRequestResponse(ConnectorRequest &$connectorRequest, array &$requestResponses): void
+function addRequestResponse(ConnectorRequest &$connectorRequest, array &$requestResponses)//TODO : void
 {
   $connectorResponse = Connector::getConnectorResponse($connectorRequest);
   foreach ($connectorResponse->getRequestResponses() as $requestId => &$requestResponse) {
@@ -138,14 +139,15 @@ class RequestObject
         return $this->requestId;
     }
 
-    public function setMethod(string $method): void
+    public function setMethod(string $method)//TODO : void
     {
       $this->method = $method;
     }
 
     public function getEntityIdList(): string
     {
-        return array_get($this->getPath(), 1, '*');
+        $path = $this->getPath();
+        return array_get($path, 1, '*');
     }
 
     public function getPath(): array
@@ -234,7 +236,7 @@ class ApiRequest extends HttpRequest2
         parent::__construct($method, $uri, $queryString, $headers, $content);
     }
 
-    public function addError(int $status, string $errorMessage, array &$path = []): void
+    public function addError(int $status, string $errorMessage, array &$path = [])//TODO : void
     {
         $this->errors[] = new ApiError($status, $errorMessage, $path);
     }
@@ -364,7 +366,7 @@ class ApiRequest extends HttpRequest2
             return $requestResponse->getStatus();
         }
     }
-    protected function nullifyHead207Response(&$content): void
+    protected function nullifyHead207Response(&$content)//TODO : void
     {
       foreach($content as $key=>&$value){
         if($value['status']===207){
