@@ -4,6 +4,7 @@ TODO
 - view  left|right|bottom|top
 - year/month/day labels
  */
+const {getStateMessage} = require('../item/item');
 
 function parseDateString (string) {
   if (typeof string !== 'string') return new Date().getTime();
@@ -135,13 +136,13 @@ function drawNodes (DIV, display) {
 
 exports.display = {
   waitingForInput: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for input...';
+    display.getWRAPPER().innerText = getStateMessage(display, 'waitingForInputMessage');
   },
   waitingForData: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for data...';
+    display.getWRAPPER().innerText = getStateMessage(display, 'waitingForDataMessage');
   },
   empty: display => {
-    display.getWRAPPER().innerHTML = 'No items to display.';
+    display.getWRAPPER().innerText = getStateMessage(display, 'emptyMessage');
   },
   first: display => {
     const datePropertyName = display.getOption('key') || 'date'; // TODO

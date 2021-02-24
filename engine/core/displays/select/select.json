@@ -5,7 +5,10 @@
     "initialValue" : {"info":"The initial value to be used."},
     "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "showCreateButton" : {"info":"Whether to show a button to a create interface.", "type":"bool", "default":false},
-    "createButtonText" : {"info":"Define a custom text for the create button.", "type":"string", "default":"+"}
+    "createButtonText" : {"info":"Define a custom text for the create button.", "type":"string", "default":"+"},
+    "waitingForInputMessage" : {"info":"Text to display while waiting for input.", "type":"string", "default":"Waiting for input..."},
+    "waitingForDataMessage" : {"info":"Text to display while waiting for data.", "type":"string", "default":"Waiting for data..."},
+    "waitingForEmptyMessage" : {"info":"Text to display when empty.", "type":"string", "default":"No items to display."}
 
   }
 }

@@ -5,6 +5,9 @@
     "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "select" : {"info":"Define a variable that stores the selection of this timeline.", "type":"string"},
     "horizontal" : {"info":"Whether to show the timeline horizontally.", "type":"bool", "default":false},
-    "midLine" : {"info":"Where the midline is located.", "type":"number", "default":0}
+    "midLine" : {"info":"Where the midline is located.", "type":"number", "default":0},
+    "waitingForInputMessage" : {"info":"Text to display while waiting for input.", "type":"string", "default":"Waiting for input..."},
+    "waitingForDataMessage" : {"info":"Text to display while waiting for data.", "type":"string", "default":"Waiting for data..."},
+    "waitingForEmptyMessage" : {"info":"Text to display when empty.", "type":"string", "default":"No items to display."}    
   }
 }

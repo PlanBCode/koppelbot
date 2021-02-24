@@ -6,13 +6,14 @@ options
 - flavor  dropdown|TODO radio
 - showCreateButton
  */
+const {getStateMessage} = require('../item/item');
 
 exports.display = {
   waitingForInput: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for input...';
+    display.getWRAPPER().innerText = getStateMessage(display, 'waitingForInputMessage');
   },
   waitingForData: display => {
-    display.getWRAPPER().innerHTML = 'Waiting for data...';
+    display.getWRAPPER().innerText = getStateMessage(display, 'waitingForDataMessage');
   },
   empty: display => {
     const WRAPPER = display.getWRAPPER();

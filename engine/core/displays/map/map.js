@@ -3,7 +3,7 @@
 /*
 TODO?label  define a label property to use
  */
-
+const {getStateMessage} = require('../item/item');
 let SCRIPT; // to dynamically load dependency;
 
 function initializeMap (display) {
@@ -12,7 +12,7 @@ function initializeMap (display) {
 
   if (WRAPPER.vectorLayer) { // map is already created, to reinitialize we clear all features
     const DIV_message = WRAPPER.firstChild;
-    DIV_message.innerText = 'Waiting for input...';
+    DIV_message.innerText = getStateMessage(display, 'waitingForInputMessage');
     WRAPPER.vectorSource.clear();
     return;
   }
@@ -25,7 +25,7 @@ function initializeMap (display) {
   WRAPPER.innerHTML = '';
   const DIV_message = document.createElement('DIV');
   DIV_message.className = 'xyz-map-message';
-  DIV_message.innerText = 'Waiting for input...';
+  DIV_message.innerText = getStateMessage(display, 'waitingForInputMessage');
   WRAPPER.appendChild(DIV_message);
 
   const vectorLayer = new ol.layer.Vector({
@@ -145,7 +145,7 @@ exports.display = {
   waitingForData: displayItem => {
     const WRAPPER = displayItem.getWRAPPER();
     const DIV_message = WRAPPER.firstChild;
-    if (DIV_message) DIV_message.innerText = 'Waiting for data...';
+    if (DIV_message) DIV_message.innerText = getStateMessage(displayItem, 'waitingForDataMessage');
   },
   empty: displayItem => {
     const WRAPPER = displayItem.getWRAPPER();

@@ -8,6 +8,19 @@ function isFullEntity (uri) {
   }
   return true;
 }
+const messageTypes = {
+  waitingForInputMessage: 'Waiting for input...',
+  waitingForDataMessage: 'Waiting for data...',
+  emptyMessage: 'No items to display.'
+};
+
+function getStateMessage (displayItem, messageType) {
+  if (displayItem.getOption(messageType)) return displayItem.getOption(messageType);
+  else if (displayItem.getOption('hideMessages')) return '';
+  else return messageTypes[messageType];
+}
+
+exports.getStateMessage = getStateMessage;
 
 exports.display = {
   /**
@@ -16,7 +29,7 @@ exports.display = {
    * @returns {void}         TODO
    */
   waitingForInput: displayItem => {
-    displayItem.getWRAPPER().innerHTML = 'Waiting for input...';
+    displayItem.getWRAPPER().innerText = getStateMessage(displayItem, 'waitingForInputMessage');
   },
   /**
    * [waitingForInput description]
@@ -24,7 +37,7 @@ exports.display = {
    * @returns {void}         TODO
    */
   waitingForData: displayItem => {
-    displayItem.getWRAPPER().innerHTML = 'Waiting for data...';
+    displayItem.getWRAPPER().innerText = getStateMessage(displayItem, 'waitingForDataMessage');
   },
   /**
    * [waitingForInput description]
@@ -32,7 +45,7 @@ exports.display = {
    * @returns {void}         TODO
    */
   empty: displayItem => {
-    displayItem.getWRAPPER().innerHTML = 'No items to display.';
+    displayItem.getWRAPPER().innerText = getStateMessage(displayItem, 'emptyMessage');
   },
   /**
    * [waitingForInput description]

@@ -5,6 +5,9 @@ options
 - TODO addEditButtons
 - TODO add multiselect tools
  */
+
+const {getStateMessage} = require('../item/item');
+
 function sortTable (TABLE, columnIndex, ascending, type) {
   let switching = true;
   const THEAD = TABLE.firstChild;
@@ -139,12 +142,10 @@ exports.fixHeaderOnScroll = fixHeaderOnScroll;
 
 exports.display = {
   waitingForInput: display => {
-    const WRAPPER = display.getWRAPPER();
-    WRAPPER.innerHTML = 'Waiting for input...';
+    display.getWRAPPER().innerText = getStateMessage(display, 'waitingForInputMessage');
   },
   waitingForData: display => {
-    const WRAPPER = display.getWRAPPER();
-    WRAPPER.innerHTML = 'Waiting for data...';
+    display.getWRAPPER().innerText = getStateMessage(display, 'waitingForDataMessage');
   },
   empty: display => {
     const WRAPPER = display.getWRAPPER();

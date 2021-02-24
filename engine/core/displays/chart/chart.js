@@ -2,6 +2,8 @@
 const Chart = require('chart.js');
 const {renderUnit} = require('../../types/number/number');
 const {sortTableOnClick, addSearchBox, fixHeaderOnScroll } = require('../list/list');
+const {getStateMessage} = require('../item/item');
+
 // TODO mixed
 const CHART_TYPES = require('./chart.json').options.flavor.choices;
 
@@ -60,7 +62,7 @@ exports.display = {
     if (!CHART_TYPES.includes(flavor)) {
       WRAPPER.innerHTML = `Unknown chart flavor: '${flavor}'.`;
       WRAPPER.classList.add('xyz-error');
-    } else WRAPPER.innerHTML = 'Waiting for input...';
+    } else WRAPPER.innerHTML = getStateMessage(display, 'waitingForInputMessage');
   },
   waitingForData: display => {
     const WRAPPER = display.getWRAPPER();
@@ -76,14 +78,14 @@ exports.display = {
       WRAPPER.innerHTML = errors.join('<br/>');
       WRAPPER.classList.add('xyz-error');
     } else {
-      WRAPPER.innerHTML = 'Waiting for data...';
+      WRAPPER.innerHTML = getStateMessage(display, 'waitingForDataMessage');
       WRAPPER.classList.remove('xyz-error');
     }
   },
   empty: display => {
     const WRAPPER = display.getWRAPPER();
     if (WRAPPER.classList.contains('xyz-error')) return;
-    WRAPPER.innerHTML = 'No items to display.';
+    WRAPPER.innerHTML = getStateMessage(display, 'emptyMessage');
   },
   first: display => {
     const WRAPPER = display.getWRAPPER();
