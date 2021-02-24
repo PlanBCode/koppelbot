@@ -111,9 +111,13 @@ function initializeMap (display) {
     }); */
   }
   const BUTTON_zoomin = document.getElementsByClassName('ol-zoom-in')[0];
+  const BUTTON_zoomout = document.getElementsByClassName('ol-zoom-out')[0];
   const BUTTON_zoomfit = document.createElement('button');
   BUTTON_zoomfit.innerHTML = '&boxplus;';
   BUTTON_zoomfit.className = 'ol-zoom-fit';
+  BUTTON_zoomout.title = 'Zoom out';
+  BUTTON_zoomin.title = 'Zoom in';
+  BUTTON_zoomfit.title = 'Zoom to fit';
   BUTTON_zoomfit.onclick = () => zoomToFit(WRAPPER);
   const DIV_buttons = BUTTON_zoomin.parentNode;
   DIV_buttons.insertBefore(BUTTON_zoomfit, BUTTON_zoomin);
