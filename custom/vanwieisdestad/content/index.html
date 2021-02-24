@@ -59,7 +59,7 @@
           tryZoom();
 
         </script>
-        <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
+        <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"/>
       </td>
       <td valign="top" width="30%" style="background-color:#EFEFEF; height:70vh;">
         <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
