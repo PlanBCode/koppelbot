@@ -18,13 +18,14 @@ exports.actions = {
     SPAN.classList.add('xyz-reference');
     const uri = item.getSetting('uri');
     const entityClassName = uri.substr(1).split('/')[0];
-
     const changeHandler = node => {
       // TODO check for errors
       const referenceEntityId = node.getContent();
       const referenceUri = '/' + entityClassName + '/' + referenceEntityId;
       // TODO options : display:'flat'
-      item.ui({uri: referenceUri, display: 'title'}, SPAN);
+      // TODO get title property and only retrieve that
+
+      item.ui({uri: referenceUri, display: 'title', onReady: item.getOption('onReady')}, SPAN);
     };
     changeHandler(item);
     return SPAN;

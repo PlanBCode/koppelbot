@@ -1,13 +1,22 @@
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
 const {renderUnit} = require('../../types/number/number');
-const {sortTableOnClick, addSearchBox} = require('../list/list');
+const {sortTableOnClick, addSearchBox, fixHeaderOnScroll } = require('../list/list');
 // TODO mixed
 const CHART_TYPES = require('./chart.json').options.flavor.choices;
 
 // TODO nth, avg, count_distinct, var(iance), stdev??
 const AGGREGATORS = ['count', 'sum', 'join', 'first', 'last', 'min', 'max'];
 
+function requestUpdate (WRAPPER) {
+  if (!WRAPPER.updateTimeOutHandle) { // Throttle chart updates
+    WRAPPER.updateTimeOutHandle = setTimeout(() => {
+      WRAPPER.chart.data.datasets = WRAPPER.tmpDatasets;
+      WRAPPER.chart.update();
+      delete WRAPPER.updateTimeOutHandle;
+    }, 500);
+  }
+}
 function getBaseValue (aggregator) {
   switch (aggregator) {
     case 'count' : return 0;
@@ -85,6 +94,12 @@ exports.display = {
     const flavor = display.getOption('flavor') || 'bar';
     if (flavor === 'table') {
       const TABLE = document.createElement('TABLE');
+      const THEAD = document.createElement('THEAD');
+      const TBODY = document.createElement('TBODY');
+      TABLE.appendChild(THEAD);
+      fixHeaderOnScroll(WRAPPER, THEAD, TBODY);
+
+      TABLE.appendChild(TBODY);
       TABLE.className = 'xyz-list';
       if (display.getOption('showHeader') !== false) {
         const TR_header = document.createElement('TR');
@@ -107,7 +122,7 @@ exports.display = {
             selectEntityIds = selectEntityIds ? selectEntityIds.split(',') : [];
             let all = true;
             let none = true;
-            for (const TR of TABLE.childNodes) {
+            for (const TR of TBODY.childNodes) {
               const TD_checkbox = TR.firstChild;
               const INPUT_checkbox = TD_checkbox.firstChild;
               if (INPUT_checkbox && INPUT_checkbox.type === 'checkbox' && INPUT_checkbox !== INPUT_checkAll) {
@@ -139,7 +154,7 @@ exports.display = {
         }
         if (display.hasOption('select')) {
           display.onSelect(selectEntityId => {
-            for (const TR_entity of TABLE.childNodes) {
+            for (const TR_entity of TBODY.childNodes) {
               const entityId = display.hasOption('groupby') ? TR_entity.groupId : TR_entity.entityId;
               if (entityId === selectEntityId) TR_entity.classList.add('xyz-list-selected');
               else TR_entity.classList.remove('xyz-list-selected');
@@ -169,7 +184,7 @@ exports.display = {
           sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
           TR_header.appendChild(TD_header);
         }
-        TABLE.appendChild(TR_header);
+        THEAD.appendChild(TR_header);
         addSearchBox(display, TR_header, TABLE);
       }
 
@@ -262,6 +277,8 @@ exports.display = {
     const flavor = display.getOption('flavor') || 'bar';
     if (flavor === 'table') {
       const TABLE = WRAPPER.firstChild;
+      const THEAD = TABLE.firstChild;
+      const TBODY = THEAD.nextElementSibling;
       let offset = 0;
       if (display.hasOption('groupby')) offset++;
       if (display.hasOption('color')) offset++;
@@ -270,7 +287,7 @@ exports.display = {
       for (const groupId in groups) {
         const group = groups[groupId];
         let found = false;
-        for (const TR of TABLE.children) {
+        for (const TR of TBODY.children) {
           if (TR.groupId === groupId) {
             for (let i = 0; i < aggregations.length; ++i) {
               const aggregation = aggregations[i];
@@ -341,10 +358,37 @@ exports.display = {
             TD.innerText = group[label];
             TR.appendChild(TD);
           }
-          TABLE.appendChild(TR);
+          TBODY.appendChild(TR);
         }
       }
     } else {
+      const id = display.hasOption('groupby') ? groupId : entityId;
+      if (!WRAPPER.hasOwnProperty('SPANs_label')) WRAPPER.SPANs_labelById = {};
+      if (!WRAPPER.SPANs_labelById.hasOwnProperty(id)) {
+        const node = display.hasOption('groupby') ? display.getNode(groupByPropertyName) : display.getNode();
+        if (node.getSetting('type') === 'reference') { // special case, if reference then retrieve the title using the title display
+          const SPAN = node.render('view', {
+            onReady: title => {
+              const labels = WRAPPER.chart.data.labels;
+              const index = labels.indexOf(String(id));
+              if (index !== -1) {
+                labels[index] = title;
+                requestUpdate(WRAPPER);
+              }
+            }
+          }
+          , []);
+          WRAPPER.SPANs_labelById[id] = SPAN;
+        } else {
+          const labels = WRAPPER.chart.data.labels;
+          const index = labels.indexOf(String(id));
+          if (index !== -1) {
+            labels[index] = node.getContent();
+            requestUpdate(WRAPPER);
+          }
+        }
+      }
+
       WRAPPER.chart.data.labels = Object.keys(groups);
       WRAPPER.chart.data.datasets = [];
       WRAPPER.tmpDatasets = [];
@@ -366,13 +410,7 @@ exports.display = {
         };
         WRAPPER.tmpDatasets.push(dataset);
       }
-      if (!WRAPPER.updateTimeOutHandle) { // Throttle chart updates
-        WRAPPER.updateTimeOutHandle = setTimeout(() => {
-          WRAPPER.chart.data.datasets = WRAPPER.tmpDatasets;
-          WRAPPER.chart.update();
-          delete WRAPPER.updateTimeOutHandle;
-        }, 500);
-      }
+      requestUpdate(WRAPPER);
     }
   },
   remove: display => {

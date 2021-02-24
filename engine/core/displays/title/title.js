@@ -26,6 +26,10 @@ exports.display = {
     // TODO highlight selection
     // TODO multiselect
     displayItem.getWRAPPER().appendChild(SPAN_entity);
+    if (displayItem.hasOption('onReady')) {
+      const onReady = displayItem.getOption('onReady');
+      if (typeof onReady === 'function') onReady(SPAN_entity.innerText);
+    }
   },
 
   remove: displayItem => {

@@ -5,18 +5,22 @@ options
 - TODO addEditButtons
 - TODO add multiselect tools
  */
-function sortTable (TABLE, columnIndex, ascending, type, skipHeaderRows = 1) {
+function sortTable (TABLE, columnIndex, ascending, type) {
   let switching = true;
+  const THEAD = TABLE.firstChild;
+  const TBODY = THEAD.nextElementSibling;
+
   /* Make a loop that will continue until
   no switching has been done: */
   while (switching) {
     // Start by saying: no switching is done:
     switching = false;
-    const rows = TABLE.rows;
+
+    const rows = TBODY.rows;
     /* Loop through all table rows (except the
     first, which contains table headers): */
     let shouldSwitch, i;
-    for (i = skipHeaderRows; i < rows.length - 1; i++) {
+    for (i = 0; i < rows.length - 1; i++) {
       // Start by saying there should be no switching:
       shouldSwitch = false;
       /* Get the two elements you want to compare,
@@ -48,7 +52,7 @@ function sortTable (TABLE, columnIndex, ascending, type, skipHeaderRows = 1) {
   }
 }
 
-function sortTableOnClick (TABLE, TD_header, type, skipHeaderRows) {
+function sortTableOnClick (TABLE, TD_header, type) {
   TD_header.style.cursor = 'pointer';
   TD_header.onclick = () => {
     let columnIndex;
@@ -73,20 +77,22 @@ function sortTableOnClick (TABLE, TD_header, type, skipHeaderRows) {
       }
       ++i;
     }
-    sortTable(TABLE, columnIndex, ascending, type, skipHeaderRows);
+    sortTable(TABLE, columnIndex, ascending, type);
   };
 }
 exports.sortTableOnClick = sortTableOnClick;
 
 function addSearchBox (display, TR_header, TABLE) {
   if (display.getOption('showSearchBar')) {
+    const THEAD = TABLE.firstChild;
+    const TBODY = THEAD.nextElementSibling;
     const TR_search = document.createElement('TR');
     const TD_search = document.createElement('TD');
     const INPUT_search = document.createElement('INPUT');
     INPUT_search.placeholder = 'search';
     INPUT_search.oninput = INPUT_search.inpaste = () => {
       const search = INPUT_search.value.toUpperCase();
-      for (const TR of TR_search.parentNode.children) {
+      for (const TR of TBODY.children) {
         if (TR !== TR_search && TR !== TR_header) {
           TR.style.display = search === '' || TR.innerHTML.toUpperCase().includes(search) ? 'table-row' : 'none';
         }
@@ -96,11 +102,40 @@ function addSearchBox (display, TR_header, TABLE) {
     TD_search.setAttribute('colspan', TR_header.children.length);
     TD_search.appendChild(INPUT_search);
     TR_search.appendChild(TD_search);
-    TABLE.appendChild(TR_search);
+    THEAD.appendChild(TR_search);
   }
 }
 
 exports.addSearchBox = addSearchBox;
+
+function fixHeaderOnScroll (WRAPPER, THEAD, TBODY) {
+  WRAPPER.onscroll = () => {
+    if (WRAPPER.scrollTop > 0) {
+      THEAD.style.position = 'fixed';
+      TBODY.style.width = TBODY.getBoundingClientRect().width + 'px';
+      const TR_header = THEAD.childNodes[0];
+      const TR_first = TBODY.childNodes[0];
+      if (TR_first && TR_header) {
+        for (let i = 0; i < TR_first.children.length; ++i) {
+          const width = TR_first.children[i].getBoundingClientRect().width + 'px';
+          TR_header.children[i].style.width = width;
+          TR_header.children[i].style.minWidth = width;
+        }
+      }
+    } else {
+      const TR_header = THEAD.childNodes[0];
+      if (TR_header) {
+        for (const TD_head of TR_header.children) {
+          TD_head.style.width = null;
+          TD_head.style.minWidth = null;
+        }
+      }
+      THEAD.style.position = 'static';
+    }
+  };
+}
+
+exports.fixHeaderOnScroll = fixHeaderOnScroll;
 
 exports.display = {
   waitingForInput: display => {
@@ -123,6 +158,11 @@ exports.display = {
     if (display.getOption('showHeader') !== false) {
       const WRAPPER = display.getWRAPPER();
       const TABLE = WRAPPER.firstChild;
+      const THEAD = document.createElement('THEAD');
+      const TBODY = document.createElement('TBODY');
+      fixHeaderOnScroll(WRAPPER, THEAD, TBODY);
+      TABLE.appendChild(THEAD);
+      TABLE.appendChild(TBODY);
       const TR_header = document.createElement('TR');
       TR_header.className = 'xyz-list-header';
       if (display.getOption('multiSelect')) {
@@ -142,7 +182,7 @@ exports.display = {
           selectEntityIds = selectEntityIds ? selectEntityIds.split(',') : [];
           let all = true;
           let none = true;
-          for (const TR of TABLE.childNodes) {
+          for (const TR of TBODY.childNodes) {
             const TD_checkbox = TR.firstChild;
             const INPUT_checkbox = TD_checkbox.firstChild;
             if (INPUT_checkbox && INPUT_checkbox.type === 'checkbox' && INPUT_checkbox !== INPUT_checkAll) {
@@ -168,27 +208,26 @@ exports.display = {
         TD_header.innerHTML = display.getEntityClassName();
         TR_header.appendChild(TD_header);
         const type = flatNodes.getSetting('type');
-        sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
+        sortTableOnClick(TABLE, TD_header, type);
       } else {
         for (const flatPropertyName in flatNodes) {
           const TD_header = document.createElement('TD');
           TD_header.innerText = display.getDisplayName(flatPropertyName);
           const type = flatNodes[flatPropertyName].getSetting('type');
-          sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
+          sortTableOnClick(TABLE, TD_header, type);
           TR_header.appendChild(TD_header);
         }
       }
 
       if (display.hasOption('select')) {
         display.onSelect(selectEntityId => {
-          for (const TR of TABLE.childNodes) {
+          for (const TR of TBODY.childNodes) {
             if (TR.entityId === selectEntityId) TR.classList.add('xyz-list-selected');
             else TR.classList.remove('xyz-list-selected');
           }
         });
       }
-      TABLE.appendChild(TR_header);
-
+      THEAD.appendChild(TR_header);
       addSearchBox(display, TR_header, TABLE);
     }
   },
@@ -254,15 +293,19 @@ exports.display = {
       TR_entity.classList.add('xyz-list-selectable');
       TR_entity.onclick = () => display.select();
     }
-    TABLE.appendChild(TR_entity);
+    const THEAD = TABLE.firstChild;
+    const TBODY = THEAD.nextElementSibling;
+    TBODY.appendChild(TR_entity);
   },
   remove: display => {
     const WRAPPER = display.getWRAPPER();
     const entityId = display.getEntityId();
     const TABLE = WRAPPER.firstChild;
-    for (const TR_entity of TABLE.childNodes) {
+    const THEAD = TABLE.firstChild;
+    const TBODY = THEAD.nextElementSibling;
+    for (const TR_entity of TBODY.childNodes) {
       if (typeof TR_entity.entityId === 'string' && (TR_entity.entityId === entityId || entityId === '*')) {
-        TABLE.removeChild(TR_entity);
+        TBODY.removeChild(TR_entity);
       }
     }
   }

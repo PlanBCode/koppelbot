@@ -232,20 +232,6 @@ li:nth-child(5n+3) {
 li:nth-child(5n+4) {
   list-style-image: url('./orange-bullet.png');
 }
-table.xyz-item > tr.xyz-item-selected.xyz-item-header {
-  background-color: yellow;
-  color: black;
-}
-
-span.xyz-item-deselect {
-  float: right;
-  cursor: pointer;
-  margin-right: 5px;
-}
-
-span.xyz-item-deselect::before {
-  content: "\2715";
-}
 table.xyz-create,
 table.xyz-item,
 table.xyz-list {
@@ -345,6 +331,7 @@ tr.xyz-list-search > td > input {
   color: white;
   border: none;
   outline: none;
+  cursor: pointer;
   border-radius: 5px;
 }
 
@@ -427,6 +414,38 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
+}table.xyz-item > tr.xyz-item-selected.xyz-item-header {
+  background-color: yellow;
+  color: black;
+}
+
+span.xyz-item-deselect {
+  float: right;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+span.xyz-item-deselect::before {
+  content: "\2715";
+}
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
 }@charset "UTF-8";
 
 /*!
@@ -666,25 +685,7 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
-
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}.xyz-login a {
+.xyz-login a {
   color: blue;
   cursor: pointer;
   margin: 5px;
