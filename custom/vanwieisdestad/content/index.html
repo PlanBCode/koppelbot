@@ -45,11 +45,18 @@
         <div id="zoom-to-amersfoort">Amersfoort</div>
         <script>
           const DIV = document.getElementById('zoom-to-amersfoort');
-          DIV.onclick = ()=>{
+          const zoomToAmersfoort = DIV.onclick = ()=>{
             const WRAPPER = document.getElementById('map');
-            WRAPPER.map.getView().setCenter(ol.proj.transform([5.4000, 52.1680], 'EPSG:4326', 'EPSG:3857'));
-            WRAPPER.map.getView().setZoom(13);
+            if(WRAPPER && WRAPPER.map){
+              WRAPPER.map.getView().setCenter(ol.proj.transform([5.4000, 52.1680], 'EPSG:4326', 'EPSG:3857'));
+              WRAPPER.map.getView().setZoom(13);
+              return true;
+            } else return false;
           }
+          const tryZoom = ()=> setTimeout(()=>{
+            if(!zoomToAmersfoort()) tryZoom();
+          },100);
+          tryZoom();
 
         </script>
         <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" showCreateButton="false" color="EigenaarID" location="geojson" markUserLocation="true" select="locatie" display="map"/>
