@@ -12,6 +12,7 @@
   color: white;
   border: none;
   outline: none;
+  cursor: pointer;
   border-radius: 5px;
 }
 
