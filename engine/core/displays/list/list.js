@@ -5,7 +5,7 @@ options
 - TODO addEditButtons
 - TODO add multiselect tools
  */
-function sortTable (TABLE, columnIndex, ascending, type) {
+function sortTable (TABLE, columnIndex, ascending, type, skipHeaderRows = 1) {
   let switching = true;
   /* Make a loop that will continue until
   no switching has been done: */
@@ -16,9 +16,11 @@ function sortTable (TABLE, columnIndex, ascending, type) {
     /* Loop through all table rows (except the
     first, which contains table headers): */
     let shouldSwitch, i;
-    for (i = 1; i < rows.length - 1; i++) {
+    console.log('skipHeaderRows', skipHeaderRows);
+    for (i = skipHeaderRows; i < rows.length - 1; i++) {
       // Start by saying there should be no switching:
       shouldSwitch = false;
+      console.log(rows[i]);
       /* Get the two elements you want to compare,
       one from current row and one from the next: */
       let x = rows[i].getElementsByTagName('TD')[columnIndex].innerHTML;
@@ -48,7 +50,7 @@ function sortTable (TABLE, columnIndex, ascending, type) {
   }
 }
 
-function sortTableOnClick (TABLE, TD_header, type) {
+function sortTableOnClick (TABLE, TD_header, type, skipHeaderRows) {
   TD_header.onclick = () => {
     let columnIndex;
     let i = 0;
@@ -72,7 +74,7 @@ function sortTableOnClick (TABLE, TD_header, type) {
       }
       ++i;
     }
-    sortTable(TABLE, columnIndex, ascending, type);
+    sortTable(TABLE, columnIndex, ascending, type, skipHeaderRows);
   };
 }
 exports.sortTableOnClick = sortTableOnClick;
@@ -167,13 +169,13 @@ exports.display = {
         TD_header.innerHTML = display.getEntityClassName();
         TR_header.appendChild(TD_header);
         const type = flatNodes.getSetting('type');
-        sortTableOnClick(TABLE, TD_header, type);
+        sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
       } else {
         for (const flatPropertyName in flatNodes) {
           const TD_header = document.createElement('TD');
           TD_header.innerText = display.getDisplayName(flatPropertyName);
           const type = flatNodes[flatPropertyName].getSetting('type');
-          sortTableOnClick(TABLE, TD_header, type);
+          sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
           TR_header.appendChild(TD_header);
         }
       }

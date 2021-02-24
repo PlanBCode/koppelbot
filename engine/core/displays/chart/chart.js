@@ -135,7 +135,7 @@ exports.display = {
           TD_groupBy.innerText = groupByLabel;
           TR_header.appendChild(TD_groupBy);
           const type = display.getNode(groupByPropertyName).getSetting('type');
-          sortTableOnClick(TABLE, TD_groupBy, type);
+          sortTableOnClick(TABLE, TD_groupBy, type, display.hasOption('showSearchBar') ? 2 : 1);
         }
         if (display.hasOption('select')) {
           display.onSelect(selectEntityId => {
@@ -166,7 +166,7 @@ exports.display = {
           TD_header.innerHTML = title;
           let type = getAggregationType(aggregator);
           if (!type) type = display.getNode(propertyName).getSetting('type'); // fallback for untyped aggregations
-          sortTableOnClick(TABLE, TD_header, type);
+          sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
           TR_header.appendChild(TD_header);
         }
         TABLE.appendChild(TR_header);
