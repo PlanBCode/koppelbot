@@ -184,13 +184,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
   this.onMultiSelect = callback => {
     if (this.hasOption('multiSelect')) variables.onVariable(this.getOption('multiSelect'), callback);
   };
-  /**
-   * [select description]
-   * @param  {string} [entityClassName_] TODO
-   * @param  {string} [entityId_]        TODO
-   * @returns {void}                 TODO
-   */
-  this.select = (entityClassName_ = entityClassName, entityId_ = entityId) => {
+  const select = (entityClassName_, entityId_) => {
     variables.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'));
     if (this.hasOption('onChange')) {
       const onChange = this.getOption('onChange');
@@ -200,6 +194,13 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
   };
   /**
    * [select description]
+   * @param  {string} [entityClassName_] TODO
+   * @param  {string} [entityId_]        TODO
+   * @returns {void}                 TODO
+   */
+  this.select = (entityClassName_ = entityClassName, entityId_ = entityId) => select(entityClassName_, entityId_);
+  /**
+   * [select description]
    * @returns {void}                 TODO
    */
   this.selectAll = () => this.select('*', '*');
@@ -207,7 +208,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * [select description]
    * @returns {void}                 TODO
    */
-  this.selectNone = () => this.select(undefined, undefined);
+  this.selectNone = () => select(undefined, undefined);// prevent parameter defaults
   /**
    * [isSelected description]
    * @param  {string} [entityClassName_] TODO

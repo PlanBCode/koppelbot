@@ -38,7 +38,7 @@ table.xyz-list tr.xyz-list-selectable:hover {
   background-color: lightblue;
 }
 
-table.xyz-list tr.xyz-list-selected {
+table.xyz-list > tr.xyz-list-selected {
   background-color: yellow;
 }
 

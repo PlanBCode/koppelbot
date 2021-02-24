@@ -272,7 +272,7 @@ table.xyz-list tr.xyz-list-selectable:hover {
   background-color: lightblue;
 }
 
-table.xyz-list tr.xyz-list-selected {
+table.xyz-list > tr.xyz-list-selected {
   background-color: yellow;
 }
 
@@ -413,7 +413,21 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}@charset "UTF-8";
+}table.xyz-item > tr.xyz-item-selected.xyz-item-header {
+  background-color: yellow;
+  color: black;
+}
+
+span.xyz-item-deselect {
+  float: right;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+span.xyz-item-deselect::before {
+  content: "\2715";
+}
+@charset "UTF-8";
 
 /*!
  * Pikaday

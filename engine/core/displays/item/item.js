@@ -40,11 +40,50 @@ exports.display = {
    * @returns {void}         TODO
    */
   first: displayItem => {
-    displayItem.getWRAPPER().innerHTML = '';
+    const WRAPPER = displayItem.getWRAPPER();
+    WRAPPER.innerHTML = '';
     if (displayItem.getOption('showCreateButton') === true) displayItem.showCreateButton();
+
+    if (displayItem.hasOption('select')) {
+      const selectionVariableName = displayItem.getOption('select');
+      const uri = displayItem.getOption('uri');
+      const entityIdList = uri.substr(1).split('/')[1] || '';
+      if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
+        // todo $locatiemetnogmeer matched ook
+      } else {
+        displayItem.onSelect(selectedEntityId => {
+          for (const TABLE_entity of WRAPPER.children) {
+            const TR_header = TABLE_entity.firstChild;
+            const entityId = TABLE_entity.entityId;
+            if (selectedEntityId === entityId) TR_header.classList.add('xyz-item-selected');
+            else TR_header.classList.remove('xyz-item-selected');
+          }
+        });
+      }
+    }
+
+    if (displayItem.hasOption('multiSelect')) {
+      const selectionVariableName = displayItem.getOption('multiSelect');
+      const uri = displayItem.getOption('uri');
+      const entityIdList = uri.substr(1).split('/')[1] || '';
+      // todo $locatiemetnogmeer matched ook
+      if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
+        //
+      } else {
+        displayItem.onMultiSelect(selectedEntityIdList => {
+          for (const TABLE_entity of WRAPPER.children) {
+            const TR_header = TABLE_entity.firstChild;
+            const INPUT_select = TR_header.firstChild.firstChild;
+            const entityId = TABLE_entity.entityId;
+            if (typeof selectedEntityIdList === 'string' && selectedEntityIdList.split(',').includes(entityId)) INPUT_select.checked = true;
+            else INPUT_select.checked = false;
+          }
+        });
+      }
+    }
   },
   /**
-   * [waitingForInput description]
+   * [entity description]
    * @param  {DisplayItem} displayItem TODO
    * @returns {void}         TODO
    */
@@ -71,13 +110,60 @@ exports.display = {
       TR_header.className = 'xyz-item-header';
       TD_header = document.createElement('TD');
       TD_header.setAttribute('colspan', displayItem.getOption('showLabels') !== false ? '2' : '1');
+
+      if (displayItem.hasOption('select')) {
+        const selectionVariableName = displayItem.getOption('select');
+        const uri = displayItem.getOption('uri');
+        const entityIdList = uri.substr(1).split('/')[1] || '';
+        if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
+          const SPAN_unselect = document.createElement('SPAN');
+          SPAN_unselect.className = 'xyz-item-deselect';
+          SPAN_unselect.onclick = () => displayItem.selectNone(undefined, undefined);
+          TD_header.appendChild(SPAN_unselect);
+        } else {
+          TR_header.onclick = event => {
+            if (!event.target || event.target.tagName !== 'INPUT') { // prevent multi select click collision
+              displayItem.select();
+            }
+          };
+          TR_header.style.cursor = 'pointer';
+          if (displayItem.isSelected()) TR_header.classList.add('xyz-item-selected');
+        }
+      }
+
+      if (displayItem.hasOption('multiSelect')) {
+        const selectionVariableName = displayItem.getOption('multiSelect');
+        const uri = displayItem.getOption('uri');
+        const entityIdList = uri.substr(1).split('/')[1] || '';
+        // toto $locatiemetnogmeer matched ook
+        if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
+          const SPAN_unselect = document.createElement('SPAN');
+          SPAN_unselect.className = 'xyz-item-deselect';
+          SPAN_unselect.onclick = () => displayItem.multieSelectRemove();
+          TD_header.appendChild(SPAN_unselect);
+        } else {
+          const INPUT_select = document.createElement('INPUT');
+          INPUT_select.onchange = event => {
+            displayItem.multiSelectToggle();
+            event.stopPropagation();
+            return false;
+          };
+          INPUT_select.type = 'checkbox';
+          TD_header.appendChild(INPUT_select);
+          if (displayItem.isMultiSelected()) INPUT_select.checked = true;
+        }
+      }
+
       TR_header.appendChild(TD_header);
       if (displayItem.hasOption('color')) TR_header.style.backgroundColor = displayItem.getColor();
+
       TABLE_entity.appendChild(TR_header);
     }
 
     if (showTitle) {
-      TD_header.innerHTML += displayItem.getTitle();
+      const SPAN_title = document.createElement('SPAN');
+      SPAN_title.innerText = displayItem.getTitle();
+      TD_header.appendChild(SPAN_title);
     }
     if (showDeleteButton) {
       const INPUT_deleteButton = document.createElement('INPUT');
