@@ -135,7 +135,7 @@ function initializeOpenLayers (callback) {
 function zoomToFit (WRAPPER) {
   const extent = ol.extent.createEmpty();
   ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
-  WRAPPER.map.getView().fit(extent, WRAPPER.map.getSize());
+  WRAPPER.map.getView().fit(extent, {padding: [100, 100, 100, 100]});
 }
 
 exports.display = {
