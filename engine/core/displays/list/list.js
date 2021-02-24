@@ -16,11 +16,9 @@ function sortTable (TABLE, columnIndex, ascending, type, skipHeaderRows = 1) {
     /* Loop through all table rows (except the
     first, which contains table headers): */
     let shouldSwitch, i;
-    console.log('skipHeaderRows', skipHeaderRows);
     for (i = skipHeaderRows; i < rows.length - 1; i++) {
       // Start by saying there should be no switching:
       shouldSwitch = false;
-      console.log(rows[i]);
       /* Get the two elements you want to compare,
       one from current row and one from the next: */
       let x = rows[i].getElementsByTagName('TD')[columnIndex].innerHTML;
@@ -51,6 +49,7 @@ function sortTable (TABLE, columnIndex, ascending, type, skipHeaderRows = 1) {
 }
 
 function sortTableOnClick (TABLE, TD_header, type, skipHeaderRows) {
+  TD_header.style.cursor = 'pointer';
   TD_header.onclick = () => {
     let columnIndex;
     let i = 0;
