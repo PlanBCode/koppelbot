@@ -72,8 +72,18 @@ div#content > div {
   border-width: 1px;
   border-color: grey;
   background-color: rgba(255, 255, 255, 0.85);
-  width: 75vh;
+  width: 75vw;
   margin: 0  auto 50px;
   padding: 50px;
   padding-top: 25px;
+}
+
+ul.features {
+  margin-left: 130px;
+}
+
+@media (max-width: 600px) {
+  ul.features {
+    margin-left: 30px;
+  }
 }

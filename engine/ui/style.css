@@ -232,6 +232,20 @@ li:nth-child(5n+3) {
 li:nth-child(5n+4) {
   list-style-image: url('./orange-bullet.png');
 }
+table.xyz-item > tr.xyz-item-selected.xyz-item-header {
+  background-color: yellow;
+  color: black;
+}
+
+span.xyz-item-deselect {
+  float: right;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+span.xyz-item-deselect::before {
+  content: "\2715";
+}
 table.xyz-create,
 table.xyz-item,
 table.xyz-list {
@@ -413,21 +427,7 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}table.xyz-item > tr.xyz-item-selected.xyz-item-header {
-  background-color: yellow;
-  color: black;
-}
-
-span.xyz-item-deselect {
-  float: right;
-  cursor: pointer;
-  margin-right: 5px;
-}
-
-span.xyz-item-deselect::before {
-  content: "\2715";
-}
-@charset "UTF-8";
+}@charset "UTF-8";
 
 /*!
  * Pikaday

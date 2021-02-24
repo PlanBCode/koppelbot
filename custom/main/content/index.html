@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" type="text/css" href="style.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 </head>
 <body>
 <nav>
@@ -23,7 +24,7 @@
 
   <h1 style="margin:auto; font-size:50px; text-align:center;"><img src="logo.png" width="50px;" style="transform: translateY(-5px);" valign="middle"/> Koppelbot</h1>
 
-  <ul style="margin-left:130px;margin-right:60px;">
+  <ul class="features">
     <li>Data oriented CMS</li>
     <li>Crowdsource and manage data</li>
     <li>Create dashboards to explore data</li>
@@ -34,11 +35,14 @@
 
   <div>
     <p><li style="list-style-image: url('./green-bullet.png');">Create interactive dashboards with simple xml macro's</li></p>
-  <table><tr><td width="60%">
-  <xyz uri="/fruit/*/Name=name,Color=color,Size=size" color="color" display="list" showCreateButton="false"/>
-</td><td>
-  <xyz uri="/fruit/*/count(name),color" color="color" groupby="color" flavor="doughnut" display="chart" />
-</td></tr></table>
+    <div style="margin:auto;">
+      <div style="display: inline-block; max-width:300px;">
+        <xyz uri="/fruit/*/Name=name,Color=color,Size=size" color="color" display="list" showCreateButton="false"/>
+      </div>
+      <div style="display: inline-block;max-width:300px;">
+        <xyz uri="/fruit/*/count(name),color" color="color" groupby="color" flavor="doughnut" display="chart" />
+      </div>
+    </div>
   </div>
 
     <div>
