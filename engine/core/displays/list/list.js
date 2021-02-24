@@ -114,16 +114,25 @@ exports.addSearchBox = addSearchBox;
 function fixHeaderOnScroll (WRAPPER, THEAD, TBODY) {
   WRAPPER.onscroll = () => {
     if (WRAPPER.scrollTop > 0) {
-      THEAD.style.position = 'fixed';
-      TBODY.style.width = TBODY.getBoundingClientRect().width + 'px';
-      const TR_header = THEAD.childNodes[0];
-      const TR_first = TBODY.childNodes[0];
-      if (TR_first && TR_header) {
-        for (let i = 0; i < TR_first.children.length; ++i) {
-          const width = TR_first.children[i].getBoundingClientRect().width + 'px';
-          TR_header.children[i].style.width = width;
-          TR_header.children[i].style.minWidth = width;
+      if (THEAD.style.position !== 'fixed') {
+        const TR_header = THEAD.childNodes[0];
+        const TR_first = TBODY.childNodes[0];
+        if (TR_first && TR_header) {
+          for (let i = 0; i < TR_first.children.length; ++i) {
+            const width = TR_first.children[i].getBoundingClientRect().width + 'px';
+            TR_header.children[i].style.width = width;
+            TR_header.children[i].style.minWidth = width;
+            TR_header.children[i].style.maxWidth = width;
+            /* TODO does not work :-( for (const TR_entity of TBODY.childNodes) {
+              TR_entity.children[i].style.width = width;
+              TR_entity.children[i].style.minWidth = width;
+              TR_entity.children[i].style.maxWidth = width;
+            } */
+          }
         }
+
+        THEAD.style.position = 'fixed';
+        THEAD.style.zIndex = 10;
       }
     } else {
       const TR_header = THEAD.childNodes[0];
@@ -131,7 +140,15 @@ function fixHeaderOnScroll (WRAPPER, THEAD, TBODY) {
         for (const TD_head of TR_header.children) {
           TD_head.style.width = null;
           TD_head.style.minWidth = null;
+          TD_head.style.maxWidth = null;
         }
+        /* TODO does not work :-(  for (const TR_entity of TBODY.childNodes) {
+          for (const TD of TR_entity.children) {
+            TD.style.width = null;
+            TD.style.minWidth = null;
+            TD.style.maxWidth = null;
+          }
+        } */
       }
       THEAD.style.position = 'static';
     }
@@ -225,9 +242,11 @@ exports.display = {
 
       if (display.hasOption('select')) {
         display.onSelect(selectEntityId => {
-          for (const TR of TBODY.childNodes) {
-            if (TR.entityId === selectEntityId) TR.classList.add('xyz-list-selected');
-            else TR.classList.remove('xyz-list-selected');
+          for (const TR_entity of TBODY.childNodes) {
+            if (TR_entity.entityId === selectEntityId) {
+              TR_entity.classList.add('xyz-list-selected');
+              TR_entity.scrollIntoView();
+            } else TR_entity.classList.remove('xyz-list-selected');
           }
         });
       }

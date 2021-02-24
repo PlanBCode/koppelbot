@@ -19,10 +19,24 @@ exports.display = {
 
   entity: displayItem => {
     const SPAN_entity = document.createElement('SPAN');
-    SPAN_entity.entityId = displayItem.getEntityId();
+    const entityId = displayItem.getEntityId();
+    SPAN_entity.entityId = entityId;
+    SPAN_entity.classList.add('xyz-title');
     SPAN_entity.innerText = displayItem.getTitle();
 
     if (displayItem.hasOption('select')) SPAN_entity.onclick = () => displayItem.select();
+    else {
+      const entityClassName = displayItem.getEntityClassName();
+      if (displayItem.getVariable(entityClassName) === entityId) SPAN_entity.classList.add('xyz-selected');
+      displayItem.onVariable(displayItem.getEntityClassName(), selectedEntityId => {
+        if (selectedEntityId === entityId) SPAN_entity.classList.add('xyz-selected');
+        else SPAN_entity.classList.remove('xyz-selected');
+      });
+
+      SPAN_entity.onclick = () => {
+        displayItem.setVariable(entityClassName, entityId);
+      };
+    }
     // TODO highlight selection
     // TODO multiselect
     displayItem.getWRAPPER().appendChild(SPAN_entity);

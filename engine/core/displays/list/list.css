@@ -30,15 +30,18 @@ table.xyz-list tr:nth-child(even) {
   width: 100%;
 }
 
-table.xyz-list tr.xyz-list-selectable {
+table.xyz-list > tr.xyz-list-selectable,
+table.xyz-list > tbody > tr.xyz-list-selectable {
   cursor: pointer;
 }
 
-table.xyz-list tr.xyz-list-selectable:hover {
+table.xyz-list > tr.xyz-list-selectable:hover,
+table.xyz-list > tbody > tr.xyz-list-selectable:hover {
   background-color: lightblue;
 }
 
-table.xyz-list > tr.xyz-list-selected {
+table.xyz-list > tr.xyz-list-selected,
+table.xyz-list > tbody > tr.xyz-list-selected {
   background-color: yellow;
 }
 

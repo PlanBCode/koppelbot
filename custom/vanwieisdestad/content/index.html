@@ -4,13 +4,16 @@
     <link rel="stylesheet" type="text/css" href="/xyz-style.css"/>
     <script type="text/javascript" src="/xyz-ui.js"></script>
     <style>
-    #locatie{
+    #locatie, #eigenaar{
       background-color: white;
       position: fixed;
       z-index: 100;
       bottom: 0;
       width: 50%;
     }
+     #eigenaar{
+       right:0;
+     }
     #logo {
       position: fixed;
       z-index: 200;
@@ -62,7 +65,7 @@
         <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"/>
       </td>
       <td valign="top" width="30%" style="background-color:#EFEFEF; height:70vh;">
-        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
+        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" select="eigenaar" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
       </td>
     </tr>
     <tr>
@@ -73,7 +76,8 @@
     <tr><td style="text-align:right;font-size: 10pt; vertical-align: bottom; padding-right: 10px;"><i><a href="https://koppelbot.org">Powered by Koppelbot</a></i></td></tr>
   </table>
   <img id="logo" src="./vanwieisdestad/vanwieisamersfoort.png"/>
-  <xyz id="locatie" uri="/locatie/$locatie/Type,Document=DocumentID,Eigenaar=EigenaarID,Oppervlakte" hideMessages select="locatie" display="item"/>
+  <xyz id="locatie" color="EigenaarID" uri="/locatie/$locatie/Type,Document=DocumentID,Eigenaar=EigenaarID,Oppervlakte" hideMessages select="locatie" display="item"/>
+  <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id"  hideMessages select="locatie" select="eigenaar" display="item"/>
 
 </body>
 </html>

@@ -160,8 +160,10 @@ exports.display = {
           display.onSelect(selectEntityId => {
             for (const TR_entity of TBODY.childNodes) {
               const entityId = display.hasOption('groupby') ? TR_entity.groupId : TR_entity.entityId;
-              if (entityId === selectEntityId) TR_entity.classList.add('xyz-list-selected');
-              else TR_entity.classList.remove('xyz-list-selected');
+              if (entityId === selectEntityId) {
+                TR_entity.classList.add('xyz-list-selected');
+                TR_entity.scrollIntoView();
+              } else TR_entity.classList.remove('xyz-list-selected');
             }
           });
         }

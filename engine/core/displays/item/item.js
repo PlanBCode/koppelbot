@@ -127,6 +127,13 @@ exports.display = {
       TR_header.className = 'xyz-item-header';
       TD_header = document.createElement('TD');
       TD_header.setAttribute('colspan', displayItem.getOption('showLabels') !== false ? '2' : '1');
+      if (displayItem.hasOption('color')) {
+        const SPAN_color = document.createElement('SPAN');
+        SPAN_color.style.verticalAlign = 'middle';
+        const color = displayItem.getColor();
+        SPAN_color.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>&nbsp;`;
+        TD_header.appendChild(SPAN_color);
+      }
 
       if (displayItem.hasOption('select')) {
         const selectionVariableName = displayItem.getOption('select');
@@ -172,7 +179,6 @@ exports.display = {
       }
 
       TR_header.appendChild(TD_header);
-      if (displayItem.hasOption('color')) TR_header.style.backgroundColor = displayItem.getColor();
 
       TABLE_entity.appendChild(TR_header);
     }
