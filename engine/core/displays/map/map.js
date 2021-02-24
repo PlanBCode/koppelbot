@@ -61,6 +61,8 @@ function initializeMap (display) {
     }
   });
 
+  let highlightedFeature = null;
+  let highlightedFeatureOriginalStyle = null;
   // change mouse cursor when over marker
   map.on('pointermove', function (e) {
     if (e.dragging) return;
@@ -69,6 +71,25 @@ function initializeMap (display) {
     const hit = map.hasFeatureAtPixel(pixel);
 
     map.getTarget().style.cursor = hit ? 'pointer' : ''; // TODO only if feature has onclick
+
+    if (highlightedFeature !== null) {
+      highlightedFeature.setStyle(highlightedFeatureOriginalStyle);
+      highlightedFeature = null;
+    }
+
+    map.forEachFeatureAtPixel(e.pixel, feature => {
+      highlightedFeatureOriginalStyle = feature.getStyle();
+      const strokeColor = feature.getStyle && feature.getStyle().getFill ? feature.getStyle().getFill() : 'blue';
+      highlightedFeature = feature;
+
+      const highlightStyle = new ol.style.Style({
+        fill: new ol.style.Fill({color: 'rgba(255,255,0,0.25)'}),
+        stroke: new ol.style.Stroke({color: strokeColor, width: 3})
+      });
+
+      feature.setStyle(highlightStyle);
+      return true;
+    });
   });
 
   const locationPropertyName = display.getOption('location') || 'geojson';
