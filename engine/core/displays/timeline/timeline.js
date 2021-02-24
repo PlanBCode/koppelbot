@@ -4,7 +4,7 @@ TODO
 - view  left|right|bottom|top
 - year/month/day labels
  */
-const {getStateMessage} = require('../item/item');
+const {getStateMessage } = require('../item/item');
 
 function parseDateString (string) {
   if (typeof string !== 'string') return new Date().getTime();
@@ -24,7 +24,6 @@ function sortLabels (A, B) {
 function getDateFromRatio (DIV, ratio) {
   let minTime = Infinity;
   let maxTime = -Infinity;
-  const LABELS = [];
   for (const NODE of DIV.childNodes) {
     if (NODE.classList.contains('xyz-timeline-node')) {
       const time = parseDateString(NODE.date);
@@ -137,12 +136,15 @@ function drawNodes (DIV, display) {
 exports.display = {
   waitingForInput: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'waitingForInputMessage');
+    display.showUiEditButton();
   },
   waitingForData: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'waitingForDataMessage');
+    display.showUiEditButton();
   },
   empty: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'emptyMessage');
+    display.showUiEditButton();
   },
   first: display => {
     const datePropertyName = display.getOption('key') || 'date'; // TODO
@@ -167,6 +169,7 @@ exports.display = {
     DIV.appendChild(DIV_line);
     WRAPPER.appendChild(DIV);
     const DIV_create = display.showCreateButton();
+    display.showUiEditButton();
     if (DIV_create) {
       DIV_line.style.cursor = 'pointer';
       DIV_line.onclick = event => {

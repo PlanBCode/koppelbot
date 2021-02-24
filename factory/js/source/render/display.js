@@ -96,7 +96,7 @@ const renderUiElement = (xyz, options, WRAPPER) => {
   options.uri = uri;
   options.labels = labels;
   options.aggregations = aggregations;
-
+  WRAPPER.classList.add('xyz-ui-wrapper');
   const displayName = options.display || DEFAULT_DISPLAYNAME;
   if (!displays.hasOwnProperty(displayName)) throw new Error('Unrecognized displayName.');
 

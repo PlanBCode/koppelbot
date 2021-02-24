@@ -11,9 +11,11 @@ const {getStateMessage} = require('../item/item');
 exports.display = {
   waitingForInput: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'waitingForInputMessage');
+    display.showUiEditButton();
   },
   waitingForData: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'waitingForDataMessage');
+    display.showUiEditButton();
   },
   empty: display => {
     const WRAPPER = display.getWRAPPER();
@@ -53,6 +55,7 @@ exports.display = {
     });
 
     display.showCreateButton();
+    display.showUiEditButton();
   },
   first: display => {
     // TODO something with wrapper?

@@ -313,6 +313,30 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
       return DIV;
     }
   };
+  /**
+   * Show little gear button that opens the ui element in the /ui editor
+   * @returns {Element} Returns the button DOM element.
+   */
+  this.showUiEditButton = () => {
+    const BUTTON_gear = document.createElement('BUTTON');
+    BUTTON_gear.className = 'xyz-ui-edit';
+    BUTTON_gear.title = 'Open element in ui editor.';
+    BUTTON_gear.onclick = () => {
+      const options = this.getOptions();
+      let uri = options.uri;
+      for (const optionName in options) {
+        if (!['uri', 'labels', 'aggregations'].includes(optionName)) {
+          uri += uri.includes('?') ? '&' : '?';
+          uri += optionName + '=' + options[optionName];
+        }
+      }
+      const win = window.open('/ui' + uri, '_blank');
+      win.focus();
+    };
+    this.getWRAPPER().appendChild(BUTTON_gear);
+    return BUTTON_gear;
+  };
+
   this.done = () => {
     // TODO
   };

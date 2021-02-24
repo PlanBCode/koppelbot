@@ -54,6 +54,36 @@ STATUS
 }
 
 /* ====================================================================================================
+UI
+==================================================================================================== */
+.xyz-ui-wrapper {
+  position: relative;
+}
+.xyz-ui-edit::before { content: "\2699"; }
+
+.xyz-ui-edit {
+  display: none;
+  height: 20px;
+  width: 20px;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.xyz-ui-wrapper:hover > .xyz-ui-edit {
+  display: block;
+}
+
+/* ====================================================================================================
 PAGE
 ==================================================================================================== */
 

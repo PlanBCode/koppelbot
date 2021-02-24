@@ -143,9 +143,11 @@ exports.fixHeaderOnScroll = fixHeaderOnScroll;
 exports.display = {
   waitingForInput: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'waitingForInputMessage');
+    display.showUiEditButton();
   },
   waitingForData: display => {
     display.getWRAPPER().innerText = getStateMessage(display, 'waitingForDataMessage');
+    display.showUiEditButton();
   },
   empty: display => {
     const WRAPPER = display.getWRAPPER();
@@ -154,6 +156,7 @@ exports.display = {
     TABLE.className = 'xyz-list';
     WRAPPER.appendChild(TABLE);
     display.showCreateButton();
+    display.showUiEditButton();
   },
   first: display => {
     if (display.getOption('showHeader') !== false) {
@@ -231,6 +234,7 @@ exports.display = {
       THEAD.appendChild(TR_header);
       addSearchBox(display, TR_header, TABLE);
     }
+    display.showUiEditButton();
   },
 
   entity: display => {

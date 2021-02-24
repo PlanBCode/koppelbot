@@ -30,6 +30,7 @@ exports.display = {
    */
   waitingForInput: displayItem => {
     displayItem.getWRAPPER().innerText = getStateMessage(displayItem, 'waitingForInputMessage');
+    displayItem.showUiEditButton();
   },
   /**
    * [waitingForInput description]
@@ -38,6 +39,7 @@ exports.display = {
    */
   waitingForData: displayItem => {
     displayItem.getWRAPPER().innerText = getStateMessage(displayItem, 'waitingForDataMessage');
+    displayItem.showUiEditButton();
   },
   /**
    * [waitingForInput description]
@@ -46,6 +48,7 @@ exports.display = {
    */
   empty: displayItem => {
     displayItem.getWRAPPER().innerText = getStateMessage(displayItem, 'emptyMessage');
+    displayItem.showUiEditButton();
   },
   /**
    * [waitingForInput description]
@@ -94,6 +97,7 @@ exports.display = {
         });
       }
     }
+    displayItem.showUiEditButton();
   },
   /**
    * [entity description]

@@ -63,6 +63,7 @@ exports.display = {
       WRAPPER.innerHTML = `Unknown chart flavor: '${flavor}'.`;
       WRAPPER.classList.add('xyz-error');
     } else WRAPPER.innerHTML = getStateMessage(display, 'waitingForInputMessage');
+    display.showUiEditButton();
   },
   waitingForData: display => {
     const WRAPPER = display.getWRAPPER();
@@ -81,16 +82,17 @@ exports.display = {
       WRAPPER.innerHTML = getStateMessage(display, 'waitingForDataMessage');
       WRAPPER.classList.remove('xyz-error');
     }
+    display.showUiEditButton();
   },
   empty: display => {
     const WRAPPER = display.getWRAPPER();
     if (WRAPPER.classList.contains('xyz-error')) return;
     WRAPPER.innerHTML = getStateMessage(display, 'emptyMessage');
+    display.showUiEditButton();
   },
   first: display => {
     const WRAPPER = display.getWRAPPER();
     if (WRAPPER.classList.contains('xyz-error')) return;
-
     WRAPPER.innerHTML = '';
     WRAPPER.groups = {};
     const flavor = display.getOption('flavor') || 'bar';
@@ -236,6 +238,7 @@ exports.display = {
       }
       WRAPPER.chart.update();
     }
+    display.showUiEditButton();
   },
   entity: display => {
     const WRAPPER = display.getWRAPPER();
