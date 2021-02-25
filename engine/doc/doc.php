@@ -149,7 +149,7 @@ class DocResponse extends HttpResponse2
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
       <link rel="manifest" href="/site.webmanifest">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">      
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
       <script src="/xyz-ui.js" ></script >
     </head>';
           if($query->checkToggle('embed')){
@@ -190,7 +190,7 @@ class DocResponse extends HttpResponse2
 </html>';
         }
     }
-    $content = replaceXyzTag($content);
+    $content = replaceXyzTags($content);
     parent::__construct($status, $content, $headers);
   }
 }

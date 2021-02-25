@@ -1,44 +1,56 @@
 <?php
 require('mime.php');
 
-function replaceXyzTag($fileContent): string
+$replaceXyzTag = function ($xyzTagMatches) {
+    $attributeString = $xyzTagMatches[2];  // '<xyz a="b" c ...' -> 'a="b" c ...'
+    $innerHTML = array_get($xyzTagMatches,7,''); // '<xyz ...>bla</xyz>' -> 'bla'
+    $attributeMatches = [];
+    // 'a="b"' or without value/toggle: 'c'
+    preg_match_all('/(\w+)(="([^"]*?)")?/', $attributeString, $attributeMatches);
+    $count = count($attributeMatches[0]);
+    $attributeNames = $attributeMatches[1];  // 'a' or 'c'
+    $attributeHasValues = $attributeMatches[2];  // '="b"'
+    $attributeValues = $attributeMatches[3]; // 'b'
+    $options = is_null($innerHTML) ? [] : ['innerHTML' => $innerHTML];
+
+    for ($i = 0; $i < $count; ++$i) {
+        $attributeName = $attributeNames[$i];
+        $attributeValue = $attributeHasValues[$i] ? $attributeValues[$i] : 'true'; // an attribute without value is set to true
+        $attributePath = explode('_', $attributeName); // "property_subOption" -> ["property","subOption"]
+        $attributePathLength = count($attributePath);
+        if ($attributePathLength === 1) { // optionName="value" -> options[optionName]="value"
+            $options[$attributeName] = $attributeValue;
+        } else {  // propertyName_optionName="value" -> options[subOptions][propertyName][optionName]="value"
+            $optionIterator =& $options;
+            for ($depth = 0; $depth < $attributePathLength - 1; ++$depth) {
+                $propertyName = $attributePath[$depth];
+                if (!array_key_exists('subOptions', $optionIterator)) $optionIterator['subOptions'] = [];
+                if (!array_key_exists($propertyName, $optionIterator['subOptions'])) $optionIterator['subOptions'][$propertyName] = [];
+                $optionIterator =& $optionIterator['subOptions'][$propertyName];
+            }
+            $optionName = $attributePath[$attributePathLength - 1];
+            $path = [$optionName];
+            json_set($optionIterator, $path, $attributeValue);
+        }
+    }
+    return '<script>xyz.ui(' . json_encode($options, JSON_UNESCAPED_SLASHES) . ');</script>';
+};
+
+function replaceXyzTags($fileContent): string
 {
+    global $replaceXyzTag;
     // '<xyz a="b" c />'
     $pattern = '/<(xyz|XYZ)((\s+(\w+)(="([^"]*?)")?)+)\s*\/>/';
     $fileContent = preg_replace_callback(
         $pattern,
-        function ($xyzTagMatches) {
-            $attributeString = $xyzTagMatches[2];
-            $attributeMatches = [];
-            // 'a="b"' or without value/toggle: 'c'
-            preg_match_all('/(\w+)(="([^"]*?)")?/', $attributeString, $attributeMatches);
-            $count = count($attributeMatches[0]);
-            $attributeNames = $attributeMatches[1];  // 'a' or 'c'
-            $attributeHasValues = $attributeMatches[2];  // '="b"'
-            $attributeValues = $attributeMatches[3]; // 'b'
-            $options = [];
-            for ($i = 0; $i < $count; ++$i) {
-                $attributeName = $attributeNames[$i];
-                $attributeValue = $attributeHasValues[$i] ? $attributeValues[$i] : 'true'; // an attribute without value is set to true
-                $attributePath = explode('_', $attributeName); // "property_subOption" -> ["property","subOption"]
-                $attributePathLength = count($attributePath);
-                if ($attributePathLength === 1) { // optionName="value" -> options[optionName]="value"
-                    $options[$attributeName] = $attributeValue;
-                } else {  // propertyName_optionName="value" -> options[subOptions][propertyName][optionName]="value"
-                    $optionIterator =& $options;
-                    for ($depth = 0; $depth < $attributePathLength - 1; ++$depth) {
-                        $propertyName = $attributePath[$depth];
-                        if (!array_key_exists('subOptions', $optionIterator)) $optionIterator['subOptions'] = [];
-                        if (!array_key_exists($propertyName, $optionIterator['subOptions'])) $optionIterator['subOptions'][$propertyName] = [];
-                        $optionIterator =& $optionIterator['subOptions'][$propertyName];
-                    }
-                    $optionName = $attributePath[$attributePathLength - 1];
-                    $path = [$optionName];
-                    json_set($optionIterator, $path, $attributeValue);
-                }
-            }
-            return '<script>xyz.ui(' . json_encode($options, JSON_UNESCAPED_SLASHES) . ');</script>';
-        },
+        $replaceXyzTag,
+        $fileContent
+    );
+    // '<xyz a="b" c>bla</xyz>'
+    $pattern = '/<(xyz|XYZ)((\s+(\w+)(="([^"]*?)")?)+)\s*>(.*)<\/xyz>/';
+    $fileContent = preg_replace_callback(
+        $pattern,
+        $replaceXyzTag,
         $fileContent
     );
     return $fileContent;
@@ -68,7 +80,7 @@ class ContentRequest extends HttpRequest2
       $fileContent = file_get_contents($fileName);
       //TODO insert sitemap into html header
       //TODO insert xyz js (only if there are xyz tags)
-      if(pathinfo($fileName, PATHINFO_EXTENSION) === 'html') $fileContent = replaceXyzTag($fileContent);
+      if(pathinfo($fileName, PATHINFO_EXTENSION) === 'html') $fileContent = replaceXyzTags($fileContent);
       return new ContentResponse($status, $fileContent, $headers);
     }
 
