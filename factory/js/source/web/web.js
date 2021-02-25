@@ -52,7 +52,10 @@ exports.getQueryParameters = (queryString = undefined) => getQueryParameters(fal
 exports.getQueryParameter = (queryParameterName, queryString = undefined) => getQueryParameters(false, queryString)[queryParameterName];
 
 function splitKeyValuePair (keyValueString) { // 'a=1' -> ['a','=','1']
-  return /^(?<key>[*,;%\w.-]+)(?<operator>[^*,;%\w.-]+)?(?<value>[*,;%\w.-]*)?$/.exec(keyValueString).slice(1);
+  const keyValuePair = /^(?<key>[*,;$%\w.-]+)(?<operator>[^*,;$%\w.-]+)?(?<value>[*,;$%\w.-]*)?$/.exec(keyValueString);
+  if (keyValuePair !== null) return keyValuePair.slice(1);
+  console.error('Failed to parse query key value pair: "' + keyValueString + '"');
+  return [];
 }
 
 function updateQueryParameter (queryParameterName, value, operator = '=') {
