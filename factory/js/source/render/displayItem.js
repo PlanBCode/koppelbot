@@ -330,6 +330,12 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
           uri += optionName + '=' + options[optionName];
         }
       }
+      const vars = variables.getVariables(); // TODO only vars that are used by uri and innerHTML?
+      for (const variableName in vars) {
+        uri += uri.includes('?') ? '&' : '?';
+        uri += variableName + '=' + vars[variableName];
+      }
+
       const win = window.open('/ui' + uri, '_blank');
       win.focus();
     };

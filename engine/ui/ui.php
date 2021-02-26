@@ -40,7 +40,8 @@ class UiRequest extends HttpRequest2
 
         $defaultOptions = [
           'display' => ["info"=>"How to display the data.","type" => "enum", "choices" => $displayNames, "default" => "list"],
-          'dynamic' => ["info"=>"Whether to refresh the data continously.","type" => "bool", "default" => false]
+          'dynamic' => ["info"=>"Whether to refresh the data continously.","type" => "bool", "default" => false],
+          'style' => ["info"=>"CSS styling.","type" => "string"],
         ];
         foreach (glob('{./engine/core,./engine/main}/displays/*', GLOB_BRACE) as $dir) {
           $displayName = basename($dir, '');
@@ -59,7 +60,7 @@ class UiRequest extends HttpRequest2
 
           require_once __DIR__ . '/../api/landing.php';
 
-          $body = '<p>This page offers an interface to create and test XYZ data displays.
+          $body = '<p>This page offers an interface to create and test data displays.
 
           For more information please visit: <a href="/doc/ui">UI reference</a>.</p>';
 

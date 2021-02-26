@@ -262,6 +262,186 @@ li:nth-child(5n+3) {
 li:nth-child(5n+4) {
   list-style-image: url('./orange-bullet.png');
 }
+table.xyz-create,
+table.xyz-item,
+table.xyz-list {
+  padding: 0;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
+table tbody:first-child tr.xyz-create-header,
+table tbody:first-child tr.xyz-list-header,
+table tbody:first-child tr.xyz-item-header {
+  background-color: darkslateblue;
+  color: white;
+}
+
+table.xyz-create tr:nth-child(even),
+table.xyz-item tr:nth-child(even),
+table.xyz-list tr:nth-child(even) {
+  background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-list,
+.xyz-item {
+  width: 100%;
+}
+
+table.xyz-list > tr.xyz-list-selectable,
+table.xyz-list > tbody > tr.xyz-list-selectable {
+  cursor: pointer;
+}
+
+table.xyz-list > tr.xyz-list-selectable:hover,
+table.xyz-list > tbody > tr.xyz-list-selectable:hover {
+  background-color: lightblue;
+}
+
+table.xyz-list > tr.xyz-list-selected,
+table.xyz-list > tbody > tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
+
+tr.xyz-list-foldable {
+  cursor: pointer;
+}
+
+tr.xyz-list-foldable td:first-child::before {
+  content: "\00A0-\00A0";
+}
+
+tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
+  content: "\00A0+\00A0";
+}
+
+.xyz-list-sorted-asc::before {
+  content: "\00A0\21E3\00A0";
+}
+
+.xyz-list-sorted-desc::before {
+  content: "\00A0\21E1\00A0";
+}
+
+tr.xyz-list-search > td {
+  padding: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgrey;
+}
+
+tr.xyz-list-search > td > input {
+  width: 100%;
+  display: block;
+  border-style: none;
+  outline-style: none;
+  padding: 3;
+  font-size: inherit;
+  margin: 0;
+}
+.xyz-map-wrapper {
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-zoom-fit {
+  height: 2em;
+  width: 2em;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.ol-rotate-reset,
+.ol-attribution {
+  display: none;
+}
+
+.xyz-map {
+  position: relative;
+}
+
+.xyz-map-message {
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 100;
+  right: 0;
+  top: 3px;
+  text-shadow: 1px 1px black;
+  color: white;
+}
+table.xyz-item > tr.xyz-item-selected.xyz-item-header {
+  background-color: yellow;
+  color: black;
+}
+
+td.xyz-item-key {
+  vertical-align: top;
+}
+
+span.xyz-item-deselect {
+  font-size: 75%;
+  line-height: 30px;
+}
+
+span.xyz-item-deselect,
+span.xyz-item-maximize,
+span.xyz-item-minimize {
+  float: right;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+span.xyz-item-deselect::before {
+  content: "\2715";
+}
+
+span.xyz-item-maximize::before {
+  content: "\2610";
+}
+
+span.xyz-item-minimize::before {
+  content: "_";
+}
+
+table.xyz-item-minimized > thead {
+  cursor: pointer;
+}
+
+table.xyz-item-maximized span.xyz-item-maximize::before,
+table.xyz-item-minimized span.xyz-item-minimize::before {
+  content: "\2750";
+}
+
+table.xyz-item-maximized {
+  z-index: 100000 !important;
+  position: fixed !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+table.xyz-item-maximized span.xyz-item-minimize,
+table.xyz-item-minimized span.xyz-item-maximize,
+table.xyz-item-minimized > tbody {
+  display: none !important;
+}
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -623,183 +803,4 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-reference:hover {
     background-color: lightblue;
-}table.xyz-item > tr.xyz-item-selected.xyz-item-header {
-  background-color: yellow;
-  color: black;
-}
-
-td.xyz-item-key {
-  vertical-align: top;
-}
-
-span.xyz-item-deselect {
-  font-size: 75%;
-  line-height: 30px;
-}
-
-span.xyz-item-deselect,
-span.xyz-item-maximize,
-span.xyz-item-minimize {
-  float: right;
-  cursor: pointer;
-  margin-right: 5px;
-}
-
-span.xyz-item-deselect::before {
-  content: "\2715";
-}
-
-span.xyz-item-maximize::before {
-  content: "\2610";
-}
-
-span.xyz-item-minimize::before {
-  content: "_";
-}
-
-table.xyz-item-minimized > thead {
-  cursor: pointer;
-}
-
-table.xyz-item-maximized span.xyz-item-maximize::before,
-table.xyz-item-minimized span.xyz-item-minimize::before {
-  content: "\2750";
-}
-
-table.xyz-item-maximized {
-  z-index: 100000 !important;
-  position: fixed !important;
-  height: 100vh !important;
-  width: 100vw !important;
-  top: 0 !important;
-  left: 0 !important;
-}
-
-table.xyz-item-maximized span.xyz-item-minimize,
-table.xyz-item-minimized span.xyz-item-maximize,
-table.xyz-item-minimized > tbody {
-  display: none !important;
-}
-table.xyz-create,
-table.xyz-item,
-table.xyz-list {
-  padding: 0;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-.xyz-list-header,
-.xyz-create-header,
-.xyz-item-header,
-table tbody:first-child tr.xyz-create-header,
-table tbody:first-child tr.xyz-list-header,
-table tbody:first-child tr.xyz-item-header {
-  background-color: darkslateblue;
-  color: white;
-}
-
-table.xyz-create tr:nth-child(even),
-table.xyz-item tr:nth-child(even),
-table.xyz-list tr:nth-child(even) {
-  background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-list,
-.xyz-item {
-  width: 100%;
-}
-
-table.xyz-list > tr.xyz-list-selectable,
-table.xyz-list > tbody > tr.xyz-list-selectable {
-  cursor: pointer;
-}
-
-table.xyz-list > tr.xyz-list-selectable:hover,
-table.xyz-list > tbody > tr.xyz-list-selectable:hover {
-  background-color: lightblue;
-}
-
-table.xyz-list > tr.xyz-list-selected,
-table.xyz-list > tbody > tr.xyz-list-selected {
-  background-color: yellow;
-}
-
-td.xyz-list-icon {
-  width: 30px;
-  max-width: 30px;
-}
-
-tr.xyz-list-foldable {
-  cursor: pointer;
-}
-
-tr.xyz-list-foldable td:first-child::before {
-  content: "\00A0-\00A0";
-}
-
-tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
-  content: "\00A0+\00A0";
-}
-
-.xyz-list-sorted-asc::before {
-  content: "\00A0\21E3\00A0";
-}
-
-.xyz-list-sorted-desc::before {
-  content: "\00A0\21E1\00A0";
-}
-
-tr.xyz-list-search > td {
-  padding: 0;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: lightgrey;
-}
-
-tr.xyz-list-search > td > input {
-  width: 100%;
-  display: block;
-  border-style: none;
-  outline-style: none;
-  padding: 3;
-  font-size: inherit;
-  margin: 0;
-}
-.xyz-map-wrapper {
-}
-
-.ol-zoom-in,
-.ol-zoom-out,
-.ol-zoom-fit {
-  height: 2em;
-  width: 2em;
-  margin: 2px;
-  float: left;
-  background-color: darkslateblue;
-  color: white;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.ol-rotate-reset,
-.ol-attribution {
-  display: none;
-}
-
-.xyz-map {
-  position: relative;
-}
-
-.xyz-map-message {
-  pointer-events: none;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 100;
-  right: 0;
-  top: 3px;
-  text-shadow: 1px 1px black;
-  color: white;
 }

@@ -96,12 +96,12 @@ onUiChange = (content, optionName) => { // declared in /engine/api/api.js
 
 function updateOptions () {
   const TABLE = document.getElementById('xyz-ui-display-options');
-  for (const TR of [...TABLE.firstElementChild.children]) {
+  const TBODY = TABLE.firstElementChild;
+  for (const TR of [...TBODY.children]) {
     if (!TR.classList.contains('xyz-list-header')) {
       try {
-        TABLE.removeChild(TR);
+        TBODY.removeChild(TR);
       } catch (e) {
-
       }
     }
   }
