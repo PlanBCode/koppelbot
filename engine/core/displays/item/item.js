@@ -1,5 +1,80 @@
 const {pathFromUri} = require('../../../../factory/js/source/uri/uri.js'); // TODO better solution
 
+function addSelection (displayItem, TR_header, TD_header) {
+  if (displayItem.hasOption('select')) {
+    const selectionVariableName = displayItem.getOption('select');
+    const uri = displayItem.getOption('uri');
+    const entityIdList = uri.substr(1).split('/')[1] || '';
+    if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
+      const SPAN_unselect = document.createElement('SPAN');
+      SPAN_unselect.className = 'xyz-item-deselect';
+      SPAN_unselect.onclick = () => displayItem.selectNone(undefined, undefined);
+      TD_header.appendChild(SPAN_unselect);
+    } else {
+      TR_header.onclick = event => {
+        if (!event.target || event.target.tagName !== 'INPUT') { // prevent multi select click collision
+          displayItem.select();
+        }
+      };
+      TR_header.style.cursor = 'pointer';
+      if (displayItem.isSelected()) TR_header.classList.add('xyz-item-selected');
+    }
+  }
+}
+
+function addMultiSelection (displayItem, TD_header) {
+  if (displayItem.hasOption('multiSelect')) {
+    const selectionVariableName = displayItem.getOption('multiSelect');
+    const uri = displayItem.getOption('uri');
+    const entityIdList = uri.substr(1).split('/')[1] || '';
+    // toto $locatiemetnogmeer matched ook
+    if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
+      const SPAN_unselect = document.createElement('SPAN');
+      SPAN_unselect.className = 'xyz-item-deselect';
+      SPAN_unselect.onclick = () => displayItem.multieSelectRemove();
+      TD_header.appendChild(SPAN_unselect);
+    } else {
+      const INPUT_select = document.createElement('INPUT');
+      INPUT_select.onchange = event => {
+        displayItem.multiSelectToggle();
+        event.stopPropagation();
+        return false;
+      };
+      INPUT_select.type = 'checkbox';
+      TD_header.appendChild(INPUT_select);
+      if (displayItem.isMultiSelected()) INPUT_select.checked = true;
+    }
+  }
+}
+
+function addWindowSizeControls (TABLE_entity, TD_header, WRAPPER) {
+  const SPAN_maximize = document.createElement('SPAN');
+  SPAN_maximize.className = 'xyz-item-maximize';
+  SPAN_maximize.onclick = event => {
+    if (TABLE_entity.classList.contains('xyz-item-maximized')) TABLE_entity.classList.remove('xyz-item-maximized');
+    else TABLE_entity.classList.add('xyz-item-maximized');
+    TABLE_entity.classList.remove('xyz-item-minimized');
+    WRAPPER.uiEditButton.style.display = null;
+    event.stopPropagation();
+    return false;
+  };
+  const SPAN_minimize = document.createElement('SPAN');
+  SPAN_minimize.className = 'xyz-item-minimize';
+  TD_header.onclick = SPAN_minimize.onclick = event => {
+    if (TABLE_entity.classList.contains('xyz-item-maximized')) return false;
+    else if (TABLE_entity.classList.contains('xyz-item-minimized')) TABLE_entity.classList.remove('xyz-item-minimized');
+    else {
+      TABLE_entity.classList.add('xyz-item-minimized');
+      WRAPPER.uiEditButton.style.display = 'none';
+    }
+    TABLE_entity.classList.remove('xyz-item-maximized');
+    event.stopPropagation();
+    return false;
+  };
+  TD_header.appendChild(SPAN_maximize);
+  TD_header.appendChild(SPAN_minimize);
+}
+
 // check if uri is '/$class/$id' or '/$class/$id/*/.../*' but not '/$class/$id/$property'
 function isFullEntity (uri) {
   const path = pathFromUri(uri);
@@ -97,7 +172,7 @@ exports.display = {
         });
       }
     }
-    displayItem.showUiEditButton();
+    WRAPPER.uiEditButton = displayItem.showUiEditButton();
   },
   /**
    * [entity description]
@@ -114,6 +189,11 @@ exports.display = {
     const TABLE_entity = document.createElement('TABLE');
     TABLE_entity.className = 'xyz-item';
     TABLE_entity.entityId = entityId;
+    const THEAD = document.createElement('THEAD');
+    const TBODY = document.createElement('TBODY');
+    TABLE_entity.appendChild(THEAD);
+    TABLE_entity.appendChild(TBODY);
+
     const uri = '/' + entityClassName + '/' + entityId;
     const showTitle = displayItem.getOption('showTitle') !== false;
     const showEditButton = displayItem.getOption('showEditButton') === true && displayItem.getAction() !== 'edit';
@@ -135,52 +215,15 @@ exports.display = {
         TD_header.appendChild(SPAN_color);
       }
 
-      if (displayItem.hasOption('select')) {
-        const selectionVariableName = displayItem.getOption('select');
-        const uri = displayItem.getOption('uri');
-        const entityIdList = uri.substr(1).split('/')[1] || '';
-        if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
-          const SPAN_unselect = document.createElement('SPAN');
-          SPAN_unselect.className = 'xyz-item-deselect';
-          SPAN_unselect.onclick = () => displayItem.selectNone(undefined, undefined);
-          TD_header.appendChild(SPAN_unselect);
-        } else {
-          TR_header.onclick = event => {
-            if (!event.target || event.target.tagName !== 'INPUT') { // prevent multi select click collision
-              displayItem.select();
-            }
-          };
-          TR_header.style.cursor = 'pointer';
-          if (displayItem.isSelected()) TR_header.classList.add('xyz-item-selected');
-        }
-      }
+      addSelection(displayItem, TR_header, TD_header);
 
-      if (displayItem.hasOption('multiSelect')) {
-        const selectionVariableName = displayItem.getOption('multiSelect');
-        const uri = displayItem.getOption('uri');
-        const entityIdList = uri.substr(1).split('/')[1] || '';
-        // toto $locatiemetnogmeer matched ook
-        if (entityIdList === '$' + selectionVariableName || entityIdList === '${' + selectionVariableName + '}') {
-          const SPAN_unselect = document.createElement('SPAN');
-          SPAN_unselect.className = 'xyz-item-deselect';
-          SPAN_unselect.onclick = () => displayItem.multieSelectRemove();
-          TD_header.appendChild(SPAN_unselect);
-        } else {
-          const INPUT_select = document.createElement('INPUT');
-          INPUT_select.onchange = event => {
-            displayItem.multiSelectToggle();
-            event.stopPropagation();
-            return false;
-          };
-          INPUT_select.type = 'checkbox';
-          TD_header.appendChild(INPUT_select);
-          if (displayItem.isMultiSelected()) INPUT_select.checked = true;
-        }
-      }
+      addWindowSizeControls(TABLE_entity, TD_header, WRAPPER);
+
+      addMultiSelection(displayItem, TD_header);
 
       TR_header.appendChild(TD_header);
 
-      TABLE_entity.appendChild(TR_header);
+      THEAD.appendChild(TR_header);
     }
 
     if (showTitle) {
@@ -254,7 +297,7 @@ exports.display = {
       const TAG = node.render(displayItem.getAction(), displayItem.getOptions());
       TD_entityContent.appendChild(TAG);
       TR_entity.appendChild(TD_entityContent);
-      TABLE_entity.appendChild(TR_entity);
+      TBODY.appendChild(TR_entity);
     } else {
       for (const flatPropertyName in columns) {
         const TR_flatProperty = document.createElement('TR');
@@ -269,7 +312,7 @@ exports.display = {
         const TAG = node.render(displayItem.getAction(), displayItem.getSubOptions(flatPropertyName));
         TD_flatPropertyContent.appendChild(TAG);
         TR_flatProperty.appendChild(TD_flatPropertyContent);
-        TABLE_entity.appendChild(TR_flatProperty);
+        TBODY.appendChild(TR_flatProperty);
       }
     }
     WRAPPER.appendChild(TABLE_entity);
