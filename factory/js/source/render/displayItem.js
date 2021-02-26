@@ -327,13 +327,13 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
       for (const optionName in options) {
         if (!['uri', 'labels', 'aggregations'].includes(optionName)) {
           uri += uri.includes('?') ? '&' : '?';
-          uri += optionName + '=' + options[optionName];
+          uri += encodeURIComponent(optionName) + '=' + encodeURIComponent(options[optionName]);
         }
       }
       const vars = variables.getVariables(); // TODO only vars that are used by uri and innerHTML?
       for (const variableName in vars) {
         uri += uri.includes('?') ? '&' : '?';
-        uri += variableName + '=' + vars[variableName];
+        uri += encodeURIComponent(variableName) + '=' + encodeURIComponent(vars[variableName]);
       }
 
       const win = window.open('/ui' + uri, '_blank');
