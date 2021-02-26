@@ -83,3 +83,15 @@ tr.xyz-list-search > td > input {
   font-size: inherit;
   margin: 0;
 }
+
+.xyz-list-search-clear {
+  margin-top: -1.7em;
+  display: block;
+  float: right;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.xyz-list-search-clear::before {
+  content: "\2715";
+}

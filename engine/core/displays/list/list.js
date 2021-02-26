@@ -93,17 +93,25 @@ function addSearchBox (display, TR_header, TABLE) {
     const TD_search = document.createElement('TD');
     const INPUT_search = document.createElement('INPUT');
     INPUT_search.placeholder = 'search';
-    INPUT_search.oninput = INPUT_search.inpaste = () => {
-      const search = INPUT_search.value.toUpperCase();
+    const search = INPUT_search.oninput = INPUT_search.onpaste = () => {
+      const needle = INPUT_search.value.toUpperCase();
       for (const TR of TBODY.children) {
         if (TR !== TR_search && TR !== TR_header) {
-          TR.style.display = search === '' || TR.innerHTML.toUpperCase().includes(search) ? 'table-row' : 'none';
+          TR.style.display = needle === '' || TR.innerHTML.toUpperCase().includes(needle) ? 'table-row' : 'none';
         }
       }
     };
     TR_search.className = 'xyz-list-search';
     TD_search.setAttribute('colspan', TR_header.children.length);
     TD_search.appendChild(INPUT_search);
+    const SPAN_clear = document.createElement('SPAN');
+    SPAN_clear.className = 'xyz-list-search-clear';
+    SPAN_clear.title = 'Clear search text.';
+    SPAN_clear.onclick = () => {
+      INPUT_search.value = '';
+      search();
+    };
+    TD_search.appendChild(SPAN_clear);
     TR_search.appendChild(TD_search);
     THEAD.appendChild(TR_search);
   }
