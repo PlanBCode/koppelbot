@@ -2,57 +2,14 @@
 <head>
     <title>Van wie is de stad</title>
     <link rel="stylesheet" type="text/css" href="/xyz-style.css"/>
+    <link rel="stylesheet" type="text/css" href="/vanwieisdestad/style.css"/>
     <script type="text/javascript" src="/xyz-ui.js"></script>
-    <style>
-    #locatie, #eigenaar{
-      background-color: white;
-      position: fixed;
-      z-index: 100;
-      bottom: 0;
-      width: 50%;
-    }
-     #eigenaar{
-       right:0;
-     }
-    #logo {
-      position: fixed;
-      z-index: 200;
-      top: 30px;
-      left: 30px;
-      opacity: 1;
-    }
-    table.xyz-list {
-      font-size: 10pt;
-    }
-
-    #zoom-to-amersfoort{
-      position: absolute;
-      z-index: 1000;
-      right: 3px;
-      color: white;
-      background-color: darkslateblue;
-      height: 2em;
-      margin: 2px;
-      border-radius: 5px;
-      padding-left: 4px;
-      padding-right: 4px;
-      cursor: pointer;
-    }
-    #locatie > table.xyz-item > tbody > tr:nth-child(5) > td:nth-child(2) {
-      height: 200px;
-      overflow: auto;
-    }
-    #locatie > table.xyz-item > tbody > tr:nth-child(5) > td:nth-child(2) > div {
-      height: 100%;
-      overflow: auto;
-    }
-    </style>
 </head>
 <body>
 
   <table width="100%" height="100%">
     <tr>
-      <td style="text-align:center; position: relative;" rowspan="3">
+      <td id="main" style="width:70%; text-align:center; position: relative;" rowspan="3">
         <div id="zoom-to-amersfoort" title="Zoom to Amersfoort">Amersfoort</div>
         <script>
           const DIV = document.getElementById('zoom-to-amersfoort');
@@ -69,10 +26,12 @@
           },100);
           tryZoom();
 
+
         </script>
+        <div id="resizer"></div>
         <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"/>
       </td>
-      <td valign="top" width="30%" style="background-color:#EFEFEF; height:70vh;">
+      <td valign="top"style="background-color:#EFEFEF; height:70vh;">
         <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" select="eigenaar" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
       </td>
     </tr>
@@ -86,6 +45,21 @@
   <img id="logo" src="./vanwieisdestad/vanwieisamersfoort.png"/>
   <xyz id="locatie" style="max-height:50vh;" color="EigenaarID" uri="/locatie/$locatie/Type,Document=DocumentID,Eigenaar=EigenaarID,Oppervlakte,Eigenschappen" hideMessages select="locatie" display="item"/>
   <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id"  hideMessages select="locatie" select="eigenaar" display="item"/>
+  <script>
+    const DIV_resizer = document.getElementById('resizer');
+    let x = null
+    DIV_resizer.onmousedown = event=>{
+        x = event.clientX;
+        event.stopPropagation();
+        return false;
+    }
+    document.body.onmouseup = event=>{
+      if(x === null) return;
+      const TD_main = document.getElementById('main');
+      main.style.width = event.clientX +'px';
+      x=null;
+    }
 
+  </script>
 </body>
 </html>

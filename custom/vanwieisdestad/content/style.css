@@ -1,0 +1,58 @@
+#locatie,
+#eigenaar {
+  background-color: white;
+  position: fixed;
+  z-index: 100;
+  bottom: 0;
+  width: 50%;
+}
+
+#eigenaar {
+  right: 0;
+}
+
+#logo {
+  position: fixed;
+  z-index: 50;
+  top: 30px;
+  left: 30px;
+  opacity: 1;
+}
+
+table.xyz-list {
+  font-size: 10pt;
+}
+
+#zoom-to-amersfoort {
+  position: absolute;
+  z-index: 50;
+  right: 3px;
+  color: white;
+  background-color: darkslateblue;
+  height: 2em;
+  margin: 2px;
+  border-radius: 5px;
+  padding-left: 4px;
+  padding-right: 4px;
+  cursor: pointer;
+}
+
+#locatie > table.xyz-item > tbody > tr:nth-child(5) > td:nth-child(2) {
+  height: 200px;
+  overflow: auto;
+}
+
+#locatie > table.xyz-item > tbody > tr:nth-child(5) > td:nth-child(2) > div {
+  height: 100%;
+  overflow: auto;
+}
+
+#resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 10px;
+  z-index: 5;
+  height: 100%;
+  cursor: ew-resize;
+}
