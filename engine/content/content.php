@@ -3,7 +3,7 @@ require('mime.php');
 
 $replaceXyzTag = function ($xyzTagMatches) {
     $attributeString = $xyzTagMatches[2];  // '<xyz a="b" c ...' -> 'a="b" c ...'
-    $innerHTML = array_get($xyzTagMatches,7,''); // '<xyz ...>bla</xyz>' -> 'bla'
+    $innerHTML = array_get($xyzTagMatches,7,null); // '<xyz ...>bla</xyz>' -> 'bla'
     $attributeMatches = [];
     // 'a="b"' or without value/toggle: 'c'
     preg_match_all('/(\w+)(="([^"]*?)")?/', $attributeString, $attributeMatches);
