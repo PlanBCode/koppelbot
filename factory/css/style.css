@@ -62,6 +62,7 @@ UI
 .xyz-ui-edit::before { content: "\2699"; }
 
 .xyz-ui-edit {
+  z-index: 10;
   display: none;
   height: 20px;
   width: 20px;
