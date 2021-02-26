@@ -44,11 +44,14 @@ exports.actions = {
         case 404 :
           SPAN.innerText = 'Not found';
           break;
-        default:
-          if (node.hasSetting('unit')) {
-            SPAN.innerHTML = node.getContent() + '&nbsp;' + renderUnit(node.getSetting('unit'));// TODO parse sub,super
-          } else SPAN.innerText = node.getContent();
+        default: {
+          const content = node.getContent();
+          if (content === null) SPAN.innerText = '-';
+          else if (node.hasSetting('unit')) {
+            SPAN.innerHTML = content + '&nbsp;' + renderUnit(node.getSetting('unit'));// TODO parse sub,super
+          } else SPAN.innerText = content;
           break;
+        }
       }
     };
     onChangeHandler(item);
