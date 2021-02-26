@@ -1,11 +1,8 @@
 table.xyz-create,
 table.xyz-item,
 table.xyz-list {
-  /* border: 1px solid lightgrey;
-    margin-bottom: 5px; */
   padding: 0;
   border-collapse: collapse;
-  table-layout: fixed;
   background-color: white;
 }
 

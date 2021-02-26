@@ -1,93 +1,5 @@
 /* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */
 
-table.xyz-create,
-table.xyz-item,
-table.xyz-list {
-  /* border: 1px solid lightgrey;
-    margin-bottom: 5px; */
-  padding: 0;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background-color: white;
-}
-
-.xyz-list-header,
-.xyz-create-header,
-.xyz-item-header,
-table tbody:first-child tr.xyz-create-header,
-table tbody:first-child tr.xyz-list-header,
-table tbody:first-child tr.xyz-item-header {
-  background-color: darkslateblue;
-  color: white;
-}
-
-table.xyz-create tr:nth-child(even),
-table.xyz-item tr:nth-child(even),
-table.xyz-list tr:nth-child(even) {
-  background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-list,
-.xyz-item {
-  width: 100%;
-}
-
-table.xyz-list > tr.xyz-list-selectable,
-table.xyz-list > tbody > tr.xyz-list-selectable {
-  cursor: pointer;
-}
-
-table.xyz-list > tr.xyz-list-selectable:hover,
-table.xyz-list > tbody > tr.xyz-list-selectable:hover {
-  background-color: lightblue;
-}
-
-table.xyz-list > tr.xyz-list-selected,
-table.xyz-list > tbody > tr.xyz-list-selected {
-  background-color: yellow;
-}
-
-td.xyz-list-icon {
-  width: 30px;
-  max-width: 30px;
-}
-
-tr.xyz-list-foldable {
-  cursor: pointer;
-}
-
-tr.xyz-list-foldable td:first-child::before {
-  content: "\00A0-\00A0";
-}
-
-tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
-  content: "\00A0+\00A0";
-}
-
-.xyz-list-sorted-asc::before {
-  content: "\00A0\21E3\00A0";
-}
-
-.xyz-list-sorted-desc::before {
-  content: "\00A0\21E1\00A0";
-}
-
-tr.xyz-list-search > td {
-  padding: 0;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: lightgrey;
-}
-
-tr.xyz-list-search > td > input {
-  width: 100%;
-  display: block;
-  border-style: none;
-  outline-style: none;
-  padding: 3;
-  font-size: inherit;
-  margin: 0;
-}
 html,
 body {
   padding: 0;
@@ -350,19 +262,94 @@ li:nth-child(5n+3) {
 li:nth-child(5n+4) {
   list-style-image: url('./orange-bullet.png');
 }
-table.xyz-item > tr.xyz-item-selected.xyz-item-header {
-  background-color: yellow;
-  color: black;
+table.xyz-create,
+table.xyz-item,
+table.xyz-list {
+  /* border: 1px solid lightgrey;
+    margin-bottom: 5px; */
+  padding: 0;
+  border-collapse: collapse;
+
+  /* table-layout: fixed; */
+  background-color: white;
 }
 
-span.xyz-item-deselect {
-  float: right;
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
+table tbody:first-child tr.xyz-create-header,
+table tbody:first-child tr.xyz-list-header,
+table tbody:first-child tr.xyz-item-header {
+  background-color: darkslateblue;
+  color: white;
+}
+
+table.xyz-create tr:nth-child(even),
+table.xyz-item tr:nth-child(even),
+table.xyz-list tr:nth-child(even) {
+  background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-list,
+.xyz-item {
+  width: 100%;
+}
+
+table.xyz-list > tr.xyz-list-selectable,
+table.xyz-list > tbody > tr.xyz-list-selectable {
   cursor: pointer;
-  margin-right: 5px;
 }
 
-span.xyz-item-deselect::before {
-  content: "\2715";
+table.xyz-list > tr.xyz-list-selectable:hover,
+table.xyz-list > tbody > tr.xyz-list-selectable:hover {
+  background-color: lightblue;
+}
+
+table.xyz-list > tr.xyz-list-selected,
+table.xyz-list > tbody > tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
+
+tr.xyz-list-foldable {
+  cursor: pointer;
+}
+
+tr.xyz-list-foldable td:first-child::before {
+  content: "\00A0-\00A0";
+}
+
+tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
+  content: "\00A0+\00A0";
+}
+
+.xyz-list-sorted-asc::before {
+  content: "\00A0\21E3\00A0";
+}
+
+.xyz-list-sorted-desc::before {
+  content: "\00A0\21E1\00A0";
+}
+
+tr.xyz-list-search > td {
+  padding: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgrey;
+}
+
+tr.xyz-list-search > td > input {
+  width: 100%;
+  display: block;
+  border-style: none;
+  outline-style: none;
+  padding: 3;
+  font-size: inherit;
+  margin: 0;
 }
 .xyz-map-wrapper {
 }
@@ -401,6 +388,24 @@ span.xyz-item-deselect::before {
   top: 3px;
   text-shadow: 1px 1px black;
   color: white;
+}
+table.xyz-item > tr.xyz-item-selected.xyz-item-header {
+  background-color: yellow;
+  color: black;
+}
+
+span.xyz-item-deselect {
+  float: right;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+span.xyz-item-deselect::before {
+  content: "\2715";
+}
+
+td.xyz-item-key {
+  vertical-align: top;
 }
 div.xyz-timeline-wrapper {
     position: relative;
@@ -464,25 +469,7 @@ div.xyz-timeline-line {
 }.xyz-title.xyz-selected {
   background-color: yellow;
 }
-
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}@charset "UTF-8";
+@charset "UTF-8";
 
 /*!
  * Pikaday
@@ -721,7 +708,32 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
-.xyz-login a {
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}
+.xyz-reference {
+    cursor: pointer;
+}
+
+.xyz-reference:hover {
+    background-color: lightblue;
+}.xyz-login a {
   color: blue;
   cursor: pointer;
   margin: 5px;
@@ -755,12 +767,4 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 
 .xyz-login-capslock-notifier {
   color: red;
-}
-
-.xyz-reference {
-    cursor: pointer;
-}
-
-.xyz-reference:hover {
-    background-color: lightblue;
 }

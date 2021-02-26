@@ -12,3 +12,7 @@ span.xyz-item-deselect {
 span.xyz-item-deselect::before {
   content: "\2715";
 }
+
+td.xyz-item-key {
+  vertical-align: top;
+}

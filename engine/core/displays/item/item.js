@@ -260,6 +260,7 @@ exports.display = {
         const TR_flatProperty = document.createElement('TR');
         if (displayItem.getOption('showLabels') !== false) {
           const TD_flatPropertyName = document.createElement('TD');
+          TD_flatPropertyName.classList.add('xyz-item-key');
           TD_flatPropertyName.innerHTML = displayItem.getDisplayName(flatPropertyName.split('.'));
           TR_flatProperty.appendChild(TD_flatPropertyName);
         }

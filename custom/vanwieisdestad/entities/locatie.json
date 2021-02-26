@@ -43,6 +43,13 @@
       "key": "geojson.properties.kadastraleGrootteWaarde"
     }
   },
+  "Eigenschappen" : {
+    "type": "json",
+    "stringify": true,
+    "connector": {
+      "key": "geojson.properties"
+    }
+  },
   "EigenaarID" : {
     "type": "reference",
     "uri": "/eigenaar/*",
