@@ -52,7 +52,6 @@ function initializeMap (display) {
 
   map.on('click', function (event) {
     const feature = map.forEachFeatureAtPixel(event.pixel, feature => feature);
-
     if (feature) {
       if (typeof feature.onclick === 'function') feature.onclick();
     } else if (DIV_create) {
@@ -72,21 +71,43 @@ function initializeMap (display) {
 
     map.getTarget().style.cursor = hit ? 'pointer' : ''; // TODO only if feature has onclick
 
+    let alreadyHighlighted = false;
+    map.forEachFeatureAtPixel(e.pixel, feature => {
+      if (feature === highlightedFeature) {
+        alreadyHighlighted = true;
+        return true;
+      }
+    });
+    if (alreadyHighlighted) return;
+
     if (highlightedFeature !== null) {
       highlightedFeature.setStyle(highlightedFeatureOriginalStyle);
       highlightedFeature = null;
     }
-
     map.forEachFeatureAtPixel(e.pixel, feature => {
+      if (highlightedFeature === feature) return true;
       highlightedFeatureOriginalStyle = feature.getStyle();
-      const strokeColor = feature.getStyle && feature.getStyle().getFill ? feature.getStyle().getFill() : 'blue';
       highlightedFeature = feature;
 
-      const highlightStyle = new ol.style.Style({
-        fill: new ol.style.Fill({color: 'rgba(255,255,0,0.25)'}),
-        stroke: new ol.style.Stroke({color: strokeColor, width: 3})
-      });
+      const geometryType = feature.getGeometry().getType();
+      let highlightStyle;
+      const fillColor = 'rgba(255,255,0,1)';
+      const strokeColor = feature.getStyle && feature.getStyle().getFill ? feature.getStyle().getFill() : 'blue';
 
+      if (geometryType === 'Point') {
+        highlightStyle = new ol.style.Style({
+          image: new ol.style.Circle({
+            stroke: new ol.style.Stroke({color: strokeColor, width: 3}),
+            radius: 5,
+            fill: new ol.style.Fill({color: fillColor})
+          })
+        });
+      } else {
+        highlightStyle = new ol.style.Style({
+          fill: new ol.style.Fill({color: fillColor}),
+          stroke: new ol.style.Stroke({color: strokeColor, width: 3})
+        });
+      }
       feature.setStyle(highlightStyle);
       return true;
     });
@@ -197,6 +218,8 @@ exports.display = {
         if (feature) { // TODO check
           const color = displayItem.getColor();
           const setStyle = (isSelected, feature_ = feature) => {
+            if (isSelected) WRAPPER.selectedFeature = feature_;
+            else if (WRAPPER.selectedFeature === feature_) WRAPPER.selectedFeature = null;
             if (data.geometry.type === 'Point') {
               // https://openlayers.org/en/latest/examples/polygon-styles.html
               const style = new ol.style.Style({
@@ -237,8 +260,6 @@ exports.display = {
 
           feature.onclick = () => {
             if (WRAPPER.selectedFeature) setStyle(false, WRAPPER.selectedFeature); // deselect previous selection
-            WRAPPER.selectedFeature = feature;
-
             setStyle(true);
             displayItem.select();
           };
