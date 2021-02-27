@@ -323,20 +323,36 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
     BUTTON_gear.title = 'Open element in ui editor.';
     BUTTON_gear.onclick = () => {
       const options = this.getOptions();
-      let uri = options.uri;
+      let uri = options.uri.split('?')[0];
+      let queryString = options.uri.split('?')[1] || '';
+      const path = uri.substr(1).split('/');
+      const entityClassName = path[0];
+      const entityIdList = path[1] || '*';
+      let properties = path[2] || '*';
+      const subPropertyPath = path.slice(3);
       for (const optionName in options) {
-        if (!['uri', 'labels', 'aggregations'].includes(optionName)) {
-          uri += uri.includes('?') ? '&' : '?';
-          uri += encodeURIComponent(optionName) + '=' + encodeURIComponent(options[optionName]);
+        if (optionName === 'aggregations') {
+          for (const [aggregation, ...propertyNames] of options.aggregations) {
+            const aggregationString = aggregation + '(' + propertyNames.join(',') + ')';
+            if (properties === '*') properties = aggregationString;
+            else properties += ',' + aggregationString;
+          }
+        } else if (!['uri', 'labels'].includes(optionName)) {
+          queryString += (queryString === '' ? '' : '&') + encodeURIComponent(optionName) + '=' + encodeURIComponent(options[optionName]);
         }
       }
-      const vars = variables.getVariables(); // TODO only vars that are used by uri and innerHTML?
-      for (const variableName in vars) {
-        uri += uri.includes('?') ? '&' : '?';
-        uri += encodeURIComponent(variableName) + '=' + encodeURIComponent(vars[variableName]);
+      uri = '/' + entityClassName + '/' + entityIdList;
+      if (path.length > 2) {
+        uri += '/' + properties;
+        if (path.length > 3) uri += '/' + subPropertyPath.join('/');
       }
 
-      const win = window.open('/ui' + uri, '_blank');
+      const vars = variables.getVariables(); // TODO only vars that are used by uri and innerHTML?
+      for (const variableName in vars) {
+        queryString += (queryString === '' ? '' : '&') + encodeURIComponent(variableName) + '=' + encodeURIComponent(vars[variableName]);
+      }
+      console.log(uri + '?' + queryString);
+      const win = window.open('/ui' + uri + '?' + queryString, '_blank');
       win.focus();
     };
     this.getWRAPPER().appendChild(BUTTON_gear);
