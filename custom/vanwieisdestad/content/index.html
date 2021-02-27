@@ -4,35 +4,18 @@
     <link rel="stylesheet" type="text/css" href="/xyz-style.css"/>
     <link rel="stylesheet" type="text/css" href="/vanwieisdestad/style.css"/>
     <script type="text/javascript" src="/xyz-ui.js"></script>
+    <script type="text/javascript" src="/vanwieisdestad/main.js"></script>
 </head>
-<body>
-
+<body onload="onLoad()">
   <table width="100%" height="100%">
     <tr>
       <td id="main" style="width:70%; text-align:center; position: relative;" rowspan="3">
         <div id="zoom-to-amersfoort" title="Zoom to Amersfoort">Amersfoort</div>
-        <script>
-          const DIV = document.getElementById('zoom-to-amersfoort');
-          const zoomToAmersfoort = DIV.onclick = ()=>{
-            const WRAPPER = document.getElementById('map');
-            if(WRAPPER && WRAPPER.map){
-              WRAPPER.map.getView().setCenter(ol.proj.transform([5.4000, 52.1680], 'EPSG:4326', 'EPSG:3857'));
-              WRAPPER.map.getView().setZoom(13);
-              return true;
-            } else return false;
-          }
-          const tryZoom = ()=> setTimeout(()=>{
-            if(!zoomToAmersfoort()) tryZoom();
-          },100);
-          tryZoom();
-
-
-        </script>
         <div id="resizer"></div>
         <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"/>
       </td>
       <td valign="top"style="background-color:#EFEFEF; height:70vh;">
-        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart"  multiSelect="EigenaarIDs" select="eigenaar" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
+        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart" multiSelect="EigenaarIDs" select="eigenaar" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
       </td>
     </tr>
     <tr>
@@ -44,23 +27,6 @@
   </table>
   <img id="logo" src="./vanwieisdestad/vanwieisamersfoort.png"/>
   <xyz id="locatie" style="max-height:50vh;" color="EigenaarID" uri="/locatie/$locatie/Type,Document=DocumentID,Eigenaar=EigenaarID,Oppervlakte,Eigenschappen" hideMessages select="locatie" display="item"/>
-  <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id"  hideMessages select="locatie" select="eigenaar" display="item"/>
-  <script>
-    const DIV_resizer = document.getElementById('resizer');
-    let x = null
-    DIV_resizer.onmousedown = event=>{
-        x = event.clientX;
-        event.stopPropagation();
-        return false;
-    }
-    document.body.onmouseup = event=>{
-      if(x === null) return;
-      const TD_main = document.getElementById('main');
-      main.style.width = event.clientX +'px';
-      main.style.minWidth = event.clientX +'px';
-      x=null;
-    }
-
-  </script>
+  <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id" hideMessages select="locatie" select="eigenaar" display="item"/>
 </body>
 </html>
