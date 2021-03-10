@@ -1,4 +1,6 @@
 <?php
+ini_set('memory_limit', '256M'); // increase memory limit for large queries
+
 http_response_code(500); // Default to error because if php crashes it will return a 200 if display_errors is on
 
 $GLOBALS['constants'] = json_decode(file_get_contents('./engine/const/constants.json'), true);
