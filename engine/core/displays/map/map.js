@@ -6,6 +6,57 @@ TODO?label  define a label property to use
 const {getStateMessage} = require('../item/item');
 let SCRIPT; // to dynamically load dependency;
 
+function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth) {
+  /* For future extensions
+  fillColor
+  fillOpacity
+  strokeColor
+  strokeOpacity
+  strokeWidth
+  strokeLinecap
+  strokeDashstyle */
+
+  const geometryType = feature.getGeometry().getType();
+  const highlightStyle = (feature, resolution) => {
+    if (geometryType === 'Point') {
+      return new ol.style.Style({
+        image: new ol.style.Circle({
+          stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth}),
+          radius: 5,
+          fill: new ol.style.Fill({color: fillColor})
+        })
+      });
+    } else if (resolution > 15) {
+      if (!feature.iconFeature) {
+        const poly = new ol.geom.Polygon(feature.getGeometry().getCoordinates());
+        const extent = poly.getExtent();
+        const coord = [];
+        coord[0] = (extent[2] - extent[0]) / 2 + extent[0];
+        coord[1] = (extent[3] - extent[1]) / 2 + extent[1];
+        const point = new ol.geom.Point(coord);
+        feature.iconFeature = new ol.Feature({
+          geometry: point
+        });
+        WRAPPER.vectorSource.addFeature(feature.iconFeature);
+      }
+      feature.iconFeature.setStyle(new ol.style.Style({
+        image: new ol.style.Circle({
+          opacity: 1,
+          stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth}),
+          radius: 5,
+          fill: new ol.style.Fill({color: fillColor})
+        })
+      }));
+    } else {
+      return new ol.style.Style({
+        fill: new ol.style.Fill({color: fillColor}),
+        stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth})
+      });
+    }
+  };
+  feature.setStyle(highlightStyle);
+}
+
 function initializeMap (display) {
   const WRAPPER = display.getWRAPPER();
   WRAPPER.classList.add('xyz-map');
@@ -88,27 +139,9 @@ function initializeMap (display) {
       if (highlightedFeature === feature) return true;
       highlightedFeatureOriginalStyle = feature.getStyle();
       highlightedFeature = feature;
-
-      const geometryType = feature.getGeometry().getType();
-      let highlightStyle;
       const fillColor = 'rgba(255,255,0,1)';
       const strokeColor = feature.getStyle && feature.getStyle().getFill ? feature.getStyle().getFill() : 'blue';
-
-      if (geometryType === 'Point') {
-        highlightStyle = new ol.style.Style({
-          image: new ol.style.Circle({
-            stroke: new ol.style.Stroke({color: strokeColor, width: 3}),
-            radius: 5,
-            fill: new ol.style.Fill({color: fillColor})
-          })
-        });
-      } else {
-        highlightStyle = new ol.style.Style({
-          fill: new ol.style.Fill({color: fillColor}),
-          stroke: new ol.style.Stroke({color: strokeColor, width: 3})
-        });
-      }
-      feature.setStyle(highlightStyle);
+      setFeatureStyle(WRAPPER, feature, fillColor, strokeColor, 3);
       return true;
     });
   });
@@ -216,48 +249,15 @@ exports.display = {
         const features = format.readFeatures(data);
         const feature = features[0]; // TODO handle multiple features?
         if (feature) { // TODO check
-          const color = displayItem.getColor();
+          const fillColor = displayItem.getColor();
           const setStyle = (isSelected, feature_ = feature) => {
             if (isSelected) WRAPPER.selectedFeature = feature_;
             else if (WRAPPER.selectedFeature === feature_) WRAPPER.selectedFeature = null;
-            if (data.geometry.type === 'Point') {
-              // https://openlayers.org/en/latest/examples/polygon-styles.html
-              const style = new ol.style.Style({
-                image: new ol.style.Circle({
-                  stroke: new ol.style.Stroke({
-                    color: isSelected ? 'yellow' : 'color',
-                    width: isSelected ? 3 : 1
-                  }),
-                  radius: 5,
-                  fill: new ol.style.Fill({
-                    color
-                  })
-                })
-              });
-              feature_.setStyle(style);
-            } else {
-              const style = new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                  color: isSelected ? 'yellow' : 'color',
-                  width: isSelected ? 3 : 1
-                }),
-                fill: new ol.style.Fill({
-                  color
-                })
-              });
-              feature_.setStyle(style);
-            }
+            const strokeColor = isSelected ? 'yellow' : fillColor;
+            const strokeWidth = isSelected ? 3 : 1;
+            setFeatureStyle(WRAPPER, feature_, fillColor, strokeColor, strokeWidth);
           };
           setStyle(displayItem.isSelected());
-          /*
-        fillColor
-        fillOpacity
-        strokeColor
-        strokeOpacity
-        strokeWidth
-        strokeLinecap
-        strokeDashstyle */
-
           feature.onclick = () => {
             if (WRAPPER.selectedFeature) setStyle(false, WRAPPER.selectedFeature); // deselect previous selection
             setStyle(true);
