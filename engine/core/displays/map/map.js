@@ -26,30 +26,47 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
           fill: new ol.style.Fill({color: fillColor})
         })
       });
-    } else if (resolution > 15) {
-      if (!feature.iconFeature) {
-        const poly = new ol.geom.Polygon(feature.getGeometry().getCoordinates());
-        const extent = poly.getExtent();
-        const coord = [];
-        coord[0] = (extent[2] - extent[0]) / 2 + extent[0];
-        coord[1] = (extent[3] - extent[1]) / 2 + extent[1];
-        const point = new ol.geom.Point(coord);
-        feature.iconFeature = new ol.Feature({
-          geometry: point
+    } else if (WRAPPER.selectedFeature === feature) {
+      const extent = feature.getGeometry().getExtent();
+
+      const topLeft = WRAPPER.map.getPixelFromCoordinate(ol.extent.getTopLeft(extent));
+      const bottomRight = WRAPPER.map.getPixelFromCoordinate(ol.extent.getBottomRight(extent));
+
+      const width = bottomRight[0] - topLeft[0];
+      const height = bottomRight[1] - topLeft[1];
+
+      if (width < 15 || height < 15) {
+        if (!feature.iconFeature) {
+          const coord = [];
+          coord[0] = (extent[2] - extent[0]) / 2 + extent[0];
+          coord[1] = (extent[3] - extent[1]) / 2 + extent[1];
+          const point = new ol.geom.Point(coord);
+          feature.iconFeature = new ol.Feature({
+            geometry: point
+          });
+          feature.iconFeature.onclick = feature.onclick;
+          feature.iconFeature.mainFeature = feature;
+          WRAPPER.vectorSource.addFeature(feature.iconFeature);
+        }
+
+        feature.iconFeature.setStyle(new ol.style.Style({
+          image: new ol.style.Circle({
+            opacity: 0,
+            stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth}),
+            radius: 5,
+            fill: new ol.style.Fill({color: fillColor})
+          })
+        }));
+        return new ol.style.Style();
+      } else {
+        if (feature.iconFeature) feature.iconFeature.setStyle(new ol.style.Style({}));
+        return new ol.style.Style({
+          fill: new ol.style.Fill({color: fillColor}),
+          stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth})
         });
-        feature.iconFeature.onclick = feature.onclick;
-        feature.iconFeature.mainFeature = feature;
-        WRAPPER.vectorSource.addFeature(feature.iconFeature);
       }
-      feature.iconFeature.setStyle(new ol.style.Style({
-        image: new ol.style.Circle({
-          opacity: 1,
-          stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth}),
-          radius: 5,
-          fill: new ol.style.Fill({color: fillColor})
-        })
-      }));
     } else {
+      if (feature.iconFeature) feature.iconFeature.setStyle(new ol.style.Style({}));
       return new ol.style.Style({
         fill: new ol.style.Fill({color: fillColor}),
         stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth})
