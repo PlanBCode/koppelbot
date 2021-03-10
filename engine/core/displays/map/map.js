@@ -37,6 +37,8 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
         feature.iconFeature = new ol.Feature({
           geometry: point
         });
+        feature.iconFeature.onclick = feature.onclick;
+        feature.iconFeature.mainFeature = feature;
         WRAPPER.vectorSource.addFeature(feature.iconFeature);
       }
       feature.iconFeature.setStyle(new ol.style.Style({
@@ -100,15 +102,24 @@ function initializeMap (display) {
   });
   WRAPPER.map = map;
   const DIV_create = display.showCreateButton();
-
-  map.on('click', function (event) {
+  let lastClickTimeStamp;
+  map.on('click', event => {
     const feature = map.forEachFeatureAtPixel(event.pixel, feature => feature);
     if (feature) {
+      if (lastClickTimeStamp) {
+        if (event.originalEvent.timeStamp - 500 <= lastClickTimeStamp) {
+          const extent = (feature.mainFeature || feature).getGeometry().getExtent();
+          WRAPPER.map.getView().fit(extent, {padding: [100, 100, 100, 100]});
+        }
+      }
+      lastClickTimeStamp = event.originalEvent.timeStamp;
       if (typeof feature.onclick === 'function') feature.onclick();
     } else if (DIV_create) {
       DIV_create.patch({[locationPropertyName]: {type: 'Point', coordinates: event.coordinate}});
       DIV_create.style.display = 'block';
     }
+    event.stopPropagation();
+    return false;
   });
 
   let highlightedFeature = null;
