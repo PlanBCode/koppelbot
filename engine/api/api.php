@@ -8,9 +8,9 @@ function pathFromUri(string $uri)//TODO: ?array
     return explode('/', substr($uri, 1));
 }
 
-function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array &$propertyPath, Query &$query, array &$accessGroups): array
+function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $requestUri, string $content, string $entityClassList, string $entityIdList, array &$propertyPath, Query &$query, array &$accessGroups, $requestId = null): array
 {
-    $requestObject = new RequestObject($method, null, $requestUri, $query, $accessGroups);
+    $requestObject = new RequestObject($method, $requestId, $requestUri, $query, $accessGroups);
 
     $connectorRequests = [];
     if ($method === 'GET' || $method === 'DELETE' || $method === 'HEAD') {
@@ -79,6 +79,14 @@ function addConnectorRequest(ApiRequest &$apiRequest, array &$connectorRequests,
     }
 }
 
+function addConnectorRequests(array &$a, array &$b){
+  foreach ($b as $connectorString => $connectorRequest) {
+    if(array_key_exists($connectorString,$a)){
+      $a[$connectorString]->merge($connectorRequest);
+    }else $a[$connectorString] = $connectorRequest;
+  }
+}
+
 function addRequestResponse(ConnectorRequest &$connectorRequest, array &$requestResponses)//TODO : void
 {
   $connectorResponse = Connector::getConnectorResponse($connectorRequest);
@@ -88,34 +96,6 @@ function addRequestResponse(ConnectorRequest &$connectorRequest, array &$request
   }
 }
 
-function getRequestResponses(array &$connectorRequests): array
-{
-    $requestResponses = [];
-    $remainingConnectorRequests = [];
-    $remappedAutoIncrementedUris = [];
-
-    // first handle all POST requests that contain the id property, the id value is required for remaining connector requests
-    foreach ($connectorRequests as &$connectorRequest) {
-        $postIdPropertyRequests = $connectorRequest->getPostIdPropertyRequests();
-        if(!empty($postIdPropertyRequests)){
-          addRequestResponse($connectorRequest, $requestResponses); // need to track which id's have been added
-          foreach($postIdPropertyRequests as &$postIdPropertyRequest){ // map '$entityClassName/$stub' to '$entityClassName/$maxAutoIncrementedId'
-            $entityClassName = $postIdPropertyRequest->getEntityClass();
-            $entityId = $postIdPropertyRequest->getEntityId();
-            $stubUri = $entityClassName . '/' . $entityId;
-            $requestId = $postIdPropertyRequest->getRequestId();
-            $requestResponse = $requestResponses[$requestId]; //TODO check
-            $remappedAutoIncrementedUris += $requestResponse->getRemappedAutoIncrementedUris();
-          }
-        }else $remainingConnectorRequests[] = $connectorRequest;
-    }
-
-    foreach ($remainingConnectorRequests as &$connectorRequest) {
-        $connectorRequest->updateAutoIncrementedUris($remappedAutoIncrementedUris);
-        addRequestResponse($connectorRequest, $requestResponses);
-    }
-    return $requestResponses;
-}
 
 class RequestObject
 {
@@ -267,6 +247,104 @@ class ApiRequest extends HttpRequest2
         return getConnectorRequests($this, 'GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
     }
 
+
+    /**
+     * For reference types the underlying values need to be retrieved. Consider entity A with property b of entity B reference type:
+     *  /A/entityId/b/myProperty  needs to retrieve /B/x/myProperty where x = /A/entityId/b
+     * @param  array  $requestResponses            [description]
+     * @param  array  $remainingConnectorRequests  [description]
+     * @param  array  $remappedAutoIncrementedUris [description]
+     * @return [type]                              [description]
+     */
+    protected function resolveReferenceResponses(array &$requestResponses, array &$remainingConnectorRequests, array &$remappedAutoIncrementedUris): array
+    {
+      $propertyResponseByReference = [];
+      $pathsByReference = [];
+
+      $referenceConnectorRequests = [];
+
+      foreach ($remainingConnectorRequests as &$connectorRequest) {
+          $connectorRequest->updateAutoIncrementedUris($remappedAutoIncrementedUris);
+          addRequestResponse($connectorRequest, $requestResponses);
+          foreach($connectorRequest->getPropertyRequests() as &$propertyRequest){
+
+            if($propertyRequest->isReferenceRequest()){ // If reference type values and sub properties then resolve those
+
+              $referenceUri = $propertyRequest->getProperty()->getSetting('uri'); // '/document/*'
+              $referenceEntityClassName = explode('/',$referenceUri)[1]; // '/document/*' -> 'document'
+              $referencePropertyPath = array_slice($propertyRequest->getPropertyPath(),1);
+              $referenceSubUri = implode('/',$referencePropertyPath);
+
+              $entityClassName = $propertyRequest->getEntityClass();
+              $entityId = $propertyRequest->getEntityIdList();
+              $requestId = $propertyRequest->getRequestId();
+
+              $requestResponse = $requestResponses[$requestId];
+              $entityClassResponse = $requestResponse->getEntityClassResponses()[$entityClassName]; //TODO check
+              $subUri = $propertyRequest->getSubUri();
+              $entityResponses = $entityClassResponse->getEntityResponses();
+
+              foreach ($entityResponses as $entityId => $entityResponse) {
+                $propertyResponse = $entityResponse->getPropertyResponses()[$subUri]; //TODO check
+                $referenceEntityId = $propertyResponse->getContent();
+                $query = new Query(''); //TODO use reference uri querystring?
+                $content = ''; // $propertyRequest->getContent(); //TODO stringify?
+                $requestUri = '/'.$referenceEntityClassName."/".$referenceEntityId."/".$referenceSubUri;
+                $referenceRequestId = $propertyRequest->getUri($entityId);
+
+                $propertyResponseByReference[$referenceRequestId] = $propertyResponse;
+                $pathsByReference[$referenceRequestId] = array_merge([$referenceEntityClassName,$referenceEntityId],$referencePropertyPath);
+                $newConnectorRequests = getConnectorRequests($this, $this->method, $requestUri, $content, $referenceEntityClassName, $referenceEntityId, $referencePropertyPath, $query, $this->accessGroups, $referenceRequestId );
+                addConnectorRequests($referenceConnectorRequests,$newConnectorRequests);
+              }
+            }
+          }
+      }
+
+      if(!empty($referenceConnectorRequests)){
+        $referenceRequestResponses = $this->getRequestResponses2($referenceConnectorRequests);
+        foreach ($referenceRequestResponses as $referenceRequestId => &$requestResponse) {
+          $propertyResponse = $propertyResponseByReference[$referenceRequestId];
+          $path = $pathsByReference[$referenceRequestId];
+          $entityClassResponse = $requestResponse->getEntityClassResponses()[$path[0]];
+          $entityResponse = $entityClassResponse->getEntityResponses()[$path[1]];
+
+          $content = $entityResponse->getContent();
+          $status = $entityResponse->getStatus();
+
+          $propertyResponse->setContent($content);
+          $propertyResponse->setStatus($status);
+
+        }
+      }      
+      return $requestResponses;
+    }
+
+    protected function getRequestResponses2(array &$connectorRequests): array //TODO rename
+    {
+        $requestResponses = [];
+        $remainingConnectorRequests = [];
+        $remappedAutoIncrementedUris = [];
+
+        // first handle all POST requests that contain the id property, the id value is required for remaining connector requests
+        foreach ($connectorRequests as &$connectorRequest) {
+            $postIdPropertyRequests = $connectorRequest->getPostIdPropertyRequests();
+            if(!empty($postIdPropertyRequests)){
+              addRequestResponse($connectorRequest, $requestResponses); // need to track which id's have been added
+              foreach($postIdPropertyRequests as &$postIdPropertyRequest){ // map '$entityClassName/$stub' to '$entityClassName/$maxAutoIncrementedId'
+                $entityClassName = $postIdPropertyRequest->getEntityClass();
+                $entityId = $postIdPropertyRequest->getEntityId();
+                $stubUri = $entityClassName . '/' . $entityId;
+                $requestId = $postIdPropertyRequest->getRequestId();
+                $requestResponse = $requestResponses[$requestId]; //TODO check
+                $remappedAutoIncrementedUris += $requestResponse->getRemappedAutoIncrementedUris();
+              }
+            }else $remainingConnectorRequests[] = $connectorRequest;
+        }
+        return $this->resolveReferenceResponses($requestResponses, $remainingConnectorRequests, $remappedAutoIncrementedUris);
+    }
+
+
     protected function getRequestResponses()
     {
         $entityClassList = count($this->path) > 0 ? $this->path[0] : '*';  //TODO helper function to split uri properly
@@ -274,7 +352,7 @@ class ApiRequest extends HttpRequest2
         $propertyPath = count($this->path) > 2 ? array_slice($this->path, 2) : [];
         $requestURi = $this->uri;
         $queryConnectorRequests = $this->getQueryConnectorRequests($this->query);
-        $queryRequestResponses = getRequestResponses($queryConnectorRequests);
+        $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
         if (count($queryRequestResponses) > 0) {
 
             /** @var RequestResponse */
@@ -311,7 +389,7 @@ class ApiRequest extends HttpRequest2
     before getting the actual data
     */
         $connectorRequests = getConnectorRequests($this, $this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query, $this->accessGroups);
-        return getRequestResponses($connectorRequests);
+        return $this->getRequestResponses2($connectorRequests);
     }
 
 

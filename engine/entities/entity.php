@@ -140,7 +140,6 @@ class EntityClass
 
     protected function createPropertyRequests(RequestObject &$requestObject, string $entityIdList, array &$propertyPath, &$entityClassContent): array
     {
-
         $method = $requestObject->getMethod();
         /** @var string[] */
         $entityIds = [];
@@ -271,14 +270,15 @@ class EntityResponse extends Response
         $property = $this->entityClass->getProperty($propertyPath);
         $propertyResponse = new PropertyResponse($property, $this->requestObject, $status, $propertyPath, $content);
         $this->addStatus($propertyResponse->getStatus());
-        $this->propertyResponses[] = $propertyResponse;
+        $subUri = implode('/',$propertyPath);
+        $this->propertyResponses[$subUri] = $propertyResponse;
     }
 
     public function merge(EntityResponse &$entityResponse)
     {
         $this->addStatus($entityResponse->getStatus());
-        foreach ($entityResponse->propertyResponses as &$propertyResponse) {
-            $this->propertyResponses[] = $propertyResponse; //TODO check for duplicate responses for propertyName ?
+        foreach ($entityResponse->propertyResponses as $subUri => &$propertyResponse) {
+            $this->propertyResponses[$subUri] = $propertyResponse; //TODO check for duplicate responses for propertyName ?
         }
     }
 

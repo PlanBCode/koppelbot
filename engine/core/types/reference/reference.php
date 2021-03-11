@@ -7,4 +7,9 @@ class Type_reference extends Type
         if (!is_string($content)) return false;
         return strpos($content,'/') === false; //TODO maybe more requirements?
    }
+
+   static function validateSubPropertyPath(array &$subPropertyPath, array &$settings): bool
+   {
+       return true; // TODO validate based on reference entityClass?
+   }
 }

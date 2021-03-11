@@ -111,6 +111,16 @@ class  PropertyRequest
       return $this->requestObject->getMethod() === 'POST' && $this->property && $this->property->isId();
     }
 
+    public function isReferenceRequest(): bool
+    {
+      return count($this->propertyPath) > 1 && !is_null($this->property) && $this->property->getTypeName() === 'reference';
+    }
+
+    public function getSubUri(): string
+    {
+        return implode('/', $this->propertyPath);
+    }
+
     public function getPropertyPath(): array
     {
         return $this->propertyPath;
@@ -141,7 +151,7 @@ class  PropertyRequest
         $this->entityIdList = $entityIdList;
     }
 
-    public function getEntityClass(): string
+    public function getEntityClass(): string //TODO rename getEntityClassName
     {
         return $this->entityClassName;
     }
@@ -164,6 +174,13 @@ class  PropertyRequest
     public function getRequestUri(): string
     {
         return $this->requestObject->getUri();
+    }
+
+    public function getUri(string $entityId): string
+    {
+        $path = $this->requestObject->getPath();
+        $path[1] = $entityId;
+        return '/'.implode('/',$path);
     }
 
     public function getRequestObject(): RequestObject
@@ -201,6 +218,8 @@ class PropertyResponse extends Response
     /** @var string[] */
     protected $propertyPath;
     // TODO ?Property
+    //protected $property;
+
     public function __construct(&$property, RequestObject &$requestObject, int $status, array &$propertyPath, &$content = null)
     {
         $this->propertyPath = $propertyPath;
@@ -221,6 +240,16 @@ class PropertyResponse extends Response
                 $this->content = $processResponse->getError();
             }
         }
+    }
+
+    public function setContent(&$content)
+    {
+         $this->content = $content;
+    }
+
+    public function setStatus(int $status)
+    {
+         $this->status = $status;
     }
 
     public function getContent()
@@ -466,9 +495,14 @@ class Property
         return $this->settings['connector'];
     }
 
-    public function getMeta(): array
+    public function getMeta(): array //TODO rename to getSettings
     {
         return $this->settings;
+    }
+
+    public function getSetting(string $settingName)
+    {
+        return array_get($this->settings,$settingName);
     }
 
     public function hasDefault(): bool
