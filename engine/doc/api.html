@@ -58,3 +58,24 @@ Get the color and size for all fruits.</p>
 
 <p><code><pre>$ ./xyz "/fruit/banana,grape/color"</pre></code><br/>
 Get the colors of the banana and grape fruit.</p>
+
+
+<h3>References and dot notation</h3>
+
+The drink entity has a type of fruit as ingredient:
+
+<p><u>http://localhost:8000/api/drink/wine/ingredient</u><br/>
+<a class= "xyz-doc-tryIt" href="/api/drink/wine/ingredient"></a>
+Get the ingredient for wine: grape</p>
+
+To get properties of this reference we can append them:
+
+<p><u>http://localhost:8000/api/drink/wine/ingredient/size</u><br/>
+<a class= "xyz-doc-tryIt" href="/api/drink/wine/ingredient/size"></a>
+Get the size of the ingredient for wine: small</p>
+
+To mix regular properties with reference or sub properties use the dot notation:
+
+<p><u>http://localhost:8000/api/drink/wine/name,ingredient.size</u><br/>
+<a class= "xyz-doc-tryIt" href="/api/drink/wine/name,ingredient.size"></a>
+Get the name of the drink and size of the ingredient for wine: wine, small</p>
