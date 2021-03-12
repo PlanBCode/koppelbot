@@ -1,0 +1,29 @@
+{
+  "_": {
+    "connector": {
+      "type": "file",
+      "parse": "json",
+      "path": "data/drinks.json"
+    },
+    "access" : {
+      "read" : ["guest"],
+      "write" : ["local"]
+    }
+  },
+  "ingredient": {
+    "type": "reference",
+    "uri" : "/fruit/*",
+    "connector": {
+      "key": ".ingredient"
+    }
+  },
+  "name": {
+    "type": "string",
+    "index": true,
+    "title": true,
+    "required": true,
+    "connector": {
+      "key": "key"
+    }
+  }
+}

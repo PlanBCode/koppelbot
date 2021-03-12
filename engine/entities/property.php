@@ -66,6 +66,7 @@ class  PropertyRequest
         $this->entityIdList = $entityIdList;
         $this->entityClassName = $entityClassName;
         $this->propertyPath = $propertyPath;
+        $this->referencePropertyPath = $propertyPath;
 
         if ($status !== 200) {
             $this->status = $status;
@@ -76,7 +77,9 @@ class  PropertyRequest
             $this->connectorString = Connector::CONNECTOR_STRING_ERROR;
             $this->content = $propertyOrError;
         } else {
+
             $this->property = $propertyOrError;
+            if($this->property->getTypeName() === 'reference') $this->propertyPath = [$propertyPath[0]];            
             $this->content = $propertyContent;
             $this->status = 200;
             $connectorSettings = $this->property->getConnectorSettings();
@@ -113,7 +116,12 @@ class  PropertyRequest
 
     public function isReferenceRequest(): bool
     {
-      return count($this->propertyPath) > 1 && !is_null($this->property) && $this->property->getTypeName() === 'reference';
+      return count($this->referencePropertyPath) > 1 && !is_null($this->property) && $this->property->getTypeName() === 'reference';
+    }
+
+    public function getReferencePropertyPath(): array
+    {
+        return $this->referencePropertyPath;
     }
 
     public function getSubUri(): string

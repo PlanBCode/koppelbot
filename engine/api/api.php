@@ -272,7 +272,7 @@ class ApiRequest extends HttpRequest2
 
               $referenceUri = $propertyRequest->getProperty()->getSetting('uri'); // '/document/*'
               $referenceEntityClassName = explode('/',$referenceUri)[1]; // '/document/*' -> 'document'
-              $referencePropertyPath = array_slice($propertyRequest->getPropertyPath(),1);
+              $referencePropertyPath = array_slice($propertyRequest->getReferencePropertyPath(),1);
               $referenceSubUri = implode('/',$referencePropertyPath);
 
               $entityClassName = $propertyRequest->getEntityClass();
@@ -316,7 +316,7 @@ class ApiRequest extends HttpRequest2
           $propertyResponse->setStatus($status);
 
         }
-      }      
+      }
       return $requestResponses;
     }
 

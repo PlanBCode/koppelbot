@@ -2,6 +2,22 @@
 require './engine/entities/property.php';
 require './engine/access/access.php';
 
+/**
+ * Create a single branch of the property path for given property. ('a',['a,b','c','d.e']) -> ['a','c','d','e']
+ * @param  string $propertyName [description]
+ * @param  array  $propertyPath [description]
+ * @return array                [description]
+ */
+function createSingularPropertyPath($propertyName, array &$propertyPath): array
+{
+  $propertyPathSingular = $propertyPath;
+  $propertyPathSingular[0] = $propertyName;
+  foreach ($propertyPathSingular as &$subPropertyName) {
+    $subPropertyName = explode('.', $subPropertyName);
+  }
+  return array_merge(...$propertyPathSingular);
+}
+
 class EntityClass
 {
     /** @var EntityClass[] */
@@ -85,8 +101,8 @@ class EntityClass
         }
         $propertyHandles = [];
         foreach ($propertyNames as &$propertyName) {
-            $propertyPathSingular = $propertyPath;
-            $propertyPathSingular[0] = $propertyName;
+            $propertyPathSingular = createSingularPropertyPath($propertyName, $propertyPath);
+            $propertyName =  $propertyPathSingular[0];
             if (!array_key_exists($propertyName, $this->properties)) {
                 //TODO expand error message using $propertyPathSingular
                 $propertyHandle = new PropertyHandle(404, 'Property "' . $propertyName . '" does not exist.', $propertyPathSingular);
@@ -295,8 +311,11 @@ class EntityResponse extends Response
     private function collapseContent(&$content)
     {
         $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);
+        $requestPropertyPath = count($requestPropertyPath)>0
+          ? createSingularPropertyPath($requestPropertyPath[0], $requestPropertyPath)
+          : [];
         foreach ($requestPropertyPath as &$subPropertyName) {
-            if (count($content) > 1 || strpos($subPropertyNameList,',') !== false) break;
+            if (!is_array($content) || count($content) > 1 || strpos($subPropertyName,',') !== false) break;
             elseif (array_key_exists($subPropertyName, $content)) {
                 $content =& array_get($content, $subPropertyName);
                 $this->status = array_get($content, 'status');
