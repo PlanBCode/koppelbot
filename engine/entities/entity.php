@@ -296,19 +296,13 @@ class EntityResponse extends Response
     {
         $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);
         foreach ($requestPropertyPath as &$subPropertyName) {
-            if (count($content) > 1) {
-                break;
-            } elseif (array_key_exists($subPropertyName, $content)) {
+            if (count($content) > 1 || strpos($subPropertyNameList,',') !== false) break;
+            elseif (array_key_exists($subPropertyName, $content)) {
                 $content =& array_get($content, $subPropertyName);
                 $this->status = array_get($content, 'status');
-                if (array_key_exists('content', $content)) {
-                    $content =& array_get($content, 'content');
-                } elseif (array_key_exists('content2', $content)) {
-                    $content =& array_get($content, 'content2');
-                }
-            } else {
-                $content = [];
-            }
+                if (array_key_exists('content', $content)) $content =& array_get($content, 'content');
+                elseif (array_key_exists('content2', $content)) $content =& array_get($content, 'content2');
+            } else $content = [];
         }
     }
 
