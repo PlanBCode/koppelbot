@@ -175,7 +175,7 @@ function TypeItem (xyz, baseUri, subPropertyPath, status, content, settings, opt
     if (typeof callback !== 'function') throw new TypeError('callback is not a function.');
 
     callbacks.push(callback);
-    if (options.display !== 'create') {
+    if (options.display !== 'create' && baseUri !== null) {
       const fullUri = subPropertyPath.length > 0
         ? baseUri + '/' + subPropertyPath.join('/')
         : baseUri;
