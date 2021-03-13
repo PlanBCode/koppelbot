@@ -23,8 +23,8 @@ function request (method, uri, data, callback) {
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
   const path = pathFromUri(uri);
   const entityClassNameList = path[0]; // TODO error if no entityClass
-
-  const entityClassNames = entityClassNameList.split(',').filter(entityClass => !entityClasses.hasOwnProperty((entityClass)));
+  const requestedEntityClassNames = entityClassNameList.split(',');
+  const entityClassNames = requestedEntityClassNames.filter(entityClass => !entityClasses.hasOwnProperty((entityClass)));
   if (entityClassNames.length === 0) {
     callback();
   } else {
@@ -44,21 +44,45 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
         console.error('PROBLEM parsing meta response', data);
         return;
       }
+      const waitForEntityClassNames = new Set();
+      const metas = {};
+      const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
+        if (waitForEntityClassNames.size === 0) {
+          for (const entityClassName in metas) {
+            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metas[entityClassName]);
+          }
+          callback();
+        }
+      };
       for (const entityClassName of entityClassNames) {
         if (!entityClasses.hasOwnProperty(entityClassName)) {
           if (!data.entity.hasOwnProperty(entityClassName)) {
             console.error(`Entity data not found for '${entityClassName}'`);
             return;
           } else {
-            const metaData = data.entity[entityClassName].content; // TODO validate data
-            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metaData);
+            const meta = data.entity[entityClassName].content; // TODO validate data
+            metas[entityClassName] = meta;
+            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, meta);
+
+            for (const propertyName in meta) {
+              const settings = meta[propertyName];
+              if (settings.type === 'reference') {
+                const referenceEntityClassName = settings.uri.split('/')[1]; // TODO check
+                waitForEntityClassNames.add(referenceEntityClassName);
+                retrieveMeta(xyz, entityClasses, '/' + referenceEntityClassName, () => {
+                  waitForEntityClassNames.delete(referenceEntityClassName);
+                  waitForAllCallbacks();
+                });
+              }
+            }
           }
         }
       }
-      callback();
+      waitForAllCallbacks();
     });
   }
 };
+exports.retrieveMeta = retrieveMeta;
 
 exports.delete = (entityClasses, uri, callback) => {
   request('DELETE', uri, null, (status, response) => {
