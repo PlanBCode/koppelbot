@@ -17,6 +17,8 @@ function XYZ () {
   this.ui = (options, WRAPPER) => ui(this, entityClasses, options, WRAPPER);
   this.checkAccess = (uri, method) => entity.checkAccess(entityClasses, uri, method);
 
+  this.getMeta = entityClassName => entityClasses.hasOwnProperty(entityClassName) ? entityClasses[entityClassName].getSettings() : {};
+
   this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);
   this.head = (uri, callback) => request.head(uri, callback);
   this.post = (uri, content, callback) => request.post(entityClasses, uri, content, callback);
