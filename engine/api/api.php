@@ -287,7 +287,7 @@ class ApiRequest extends HttpRequest2
               foreach ($entityResponses as $entityId => $entityResponse) {
                 $propertyResponse = $entityResponse->getPropertyResponses()[$subUri]; //TODO check
                 $referenceEntityId = $propertyResponse->getContent();
-                $query = new Query(''); //TODO use reference uri querystring?
+                $query = new Query($this->query->checkToggle('expand')?'expand':''); //TODO use reference uri querystring?
                 $content = ''; // $propertyRequest->getContent(); //TODO stringify?
                 $requestUri = '/'.$referenceEntityClassName."/".$referenceEntityId."/".$referenceSubUri;
                 $referenceRequestId = $propertyRequest->getUri($entityId);
