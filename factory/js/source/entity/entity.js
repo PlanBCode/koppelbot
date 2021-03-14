@@ -154,13 +154,12 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
 
   this.getDisplayName = propertyPath => {
+    propertyPath = propertyPath.map(subPropertyName => subPropertyName.split('.')).flat();
     if (!(propertyPath instanceof Array) || propertyPath.length === 0) {
       return entityClassName; // TODO also add option to $entity.json for a display name
     } else if (properties.hasOwnProperty(propertyPath[0])) {
       return properties[propertyPath[0]].getDisplayName(propertyPath.slice(1));
-    } else {
-      return 'Unknown';
-    }
+    } else return 'Unknown';
   };
 
   this.isAutoIncremented = () => {

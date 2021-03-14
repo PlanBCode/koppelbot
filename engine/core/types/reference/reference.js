@@ -33,5 +33,8 @@ exports.actions = {
   validateContent: function (item) {
     const referenceUri = item.getContent();
     return typeof referenceUri === 'string' && !referenceUri.includes('/'); // TODO more requirements for ids?
+  },
+  validateSubPropertyPath: function (subPropertyPath, settings, validateSubPropertyPath) {
+    return true;
   }
 };

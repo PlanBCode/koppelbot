@@ -11,7 +11,7 @@ const validateSubPropertyPath = (types) => (type, subPropertyPath) => {
   return types[type].validateSubPropertyPath(subPropertyPath);
 };
 
-exports.constructor = function Property (xyz, parent, propertyName, meta) {
+exports.constructor = function Property (xyz, parent, propertyName, settings) {
   listener.Handler.call(this);
 
   const subProperties = {};
@@ -19,19 +19,25 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
   const errors = {};// TODO
   const statusses = {};// TODO
 
-  const type = meta.type;
+  const type = settings.type;
   // TODO handle type alliasses?
-  const settings = meta; // TODO check if object
 
-  let isPrimitive = true;
-  if (settings.hasOwnProperty('signature')) {
-    isPrimitive = false;
-    for (const subPropertyName in settings.signature) {
-      subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, settings.signature[subPropertyName]);
+  const isPrimitive = !settings.hasOwnProperty('signature') && type !== 'reference';
+  if (!isPrimitive) {
+    if (type === 'reference') {
+      const referenceEntityClassName = settings.uri.split('/')[1];// TODO check
+      const meta = xyz.getMeta(referenceEntityClassName);
+      for (const subPropertyName in meta) {
+        subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, meta[subPropertyName]);
+      }
+    } else {
+      for (const subPropertyName in settings.signature) {
+        subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, settings.signature[subPropertyName]);
+      }
     }
   }
   this.getStatus = entityId => {
-    if (isPrimitive) return statusses[entityId];
+    if (isPrimitive || (type === 'reference' && contents.hasOwnProperty(entityId))) return statusses[entityId];
     let status;
     for (const subPropertyName in subProperties) {
       const subStatus = subProperties[subPropertyName].getStatus(entityId);
@@ -45,7 +51,7 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
   };
 
   this.getContent = entityId => {
-    if (isPrimitive) return contents[entityId];
+    if (isPrimitive || (type === 'reference' && contents.hasOwnProperty(entityId))) return contents[entityId];
     const content = {};
     for (const subPropertyName in subProperties) {
       content[subPropertyName] = subProperties[subPropertyName].getContent(entityId);
@@ -68,7 +74,7 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
   this.getParent = () => parent;
 
   this.getResponse = (path, entityId, method) => {
-    if (isPrimitive) {
+    if (isPrimitive || (type === 'reference' && path.length === 0)) {
       return new response.Node(this, entityId, this.getStatus(entityId), this.getContent(entityId), errors[entityId], method);
     } else {
       const subPropertyNames = (path.length === 0 || path[0] === '*')
@@ -93,9 +99,11 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
     parent.callListeners(state.getParentState(), entityId);
   };
 
-  this.handleInput = isPrimitive
-    ? input.handlePrimitive(this, contents, statusses)
-    : input.handle(this, statusses, subProperties);
+  this.handleInput = (...args) => {
+    return isPrimitive || (type === 'reference' && args[0].length === 0)
+      ? input.handlePrimitive(this, contents, statusses)(...args)
+      : input.handle(this, statusses, subProperties, null)(...args);
+  };
 
   this.addPropertyListener = (entityId, subPropertyPath, eventName, callback) => {
     const listeners = [];
@@ -117,7 +125,7 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
     } else {
       const subPropertNameList = subPropertyPath[0];
       const subPropertyNames = subPropertNameList === '*'
-        ? Object.keys(properties)
+        ? Object.keys(subProperties)
         : subPropertNameList.split(',');
       const subPath = subPropertyPath.slice(1);
       for (const subPropertyName of subPropertyNames) {
@@ -165,6 +173,7 @@ exports.constructor = function Property (xyz, parent, propertyName, meta) {
   };
 
   this.getDisplayName = propertyPath => {
+    propertyPath = propertyPath.map(subPropertyName => subPropertyName.split('.')).flat();
     if (isPrimitive || !(propertyPath instanceof Array) || propertyPath.length === 0) {
       return settings.displayName || propertyName;
     } else if (subProperties.hasOwnProperty(propertyPath[0])) {
