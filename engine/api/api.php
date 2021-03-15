@@ -36,19 +36,6 @@ function getConnectorRequests(ApiRequest &$apiRequest, string $method, string $r
     } else {
         $apiRequest->addError(400, 'Unknown method: ' . $method);
     }
-    /*  TODO multi request
-        foreach ($jsonContent as $requestId => $subRequest) {
-            // TODO supplement with subUri?
-             $subEntityClass = array_get($subRequest, 'class', $entityClass);
-             $subEntityId = array_get($subRequest, 'id', $entityId);
-             $subPropertyName = array_get($subRequest, 'property', $propertyName);
-             //TODO property path
-             $subQuery = array_key_exists('query', $subRequest) ? $query->add($subRequest['query']) : $query;
-             $subMethod = array_get($subRequest, 'method', 'GET');
-             $subContent = array_get($subRequest, 'content', null);
-             addConnectorRequest($connectorRequests, $subRequestObject, $subEntityClass, $subEntityId, $subPropertyName,$propertyPath, $subContent);
-        }
-    }*/
     return $connectorRequests;
 }
 
@@ -161,7 +148,7 @@ function isSingularPath(array &$path): bool
     $pathLength = count($path);
     if ($pathLength <= 2) return false; // at least a property needs to be defined
     foreach ($path as $item) {
-        if ($item === '*' || stripos($item, ',') !== false) return false;
+        if ($item === '*' || strpos($item, ',') !== false || strpos($item, ';') !== false) return false;
     }
     return true;
 }
@@ -209,8 +196,6 @@ class ApiRequest extends HttpRequest2
 
     public function __construct(string $method, string $uri, string $queryString, array $headers, string $content, array $accessGroups)
     {
-        if (substr($uri, -1, 1) === '/') $uri = substr($uri, 0, -1); // '/a/b/c/' -> '/a/b/c'
-        $this->path = array_slice(explode('/', $uri), 1); // '/a/b/c' -> ['a','b','c']
         $this->errors = [];
         $this->accessGroups = $accessGroups;
         parent::__construct($method, $uri, $queryString, $headers, $content);
@@ -287,14 +272,14 @@ class ApiRequest extends HttpRequest2
               foreach ($entityResponses as $entityId => $entityResponse) {
                 $propertyResponse = $entityResponse->getPropertyResponses()[$subUri]; //TODO check
                 $referenceEntityId = $propertyResponse->getContent();
-                $query = new Query($this->query->checkToggle('expand')?'expand':''); //TODO use reference uri querystring?
-                $content = ''; // $propertyRequest->getContent(); //TODO stringify?
+                $query = new Query($propertyRequest->getQuery()->checkToggle('expand')?'expand':''); //TODO use reference uri querystring?
+                $content = ''; // $propertyRequest->getContent(); //TODO stringify for POST/PATH/PUT reference requests
                 $requestUri = '/'.$referenceEntityClassName."/".$referenceEntityId."/".$referenceSubUri;
                 $referenceRequestId = $propertyRequest->getUri($entityId);
 
                 $propertyResponseByReference[$referenceRequestId] = $propertyResponse;
                 $pathsByReference[$referenceRequestId] = array_merge([$referenceEntityClassName,$referenceEntityId],$referencePropertyPath);
-                $newConnectorRequests = getConnectorRequests($this, $this->method, $requestUri, $content, $referenceEntityClassName, $referenceEntityId, $referencePropertyPath, $query, $this->accessGroups, $referenceRequestId );
+                $newConnectorRequests = getConnectorRequests($this, $propertyRequest->getMethod(), $requestUri, $content, $referenceEntityClassName, $referenceEntityId, $referencePropertyPath, $query, $this->accessGroups, $referenceRequestId );
                 addConnectorRequests($referenceConnectorRequests,$newConnectorRequests);
               }
             }
@@ -344,88 +329,122 @@ class ApiRequest extends HttpRequest2
         return $this->resolveReferenceResponses($requestResponses, $remainingConnectorRequests, $remappedAutoIncrementedUris);
     }
 
+    protected function getRequestResponse($requestId, string $requestUri, string &$requestContent){
+      $split = explode('?',$requestUri);
+      $requestUri = $split[0];
+      $queryString = array_get($split,1,'');
+      $query = new Query($queryString);
+
+      if (substr($requestUri, -1, 1) === '/') $requestUri = substr($requestUri, 0, -1); // '/a/b/c/' -> '/a/b/c'
+      $path = array_slice(explode('/', $requestUri), 1); // '/a/b/c' -> ['a','b','c']
+
+      $entityClassList = count($path) > 0 ? $path[0] : '*';  //TODO helper function to split uri properly
+      $entityIdList = count($path) > 1 ? $path[1] : '*';
+      $propertyPath = count($path) > 2 ? array_slice($path, 2) : [];
+      // First retrieve query responses
+      $queryConnectorRequests = $this->getQueryConnectorRequests($query);
+      $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
+      if (count($queryRequestResponses) > 0) {
+
+          /** @var RequestResponse */
+          $requestResponse = array_values($queryRequestResponses)[0];
+          $status =   $requestResponse->getStatus();
+          if($status !== 200){
+            $this->addError($status, 'Bad filter request');
+            return [];
+          }
+          $data = $requestResponse->getContent();
+
+          //TODO handle failure
+          $entityIds = $query->getMatchingEntityIds($data, $this->accessGroups);
+
+          $offset = $query->getOption('offset', 0);
+          if($offset !== 0 || $query->hasOption('limit')){
+            $limit = $query->getOption('limit', count($entityIds));
+            $entityIds = array_slice($entityIds, $offset, $limit);
+          }
+
+          if ($query->hasOption('search')) {
+              $search = $query->getOption('search');
+              $entityClassData = array_values($data)[0]; // TODO implement or error for multi class
+              // filter entity ids that do not contain the search string
+              $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
+                  return json_search($entityClassData[$entityId], $search);;
+              });
+          }
+          if(empty($entityIds)) return [];
+          $entityIdList = implode(',', $entityIds);
+      }
+      /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.
+      then decide to first get the query id's and update the $connectorRequests
+      before getting the actual data
+      */
+      $requestMethod = $query->hasOption('method') ? $query->getOption('method') : $this->method;
+      return getConnectorRequests($this, $requestMethod, $requestUri, $requestContent, $entityClassList, $entityIdList, $propertyPath, $query, $this->accessGroups, $requestId);
+
+    }
 
     protected function getRequestResponses()
     {
-        $entityClassList = count($this->path) > 0 ? $this->path[0] : '*';  //TODO helper function to split uri properly
-        $entityIdList = count($this->path) > 1 ? $this->path[1] : '*';
-        $propertyPath = count($this->path) > 2 ? array_slice($this->path, 2) : [];
-        $requestURi = $this->uri;
-        $queryConnectorRequests = $this->getQueryConnectorRequests($this->query);
-        $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
-        if (count($queryRequestResponses) > 0) {
+      $originalUri = $this->uri.'?'.$this->queryString;
+      $requestUris = explode(';',$originalUri); // reconstruct the full uri
+      $isMultiRequest = count($requestUris)>1;
+      $requestContents = $isMultiRequest ? json_decode($this->content): null;
+      $connectorRequests = [];
+      foreach($requestUris as $requestId => $requestUri){
+        $requestContent = $isMultiRequest && is_array($requestContents)
+          ? json_simpleEncode(array_get($requestContents,$requestId,''))
+          : $this->content;
 
-            /** @var RequestResponse */
-            $requestResponse = array_values($queryRequestResponses)[0];
-            $status =   $requestResponse->getStatus();
-            if($status !== 200){
-              $this->addError($status, 'Bad filter request');
-              return [];
-            }
-            $data = $requestResponse->getContent();
-
-            //TODO handle failure
-            $entityIds = $this->query->getMatchingEntityIds($data, $this->accessGroups);
-
-            $offset = $this->query->getOption('offset', 0);
-            if($offset !== 0 || $this->query->hasOption('limit')){
-              $limit = $this->query->getOption('limit', count($entityIds));
-              $entityIds = array_slice($entityIds, $offset, $limit);
-            }
-
-            if ($this->query->hasOption('search')) {
-                $search = $this->query->getOption('search');
-                $entityClassData = array_values($data)[0]; // TODO implement or error for multi class
-                // filter entity ids that do not contain the search string
-                $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
-                    return json_search($entityClassData[$entityId], $search);;
-                });
-            }
-            if(empty($entityIds)) return [];
-            $entityIdList = implode(',', $entityIds);
+        $connectorRequests2 = $this->getRequestResponse($requestId,$requestUri, $requestContent);
+        foreach($connectorRequests2 as $connectorString => &$connectorRequest){
+          if(array_key_exists($connectorString,$connectorRequests)){
+            $connectorRequests[$connectorString]->merge($connectorRequest);
+          } else $connectorRequests[$connectorString] = $connectorRequest;
         }
-        /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.
-    then decide to first get the query id's and update the $connectorRequests
-    before getting the actual data
-    */
-        $connectorRequests = getConnectorRequests($this, $this->method, $requestURi, $this->content, $entityClassList, $entityIdList, $propertyPath, $this->query, $this->accessGroups);
-        return $this->getRequestResponses2($connectorRequests);
+      }
+      return $this->getRequestResponses2($connectorRequests);
     }
-
 
     protected function createNonSingularContent(array &$requestResponses)
     {
         $count = count($requestResponses);
         if ($count === 0) {
             return [];
-        } else { //TODO handle multi requests
+        } else if($count === 1){
             /** @var RequestResponse */
-            $requestResponse = array_values($requestResponses)[0]; // TODO because non multi request
+            $requestResponse = array_values($requestResponses)[0];
             return $requestResponse->getContent();
+        } else {
+          $content = [];
+          foreach ($requestResponses as $requestId => $requestResponse) {
+            $content[$requestId] = $requestResponse->getContent();
+          }
+          return $content;
         }
     }
-
-    protected function stringifyContent(&$content, $status): string
+    protected function stringifyContent(&$content, $status, Query& $query, array &$path): string
     {
-        $output = $this->query->getOption('output');
+        //TODO handle for multi requests
+        $output = $query->getOption('output');
         if($output ==='json' || is_null($output)){
-          if (!$this->query->checkToggle('expand') && !is_array($content)) { // default to json
+          if (!$query->checkToggle('expand') && !is_array($content)) { // default to json
             return json_simpleEncode($content);
           } else {
             return json_encode($content, JSON_PRETTY_PRINT);
           }
         }else if($output === 'csv' && $status === 200){
           require_once('output/csv.php');
-          return outputCSV($content, $this->query,$this->path);
+          return outputCSV($content, $query, $path);
         }else if($output === 'sql' && $status === 200){
           require_once('output/sql.php');
-          return outputSQL($content, $this->query,$this->path);
+          return outputSQL($content, $query, $path);
         }else if($output === 'xml' && $status === 200){
           require_once('output/xml.php');
-          return outputXML($content, $this->query,$this->path);
+          return outputXML($content, $query, $path);
         }else if($output === 'yaml'){
           require_once('output/yaml.php');
-          return outputYAML($content, $this->query,$this->path);
+          return outputYAML($content, $query, $path);
         }else if($output === 'php'){
           return serialize($content);
         }else {
@@ -436,12 +455,15 @@ class ApiRequest extends HttpRequest2
     protected function getStatus(array &$requestResponses): int
     {
         $count = count($requestResponses);
-        if ($count == 0) {
-            return 200;
-        } else {
-            /** @var RequestResponse */
-            $requestResponse = array_values($requestResponses)[0]; // TODO because non multi request
-            return $requestResponse->getStatus();
+        if ($count == 0) return 200;
+        else {
+            $status = null;
+            foreach ($requestResponses as &$requestResponse) {
+              $subStatus = $requestResponse->getStatus();
+              if(is_null($status)) $status = $subStatus;
+              else if($subStatus !== $status) return 207;
+            }
+            return $status;
         }
     }
     protected function nullifyHead207Response(&$content)//TODO : void
@@ -459,12 +481,9 @@ class ApiRequest extends HttpRequest2
       if($status === 207){
         $content = $this->createNonSingularContent($requestResponses);
         $this->nullifyHead207Response($content);
-        $content = $this->stringifyContent($content, $status);
-        return new HttpResponse2($status, $content, $headers);
-      }else{
-        $content = '';
-        return new HttpResponse2($status, $content, $headers);
-      }
+        $stringContent =  json_encode($content, JSON_PRETTY_PRINT);
+      }else $stringContent = '';
+      return new HttpResponse2($status, $stringContent, $headers);
     }
 
     public function createResponse(): HttpResponse2
@@ -476,49 +495,64 @@ class ApiRequest extends HttpRequest2
         $requestResponses = $this->getRequestResponses();
         $status = $this->getStatus($requestResponses);
 
+
+
         if ($this->method === 'HEAD') return $this->createHeadResponse($status,$requestResponses);
         else {
             $content = $this->createNonSingularContent($requestResponses);
 
             if (count($this->errors)) {
-                $stringContent = '';
+                $errorStringContent = '';
                 foreach ($this->errors as &$error) {
                     $path = $error->getPath();
                     if (count($path) === 0) {
-                        $stringContent .= $error->getErrorMessage();
+                        $errorStringContent .= $error->getErrorMessage();
                     } else {
                         if ($content === null) {
                             $content = [];
                             json_set($content, $path, $error->getErrorMessage());
                             $status = $error->getStatus();
                         } else {  //TODO add error properly
-                            echo $status . '<br/>';
-                            echo implode('/', $path) . ' ' . $error->getErrorMessage() . '<br/>';;
+                            echo $status . "\n";
+                            echo implode('/', $path) . ' ' . $error->getErrorMessage() . "\n";
                         }
                     }
                 }
 
-                if ($stringContent !== '') {
+                if ($errorStringContent !== '') {
                   $headers = [];
-                  return new HttpResponse2(400, $stringContent, $headers);
+                  return new HttpResponse2(400, $errorStringContent, $headers);
                 }
             }
             $headers = [];
-            if (isSingularPath($this->path) && !$this->query->checkToggle('expand')) { //TODO and queryToggle 'serve'
-                $entityClassName = $this->path[0];
+            $path = array_slice(explode('/', $this->uri), 1); // '/a/b/c' -> ['a','b','c']
+
+            if (isSingularPath($path) && !$this->query->checkToggle('expand')) {
+                $entityClassName = $path[0];
                 $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
                 if(is_null($entityClass)){
                   $stringContent = 'Unknown entity '.$entityClassName;
                   return new HttpResponse2($status, $stringContent, $headers);
                 }
-                $propertyPath = array_slice($this->path, 2);
+                $propertyPath = array_slice($path, 2);
                 /** @var Property */
                 $property = $entityClass->getProperty($propertyPath);
                 if(is_null($property)) return  new HttpResponse2($status, $content, $headers);
                 return $property->serveContent($status, $content);
-            } else {
-                $stringContent = $this->stringifyContent($content, $status);
-                return new HttpResponse2($status, $stringContent, $headers);
+            } else if(count($requestResponses) === 1){
+              $stringContent = $this->stringifyContent($content, $status, $this->query, $path);
+              return new HttpResponse2($status, $stringContent, $headers);
+            } else if(count($requestResponses) === 0){
+              $stringContent ='[]';
+              return new HttpResponse2($status, $stringContent, $headers);
+            }else {
+              if($status === 207){
+                foreach($content as $requestId => &$requestContent){
+                  $content[$requestId] = ["status" => $requestResponses[$requestId]->getStatus(), "content" => $requestContent];
+                }
+              }
+              $stringContent = json_encode($content, JSON_PRETTY_PRINT);
+              return new HttpResponse2($status, $stringContent, $headers);
             }
         }
     }
