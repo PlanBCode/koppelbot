@@ -15,6 +15,21 @@ function TypeItem (xyz, baseUri, subPropertyPath, status, content, settings, opt
    */
   this.getUri = () => baseUri;
   /**
+   * Get the path for the current entity
+   * @returns {Array} path
+   */
+  this.getPath = () => baseUri.substr(1).split('/');
+  /**
+   * Get the entityIdList for the current entity
+   * @returns {string} entityIdList
+   */
+  this.getEntityIdList = () => this.getPath()[1] || '*';
+  /**
+   * Get the entityClassName for the current entity
+   * @returns {string} entityClassName
+   */
+  this.getEntityClassName = () => this.getPath()[0];
+  /**
    * [getStatus description]
    * @returns {TODO} TODO
    */
@@ -205,6 +220,8 @@ function TypeItem (xyz, baseUri, subPropertyPath, status, content, settings, opt
    * @returns {void}                 TODO
    */
   this.select = (entityClassName, entityId) => variables.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
+
+  this.getTitlePropertyPath = entityClassName => xyz.getTitlePropertyPath(entityClassName || this.getEntityClassName());
 }
 
 exports.TypeItem = TypeItem;

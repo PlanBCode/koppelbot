@@ -87,6 +87,17 @@ function Node (object, entityId, status_, content_, errors_, method_) {
 
   this.getObject = () => object; // TODO need private
   this.getEntityId = () => entityId;
+  /**
+   * Get the path for the current entity
+   * @returns {Array} path
+   */
+  this.getPath = () => this.getUri().substr(1).split('/');
+  /**
+   * Get the entityClassName for the current entity
+   * @returns {string} entityClassName
+   */
+  this.getEntityClassName = () => this.getPath()[0];
+
   this.getMethod = () => method;
   this.getStatus = () => status;
   this.getContent = () => content;
@@ -116,6 +127,9 @@ function Node (object, entityId, status_, content_, errors_, method_) {
     return object.render(action, subOptions, entityId, subPath);
   };
   this.getSubNode = subPath => getSubNodeFromNode(subPath, object, entityId, status, content, errors);
+
+  this.getTitlePropertyPath = entityClassName => xyz.getTitlePropertyPath(entityClassName || this.getEntityClassName());
+
   /*
   this.select = (entityClassName, entityId)
   this.renderCreator = (options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit, displayMessage) => render.creator(xyz, options, uri, settings, subPropertyPath, newCreatorData, INPUT_submit, displayMessage);

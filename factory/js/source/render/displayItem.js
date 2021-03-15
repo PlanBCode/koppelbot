@@ -144,7 +144,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    */
   this.getTitle = () => {
     const fallback = '/' + entityClassName + '/' + entityId;
-    const titlePropertyPath = xyz.getTitlePropertyPath(entityClassName);
+    const titlePropertyPath = this.getTitlePropertyPath(entityClassName);
     if (titlePropertyPath === null) return fallback;
     const titleResponse = response.getSubNode(node, titlePropertyPath);
     if (!titleResponse || titleResponse.hasErrors()) return fallback;
@@ -367,6 +367,6 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
   this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
   this.getVariable = (variableName) => variables.getVariable(variableName);
   this.clearVariable = (variableName) => variables.clearVariable(variableName);
-
+  this.getTitlePropertyPath = (entityClassName_ = entityClassName) => xyz.getTitlePropertyPath(entityClassName_);
   this.xyz = xyz; // TODO encapsulate
 };
