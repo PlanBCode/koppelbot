@@ -29,6 +29,20 @@ curl('HEAD', '/fruit/cucumber')
   .contentShouldMatch('')
   .runSync('Fruit HEAD fail');
 
+curl('HEAD', '/fruit/apple,pear')
+  .statusShouldMatch(207)
+  .contentShouldMatch({
+    apple: {
+      status: 200,
+      content: ''
+    },
+    pear: {
+      status: 404,
+      content: ''
+    }
+  })
+  .runSync('Fruit HEAD mixed');
+
 curl('GET', '/fruit/banana')
   .statusShouldMatch(404)
   .run('Fruit: GET 404');
@@ -41,6 +55,28 @@ curl('GET', '/fruit/apple')
     name: 'apple'
   })
   .run('Fruit GET');
+
+curl('GET', '/fruit/apple/color;/fruit/grape/color')
+  .statusShouldMatch(200)
+  .contentShouldMatch([
+    'red',
+    'purple'
+  ])
+  .run('Fruit GET multi');
+
+curl('GET', '/fruit/apple/color;/fruit/pear/color')
+  .statusShouldMatch(207)
+  .contentShouldMatch([
+    {
+      status: 200,
+      content: 'red'
+    },
+    {
+      status: 404,
+      content: 'Not found'
+    }
+  ])
+  .run('Fruit GET multi failure');
 
 curl('GET', '/fruit/apple?expand')
   .statusShouldMatch(200)
