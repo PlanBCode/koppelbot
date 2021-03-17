@@ -52,7 +52,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
         console.error('PROBLEM parsing meta response', data);
         return;
       }
-      const waitForEntityClassNames = new Set();
+      const waitForEntityClassNames = new Set('*'); // add '*' to ensure callbacks being called correctly
       const metas = {};
       const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
         if (waitForEntityClassNames.size === 0) {
@@ -86,6 +86,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
           }
         }
       }
+      waitForEntityClassNames.delete('*');
       waitForAllCallbacks();
     });
   }
@@ -135,10 +136,8 @@ exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(ent
 
 // callback = Response =>{}
 // get the requested uri from cache or request it from server
-exports.get = (xyz, entityClasses, uri, dataCallback, metaCallBack) => {
+exports.get = (xyz, entityClasses, uri, dataCallback) => {
   retrieveMeta(xyz, entityClasses, uri, () => {
-    if (typeof metaCallBack === 'function') metaCallBack();
-
     // TODO meta should be good or we have a problem
     // TODO get the data from cache if already in cache
     request('GET', uri, undefined, (status, responseStringContent) => {
