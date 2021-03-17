@@ -34,16 +34,19 @@ const getEntityClassNames = (uri, entityClasses) => {
   }
 };
 
-const getBaseUri = uri => {
+const getBaseRequestUri = uri => {
   const path = pathFromUri(uri);
-  if (path.length === 1) {
-    return '/' + path[0] + '/*';
-  } else if (path.length === 0) {
-    console.error('PROBLEM ERROR'); // TODO
-  } else {
-    return '/' + path[0] + '/' + path[1];
-  }
+  if (path.length === 1) return '/' + path[0] + '/*';
+  else if (path.length === 0) console.error('PROBLEM ERROR'); // TODO
+  else return '/' + path[0] + '/' + path[1];
 };
+
+/**
+ * Get entityClass and entityId part of uri's only  '/a/b/c/' -> '/a/b'
+ * @param  {string} uri [description]
+ * @returns {string}     [description]
+ */
+const getBaseUri = uri => uri.split(';').map(requestUri => getBaseRequestUri(requestUri)).join(';');
 
 const addQueryString = (uri, queryString) => {
   return uri.indexOf('?') === -1

@@ -4,6 +4,7 @@ const uriTools = require('../uri/uri.js');
 const State = require('./state.js').State;
 const response = require('./response.js');
 const input = require('../request/input.js');
+const {getQueryParameter} = require('../web/web');
 
 function compileSettings (rawSettings) {
   const settings = {};
@@ -146,11 +147,12 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
 
   this.getTitlePropertyPath = () => {
+    let shortestTitlePropertyPath = null;
     for (const propertyName in properties) {
       const titlePropertyPath = properties[propertyName].getTitlePropertyPath();
-      if (titlePropertyPath !== null) return [propertyName].concat(titlePropertyPath);
+      if (titlePropertyPath !== null && (shortestTitlePropertyPath === null || shortestTitlePropertyPath.length > titlePropertyPath.length + 1)) shortestTitlePropertyPath = [propertyName].concat(titlePropertyPath);
     }
-    return null;
+    return shortestTitlePropertyPath;
   };
 
   this.getDisplayName = propertyPath => {
@@ -278,6 +280,38 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     return true;
   };
 }
+/**
+ * Handle the input in case the uri contains multiple requests
+ * @param  {[type]} method          [description]
+ * @param  {[type]} uri             [description]
+ * @param  {[type]} status          [description]
+ * @param  {[type]} responseContent [description]
+ * @param  {[type]} requestContent  [description]
+ * @param  {[type]} entityClasses   [description]
+ * @returns {void}
+ */
+const handleMultiInput = (method, uri, status, responseContent, requestContent, entityClasses) => {
+  if (uri.includes(';')) {
+    if (!(responseContent instanceof Array) || (!(requestContent instanceof Array) && requestContent !== null)) {
+      // TODO
+      console.warn('Attention', responseContent, requestContent);
+    }
+    const requestUris = uri.split(';');
+    for (let requestId = 0; requestId < requestUris.length; ++requestId) {
+      const requestUri = requestUris[requestId];
+      const subQueryString = requestUri.split('?')[1] || '';
+      const subMethod = getQueryParameter('method', subQueryString) || method;
+      const subRequestContent = requestContent === null ? null : requestContent[requestId];
+      if (status === 207) {
+        const subResponseContent = responseContent[requestId].content; // TOOD check
+        const subStatus = responseContent[requestId].status;
+        handleInput(subMethod, requestUri, subStatus, subResponseContent, subRequestContent, entityClasses);
+      } else {
+        handleInput(subMethod, requestUri, status, responseContent[requestId], subRequestContent, entityClasses);
+      }
+    }
+  } else handleInput(method, uri, status, responseContent, requestContent, entityClasses);
+};
 
 const handleInput = (method, uri, status, responseContent, requestContent, entityClasses) => {
   const state = new State(method);
@@ -363,6 +397,29 @@ function getResponse (uri, entityClasses, method, entityIdsPerClassName) {
   return content;
 }
 
+/**
+ * Handle the input in case the uri contains multiple requests
+ * @param  {string} uri                   [description]
+ * @param  {[type]} entityClasses         [description]
+ * @param  {string} method                [description]
+ * @param  {[type]} entityIdsPerClassName [description]
+ * @returns {void}                       [description]
+ */
+function getMultiResponse (uri, entityClasses, method, entityIdsPerClassName) {
+  const isMultiRequest = uri.includes(';');
+  if (isMultiRequest) {
+    const requestUris = uri.split(';');
+    const content = [];
+    for (const requestUri of requestUris) {
+      const subQueryString = requestUri.split('?')[1] || '';
+      const subMethod = getQueryParameter('method', subQueryString) || method;
+      const subContent = getResponse(requestUri, entityClasses, subMethod, entityIdsPerClassName);
+      content.push(subContent);
+    }
+    return content;
+  } else return getResponse(uri, entityClasses, method, entityIdsPerClassName);
+}
+
 const isAutoIncremented = (entityClasses, entityClassName) => {
   return entityClassName === '*' || !entityClasses.hasOwnProperty(entityClassName)
     ? false
@@ -414,6 +471,6 @@ exports.getTitlePropertyPath = getTitlePropertyPath;
 exports.getDisplayName = getDisplayName;
 exports.checkAccess = checkAccess;
 
-exports.getResponse = getResponse;
+exports.getMultiResponse = getMultiResponse;
 exports.Class = EntityClass;
-exports.handleInput = handleInput;
+exports.handleMultiInput = handleMultiInput;

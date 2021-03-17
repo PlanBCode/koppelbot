@@ -31,12 +31,22 @@ function flatten (source) {
   return target;
 }
 
-exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, node, uri) {
+exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, node, requestUri, requestId) {
+  /**
+   * Whether this is part of a multi request
+   * @returns {bool} Whether this is part of a multi request
+   */
+  this.isMultiRequest = () => typeof requestId === 'number';
+  /**
+   * Get the request id for the current entity
+   * @returns {string} uri
+   */
+  this.getRequestId = () => requestId;
   /**
    * Get the uri for the current entity
    * @returns {string} uri
    */
-  this.getRequestUri = () => uri;
+  this.getRequestUri = () => requestUri;
   /**
    * Get the action for the display.
    * @returns {string} action 'edit' or 'view'
@@ -135,7 +145,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @returns {Array} TODO
    */
   this.getPropertyPath = () => {
-    const path = uriTools.pathFromUri(uri);
+    const path = uriTools.pathFromUri(requestUri);
     return path.slice(2);
   };
 
@@ -324,7 +334,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
     BUTTON_gear.onclick = () => {
       const options = this.getOptions();
       let uri = options.uri.split('?')[0];
-      let queryString = options.uri.split('?')[1] || '';
+      let queryString = options.uri.split('?')[1] || ''; // TODO handle multirequest
       const path = uri.substr(1).split('/');
       const entityClassName = path[0];
       const entityIdList = path[1] || '*';
@@ -351,7 +361,6 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
       for (const variableName in vars) {
         queryString += (queryString === '' ? '' : '&') + encodeURIComponent(variableName) + '=' + encodeURIComponent(vars[variableName]);
       }
-      console.log(uri + '?' + queryString);
       const win = window.open('/ui' + uri + '?' + queryString, '_blank');
       win.focus();
     };

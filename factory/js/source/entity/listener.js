@@ -117,7 +117,7 @@ function ListenerHandler () {
     listeners.set(listener, callback);
 
     // for debug reasons output listener counts:
-    let count = 0;
+    /* let count = 0;
     for (const entityId in listenersPerEntityIdPerEventNamePerSubUri) {
       const listenersPerEventNamePerSubUri = listenersPerEntityIdPerEventNamePerSubUri[entityId];
       for (const eventName in listenersPerEventNamePerSubUri) {
@@ -128,7 +128,8 @@ function ListenerHandler () {
         }
       }
     }
-    // console.log('addListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, count);
+     console.log('addListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, count);
+     */
     return listener;
   };
 

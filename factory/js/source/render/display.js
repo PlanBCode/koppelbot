@@ -47,22 +47,31 @@ const uiElementRemove = (display, displayItem) => {
   }
 };
 
-const renderDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId, node, eventName) => {
+const renderDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId, node, eventName, requestId) => { // XYZ123
   const displayName = options.display || DEFAULT_DISPLAYNAME;
   const display = displays[displayName];
   const action = options.action || DEFAULT_ACTION;
-  const path = uriTools.pathFromUri(uri);
+  const requestUri = typeof requestId !== 'undefined'
+    ? uri.split(';')[requestId]
+    : uri;
+
+  const path = uriTools.pathFromUri(requestUri);
   node = response.filter(node, path.slice(2)); // filter the content that was not requested
-  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
+
+  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, requestUri, requestId);
   uiElementFirst(display, displayItem);
   uiElementEntity(display, displayItem);
 };
 
-const removeDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId, node, eventName) => {
+const removeDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId, node, eventName, requestId) => { // XYZ123
   const displayName = options.display || DEFAULT_DISPLAYNAME;
   const display = displays[displayName];
   const action = options.action || DEFAULT_ACTION;
-  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, uri);
+  const requestUri = typeof requestId !== 'undefined'
+    ? uri.split(';')[requestId]
+    : uri;
+
+  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, requestUri, requestId);
   uiElementRemove(display, displayItem);
 };
 
@@ -84,7 +93,7 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
       displayListenersPerWrapper.delete(WRAPPER);
     }
   });
-  const baseUri = uriTools.getBaseUri(uri);
+  const baseUri = uriTools.getBaseUri(uri); // TODO handle multi uri
   const createdListeners = xyz.on(baseUri, 'created', renderDisplay(xyz, uri, options, WRAPPER));
   const removedListeners = xyz.on(baseUri, 'removed', removeDisplay(xyz, uri, options, WRAPPER));
 
@@ -107,19 +116,23 @@ const renderUiElement = (xyz, options, WRAPPER) => {
   const entityId = path[1] || '*';
   const entityClass = path[0];
 
-  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClass, entityId, null, uri);
+  const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClass, entityId, null, uri, undefined);
 
   uiElementWaitingForData(display, displayItem);
-
+  const isMultiRequest = uri.includes(';');
+  const eventName = undefined; // added for clarity
   const readyCallback = uri => {
     // TODO this can be called multiple times on variable changes,
     uiElementEmpty(display, displayItem);
     xyz.get(uri, node => { // TODO this should be handled by having an available instead of created listener
+      const nodes = isMultiRequest ? node : [node];
       WRAPPER.classList.remove('xyz-waiting-for-data');
-
-      for (const entityClassName in node) {
-        for (const entityId in node[entityClassName]) {
-          renderDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node[entityClassName][entityId]);
+      for (let requestId = 0; requestId < nodes.length; ++requestId) {
+        const node = nodes[requestId];
+        for (const entityClassName in node) {
+          for (const entityId in node[entityClassName]) {
+            renderDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node[entityClassName][entityId], eventName, isMultiRequest ? requestId : undefined);
+          }
         }
       }
 

@@ -4,22 +4,29 @@ const uriTools = require('../uri/uri.js');
 const on = (xyz, entityClasses, uri, eventName, callback) => {
   // TODO check eventName, callback and uri
 
-  if (eventName.startsWith('access:')) return addAccessListener(xyz, entityClasses, uri, eventName, callback);
-
+  if (eventName.startsWith('access:')) {
+    for (const requestUri of uri.split(';')) {
+      addAccessListener(xyz, entityClasses, requestUri, eventName, callback); // TODO add requestId? // XYZ123
+    }
+    return []; // TODO return something?
+  }
   const listeners = [];
-  const entityClassNames = uriTools.getEntityClassNames(uri, entityClasses);
-  request.retrieveMeta(xyz, entityClasses, uri, () => {
-    const subPath = uriTools.pathFromUri(uri).slice(1);
-    for (const entityClassName of entityClassNames) {
-      if (entityClasses.hasOwnProperty(entityClassName)) {
-        const entityClassListeners = entityClasses[entityClassName].addListener(subPath, eventName, callback);
-        listeners.push(...entityClassListeners);
-      } else {
+
+  for (const requestUri of uri.split(';')) {
+    const entityClassNames = uriTools.getEntityClassNames(requestUri, entityClasses);
+    request.retrieveMeta(xyz, entityClasses, requestUri, () => {
+      const subPath = uriTools.pathFromUri(requestUri).slice(1);
+      for (const entityClassName of entityClassNames) {
+        if (entityClasses.hasOwnProperty(entityClassName)) {
+          const entityClassListeners = entityClasses[entityClassName].addListener(subPath, eventName, callback); // TODO add requestId? // XYZ123
+          listeners.push(...entityClassListeners);
+        } else {
         // TODO callback 404 on listener
         // if eventName = 'error' or 404  callback(entityClassName);
+        }
       }
-    }
-  });
+    });
+  }
   return listeners;
 };
 
@@ -52,9 +59,10 @@ function addAccessListener (xyz, entityClasses, uri, eventName, callback) {
     if (!initialized) { // setup listener to check for updates in sessions
       on(xyz, entityClasses, '/session/*', 'touched', monitorSessionChanges(xyz));
       initialized = true;
-    } else
+    } else {
     // DEBUG console.log('callListener ', uri + ':' + eventName);
-    { callback(state); }
+      callback(state);
+    }
   });
 }
 
