@@ -26,7 +26,7 @@
     <tr><td style="text-align:right;font-size: 10pt; vertical-align: bottom; padding-right: 10px;"><i><a href="https://koppelbot.org">Powered by Koppelbot</a></i></td></tr>
   </table>
   <img id="logo" src="./vanwieisdestad/vanwieisamersfoort.png"/>
-  <xyz id="locatie" style="max-height:50vh;" color="EigenaarID" uri="/locatie/$locatie/Type,Document=DocumentID,Eigenaar=EigenaarID,Oppervlakte,Eigenschappen" hideMessages select="locatie" display="item"/>
+  <xyz id="locatie" style="max-height:50vh;" color="EigenaarID" uri="/locatie/$locatie/Type,Eigenaar=EigenaarID,Oppervlakte,Bron=DocumentID.Bron,Datum=DocumentID.Datum,Eigenschappen" hideMessages select="locatie" display="item"/>
   <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id" hideMessages select="locatie" select="eigenaar" display="item"/>
 </body>
 </html>

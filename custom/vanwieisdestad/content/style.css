@@ -37,12 +37,12 @@ table.xyz-list {
   cursor: pointer;
 }
 
-#locatie > table.xyz-item > tbody > tr:nth-child(5) > td:nth-child(2) {
+#locatie > table.xyz-item > tbody > tr:nth-child(6) > td:nth-child(2) {
   height: 200px;
   overflow: auto;
 }
 
-#locatie > table.xyz-item > tbody > tr:nth-child(5) > td:nth-child(2) > div {
+#locatie > table.xyz-item > tbody > tr:nth-child(6) > td:nth-child(2) > div {
   height: 100%;
   overflow: auto;
 }
