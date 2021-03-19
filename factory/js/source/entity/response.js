@@ -40,6 +40,23 @@ function mergeIntoSingleNode (contentOrNode) {
   }
 }
 
+function addToFilteredContent (filteredContent, propertyName, content, subPath) {
+  if (filteredContent.hasOwnProperty(propertyName)) {
+    const existingFilteredContent = filteredContent[propertyName];
+    const additionalFilteredContent = filter(content[propertyName], subPath);
+    if (typeof existingFilteredContent === 'object' && existingFilteredContent !== null &&
+      typeof additionalFilteredContent === 'object' && additionalFilteredContent !== null) {
+      for (const id in additionalFilteredContent) {
+        existingFilteredContent[id] = additionalFilteredContent[id];
+      }
+      return existingFilteredContent;
+    } else {
+      console.warn('addToFilteredContent', filteredContent[propertyName], additionalFilteredContent);
+      return filteredContent[propertyName];
+    }
+  } else filteredContent[propertyName] = filter(content[propertyName], subPath);
+}
+
 function filter (content, path) {
   if (path.length === 0) {
     return mergeIntoSingleNode(content);
@@ -55,7 +72,14 @@ function filter (content, path) {
       const propertyNames = propertyNameList.split(',');
       for (const propertyName in content) {
         if (propertyNames.includes(propertyName)) {
-          filteredContent[propertyName] = filter(content[propertyName], subPath);
+          addToFilteredContent(filteredContent, propertyName, content, subPath);
+        } else {
+          for (const propertyName_ of propertyNames) {
+            if (propertyName_.startsWith(propertyName + '.')) { // TODO use path to match better
+              const subPath_ = propertyName_.split('.').slice(1).concat(subPath);
+              addToFilteredContent(filteredContent, propertyName, content, subPath_);
+            }
+          }
         }
       }
     }

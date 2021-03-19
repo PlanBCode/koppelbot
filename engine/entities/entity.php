@@ -308,6 +308,15 @@ class EntityResponse extends Response
         return $this->propertyResponses;
     }
 
+    public function getRequestObject(): RequestObject
+    {
+        return $this->requestObject;
+    }
+    
+    public function getIdPropertyName()
+    {
+      return $this->entityClass->getIdPropertyName();
+    }
     private function collapseContent(&$content)
     {
         $requestPropertyPath = array_slice($this->requestObject->getPath(), 2);

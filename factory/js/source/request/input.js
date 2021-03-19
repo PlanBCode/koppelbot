@@ -126,6 +126,70 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
   return state;
 };
 
+function zipSubPaths (subPaths) {
+  const path = [];
+  const xMatch = false;
+  const minLength = Math.max(...subPaths.map(subPath => subPath.length));
+  for (let i = 0; i < minLength; ++i) {
+    let x;
+    for (const subPath of subPaths) {
+      if (typeof x === 'undefined') x = subPath[0];
+      else if (x !== subPath[0]) { // [[...,'a','b'],[...,'b','c']] => [...,'a.b,c.d']
+        const tails = subPaths.map(subPath => subPath.slice(i).join('.'));
+        path.push(tails.join(','));
+        return path;
+      }
+    }
+    if (!xMatch) path.push(x); // [[...,'a',...],[...,'a',...]] => [...,'a',...]
+  }
+  return path;
+}
+/*
+
+['a','b'] -> ['b']
+['a.b'] -> ['b']
+['a.b,a.c','d'] -> ['b,c','d']
+['a.b','d'] -> ['b.d',d'] TODO
+['a,a.b'] -> ['*,b'] TODO
+ */
+const getSubPath = (path, propertyName) => {
+  if (path.length === 0) return [];
+  const subPaths = [];
+  for (const subPropertName of path[0].split(',')) {
+    if (propertyName === subPropertName) { // ['a','b'] -> ['b']
+      const subPath = path.slice(1);
+      subPaths.push(subPath);
+    } else if (subPropertName.startsWith(propertyName + '.')) { // ['a.b',d,...] -> ['b',d,...]
+      const subPath = subPropertName.split('.').slice(1).concat(path.slice(1));
+      subPaths.push(subPath);
+    }
+  }
+  return zipSubPaths(subPaths);
+};
+
+exports.getSubPath = getSubPath;
+
+/*
+({'a':'b'},'a',[]) -> 'b'
+({'a.b':'c'},'a',['b']) -> 'c'
+ */
+
+function getSubContent (content, propertyName, subPath) {
+  if (typeof content !== 'object' || content === null) return null;
+  if (content instanceof Array) {
+    return content[propertyName]; // TODO
+  } else {
+    if (content.hasOwnProperty(propertyName)) return content[propertyName];
+    for (const contentPropertyName in content) { // TODO
+      const propertyPath = [propertyName].concat(subPath).join('.');
+      if (propertyPath === contentPropertyName || propertyPath.startsWith(contentPropertyName + '.')) {
+        return content[contentPropertyName];
+      }
+    }
+    return null;
+  }
+}
+
 exports.handle = (element, statusses, subProperties, entities) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
   if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
   if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
@@ -148,11 +212,10 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
           // TODO reponse is in error
           console.error('error response in wrong format');
         } else {
+          const subPath = getSubPath(path, subPropertyName);
           const subStatus = subProperty207Wrapper.status;
-          const subResponseContent = subProperty207Wrapper.content;
-
-          const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
-          const subPath = path.slice(1);
+          const subResponseContent = getSubContent(subProperty207Wrapper.content, subPropertyName, subPath);
+          const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
           const subProperty = subProperties[subPropertyName];
           const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent);
           state.addSubState(subState);
@@ -162,9 +225,9 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
   } else {
     for (const subPropertyName in subProperties) {
       if (responseContent !== null && typeof responseContent === 'object' && responseContent.hasOwnProperty(subPropertyName)) {
-        const subResponseContent = responseContent[subPropertyName];
-        const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[subPropertyName] : null;
-        const subPath = path.slice(1);
+        const subPath = getSubPath(path, subPropertyName);
+        const subResponseContent = getSubContent(responseContent, subPropertyName, subPath);
+        const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
         const subProperty = subProperties[subPropertyName];
         const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent);
         state.addSubState(subState);

@@ -81,11 +81,14 @@ exports.constructor = function Property (xyz, parent, propertyName, settings) {
         ? Object.keys(subProperties)
         : path[0].split(',');
       const content = {};
-      const subPath = path.slice(1);
       for (const subPropertyName of subPropertyNames) {
-        content[subPropertyName] = subProperties.hasOwnProperty(subPropertyName)
-          ? subProperties[subPropertyName].getResponse(subPath, entityId, method)
-          : content[subPropertyName] = new response.Node(this, entityId, 400, null, [`${subPropertyName} does not exist.`], method); // TODO
+        const baseSubPropertyName = subPropertyName.split('.')[0];
+        if (subProperties.hasOwnProperty(baseSubPropertyName)) {
+          const subPath = input.getSubPath(path, baseSubPropertyName);
+          content[baseSubPropertyName] = subProperties[baseSubPropertyName].getResponse(subPath, entityId, method);
+        } else {
+          content[baseSubPropertyName] = new response.Node(this, entityId, 400, null, [`${baseSubPropertyName} does not exist.`], method); // TODO
+        }
       }
       return content;
     }

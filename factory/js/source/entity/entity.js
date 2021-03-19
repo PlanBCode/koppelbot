@@ -96,11 +96,14 @@ function EntityClass (xyz, entityClassName, rawSettings) {
       ? Object.keys(properties)
       : path[0].split(',');
     const content = {};
-    const subPath = path.slice(1);
     for (const propertyName of propertyNames) {
-      content[propertyName] = properties.hasOwnProperty(propertyName)
-        ? properties[propertyName].getResponse(subPath, entityId, method)
-        : content[propertyName] = new response.Node(this, entityId, 400, null, [`${propertyName} does not exist.`], method); // TODO
+      const basePropertyName = propertyName.split('.')[0];
+      if (properties.hasOwnProperty(basePropertyName)) {
+        const subPath = input.getSubPath(path, basePropertyName);
+        content[basePropertyName] = properties[basePropertyName].getResponse(subPath, entityId, method);
+      } else {
+        content[basePropertyName] = new response.Node(this, entityId, 400, null, [`${basePropertyName} does not exist.`], method); // TODO
+      }
     }
     // TODO use query
 

@@ -20,8 +20,9 @@ exports.actions = {
     const referenceEntityClassName = uri.substr(1).split('/')[0];
     const changeHandler = node => {
       // TODO check for errors
+      const titlePropertyPath = item.getTitlePropertyPath(referenceEntityClassName);
       const referenceEntityId = node.getContent();
-      const referenceUri = '/' + referenceEntityClassName + '/' + referenceEntityId + '/' + item.getTitlePropertyPath(referenceEntityClassName).join('/');
+      const referenceUri = '/' + referenceEntityClassName + '/' + referenceEntityId + '/' + titlePropertyPath.join('/');
       // TODO options : display:'flat'
       item.ui({uri: referenceUri, display: 'title', onReady: item.getOption('onReady')}, SPAN);
     };

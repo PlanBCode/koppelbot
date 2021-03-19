@@ -293,13 +293,16 @@ class ApiRequest extends HttpRequest2
           $path = $pathsByReference[$referenceRequestId];
           $entityClassResponse = $requestResponse->getEntityClassResponses()[$path[0]];
           $entityResponse = $entityClassResponse->getEntityResponses()[$path[1]];
-
           $content = $entityResponse->getContent();
           $status = $entityResponse->getStatus();
-
+          if(is_array($content) && $entityResponse->getRequestObject()->getQuery()->checkToggle('expand')){
+            $entityId = $entityResponse->getEntityId();
+            $IdPropertyName = $entityResponse->getIdPropertyName();
+            $IdPropertyName = is_null($IdPropertyName) ? 'id' : $IdPropertyName;
+            $content[$IdPropertyName] = $entityId;
+          }
           $propertyResponse->setContent($content);
           $propertyResponse->setStatus($status);
-
         }
       }
       return $requestResponses;
