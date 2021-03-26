@@ -1,5 +1,5 @@
 const entity = require('../entity/entity.js');
-const {addQueryString, pathFromUri} = require('../uri/uri.js');
+const {getQueryParameter, setQueryParameter, addQueryString, pathFromUri} = require('../uri/uri.js');
 
 function request (method, uri, data, callback) {
   // TODO set content type and length headers
@@ -133,6 +133,52 @@ const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, c
 exports.post = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'POST', uri, content, callback);
 exports.patch = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PATCH', uri, content, callback);
 exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PUT', uri, content, callback);
+const PAGE_SIZE = 1000;
+
+function getPartial (uri, entityClasses, dataCallback, originalOffset, originalLimit, offset) {
+  if (typeof offset === 'undefined') offset = 0;
+  if (typeof originalOffset === 'undefined') originalOffset = 0;
+  const limit = typeof originalLimit === 'undefined' ? PAGE_SIZE : Math.min(PAGE_SIZE, originalLimit);
+  uri = setQueryParameter(uri, 'limit', limit);
+  uri = setQueryParameter(uri, 'offset', offset);
+  request('GET', uri, undefined, (status, responseStringContent) => {
+    let responseObjectContent;
+    try {
+      responseObjectContent = JSON.parse(responseStringContent);
+    } catch (e) {
+      console.error('GET', uri, responseStringContent, e);
+      return;
+    }
+    // console.log('GET', uri, status, responseObjectContent);
+    // TODO replace null with current content?
+    // TODO handle multi requests
+    const state = entity.handleMultiInput('GET', uri, status, responseObjectContent, null, entityClasses);
+    // TODO  word er nog iets met state gedaan...?
+    if (typeof dataCallback === 'function') {
+      // determine the actually requested entityIds per ClassName
+      const entityIdsPerClassName = {};
+      const isMultiRequest = (responseObjectContent instanceof Array) && uri.includes(';');
+      const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
+      let maxEntityCount = 0;
+      for (const responseObjectContent of responseObjectContents) {
+        for (const entityClassName in responseObjectContent) {
+        // TODO check
+          const entityClassContent = status === 207
+            ? responseObjectContent[entityClassName].content
+            : responseObjectContent[entityClassName];
+          const entityIds = Object.keys(entityClassContent); // TODO check
+          entityIdsPerClassName[entityClassName] = entityIds;
+          if (entityIds.length > maxEntityCount) maxEntityCount = entityIds.length;
+        }
+      }
+      const node = entity.getMultiResponse(uri, entityClasses, 'GET', entityIdsPerClassName);
+      dataCallback(node);
+      if (maxEntityCount >= PAGE_SIZE) {
+        getPartial(uri, entityClasses, dataCallback, originalOffset, originalLimit, offset + PAGE_SIZE);
+      }
+    }
+  });
+}
 
 // callback = Response =>{}
 // get the requested uri from cache or request it from server
@@ -140,38 +186,9 @@ exports.get = (xyz, entityClasses, uri, dataCallback) => {
   retrieveMeta(xyz, entityClasses, uri, () => {
     // TODO meta should be good or we have a problem
     // TODO get the data from cache if already in cache
-    request('GET', uri, undefined, (status, responseStringContent) => {
-      let responseObjectContent;
-      try {
-        responseObjectContent = JSON.parse(responseStringContent);
-      } catch (e) {
-        console.error('GET', uri, responseStringContent, e);
-        return;
-      }
-      // console.log('GET', uri, status, responseObjectContent);
-      // TODO replace null with current content?
-      // TODO handle multi requests
-      const state = entity.handleMultiInput('GET', uri, status, responseObjectContent, null, entityClasses);
-      // TODO  word er nog iets met state gedaan...?
-      if (typeof dataCallback === 'function') {
-        // determine the actually requested entityIds per ClassName
-        const entityIdsPerClassName = {};
-        const isMultiRequest = (responseObjectContent instanceof Array) && uri.includes(';');
-        const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
-        for (const responseObjectContent of responseObjectContents) {
-          for (const entityClassName in responseObjectContent) {
-          // TODO check
-            const entityClassContent = status === 207
-              ? responseObjectContent[entityClassName].content
-              : responseObjectContent[entityClassName];
-            const entityIds = Object.keys(entityClassContent); // TODO check
-            entityIdsPerClassName[entityClassName] = entityIds;
-          }
-        }
-        const node = entity.getMultiResponse(uri, entityClasses, 'GET', entityIdsPerClassName);
-        dataCallback(node);
-      }
-    });
+    const originalLimit = getQueryParameter(uri, 'limit');
+    const originalOffset = getQueryParameter(uri, 'offset');
+    getPartial(uri, entityClasses, dataCallback, originalLimit, originalOffset);
   });
 };
 

@@ -136,7 +136,7 @@ const renderUiElement = (xyz, options, WRAPPER) => {
         }
       }
 
-      addListeners(xyz, uri, options, WRAPPER);
+      // TODO addListeners(xyz, uri, options, WRAPPER);
     });
   };
 

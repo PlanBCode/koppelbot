@@ -58,8 +58,9 @@ function splitKeyValuePair (keyValueString) { // 'a=1' -> ['a','=','1']
   return [];
 }
 
-function updateQueryParameter (queryParameterName, value, operator = '=') {
-  const keyValuePairs = document.location.search.substr(1).split('&').filter(x => x !== ''); // '?a=1&b=2' -> ['a=1','b=2']
+function updateQueryParameter (queryParameterName, value, operator = '=', queryString = undefined) {
+  if (typeof queryString === 'undefined') queryString = document.location.search.substr(1); // '?a=1&b=2' -> 'a=1&b=2'
+  const keyValuePairs = queryString.split('&').filter(x => x !== ''); // 'a=1&b=2' -> ['a=1','b=2']
 
   let found = false;
   let changed = false;
@@ -82,10 +83,15 @@ function updateQueryParameter (queryParameterName, value, operator = '=') {
     changed = true;
   }
 
-  return [changed, window.location.protocol + '//' + window.location.host + window.location.pathname + (keyValuePairs.length ? '?' + keyValuePairs.join('&') : '')];
+  return [changed, keyValuePairs.join('&')];
 }
 
-exports.setQueryParameter = function (queryParameterName, value, operator = '=') {
-  const [changed, newUrl] = updateQueryParameter(queryParameterName, value, operator);
-  if (changed) window.history.pushState({path: newUrl}, '', newUrl);
+exports.setQueryParameter = function (queryParameterName, value, operator = '=', queryString = undefined) {
+  const [changed, updatedQueryString] = updateQueryParameter(queryParameterName, value, operator, queryString);
+
+  if (changed && typeof queryString === 'undefined') {
+    const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + (updatedQueryString === '' ? '' : '?' + updatedQueryString);
+    window.history.pushState({path: newUrl}, '', newUrl);
+  }
+  return updatedQueryString;
 };

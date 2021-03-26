@@ -1,5 +1,5 @@
 <?php
-
+$DEFAULT_LIMIT = 1000;
 
 class QueryStatement
 {
@@ -254,11 +254,10 @@ class Query
                 return $property->sort($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
             });
         }
-
         // limit & offset
         $offset = $this->getOption('offset', 0);
         if($offset !== 0 || $this->hasOption('limit')){
-          $limit = $this->getOption('limit', count($entityIds));
+          $limit = $this->getOption('limit', max(count($entityIds), $DEFAULT_LIMIT));
           $entityIds = array_slice($entityIds, $offset, $limit);
         }
 

@@ -1,5 +1,7 @@
 const variables = require('../variables/variables.js');
 
+const web = require('../web/web.js');
+
 const pathFromUri = uri => {
   uri = uri.split('?')[0]; // remove querystring
   if (uri.startsWith('/')) {
@@ -49,10 +51,23 @@ const getBaseRequestUri = uri => {
 const getBaseUri = uri => uri.split(';').map(requestUri => getBaseRequestUri(requestUri)).join(';');
 
 const addQueryString = (uri, queryString) => {
-  return uri.indexOf('?') === -1
-    ? uri + '?' + queryString
-    : uri + '&' + queryString;
+  return uri + (uri.includes('?') ? '&' : '?') + queryString; // TODO smarter instead of just appending
 };
+
+function getQueryParameter (uri, queryParameterName) {
+  return uri.includes('?')
+    ? web.getQueryParameter(queryParameterName, uri.split('?')[1])
+    : undefined;
+}
+
+function setQueryParameter (uri, queryParameterName, value, operator = '=') {
+  return uri.split('?')[0] + '?' +
+  (
+    uri.includes('?')
+      ? web.setQueryParameter(queryParameterName, value, operator, uri.split('?')[1])
+      : queryParameterName + operator + value
+  );
+}
 
 // '/$entityClassName/$entityId/sum(x),x?q' -> '/$entityClassName/$entityId/x,y?q'  and ['sum','x']
 function parseAggregationFromUri (uri) {
@@ -118,3 +133,5 @@ exports.pathFromUri = pathFromUri;
 exports.uriFromPath = uriFromPath;
 exports.wrapContent = wrapContent;
 exports.addQueryString = addQueryString;
+exports.getQueryParameter = getQueryParameter;
+exports.setQueryParameter = setQueryParameter;
