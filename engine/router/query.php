@@ -212,6 +212,7 @@ class Query
     public function getMatchingEntityIds(&$content, array $accessGroups): array
     {
         $entityIds = [];
+        // filter
         //TODO handle multi class requests
         foreach ($content as $entityClassName => $entityClassContent) {
             foreach ($entityClassContent as $entityId => $entityContent) {
@@ -225,6 +226,18 @@ class Query
                 if ($flagMatch) array_push($entityIds, $entityId);
             }
         }
+
+        // search
+        if ($this->hasOption('search')) {
+            $search = $this->getOption('search');
+            $entityClassData = array_values($content)[0]; // TODO implement or error for multi class
+            // filter entity ids that do not contain the search string
+            $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
+                return json_search($entityClassData[$entityId], $search);;
+            });
+        }
+
+        // sortBy
         if ($this->hasOption('sortBy')) {
             //TODO handle multi class requests
             $entityClassName = array_keys($content)[0];
@@ -241,6 +254,14 @@ class Query
                 return $property->sort($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
             });
         }
+
+        // limit & offset
+        $offset = $this->getOption('offset', 0);
+        if($offset !== 0 || $this->hasOption('limit')){
+          $limit = $this->getOption('limit', count($entityIds));
+          $entityIds = array_slice($entityIds, $offset, $limit);
+        }
+
         return $entityIds;
     }
 }

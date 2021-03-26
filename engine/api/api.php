@@ -213,23 +213,27 @@ class ApiRequest extends HttpRequest2
         $entityIdList = count($path) > 2 ? $path[2] : '*';
         $propertyNames = $query->getAllUsedPropertyNames();
 
-        if ($query->hasOption('sortBy')) {
-            $propertyNames[] = $query->getOption('sortBy');
-        }
+        if ($query->hasOption('sortBy')) $propertyNames[] = $query->getOption('sortBy');
 
         if ($query->hasOption('search')) $propertyNames = ['*'];
-        else if (count($propertyNames) === 0) return [];
+        else if( count($propertyNames) === 0 && $query->hasOption('offset') || $query->hasOption('limit')){
 
-        if (count($propertyNames) !== 1) {
-            $this->addError(500, 'multi property query not yet supported');
-            //TODO transform into propertyTree
-            return [];
+          //TODO error on multiple classes
+          //TODO solve for multiple classes
+          $entityClassName = $entityClassList;
+          $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
+          //TODO check
+          $propertyNames[] = $entityClass->getIdPropertyName();
         }
+        if (count($propertyNames) === 0) return [];
+
+        //TODO check for trees -> dot notation
+
         $propertyPath = explode('.', $propertyNames[0]);
-        $requestURi = '/' . $entityClassList . '/' . $entityIdList . '/' . $propertyNames[0]; //TODO tree
+        $requestUri = '/' . $entityClassList . '/' . $entityIdList . '/' . implode(',',$propertyNames); //TODO tree
         $queryString = mergeQueryStrings($this->queryString, 'expand');
         $otherQuery = new Query($queryString);
-        return getConnectorRequests($this, 'GET', $requestURi, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
+        return getConnectorRequests($this, 'GET', $requestUri, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
     }
 
 
@@ -361,20 +365,6 @@ class ApiRequest extends HttpRequest2
           //TODO handle failure
           $entityIds = $query->getMatchingEntityIds($data, $this->accessGroups);
 
-          $offset = $query->getOption('offset', 0);
-          if($offset !== 0 || $query->hasOption('limit')){
-            $limit = $query->getOption('limit', count($entityIds));
-            $entityIds = array_slice($entityIds, $offset, $limit);
-          }
-
-          if ($query->hasOption('search')) {
-              $search = $query->getOption('search');
-              $entityClassData = array_values($data)[0]; // TODO implement or error for multi class
-              // filter entity ids that do not contain the search string
-              $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
-                  return json_search($entityClassData[$entityId], $search);;
-              });
-          }
           if(empty($entityIds)) return [];
           $entityIdList = implode(',', $entityIds);
       }
