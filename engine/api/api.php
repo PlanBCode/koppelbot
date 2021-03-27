@@ -206,9 +206,9 @@ class ApiRequest extends HttpRequest2
         $this->errors[] = new ApiError($status, $errorMessage, $path);
     }
 
-    public function getQueryConnectorRequests(Query &$query): array
+    public function getQueryConnectorRequests(string $requestUri, Query &$query): array
     {
-        $path = explode('/', $this->uri); //TODO helper function to split uri properly
+        $path = explode('/', $requestUri); //TODO helper function to split uri properly
         $entityClassList = count($path) > 1 ? $path[1] : '*';
         $entityIdList = count($path) > 2 ? $path[2] : '*';
         $propertyNames = $query->getAllUsedPropertyNames();
@@ -346,10 +346,11 @@ class ApiRequest extends HttpRequest2
       $path = array_slice(explode('/', $requestUri), 1); // '/a/b/c' -> ['a','b','c']
 
       $entityClassList = count($path) > 0 ? $path[0] : '*';  //TODO helper function to split uri properly
+
       $entityIdList = count($path) > 1 ? $path[1] : '*';
       $propertyPath = count($path) > 2 ? array_slice($path, 2) : [];
       // First retrieve query responses
-      $queryConnectorRequests = $this->getQueryConnectorRequests($query);
+      $queryConnectorRequests = $this->getQueryConnectorRequests($requestUri, $query);
       $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
       if (count($queryRequestResponses) > 0) {
 
@@ -360,10 +361,10 @@ class ApiRequest extends HttpRequest2
             $this->addError($status, 'Bad filter request');
             return [];
           }
-          $data = $requestResponse->getContent();
+          $content = $requestResponse->getContent();
 
           //TODO handle failure
-          $entityIds = $query->getMatchingEntityIds($data, $this->accessGroups);
+          $entityIds = $query->getMatchingEntityIds($entityClassList, $content, $this->accessGroups);
 
           if(empty($entityIds)) return [];
           $entityIdList = implode(',', $entityIds);

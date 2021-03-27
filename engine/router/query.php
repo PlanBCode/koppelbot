@@ -208,12 +208,15 @@ class Query
         return array_unique($propertyNames);
     }
 
-    public function getMatchingEntityIds(&$content, array $accessGroups): array
+    public function getMatchingEntityIds(string $entityClassList, &$content, array $accessGroups): array
     {
+        $entityClassNames = explode(',',$entityClassList);
         $entityIds = [];
         // filter
         //TODO handle multi class requests
-        foreach ($content as $entityClassName => $entityClassContent) {
+        foreach ($entityClassNames as $entityClassName) {
+          if(array_key_exists($entityClassName,$content)){
+            $entityClassContent = $content[$entityClassName];
             foreach ($entityClassContent as $entityId => $entityContent) {
                 $flagMatch = true;
                 foreach ($this->queryStatements as $queryStatement) {
@@ -224,12 +227,14 @@ class Query
                 }
                 if ($flagMatch) array_push($entityIds, $entityId);
             }
+          }
         }
 
         // search
         if ($this->hasOption('search')) {
+            $entityClassName = $entityClassNames[0];
+            $entityClassData = $content[$entityClassName]; // TODO implement or error for multi class
             $search = $this->getOption('search');
-            $entityClassData = array_values($content)[0]; // TODO implement or error for multi class
             // filter entity ids that do not contain the search string
             $entityIds = array_filter($entityIds, function ($entityId) use ($entityClassData, $search) {
                 return json_search($entityClassData[$entityId], $search);;
@@ -239,7 +244,7 @@ class Query
         // sortBy
         if ($this->hasOption('sortBy')) {
             //TODO handle multi class requests
-            $entityClassName = array_keys($content)[0];
+            $entityClassName = $entityClassNames[0];
             $entityClass = EntityClass::get($entityClassName, $accessGroups);
 
             $sortPath = explode('.', $this->getOption('sortBy'));
@@ -260,7 +265,6 @@ class Query
           $limit = $this->getOption('limit', max(count($entityIds), $DEFAULT_LIMIT));
           $entityIds = array_slice($entityIds, $offset, $limit);
         }
-
         return $entityIds;
     }
 }
