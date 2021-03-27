@@ -1,5 +1,4 @@
 <?php
-$DEFAULT_LIMIT = 1000;
 
 class QueryStatement
 {
@@ -257,6 +256,7 @@ class Query
         // limit & offset
         $offset = $this->getOption('offset', 0);
         if($offset !== 0 || $this->hasOption('limit')){
+          $DEFAULT_LIMIT = 1000;
           $limit = $this->getOption('limit', max(count($entityIds), $DEFAULT_LIMIT));
           $entityIds = array_slice($entityIds, $offset, $limit);
         }
