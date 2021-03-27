@@ -50,10 +50,6 @@ const getBaseRequestUri = uri => {
  */
 const getBaseUri = uri => uri.split(';').map(requestUri => getBaseRequestUri(requestUri)).join(';');
 
-const addQueryString = (uri, queryString) => {
-  return uri + (uri.includes('?') ? '&' : '?') + queryString; // TODO smarter instead of just appending
-};
-
 function getQueryParameter (uri, queryParameterName) {
   return uri.includes('?')
     ? web.getQueryParameter(queryParameterName, uri.split('?')[1])
@@ -66,6 +62,17 @@ function setQueryParameter (uri, queryParameterName, value, operator = '=') {
     uri.includes('?')
       ? web.setQueryParameter(queryParameterName, value, operator, uri.split('?')[1])
       : queryParameterName + operator + value
+  );
+}
+
+function setQueryParameters (uri, queryParameters, operator = '=') {
+  return uri.split('?')[0] + '?' +
+  (
+    uri.includes('?')
+      ? web.setQueryParameter(queryParameters, operator, uri.split('?')[1])
+      : Object.entries(queryParameters) // {a:'b',c:'d'} -> [['a','b'],['c','d']]
+        .map(([queryParameterName, value]) => queryParameterName + operator + value) // [['a','b'],['c','d']] -> ['a=b','c=d']
+        .join('&') //  ['a=b','c=d'] ->  'a=b&c=d'
   );
 }
 
@@ -122,6 +129,14 @@ function uriHasUnresolvedVariables (uri) {
   return uri.includes('$');
 }
 
+function multiSetQueryParameter (uri, queryParameterName, value, operator) {
+  return uri.split(';').map(requestUri => setQueryParameter(requestUri, queryParameterName, value, operator)).join(';');
+}
+
+function multiSetQueryParameters (uri, queryParameters, operator) {
+  return uri.split(';').map(requestUri => setQueryParameters(requestUri, queryParameters, operator)).join(';');
+}
+
 exports.getVariableNamesFromUri = getVariableNamesFromUri;
 exports.uriHasUnresolvedVariables = uriHasUnresolvedVariables;
 exports.resolveVariablesInUri = resolveVariablesInUri;
@@ -132,6 +147,9 @@ exports.getEntityClassNames = getEntityClassNames;
 exports.pathFromUri = pathFromUri;
 exports.uriFromPath = uriFromPath;
 exports.wrapContent = wrapContent;
-exports.addQueryString = addQueryString;
+
 exports.getQueryParameter = getQueryParameter;
 exports.setQueryParameter = setQueryParameter;
+exports.setQueryParameters = setQueryParameters;
+exports.multiSetQueryParameter = multiSetQueryParameter;
+exports.multiSetQueryParameters = multiSetQueryParameters;
