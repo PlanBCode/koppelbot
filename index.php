@@ -47,7 +47,7 @@ if ($isCli) {
     $content = implode(' ', array_slice($options['args'], 2));
     $uriQueryString = explode('?', $requestUri);
     $uri = array_get($uriQueryString, 0, '');
-    $queryString = array_get($uriQueryString, 1, '');
+    $queryString = implode('?',array_slice($uriQueryString, 1));
     $method = array_get($options, 'method', 'GET');
     if (array_get($options, 'verbose', false)) {
         echo 'Request:' . PHP_EOL;
