@@ -1,16 +1,15 @@
 const entity = require('../entity/entity.js');
-const {getQueryParameter, setQueryParameter, addQueryString, pathFromUri} = require('../uri/uri.js');
+const {setQueryParameter, getQueryParameter, multiSetQueryParameters, pathFromUri} = require('../uri/uri.js');
 
 function request (method, uri, data, callback) {
   // TODO set content type and length headers
   // TODO allow for multiple hosts by prepending http(s)://..
   const location = window.location.origin + '/';
 
-  uri = uri.split(';').map(requestUri => addQueryString(requestUri, 'expand')).join(';');
+  uri = uri.split(';').map(requestUri => setQueryParameter(requestUri, 'expand', 'true')).join(';');
   uri = encodeURI(uri);
-
   const xhr = new window.XMLHttpRequest();
-  xhr.open(method, location + 'api' + addQueryString(uri, 'expand'), true);
+  xhr.open(method, location + 'api' + uri, true);
 
   xhr.onreadystatechange = () => {
     if (xhr.readyState === 4) {
@@ -36,7 +35,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
   if (entityClassNames.length === 0) {
     callback();
   } else {
-    const metaUri = addQueryString('/entity/' + entityClassNames.join(','), 'expand');
+    const metaUri = setQueryParameter('/entity/' + entityClassNames.join(','), 'expand', 'true');
     request('GET', metaUri, undefined, (status, content) => { // TODO add querystring better
       // TODO check status
       // console.log(metaUri, content);
@@ -139,8 +138,7 @@ function getPartial (uri, entityClasses, dataCallback, originalOffset, originalL
   if (typeof offset === 'undefined') offset = 0;
   if (typeof originalOffset === 'undefined') originalOffset = 0;
   const limit = typeof originalLimit === 'undefined' ? PAGE_SIZE : Math.min(PAGE_SIZE, originalLimit);
-  uri = setQueryParameter(uri, 'limit', limit);
-  uri = setQueryParameter(uri, 'offset', offset);
+  uri = multiSetQueryParameters(uri, {limit, offset});
   request('GET', uri, undefined, (status, responseStringContent) => {
     let responseObjectContent;
     try {
