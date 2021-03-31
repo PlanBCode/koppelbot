@@ -69,7 +69,7 @@ function setQueryParameters (uri, queryParameters, operator = '=') {
   return uri.split('?')[0] + '?' +
   (
     uri.includes('?')
-      ? web.setQueryParameter(queryParameters, operator, uri.split('?')[1])
+      ? web.setQueryParameters(queryParameters, operator, uri.split('?')[1])
       : Object.entries(queryParameters) // {a:'b',c:'d'} -> [['a','b'],['c','d']]
         .map(([queryParameterName, value]) => queryParameterName + operator + value) // [['a','b'],['c','d']] -> ['a=b','c=d']
         .join('&') //  ['a=b','c=d'] ->  'a=b&c=d'
