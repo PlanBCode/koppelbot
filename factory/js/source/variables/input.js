@@ -4,6 +4,10 @@ const TypeItem = require('../render/item.js').TypeItem;
 
 function renderUiInput (xyz, options, WRAPPER) {
   if (options.name) {
+    if (!options.hasOwnProperty('name')) {
+      console.error('Missing input name');
+      return;
+    }
     const name = options.name; // TODO error if missing
 
     const INPUT = document.createElement('INPUT');
