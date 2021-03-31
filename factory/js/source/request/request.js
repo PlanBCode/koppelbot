@@ -56,7 +56,9 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
       const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
         if (waitForEntityClassNames.size === 0) {
           for (const entityClassName in metas) {
-            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metas[entityClassName]);
+            if (!entityClasses.hasOwnProperty(entityClassName)) {
+              entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metas[entityClassName]);
+            }
           }
           callback();
         }
