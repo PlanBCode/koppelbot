@@ -136,6 +136,20 @@ exports.patch = (entityClasses, uri, content, callback) => handleModifyRequest(e
 exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PUT', uri, content, callback);
 const PAGE_SIZE = 1000;
 
+function getMaxEntityCount (status, responseObjectContents) {
+  let maxEntityCount = 0;
+  for (const responseObjectContent of responseObjectContents) {
+    for (const entityClassName in responseObjectContent) {
+      // TODO check
+      const entityClassContent = status === 207
+        ? responseObjectContent[entityClassName].content
+        : responseObjectContent[entityClassName];
+      const entityIds = Object.keys(entityClassContent); // TODO check
+      if (entityIds.length > maxEntityCount) maxEntityCount = entityIds.length;
+    }
+  }
+  return maxEntityCount;
+}
 function getPartial (uri, entityClasses, dataCallback, originalOffset, originalLimit, offset) {
   if (typeof offset === 'undefined') offset = 0;
   if (typeof originalOffset === 'undefined') originalOffset = 0;
@@ -149,33 +163,16 @@ function getPartial (uri, entityClasses, dataCallback, originalOffset, originalL
       console.error('GET', uri, responseStringContent, e);
       return;
     }
-    // console.log('GET', uri, status, responseObjectContent);
-    // TODO replace null with current content?
-    // TODO handle multi requests
-    const state = entity.handleMultiInput('GET', uri, status, responseObjectContent, null, entityClasses);
-    // TODO  word er nog iets met state gedaan...?
-    if (typeof dataCallback === 'function') {
-      // determine the actually requested entityIds per ClassName
-      const entityIdsPerClassName = {};
-      const isMultiRequest = (responseObjectContent instanceof Array) && uri.includes(';');
-      const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
-      let maxEntityCount = 0;
-      for (const responseObjectContent of responseObjectContents) {
-        for (const entityClassName in responseObjectContent) {
-        // TODO check
-          const entityClassContent = status === 207
-            ? responseObjectContent[entityClassName].content
-            : responseObjectContent[entityClassName];
-          const entityIds = Object.keys(entityClassContent); // TODO check
-          entityIdsPerClassName[entityClassName] = entityIds;
-          if (entityIds.length > maxEntityCount) maxEntityCount = entityIds.length;
-        }
-      }
-      const node = entity.getMultiResponse(uri, entityClasses, 'GET', entityIdsPerClassName);
-      dataCallback(node);
-      if (maxEntityCount >= PAGE_SIZE) {
-        getPartial(uri, entityClasses, dataCallback, originalOffset, originalLimit, offset + PAGE_SIZE);
-      }
+
+    entity.handleMultiInput('GET', uri, status, responseObjectContent, null, entityClasses);
+
+    if (typeof dataCallback === 'function') dataCallback(); // TODO remove but still used by accessListener
+
+    // determine if we need to get another page
+    const isMultiRequest = (responseObjectContent instanceof Array) && uri.includes(';');
+    const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
+    if (getMaxEntityCount(status, responseObjectContents) >= PAGE_SIZE) {
+      getPartial(uri, entityClasses, dataCallback, originalOffset, originalLimit, offset + PAGE_SIZE);
     }
   });
 }
