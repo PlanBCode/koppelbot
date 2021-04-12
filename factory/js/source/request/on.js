@@ -11,14 +11,16 @@ const on = (xyz, entityClasses, uri, eventName, callback) => {
     return []; // TODO return something?
   }
   const listeners = [];
+  const requestUris = uri.split(';');
+  for (let requestId = 0; requestId < requestUris.length; ++requestId) {
+    const [requestUri, queryString] = requestUris[requestId].split('?');
 
-  for (const requestUri of uri.split(';')) {
     const entityClassNames = uriTools.getEntityClassNames(requestUri, entityClasses);
     request.retrieveMeta(xyz, entityClasses, requestUri, () => {
       const subPath = uriTools.pathFromUri(requestUri).slice(1);
       for (const entityClassName of entityClassNames) {
         if (entityClasses.hasOwnProperty(entityClassName)) {
-          const entityClassListeners = entityClasses[entityClassName].addListener(subPath, eventName, callback); // TODO add requestId? // XYZ123
+          const entityClassListeners = entityClasses[entityClassName].addListener(subPath, eventName, callback, requestId, queryString);
           listeners.push(...entityClassListeners);
         } else {
         // TODO callback 404 on listener
