@@ -84,7 +84,11 @@ function updateQueryParameter (queryParameterName, value, operator = '=', queryS
 }
 
 exports.setQueryParameters = function (queryParameters, operator = '=', queryString = undefined) {
-  if (typeof queryString === 'undefined') queryString = document.location.search.substr(1); // '?a=1&b=2' -> 'a=1&b=2'
+  let useDocumentQueryString = false;
+  if (typeof queryString === 'undefined') {
+    useDocumentQueryString = true;
+    queryString = document.location.search.substr(1); // '?a=1&b=2' -> 'a=1&b=2'
+  }
 
   let changed = false;
   let updatedQueryString = queryString;
@@ -95,7 +99,7 @@ exports.setQueryParameters = function (queryParameters, operator = '=', queryStr
     if (subChanged) changed = true;
   }
 
-  if (changed && typeof queryString === 'undefined') {
+  if (changed && useDocumentQueryString) {
     const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + (updatedQueryString === '' ? '' : '?' + updatedQueryString);
     window.history.pushState({path: newUrl}, '', newUrl);
   }
@@ -103,11 +107,15 @@ exports.setQueryParameters = function (queryParameters, operator = '=', queryStr
 };
 
 exports.setQueryParameter = function (queryParameterName, value, operator = '=', queryString = undefined) {
-  if (typeof queryString === 'undefined') queryString = document.location.search.substr(1); // '?a=1&b=2' -> 'a=1&b=2'
+  let useDocumentQueryString = false;
+  if (typeof queryString === 'undefined') {
+    useDocumentQueryString = true;
+    queryString = document.location.search.substr(1); // '?a=1&b=2' -> 'a=1&b=2'
+  }
 
   const [changed, updatedQueryString] = updateQueryParameter(queryParameterName, value, operator, queryString);
 
-  if (changed && typeof queryString === 'undefined') {
+  if (changed && useDocumentQueryString) {
     const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + (updatedQueryString === '' ? '' : '?' + updatedQueryString);
     window.history.pushState({path: newUrl}, '', newUrl);
   }
