@@ -302,7 +302,6 @@ class ApiRequest extends HttpRequest2
           if(is_array($content) && $entityResponse->getRequestObject()->getQuery()->checkToggle('expand')){
             $entityId = $entityResponse->getEntityId();
             $IdPropertyName = $entityResponse->getIdPropertyName();
-            $IdPropertyName = is_null($IdPropertyName) ? 'id' : $IdPropertyName;
             $content[$IdPropertyName] = $entityId;
           }
           $propertyResponse->setContent($content);
@@ -336,7 +335,8 @@ class ApiRequest extends HttpRequest2
         return $this->resolveReferenceResponses($requestResponses, $remainingConnectorRequests, $remappedAutoIncrementedUris);
     }
 
-    protected function getRequestResponse($requestId, string $requestUri, string &$requestContent){
+    protected function getRequestResponse($requestId, string $requestUri, string &$requestContent): array
+    {
       $split = explode('?',$requestUri);
       $requestUri = $split[0];
       $queryString = array_get($split,1,'');
@@ -349,6 +349,13 @@ class ApiRequest extends HttpRequest2
 
       $entityIdList = count($path) > 1 ? $path[1] : '*';
       $propertyPath = count($path) > 2 ? array_slice($path, 2) : [];
+
+      // on expand, also add all query parameters
+      if($query->checkToggle('expand') && count($propertyPath) > 0 && $propertyPath[0] !== '*'){
+        $queryPropertyNames = $query->getAllUsedPropertyNames();
+        if(count($queryPropertyNames)>0) $propertyPath[0] .= ',' . implode(',', $queryPropertyNames);
+      }
+
       // First retrieve query responses
       $queryConnectorRequests = $this->getQueryConnectorRequests($requestUri, $query);
       $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
@@ -361,10 +368,10 @@ class ApiRequest extends HttpRequest2
             $this->addError($status, 'Bad filter request');
             return [];
           }
-          $content = $requestResponse->getContent();
+          $queryContent = $requestResponse->getContent();
 
           //TODO handle failure
-          $entityIds = $query->getMatchingEntityIds($entityClassList, $content, $this->accessGroups);
+          $entityIds = $query->getMatchingEntityIds($entityClassList, $queryContent, $this->accessGroups);
 
           if(empty($entityIds)) return [];
           $entityIdList = implode(',', $entityIds);
