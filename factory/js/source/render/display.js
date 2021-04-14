@@ -53,9 +53,6 @@ const renderDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId
   const requestUri = typeof requestId !== 'undefined'
     ? uri.split(';')[requestId]
     : uri;
-
-  // OUTDATED node = response.filter(node, path.slice(2)); // filter the content that was not requested
-
   const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, requestUri, requestId);
   uiElementFirst(display, displayItem);
   uiElementEntity(display, displayItem);
@@ -106,13 +103,13 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
         entityPath[2] = entityId;
         const entityUri = entityPath.join('/');
         const entityContent = xyz.getContent(entityUri)[entityClassName][entityId]; // TODO check
-        renderDisplay(xyz, requestUri, options, WRAPPER)(entityClassName, entityId, entityContent, eventName, requestId);
+        renderDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, entityContent, eventName, requestId);
       }
     });
     const removedListeners = xyz.on(requestUri, 'removed', (entityClassName, entityId, node, eventName, requestId) => {
       if (!WRAPPER.entityIds.hasOwnProperty(entityId)) return;
       delete WRAPPER.entityIds[entityId];
-      removeDisplay(xyz, requestUri, options, WRAPPER)(entityClassName, entityId, node, eventName, requestId);
+      removeDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node, eventName, requestId);
     });
     displayListeners.push(...availableListeners, ...removedListeners);
   }

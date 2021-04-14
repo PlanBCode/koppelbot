@@ -94,38 +94,38 @@ exports.constructor = function Property (xyz, parent, propertyName, settings) {
     }
   };
 
-  this.callListeners = (state, entityId, queryString, entityExisted) => {
+  this.callListeners = (state, entityId, queryString, entityExisted, requestId) => {
     // DEBUG console.log('Property::callListeners', entityId, queryString, 'entityExisted', entityExisted);
     const propertyPath = this.getPropertyPath();
     for (let depth = propertyPath.length - 1; depth >= 0; --depth) { // call all depths of the property path
       const subPropertyPath = propertyPath.slice(0, depth);
       const subUri = ''; // TODO not sure what to do
-      this.callAtomicListeners(state, entityId, this.getResponse(subPropertyPath, entityId, state.getMethod()), subUri, queryString, entityExisted);
+      this.callAtomicListeners(state, entityId, this.getResponse(subPropertyPath, entityId, state.getMethod()), subUri, queryString, entityExisted, requestId);
     }
-    parent.callListeners(state.getParentState(), entityId, queryString, entityExisted);
+    parent.callListeners(state.getParentState(), entityId, queryString, entityExisted, requestId);
   };
 
-  this.handleInput = (path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted) => {
+  this.handleInput = (path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted, requestId) => {
     // DEBUG console.log('Property::handleInput', ...args);
     if (type === 'reference') {
-      if (path.length === 0) return input.handlePrimitive(this, contents, statusses)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted);
+      if (path.length === 0) return input.handlePrimitive(this, contents, statusses)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted, requestId);
       else {
         // Handle both the primitive reference property (this) and the subProperties
-        const state = input.handle(this, statusses, subProperties, null)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted);
+        const state = input.handle(this, statusses, subProperties, null)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted, requestId);
         const idPropertyPath = this.getIdPropertyPath();
         const idPropertyName = idPropertyPath[1];
         const referenceEntityId = responseContent[idPropertyName]; // TODO check
         const primitiveResponseContent = referenceEntityId;
         const primitiveRequestContent = null; // TODO check for other methods
         const primitivePath = null;
-        const primitiveState = input.handlePrimitive(this, contents, statusses)(primitivePath, method, entityId, responseStatus, primitiveResponseContent, primitiveRequestContent, queryString, entityExisted);
+        const primitiveState = input.handlePrimitive(this, contents, statusses)(primitivePath, method, entityId, responseStatus, primitiveResponseContent, primitiveRequestContent, queryString, entityExisted, requestId);
         // TODO merge primitiveState and state?
         return state;
       }
     } else {
       return isPrimitive
-        ? input.handlePrimitive(this, contents, statusses)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted)
-        : input.handle(this, statusses, subProperties, null)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted);
+        ? input.handlePrimitive(this, contents, statusses)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted, requestId)
+        : input.handle(this, statusses, subProperties, null)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted, requestId);
     }
   };
 

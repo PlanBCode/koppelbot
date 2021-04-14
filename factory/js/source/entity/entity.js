@@ -206,19 +206,20 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     return null;
   };
 
-  this.callListeners = (state, entityId, queryString, entityExisted) => { // TODO pass method?
+  this.callListeners = (state, entityId, queryString, entityExisted, requestId) => { // TODO pass method?
     // DEBUG console.log('Entity::callListeners', entityId, queryString, 'entityExisted', entityExisted);
     const subUri = ''; // TODO not sure what to do
-    this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()), subUri, queryString, entityExisted);
+    this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()), subUri, queryString, entityExisted, requestId);
   };
 
   // TODO simplify argument passing?
-  const handleEntityIdInput = (path, method, entityId, responseStatus, responseContent, requestContent, queryString) => {
-    return input.handle(this, statusses, properties, entities)(path, method, entityId, responseStatus, responseContent, requestContent, queryString);
+  const handleEntityIdInput = (path, method, entityId, responseStatus, responseContent, requestContent, queryString, requestId) => {
+    const entityExisted = undefined; // TODO check whole entityExisted flow
+    return input.handle(this, statusses, properties, entities)(path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted, requestId);
   };
 
-  this.handleInput = (path, queryString, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
-    // DEBUG console.log('Entity::handleInput', path, queryString);
+  this.handleInput = (path, queryString, method, entityClassStatus, entityClassContent, requestContent, entityIds, requestId) => {
+    // DEBUG  console.log('Entity::handleInput', requestId, path, queryString,entityIds);
 
     if (entityClassStatus === 207) {
       for (const entityId of entityIds) {
@@ -235,7 +236,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
           const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
           const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
           const subPath = path.slice(1);
-          handleEntityIdInput(subPath, method, entityId, entityStatus, entityContent, subRequestContent, queryString);
+          handleEntityIdInput(subPath, method, entityId, entityStatus, entityContent, subRequestContent, queryString, requestId);
         }
       }
     } else {
@@ -248,7 +249,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
         const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
         const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
         const subPath = path.slice(1);
-        handleEntityIdInput(subPath, method, entityId, entityClassStatus, entityContent, subRequestContent, queryString);
+        handleEntityIdInput(subPath, method, entityId, entityClassStatus, entityContent, subRequestContent, queryString, requestId);
       }
     }
   };
@@ -361,18 +362,19 @@ const handleMultiInput = (method, uri, status, responseContent, requestContent, 
       if (status === 207) {
         const subResponseContent = responseContent[requestId].content; // TOOD check
         const subStatus = responseContent[requestId].status;
-        handleInput(subMethod, requestUri, queryString, subStatus, subResponseContent, subRequestContent, entityClasses);
+        handleInput(subMethod, requestUri, queryString, subStatus, subResponseContent, subRequestContent, entityClasses, requestId);
       } else {
-        handleInput(subMethod, requestUri, queryString, status, responseContent[requestId], subRequestContent, entityClasses);
+        handleInput(subMethod, requestUri, queryString, status, responseContent[requestId], subRequestContent, entityClasses, requestId);
       }
     }
   } else {
     const [requestUri, queryString] = uri.split('?');
-    handleInput(method, requestUri, queryString, status, responseContent, requestContent, entityClasses);
+    const requestId = undefined;// singular request
+    handleInput(method, requestUri, queryString, status, responseContent, requestContent, entityClasses, requestId);
   }
 };
 
-const handleInput = (method, uri, queryString, status, responseContent, requestContent, entityClasses) => {
+const handleInput = (method, uri, queryString, status, responseContent, requestContent, entityClasses, requestId) => {
   // DEBUG console.log('handleInput', uri, queryString, responseContent);
   // TODO check status
 
@@ -397,7 +399,7 @@ const handleInput = (method, uri, queryString, status, responseContent, requestC
           : entityIdList.split(',');
         const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[entityClassName] : null;
         const subPath = path.slice(1);
-        entityClass.handleInput(subPath, queryString, method, entityClassStatus, entityClassContent, subRequestContent, entityIds);
+        entityClass.handleInput(subPath, queryString, method, entityClassStatus, entityClassContent, subRequestContent, entityIds, requestId);
       }
     }
   } else {
@@ -410,13 +412,13 @@ const handleInput = (method, uri, queryString, status, responseContent, requestC
           ? []
           : entityIdList.split(',');
         const entityClass = entityClasses[entityClassName];
-        entityClass.handleInput(subPath, queryString, method, 404, {}, subRequestContent, entityIds);
+        entityClass.handleInput(subPath, queryString, method, 404, {}, subRequestContent, entityIds, requestId);
       } else {
         const entityIds = entityIdList === '*'
           ? Object.keys(entityClassContent)
           : entityIdList.split(',');
         const entityClass = entityClasses[entityClassName];
-        entityClass.handleInput(subPath, queryString, method, status, entityClassContent, subRequestContent, entityIds);
+        entityClass.handleInput(subPath, queryString, method, status, entityClassContent, subRequestContent, entityIds, requestId);
       }
     }
   }

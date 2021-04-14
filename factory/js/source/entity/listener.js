@@ -20,7 +20,7 @@ function Listener (listenerHandler, eventName, entityId, subUri) {
 function ListenerHandler () {
   const listenersPerEntityIdPerEventNamePerSubUri = {};
 
-  const callListeners = (eventName, entityId, listenerEntityId, node, subUri) => {
+  const callListeners = (eventName, entityId, listenerEntityId, node, subUri, requestId) => {
     // DEBUG console.log('callListener', listenerEntityId, this.getUri(entityId) + '//' + (subUri || '') + ':' + eventName);
 
     if (listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(listenerEntityId)) { // Nb  '*' case is handled by callAllListeners
@@ -36,7 +36,7 @@ function ListenerHandler () {
             if (subNode) {
               // DEBUG console.log('2-> callListener', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName);
               const listeners = listenersPerSubUri[subUri];
-              listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName));
+              listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName, requestId));
             }
           }
         } else if (listenersPerSubUri.hasOwnProperty(subUri)) {
@@ -46,36 +46,36 @@ function ListenerHandler () {
           if (subNode) {
             // DEBUG console.log('2-> callListener', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName);
             const listeners = listenersPerSubUri[subUri];
-            listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName));
+            listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName, requestId));
           }
         }
       }
     }
   };
 
-  const callAllListeners = (eventName, entityId, node, subUri) => {
+  const callAllListeners = (eventName, entityId, node, subUri, requestId) => {
     if (eventNames.indexOf(eventName) === -1) throw new Error('Listener eventName "' + eventName + '"  is not in allowed event names: ' + eventNames.join(', ') + '.');
-    callListeners(eventName, entityId, '*', node, subUri);
-    callListeners(eventName, entityId, entityId, node, subUri);
+    callListeners(eventName, entityId, '*', node, subUri, requestId);
+    callListeners(eventName, entityId, entityId, node, subUri, requestId);
   };
 
-  this.callAtomicListeners = (state, entityId, node, subUri, queryString, entityExisted) => {
+  this.callAtomicListeners = (state, entityId, node, subUri, queryString, entityExisted, requestId) => {
     // DEBUG console.log('callAtomicListeners', entityId, this.getUri(entityId) + '//' + (subUri || ''), listenersPerEntityIdPerEventNamePerSubUri, queryString, 'entityExisted', entityExisted);
 
     if (typeof entityId !== 'string') throw new TypeError('entityId is not a string.');
     if (!(state instanceof State)) throw new TypeError('state is not a State.');
     if (state.isRemoved()) {
-      callAllListeners('changed', entityId, node, subUri);
-      callAllListeners('removed', entityId, node, subUri);
+      callAllListeners('changed', entityId, node, subUri, requestId);
+      callAllListeners('removed', entityId, node, subUri, requestId);
     } else if (state.isExtended()) {
-      callAllListeners('available', entityId, node, subUri); // TODO check if extention applicable to listener?
+      callAllListeners('available', entityId, node, subUri, requestId); // TODO check if extention applicable to listener?
     } else if (state.isCreated() || !entityExisted) { // TODO fix
-      callAllListeners('created', entityId, node, subUri);
-      callAllListeners('changed', entityId, node, subUri);
+      callAllListeners('created', entityId, node, subUri, requestId);
+      callAllListeners('changed', entityId, node, subUri, requestId);
     } else if (state.isChanged()) {
-      callAllListeners('changed', entityId, node, subUri);
+      callAllListeners('changed', entityId, node, subUri, requestId);
       // TODO }else if(state.hasErrors()){
-      //   callAllListeners('error', entityId, node, subUri);
+      //   callAllListeners('error', entityId, node, subUri,requestId);
     } else {
       // nothing to do
     }
