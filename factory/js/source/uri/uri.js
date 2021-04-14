@@ -69,7 +69,7 @@ function setQueryParameters (uri, queryParameters, operator = '=') {
   return uri.split('?')[0] + '?' +
   (
     uri.includes('?')
-      ? web.setQueryParameter(queryParameters, operator, uri.split('?')[1])
+      ? web.setQueryParameters(queryParameters, operator, uri.split('?')[1])
       : Object.entries(queryParameters) // {a:'b',c:'d'} -> [['a','b'],['c','d']]
         .map(([queryParameterName, value]) => queryParameterName + operator + value) // [['a','b'],['c','d']] -> ['a=b','c=d']
         .join('&') //  ['a=b','c=d'] ->  'a=b&c=d'
@@ -137,6 +137,11 @@ function multiSetQueryParameters (uri, queryParameters, operator) {
   return uri.split(';').map(requestUri => setQueryParameters(requestUri, queryParameters, operator)).join(';');
 }
 
+function getQueryFilters (uri) {
+  if (!uri.includes('?')) return {};
+  return web.getQueryFilters('?' + uri.split('?')[1]);
+}
+
 exports.getVariableNamesFromUri = getVariableNamesFromUri;
 exports.uriHasUnresolvedVariables = uriHasUnresolvedVariables;
 exports.resolveVariablesInUri = resolveVariablesInUri;
@@ -153,3 +158,5 @@ exports.setQueryParameter = setQueryParameter;
 exports.setQueryParameters = setQueryParameters;
 exports.multiSetQueryParameter = multiSetQueryParameter;
 exports.multiSetQueryParameters = multiSetQueryParameters;
+
+exports.getQueryFilters = getQueryFilters;

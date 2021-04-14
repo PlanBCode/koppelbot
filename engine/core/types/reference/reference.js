@@ -22,8 +22,10 @@ exports.actions = {
       // TODO check for errors
       const titlePropertyPath = item.getTitlePropertyPath(referenceEntityClassName);
       const referenceEntityId = node.getContent();
-      const referenceUri = '/' + referenceEntityClassName + '/' + referenceEntityId + '/' + titlePropertyPath.join('/');
+      const referenceUri = '/' + referenceEntityClassName + '/' + referenceEntityId +
+       (titlePropertyPath === null ? '' : '/' + titlePropertyPath.join('/'));
       // TODO options : display:'flat'
+
       item.ui({uri: referenceUri, display: 'title', onReady: item.getOption('onReady')}, SPAN);
     };
     changeHandler(item);

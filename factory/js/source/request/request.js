@@ -1,25 +1,63 @@
 const entity = require('../entity/entity.js');
 const {setQueryParameter, getQueryParameter, multiSetQueryParameters, pathFromUri} = require('../uri/uri.js');
 
+const pendingRequests = [];
+
+function renderPendingRequestIndicator () {
+  let DIV_pendingRequestIndicator = document.getElementById('xyz-pendingRequestIndicator');
+
+  if (pendingRequests.length > 0) {
+    if (!DIV_pendingRequestIndicator) {
+      DIV_pendingRequestIndicator = document.createElement('DIV');
+      document.body.appendChild(DIV_pendingRequestIndicator);
+    }
+    DIV_pendingRequestIndicator.id = 'xyz-pendingRequestIndicator';
+    DIV_pendingRequestIndicator.style.display = 'block';
+  } else if (DIV_pendingRequestIndicator) DIV_pendingRequestIndicator.style.display = 'none';
+}
+
 function request (method, uri, data, callback) {
   // TODO set content type and length headers
   // TODO allow for multiple hosts by prepending http(s)://..
   const location = window.location.origin + '/';
 
+  renderPendingRequestIndicator();
   uri = uri.split(';').map(requestUri => setQueryParameter(requestUri, 'expand', 'true')).join(';');
   uri = encodeURI(uri);
+  pendingRequests.push(uri);
+
   const xhr = new window.XMLHttpRequest();
   xhr.open(method, location + 'api' + uri, true);
-
   xhr.onreadystatechange = () => {
     if (xhr.readyState === 4) {
       const status = xhr.status;
       const content = xhr.responseText;
+      const index = pendingRequests.indexOf(uri);
+      if (index !== -1) {
+        pendingRequests.splice(index, 1);
+        renderPendingRequestIndicator();
+      }
       callback(status, content);
     }
   };
   xhr.send(data);
 }
+
+const retrieveEntityClassMeta = (xyz, entityClasses, entityClassName, callback) => {
+  const meta = xyz.metas[entityClassName];
+  const referencedEntityClassNames = new Set();
+  for (const propertyName in meta) {
+    const settings = meta[propertyName];
+    if (settings.type === 'reference') {
+      const referenceEntityClassName = settings.uri.split('/')[1]; // TODO check
+      if (!xyz.metas.hasOwnProperty(referenceEntityClassName)) referencedEntityClassNames.add(referenceEntityClassName);
+    }
+  }
+  if (referencedEntityClassNames.size === 0) callback();
+  else {
+    retrieveMeta(xyz, entityClasses, '/' + [...referencedEntityClassNames].join(','), callback);
+  }
+};
 
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
   const requestedEntityClassNames = uri.split(';') // '/a;/b' -> ['/a','/b,c']
@@ -31,12 +69,11 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     // TODO unique?
     ;
 
-  const entityClassNames = requestedEntityClassNames.filter(entityClass => !entityClasses.hasOwnProperty((entityClass)));
-  if (entityClassNames.length === 0) {
-    callback();
-  } else {
+  const entityClassNames = requestedEntityClassNames.filter(entityClass => !entityClasses.hasOwnProperty(entityClass));
+  if (entityClassNames.length === 0) callback();
+  else {
     const metaUri = setQueryParameter('/entity/' + entityClassNames.join(','), 'expand', 'true');
-    request('GET', metaUri, undefined, (status, content) => { // TODO add querystring better
+    request('GET', metaUri, undefined, (status, content) => {
       // TODO check status
       // console.log(metaUri, content);
       let data;
@@ -51,42 +88,31 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
         console.error('PROBLEM parsing meta response', data);
         return;
       }
-      const waitForEntityClassNames = new Set('*'); // add '*' to ensure callbacks being called correctly
-      const metas = {};
-      const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
-        if (waitForEntityClassNames.size === 0) {
-          for (const entityClassName in metas) {
-            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metas[entityClassName]);
-          }
-          callback();
-        }
-      };
-      for (const entityClassName of entityClassNames) {
-        if (!entityClasses.hasOwnProperty(entityClassName)) {
-          if (!data.entity.hasOwnProperty(entityClassName)) {
-            console.error(`Entity data not found for '${entityClassName}'`);
-            return;
-          } else {
-            const meta = data.entity[entityClassName].content; // TODO validate data
-            metas[entityClassName] = meta;
-            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, meta);
 
-            for (const propertyName in meta) {
-              const settings = meta[propertyName];
-              if (settings.type === 'reference') {
-                const referenceEntityClassName = settings.uri.split('/')[1]; // TODO check
-                waitForEntityClassNames.add(referenceEntityClassName);
-                retrieveMeta(xyz, entityClasses, '/' + referenceEntityClassName, () => {
-                  waitForEntityClassNames.delete(referenceEntityClassName);
-                  waitForAllCallbacks();
-                });
-              }
-            }
+      const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
+        for (const entityClassName of entityClassNames) {
+          if (!xyz.metas.hasOwnProperty(entityClassName)) return;
+        }
+        for (const entityClassName of entityClassNames) {
+          if (!entityClasses.hasOwnProperty(entityClassName)) {
+            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, xyz.metas[entityClassName]);
           }
+        }
+        callback();
+      };
+
+      for (const entityClassName of entityClassNames) {
+        if (!data.entity.hasOwnProperty(entityClassName)) {
+          console.error(`Entity data not found for '${entityClassName}'`);
+          return;
+        } else {
+          const meta = data.entity[entityClassName].content; // TODO validate data
+          xyz.metas[entityClassName] = meta;
         }
       }
-      waitForEntityClassNames.delete('*');
-      waitForAllCallbacks();
+      for (const entityClassName of entityClassNames) {
+        retrieveEntityClassMeta(xyz, entityClasses, entityClassName, waitForAllCallbacks);
+      }
     });
   }
 };
@@ -134,6 +160,20 @@ exports.patch = (entityClasses, uri, content, callback) => handleModifyRequest(e
 exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PUT', uri, content, callback);
 const PAGE_SIZE = 1000;
 
+function getMaxEntityCount (status, responseObjectContents) {
+  let maxEntityCount = 0;
+  for (const responseObjectContent of responseObjectContents) {
+    for (const entityClassName in responseObjectContent) {
+      // TODO check
+      const entityClassContent = status === 207
+        ? responseObjectContent[entityClassName].content
+        : responseObjectContent[entityClassName];
+      const entityIds = Object.keys(entityClassContent); // TODO check
+      if (entityIds.length > maxEntityCount) maxEntityCount = entityIds.length;
+    }
+  }
+  return maxEntityCount;
+}
 function getPartial (uri, entityClasses, dataCallback, originalOffset, originalLimit, offset) {
   if (typeof offset === 'undefined') offset = 0;
   if (typeof originalOffset === 'undefined') originalOffset = 0;
@@ -147,33 +187,16 @@ function getPartial (uri, entityClasses, dataCallback, originalOffset, originalL
       console.error('GET', uri, responseStringContent, e);
       return;
     }
-    // console.log('GET', uri, status, responseObjectContent);
-    // TODO replace null with current content?
-    // TODO handle multi requests
-    const state = entity.handleMultiInput('GET', uri, status, responseObjectContent, null, entityClasses);
-    // TODO  word er nog iets met state gedaan...?
-    if (typeof dataCallback === 'function') {
-      // determine the actually requested entityIds per ClassName
-      const entityIdsPerClassName = {};
-      const isMultiRequest = (responseObjectContent instanceof Array) && uri.includes(';');
-      const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
-      let maxEntityCount = 0;
-      for (const responseObjectContent of responseObjectContents) {
-        for (const entityClassName in responseObjectContent) {
-        // TODO check
-          const entityClassContent = status === 207
-            ? responseObjectContent[entityClassName].content
-            : responseObjectContent[entityClassName];
-          const entityIds = Object.keys(entityClassContent); // TODO check
-          entityIdsPerClassName[entityClassName] = entityIds;
-          if (entityIds.length > maxEntityCount) maxEntityCount = entityIds.length;
-        }
-      }
-      const node = entity.getMultiResponse(uri, entityClasses, 'GET', entityIdsPerClassName);
-      dataCallback(node);
-      if (maxEntityCount >= PAGE_SIZE) {
-        getPartial(uri, entityClasses, dataCallback, originalOffset, originalLimit, offset + PAGE_SIZE);
-      }
+
+    entity.handleMultiInput('GET', uri, status, responseObjectContent, null, entityClasses);
+
+    if (typeof dataCallback === 'function') dataCallback(); // TODO remove but still used by accessListener
+
+    // determine if we need to get another page
+    const isMultiRequest = (responseObjectContent instanceof Array) && uri.includes(';');
+    const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
+    if (getMaxEntityCount(status, responseObjectContents) >= PAGE_SIZE) {
+      getPartial(uri, entityClasses, dataCallback, originalOffset, originalLimit, offset + PAGE_SIZE);
     }
   });
 }

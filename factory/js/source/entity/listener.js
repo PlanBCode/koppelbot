@@ -1,5 +1,11 @@
 const State = require('./state.js').State;
-const eventNames = ['changed', 'created', 'removed', 'touched']; // TODO , 'error'
+const eventNames = [
+  'changed',
+  'created',
+  'removed',
+  'touched', // created, changed or deleted
+  'available' // on first retrieved/created
+]; // TODO , 'error'
 const response = require('./response.js');
 
 function Listener (listenerHandler, eventName, entityId, subUri) {
@@ -15,7 +21,9 @@ function ListenerHandler () {
   const listenersPerEntityIdPerEventNamePerSubUri = {};
 
   const callListeners = (eventName, entityId, listenerEntityId, node, subUri) => {
-    if (listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(listenerEntityId)) {
+    // DEBUG console.log('callListener', listenerEntityId, this.getUri(entityId) + '//' + (subUri || '') + ':' + eventName);
+
+    if (listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(listenerEntityId)) { // Nb  '*' case is handled by callAllListeners
       const listenersPerEventNamePerSubUri = listenersPerEntityIdPerEventNamePerSubUri[listenerEntityId];
       if (listenersPerEventNamePerSubUri.hasOwnProperty(eventName)) {
         const listenersPerSubUri = listenersPerEventNamePerSubUri[eventName];
@@ -24,8 +32,9 @@ function ListenerHandler () {
           for (const subUri in listenersPerSubUri) {
             const subPath = subUri === '' ? [] : subUri.split('/');
             const subNode = response.getSubNode(node, subPath);
-            // DEBUG console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
+            // DEBUG console.log('1-> callListener', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName, subNode);
             if (subNode) {
+              // DEBUG console.log('2-> callListener', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName);
               const listeners = listenersPerSubUri[subUri];
               listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName));
             }
@@ -33,8 +42,9 @@ function ListenerHandler () {
         } else if (listenersPerSubUri.hasOwnProperty(subUri)) {
           const subPath = subUri === '' ? [] : subUri.split('/');
           const subNode = response.getSubNode(node, subPath);
-          // DEBUG console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
+          // DEBUG console.log('1-> callListener', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName, subNode);
           if (subNode) {
+            // DEBUG console.log('2-> callListener', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName);
             const listeners = listenersPerSubUri[subUri];
             listeners.forEach(callback => callback(entityClassName, entityId, subNode, eventName));
           }
@@ -49,32 +59,41 @@ function ListenerHandler () {
     callListeners(eventName, entityId, entityId, node, subUri);
   };
 
-  this.callAtomicListeners = (state, entityId, node, subUri) => {
+  this.callAtomicListeners = (state, entityId, node, subUri, queryString, entityExisted) => {
+    // DEBUG console.log('callAtomicListeners', entityId, this.getUri(entityId) + '//' + (subUri || ''), listenersPerEntityIdPerEventNamePerSubUri, queryString, 'entityExisted', entityExisted);
+
     if (typeof entityId !== 'string') throw new TypeError('entityId is not a string.');
     if (!(state instanceof State)) throw new TypeError('state is not a State.');
-
     if (state.isRemoved()) {
       callAllListeners('changed', entityId, node, subUri);
       callAllListeners('removed', entityId, node, subUri);
-    } else if (state.isCreated()) {
+    } else if (state.isExtended()) {
+      callAllListeners('available', entityId, node, subUri); // TODO check if extention applicable to listener?
+    } else if (state.isCreated() || !entityExisted) { // TODO fix
       callAllListeners('created', entityId, node, subUri);
+      callAllListeners('changed', entityId, node, subUri);
+    } else if (state.isChanged()) {
       callAllListeners('changed', entityId, node, subUri);
       // TODO }else if(state.hasErrors()){
       //   callAllListeners('error', entityId, node, subUri);
-    } else if (state.isChanged()) {
-      callAllListeners('changed', entityId, node, subUri);
     } else {
       // nothing to do
     }
   };
 
   // used for touched event, to immediately return current available data
-  const callListenerWithCurrentEntities = (entityId, callback, subUri, contents) => {
-    const eventName = 'touched';
+  const callListenerWithAvailableEntities = (eventName, entityId, callback, subUri, contents, requestId, queryString) => {
+    const availableEntityIds = this.getAvailableEntityIds(entityId, queryString);
     const subPath = subUri === '' ? [] : subUri.split('/');
     const entityClassName = this.getEntityClassName();
+    // DEBUG console.log('callListenerWithAvailableEntities', this.getUri(entityId) + '//' + subPath.join('/') + ':' + eventName);
 
-    // DEBUG console.log('callListener', '/' + entityClassName + '/' + entityId + '/' + subUri + ':' + eventName);
+    for (const entityId of availableEntityIds) {
+      const node = this.getResponse(subPath, entityId, 'GET');
+      callback(entityClassName, entityId, node, eventName);
+    }
+    /*
+
     if (entityId === '*') {
       for (const entityId in contents) {
         const node = this.getResponse(subPath, entityId, 'GET');
@@ -83,10 +102,11 @@ function ListenerHandler () {
     } else {
       const node = this.getResponse(subPath, entityId, 'GET');
       callback(entityClassName, entityId, node, eventName);
-    }
+    } */
   };
-
-  this.addAtomicListener = (entityId, eventName, callback, subUri, contents) => {
+  // contents = entities = {[entityId]:true,...} for entities
+  this.addAtomicListener = (entityId, eventName, callback, subUri, contents, requestId, queryString) => {
+    // TODO use requestId
     if (typeof subUri === 'undefined') subUri = '';
     if (typeof subUri !== 'string') throw new TypeError('Listener subUri is not a string.');
     if (typeof callback !== 'function') throw new TypeError('Listener callback is not a function.');
@@ -94,9 +114,13 @@ function ListenerHandler () {
     if (typeof eventName !== 'string') throw new TypeError('Listener eventName is not a string.');
     if (eventNames.indexOf(eventName) === -1) throw new Error('Listener eventName "' + eventName + '"  is not in allowed event names: ' + eventNames.join(', ') + '.');
 
-    // if touched then fire the listeners for existing items
-    if (eventName === 'touched') {
-      callListenerWithCurrentEntities(entityId, callback, subUri, contents);
+    // DEBUG console.log('addListener', this.getUri(entityId) + '/' + subUri + ':' + eventName, requestId, queryString);
+
+    if (eventName === 'available') { // if available then fire the listeners for existing items
+      callListenerWithAvailableEntities(eventName, entityId, callback, subUri, contents, requestId, queryString);
+      this.addAtomicListener(entityId, 'created', callback, subUri, contents, requestId, queryString);
+    } else if (eventName === 'touched') { // if touched then fire the listeners for existing items
+      callListenerWithAvailableEntities(eventName, entityId, callback, subUri, contents, requestId, queryString);
       eventName = 'changed';
     }
 
@@ -113,10 +137,10 @@ function ListenerHandler () {
       listenersPerSubUri[subUri] = new Map();
     }
     const listeners = listenersPerSubUri[subUri];
-    const listener = new Listener(this, eventName, entityId, subUri);
+    const listener = new Listener(this, eventName, entityId, subUri); // TODO requestId, queryString
     listeners.set(listener, callback);
 
-    // for debug reasons output listener counts:
+    // DEBUG for debug reasons output listener counts:
     /* let count = 0;
     for (const entityId in listenersPerEntityIdPerEventNamePerSubUri) {
       const listenersPerEventNamePerSubUri = listenersPerEntityIdPerEventNamePerSubUri[entityId];
@@ -154,78 +178,6 @@ function ListenerHandler () {
     }
     return false;
   };
-
-  /* this.hasListeners = (entityId, eventName) => { //TODO upgrade with subUri
-        if (typeof entityId === 'undefined') {
-            return Object.keys(listenersPerEntityIdPerEventNamePerSubUri).length > 0;
-        } else if (entityId === '*') {
-            if (typeof eventName === 'undefined') {
-                return Object.keys(listenersPerEntityIdPerEventNamePerSubUri).length > 0;
-            } else if (typeof eventName === 'string') {
-                for (let entityId in listenersPerEntityIdPerEventNamePerSubUri) {
-                    if (listenersPerEntityIdPerEventNamePerSubUri[entityId].hasOwnProperty(eventName)) {
-                        return true;
-                    }
-                }
-                return false;
-            } else {
-                throw new TypeError("eventName is not a string.");
-            }
-        } else if (typeof entityId === 'string') {
-            if (listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(entityId)) {
-                if (typeof eventName === 'undefined') {
-                    return true;
-                } else if (typeof eventName === 'string') {
-                    return listenersPerEntityIdPerEventNamePerSubUri[entityId].hasOwnProperty(eventName);
-                } else {
-                    throw new TypeError("eventName is not a string.");
-                }
-            }
-        } else {
-            throw new TypeError("entityId is not a string.");
-        }
-    }; */
-
-  /* this.removeListeners = (entityId, eventName) => { //TODO upgrade with subUri
-        if (typeof entityId === 'undefined') {
-            for (let entityId in listenersPerEntityIdPerEventNamePerSubUri) {
-                delete listenersPerEntityIdPerEventNamePerSubUri[entityId];
-            }
-        } else if (entityId === '*') {
-            if (typeof eventName === 'undefined') {
-                for (let entityId in listenersPerEntityIdPerEventNamePerSubUri) {
-                    delete listenersPerEntityIdPerEventNamePerSubUri[entityId];
-                }
-            } else if (typeof eventName === 'string') {
-                for (let entityId in listenersPerEntityIdPerEventNamePerSubUri) {
-                    if (listenersPerEntityIdPerEventNamePerSubUri[entityId].hasOwnProperty(eventName)) {
-                        delete listenersPerEntityIdPerEventNamePerSubUri[entityId][eventName];
-                    }
-                }
-                if (Object.keys(listenersPerEntityIdPerEventNamePerSubUri[entityId]).length === 0) {
-                    delete listenersPerEntityIdPerEventNamePerSubUri[entityId];
-                }
-                return false;
-            } else {
-                throw new TypeError("eventName is not a string.");
-            }
-        } else if (typeof entityId === 'string') {
-            if (listenersPerEntityIdPerEventNamePerSubUri.hasOwnProperty(entityId)) {
-                if (typeof eventName === 'undefined') {
-                    delete listenersPerEntityIdPerEventNamePerSubUri[entityId];
-                } else if (typeof eventName === 'string') {
-                    delete listenersPerEntityIdPerEventNamePerSubUri[entityId][eventName];
-                    if (Object.keys(listenersPerEntityIdPerEventNamePerSubUri[entityId]).length === 0) {
-                        delete listenersPerEntityIdPerEventNamePerSubUri[entityId];
-                    }
-                } else {
-                    throw new TypeError("eventName is not a string.");
-                }
-            }
-        } else {
-            throw new TypeError("entityId is not a string.");
-        }
-    } */
 }
 
 exports.Handler = ListenerHandler;
