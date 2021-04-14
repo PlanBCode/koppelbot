@@ -1,20 +1,42 @@
 const entity = require('../entity/entity.js');
 const {setQueryParameter, getQueryParameter, multiSetQueryParameters, pathFromUri} = require('../uri/uri.js');
 
+const pendingRequests = [];
+
+function renderPendingRequestIndicator () {
+  let DIV_pendingRequestIndicator = document.getElementById('xyz-pendingRequestIndicator');
+
+  if (pendingRequests.length > 0) {
+    if (!DIV_pendingRequestIndicator) {
+      DIV_pendingRequestIndicator = document.createElement('DIV');
+      document.body.appendChild(DIV_pendingRequestIndicator);
+    }
+    DIV_pendingRequestIndicator.id = 'xyz-pendingRequestIndicator';
+    DIV_pendingRequestIndicator.style.display = 'block';
+  } else if (DIV_pendingRequestIndicator) DIV_pendingRequestIndicator.style.display = 'none';
+}
+
 function request (method, uri, data, callback) {
   // TODO set content type and length headers
   // TODO allow for multiple hosts by prepending http(s)://..
   const location = window.location.origin + '/';
 
+  renderPendingRequestIndicator();
   uri = uri.split(';').map(requestUri => setQueryParameter(requestUri, 'expand', 'true')).join(';');
   uri = encodeURI(uri);
+  pendingRequests.push(uri);
+
   const xhr = new window.XMLHttpRequest();
   xhr.open(method, location + 'api' + uri, true);
-
   xhr.onreadystatechange = () => {
     if (xhr.readyState === 4) {
       const status = xhr.status;
       const content = xhr.responseText;
+      const index = pendingRequests.indexOf(uri);
+      if (index !== -1) {
+        pendingRequests.splice(index, 1);
+        renderPendingRequestIndicator();
+      }
       callback(status, content);
     }
   };
