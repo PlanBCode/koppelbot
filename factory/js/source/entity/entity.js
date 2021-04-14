@@ -1,8 +1,9 @@
 const Property = require('./property.js').constructor;
 const listener = require('./listener.js');
 const uriTools = require('../uri/uri.js');
-const State = require('./state.js').State;
+const json = require('../web/json.js');
 const response = require('./response.js');
+
 const input = require('../request/input.js');
 const {getQueryParameter} = require('../web/web');
 
@@ -52,54 +53,58 @@ function EntityClass (xyz, entityClassName, rawSettings) {
   };
   this.getPath = entityId => [entityClassName, entityId];
 
-  const addEntityListener = (entityId, path, eventName, callback) => {
+  const addEntityListener = (entityId, path, eventName, callback, requestId, queryString) => {
     const listeners = [];
     if (path.length === 0) {
-      const listener = this.addAtomicListener(entityId, eventName, callback, '', entities);
+      const listener = this.addAtomicListener(entityId, eventName, callback, '', entities, requestId, queryString);
       listeners.push(listener);
     } else {
       const propertNameList = path[0];
       const propertyNames = propertNameList === '*'
         ? Object.keys(properties)
         : propertNameList.split(',');
-      const subPath = path.slice(1);
+      const propertyPath = path.slice(1);
       for (const propertyName of propertyNames) {
-        if (properties.hasOwnProperty(propertyName)) {
-          const propertyListeners = properties[propertyName].addPropertyListener(entityId, subPath, eventName, callback);
+        const basePropertyName = propertyName.split('.')[0];
+
+        if (properties.hasOwnProperty(basePropertyName)) {
+          const subPath = input.getSubPath(propertyPath, basePropertyName);
+
+          const propertyListeners = properties[basePropertyName].addPropertyListener(entityId, subPath, eventName, callback, requestId, queryString);
           listeners.push(...propertyListeners);
         } else {
           // TODO throw error?
-          console.error(propertyName + ' not available');
+          console.error(basePropertyName + ' not available');
         }
       }
     }
     return listeners;
   };
 
-  this.addListener = (path, eventName, callback) => {
+  this.addListener = (path, eventName, callback, requestId, queryString) => {
     // TODO check path, callback and eventName
     // TODO only if path.length <= 1 ? otherwise send to properties
     const listeners = [];
     const entityIds = (path.length === 0 || path[0] === '*')
       ? ['*']
       : path[0].split(',');
-    const subPath = path.splice(1);
+    const subPath = path.slice(1);
     for (const entityId of entityIds) {
-      const entityListeners = addEntityListener(entityId, subPath, eventName, callback);
+      const entityListeners = addEntityListener(entityId, subPath, eventName, callback, requestId, queryString);
       listeners.push(...entityListeners);
     }
     return listeners;
   };
 
-  this.getResponse = (path, entityId, method) => {
-    const propertyNames = (path.length === 0 || path[0] === '*')
+  this.getResponse = (propertyPath, entityId, method) => {
+    const propertyNames = (propertyPath.length === 0 || propertyPath[0] === '*')
       ? Object.keys(properties)
-      : path[0].split(',');
+      : propertyPath[0].split(',');
     const content = {};
     for (const propertyName of propertyNames) {
       const basePropertyName = propertyName.split('.')[0];
       if (properties.hasOwnProperty(basePropertyName)) {
-        const subPath = input.getSubPath(path, basePropertyName);
+        const subPath = input.getSubPath(propertyPath, basePropertyName);
         content[basePropertyName] = properties[basePropertyName].getResponse(subPath, entityId, method);
       } else {
         content[basePropertyName] = new response.Node(this, entityId, 400, null, [`${basePropertyName} does not exist.`], method); // TODO
@@ -118,11 +123,11 @@ function EntityClass (xyz, entityClassName, rawSettings) {
         : path[0].split(',');
     }
     const content = {};
-    const subPath = path.slice(1);
+    const propertyPath = path.slice(1);
 
     for (const entityId of entityIds) {
       const entityContent = entities.hasOwnProperty(entityId)
-        ? this.getResponse(subPath, entityId, method)
+        ? this.getResponse(propertyPath, entityId, method)
         : new response.Node(this, entityId, 404, null, [`/${entityClassName}/${entityId} not found.`], method); // TODO
       content[entityId] = entityContent;
     }
@@ -201,14 +206,20 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     return null;
   };
 
-  this.callListeners = (state, entityId) => { // TODO pass method?
-    this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()));
+  this.callListeners = (state, entityId, queryString, entityExisted) => { // TODO pass method?
+    // DEBUG console.log('Entity::callListeners', entityId, queryString, 'entityExisted', entityExisted);
+    const subUri = ''; // TODO not sure what to do
+    this.callAtomicListeners(state, entityId, this.getResponse([], entityId, state.getMethod()), subUri, queryString, entityExisted);
   };
 
-  const handleEntityIdInput = input.handle(this, statusses, properties, entities);
+  // TODO simplify argument passing?
+  const handleEntityIdInput = (path, method, entityId, responseStatus, responseContent, requestContent, queryString) => {
+    return input.handle(this, statusses, properties, entities)(path, method, entityId, responseStatus, responseContent, requestContent, queryString);
+  };
 
-  this.handleInput = (path, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
-    const state = new State(method);
+  this.handleInput = (path, queryString, method, entityClassStatus, entityClassContent, requestContent, entityIds) => {
+    // DEBUG console.log('Entity::handleInput', path, queryString);
+
     if (entityClassStatus === 207) {
       for (const entityId of entityIds) {
         const entity207Wrapper = entityClassContent[entityId];
@@ -224,9 +235,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
           const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
           const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
           const subPath = path.slice(1);
-          const entityState = handleEntityIdInput(subPath, method, entityId, entityStatus, entityContent, subRequestContent);
-          // TODO check with query
-          state.addSubState(entityState);
+          handleEntityIdInput(subPath, method, entityId, entityStatus, entityContent, subRequestContent, queryString);
         }
       }
     } else {
@@ -239,11 +248,9 @@ function EntityClass (xyz, entityClassName, rawSettings) {
         const requestEntityId = method === 'POST' ? 'new' : entityId; // for POST the request is done with new TODO fix for multiple
         const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[requestEntityId] : null;
         const subPath = path.slice(1);
-        const entityState = handleEntityIdInput(subPath, method, entityId, entityClassStatus, entityContent, subRequestContent);
-        state.addSubState(entityState);
+        handleEntityIdInput(subPath, method, entityId, entityClassStatus, entityContent, subRequestContent, queryString);
       }
     }
-    return state;
   };
 
   this.getSubObject = propertyName => properties[propertyName];
@@ -255,14 +262,60 @@ function EntityClass (xyz, entityClassName, rawSettings) {
 
     const DIV = document.createElement('DIV');
     for (const propertyName of propertyNames) {
-      if (properties.hasOwnProperty(propertyName)) {
-        const TAG = properties[propertyName].render(action, options, entityId);
+      const [basePropertyName, ...dotPropertyPath] = propertyName.split('.');
+      if (properties.hasOwnProperty(basePropertyName)) { // TODO do something with dotPropertyPath and subPath?
+        const TAG = properties[basePropertyName].render(action, options, entityId);
         DIV.appendChild(TAG);
       } else {
         // TODO error?
       }
     }
     return DIV;
+  };
+
+  this.isAvailable = path => {
+    const entityId = path[0];
+    if (!entities.hasOwnProperty(entityId)) return false;
+
+    const propertyNames = path.length === 1 || path[1] === '*'
+      ? Object.keys(properties)
+      : path[1].split(',');
+    for (const propertyName of propertyNames) {
+      const [basePropertyName, ...dotPropertyPath] = propertyName.split('.');
+      if (properties.hasOwnProperty(basePropertyName)) {
+        const subPropertyPath = dotPropertyPath.concat(path.slice(2));
+        if (!properties[basePropertyName].isAvailable(entityId, subPropertyPath)) return false;
+      } else {
+        // TODO error?
+      }
+    }
+    return true;
+  };
+
+  this.getAvailableEntityIds = (entityIdList, queryString) => {
+    const entityIds = entityIdList === '*'
+      ? Object.keys(entities)
+      : entityIdList.split(',').filter(entityId => entities.hasOwnProperty(entityId));
+    if (!queryString) {
+      return entityIds;
+    } else {
+      const entityPath = this.getPath(entityIdList).slice(1);
+      const queryFilters = uriTools.getQueryFilters('?' + queryString);
+      if (Object.keys(queryFilters).length === 0) return entityIds;
+      const filteredEntityIds = [];
+      const content = this.getEntityClassResponse(entityPath, 'get');
+      for (const entityId in content) {
+        const entityContent = content[entityId];
+        for (const propertyName in queryFilters) {
+          const propertyPath = propertyName.split('.');
+          const [operator, rhs] = queryFilters[propertyName];
+          const propertyContent = json.get(entityContent, propertyPath);
+          const lhs = propertyContent ? propertyContent.getContent() : null;
+          if (rhs == lhs) filteredEntityIds.push(entityId); // TODO use operator
+        }
+      }
+      return filteredEntityIds;
+    }
   };
 
   this.checkAccess = (propertyPath, method, groups) => {
@@ -301,23 +354,26 @@ const handleMultiInput = (method, uri, status, responseContent, requestContent, 
     }
     const requestUris = uri.split(';');
     for (let requestId = 0; requestId < requestUris.length; ++requestId) {
-      const requestUri = requestUris[requestId];
-      const subQueryString = requestUri.split('?')[1] || '';
-      const subMethod = getQueryParameter('method', subQueryString) || method;
+      const [requestUri, queryString] = requestUris[requestId].split('?');
+
+      const subMethod = getQueryParameter('method', queryString || '') || method;
       const subRequestContent = requestContent === null ? null : requestContent[requestId];
       if (status === 207) {
         const subResponseContent = responseContent[requestId].content; // TOOD check
         const subStatus = responseContent[requestId].status;
-        handleInput(subMethod, requestUri, subStatus, subResponseContent, subRequestContent, entityClasses);
+        handleInput(subMethod, requestUri, queryString, subStatus, subResponseContent, subRequestContent, entityClasses);
       } else {
-        handleInput(subMethod, requestUri, status, responseContent[requestId], subRequestContent, entityClasses);
+        handleInput(subMethod, requestUri, queryString, status, responseContent[requestId], subRequestContent, entityClasses);
       }
     }
-  } else handleInput(method, uri, status, responseContent, requestContent, entityClasses);
+  } else {
+    const [requestUri, queryString] = uri.split('?');
+    handleInput(method, requestUri, queryString, status, responseContent, requestContent, entityClasses);
+  }
 };
 
-const handleInput = (method, uri, status, responseContent, requestContent, entityClasses) => {
-  const state = new State(method);
+const handleInput = (method, uri, queryString, status, responseContent, requestContent, entityClasses) => {
+  // DEBUG console.log('handleInput', uri, queryString, responseContent);
   // TODO check status
 
   const path = uriTools.pathFromUri(uri);
@@ -341,8 +397,7 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
           : entityIdList.split(',');
         const subRequestContent = typeof requestContent === 'object' && requestContent !== null ? requestContent[entityClassName] : null;
         const subPath = path.slice(1);
-        const entityClassState = entityClass.handleInput(subPath, method, entityClassStatus, entityClassContent, subRequestContent, entityIds);
-        state.addSubState(entityClassState);
+        entityClass.handleInput(subPath, queryString, method, entityClassStatus, entityClassContent, subRequestContent, entityIds);
       }
     }
   } else {
@@ -355,19 +410,16 @@ const handleInput = (method, uri, status, responseContent, requestContent, entit
           ? []
           : entityIdList.split(',');
         const entityClass = entityClasses[entityClassName];
-        const entityClassState = entityClass.handleInput(subPath, method, 404, {}, subRequestContent, entityIds);
-        state.addSubState(entityClassState);
+        entityClass.handleInput(subPath, queryString, method, 404, {}, subRequestContent, entityIds);
       } else {
         const entityIds = entityIdList === '*'
           ? Object.keys(entityClassContent)
           : entityIdList.split(',');
         const entityClass = entityClasses[entityClassName];
-        const entityClassState = entityClass.handleInput(subPath, method, status, entityClassContent, subRequestContent, entityIds);
-        state.addSubState(entityClassState);
+        entityClass.handleInput(subPath, queryString, method, status, entityClassContent, subRequestContent, entityIds);
       }
     }
   }
-  return state;
 };
 
 /**
@@ -469,11 +521,24 @@ const checkAccess = (entityClasses, uri, method) => {
   return true;
 };
 
+function getIdPropertyPath (entityClasses, entityClassName) {
+  if (!entityClasses.hasOwnProperty(entityClassName)) return null;
+  else return entityClasses[entityClassName].getIdPropertyPath();
+}
+
+function isAvailable (entityClasses, path) {
+  if (!(path instanceof Array)) console.error('Expected array path.');
+  const entityClassName = path[0];
+  if (!entityClasses.hasOwnProperty(entityClassName)) return false;
+  return entityClasses[entityClassName].isAvailable(path.slice(1));
+}
 exports.isAutoIncremented = isAutoIncremented;
 exports.getTitlePropertyPath = getTitlePropertyPath;
 exports.getDisplayName = getDisplayName;
 exports.checkAccess = checkAccess;
 
-exports.getMultiResponse = getMultiResponse;
+exports.getMultiResponse = getMultiResponse;// TODO remove
 exports.Class = EntityClass;
 exports.handleMultiInput = handleMultiInput;
+exports.isAvailable = isAvailable;
+exports.getIdPropertyPath = getIdPropertyPath;

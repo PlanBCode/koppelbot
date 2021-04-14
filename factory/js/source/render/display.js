@@ -55,8 +55,7 @@ const renderDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId
     ? uri.split(';')[requestId]
     : uri;
 
-  const path = uriTools.pathFromUri(requestUri);
-  node = response.filter(node, path.slice(2)); // filter the content that was not requested
+  // OUTDATED node = response.filter(node, path.slice(2)); // filter the content that was not requested
 
   const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClassName, entityId, node, requestUri, requestId);
   uiElementFirst(display, displayItem);
@@ -93,11 +92,29 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
       displayListenersPerWrapper.delete(WRAPPER);
     }
   });
-  const baseUri = uriTools.getBaseUri(uri); // TODO handle multi uri
-  const createdListeners = xyz.on(baseUri, 'created', renderDisplay(xyz, uri, options, WRAPPER));
-  const removedListeners = xyz.on(baseUri, 'removed', removeDisplay(xyz, uri, options, WRAPPER));
+  WRAPPER.entityIds = {};
 
-  displayListenersPerWrapper.set(WRAPPER, [...createdListeners, ...removedListeners]);
+  const availableListeners = xyz.on(uri, 'available', (entityClassName, entityId, node, eventName, requestId) => {
+    if (WRAPPER.entityIds.hasOwnProperty(entityId)) return;
+    const path = uriTools.pathFromUri(uri);
+    path[1] = entityId;
+
+    if (xyz.isAvailable(path)) { // TODO move to listeners?
+      WRAPPER.entityIds[entityId] = true;
+      const entityPath = uri.split('/');
+      entityPath[2] = entityId;
+      const entityUri = entityPath.join('/');
+      const entityContent = xyz.getContent(entityUri)[entityClassName][entityId]; // TODO check
+      renderDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, entityContent, eventName, requestId);
+    }
+  });
+  const removedListeners = xyz.on(uri, 'removed', (entityClassName, entityId, node, eventName, requestId) => {
+    if (!WRAPPER.entityIds.hasOwnProperty(entityId)) return;
+    delete WRAPPER.entityIds[entityId];
+    removeDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node, eventName, requestId);
+  });
+
+  displayListenersPerWrapper.set(WRAPPER, [...availableListeners, ...removedListeners]);
 };
 
 const renderUiElement = (xyz, options, WRAPPER) => {
@@ -119,40 +136,20 @@ const renderUiElement = (xyz, options, WRAPPER) => {
   const displayItem = new DisplayItem(xyz, action, options, WRAPPER, entityClass, entityId, null, uri, undefined);
 
   uiElementWaitingForData(display, displayItem);
-  const isMultiRequest = uri.includes(';');
-  const eventName = undefined; // added for clarity
-  const readyCallback = uri => {
-    // TODO this can be called multiple times on variable changes,
+  const readyCallback = uri => { // Nb this can be called multiple times on variable changes,
     uiElementEmpty(display, displayItem);
-    xyz.get(uri, node => { // TODO this should be handled by having an available instead of created listener
-      const nodes = isMultiRequest ? node : [node];
-      WRAPPER.classList.remove('xyz-waiting-for-data');
-      for (let requestId = 0; requestId < nodes.length; ++requestId) {
-        const node = nodes[requestId];
-        for (const entityClassName in node) {
-          for (const entityId in node[entityClassName]) {
-            renderDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node[entityClassName][entityId], eventName, isMultiRequest ? requestId : undefined);
-          }
-        }
-      }
-
-      // TODO addListeners(xyz, uri, options, WRAPPER);
-    });
+    addListeners(xyz, uri, options, WRAPPER);
+    xyz.get(uri);
   };
 
   const onChange = () => {
     const resolvedUri = uriTools.resolveVariablesInUri(uri);
-    if (uriTools.uriHasUnresolvedVariables(resolvedUri)) {
-      uiElementWaitingForInput(display, displayItem);
-    } else {
-      readyCallback(resolvedUri);
-    }
+    if (uriTools.uriHasUnresolvedVariables(resolvedUri)) uiElementWaitingForInput(display, displayItem);
+    else readyCallback(resolvedUri);
   };
 
   const variableNames = uriTools.getVariableNamesFromUri(uri);
-  for (const variableName of variableNames) {
-    variables.onVariable(variableName, onChange);
-  }
+  for (const variableName of variableNames) variables.onVariable(variableName, onChange);
 
   const waitCallback = () => uiElementWaitingForInput(display, displayItem);
   registerUri(xyz, uri, readyCallback, waitCallback, options.dynamic);

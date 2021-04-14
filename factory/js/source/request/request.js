@@ -21,6 +21,22 @@ function request (method, uri, data, callback) {
   xhr.send(data);
 }
 
+const retrieveEntityClassMeta = (xyz, entityClasses, entityClassName, callback) => {
+  const meta = xyz.metas[entityClassName];
+  const referencedEntityClassNames = new Set();
+  for (const propertyName in meta) {
+    const settings = meta[propertyName];
+    if (settings.type === 'reference') {
+      const referenceEntityClassName = settings.uri.split('/')[1]; // TODO check
+      if (!xyz.metas.hasOwnProperty(referenceEntityClassName)) referencedEntityClassNames.add(referenceEntityClassName);
+    }
+  }
+  if (referencedEntityClassNames.size === 0) callback();
+  else {
+    retrieveMeta(xyz, entityClasses, '/' + [...referencedEntityClassNames].join(','), callback);
+  }
+};
+
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
   const requestedEntityClassNames = uri.split(';') // '/a;/b' -> ['/a','/b,c']
     .map(requestUri => pathFromUri(requestUri)) //  -> [['a'],['b,c']]
@@ -31,12 +47,11 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     // TODO unique?
     ;
 
-  const entityClassNames = requestedEntityClassNames.filter(entityClass => !entityClasses.hasOwnProperty((entityClass)));
-  if (entityClassNames.length === 0) {
-    callback();
-  } else {
+  const entityClassNames = requestedEntityClassNames.filter(entityClass => !entityClasses.hasOwnProperty(entityClass));
+  if (entityClassNames.length === 0) callback();
+  else {
     const metaUri = setQueryParameter('/entity/' + entityClassNames.join(','), 'expand', 'true');
-    request('GET', metaUri, undefined, (status, content) => { // TODO add querystring better
+    request('GET', metaUri, undefined, (status, content) => {
       // TODO check status
       // console.log(metaUri, content);
       let data;
@@ -51,44 +66,31 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
         console.error('PROBLEM parsing meta response', data);
         return;
       }
-      const waitForEntityClassNames = new Set('*'); // add '*' to ensure callbacks being called correctly
-      const metas = {};
-      const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
-        if (waitForEntityClassNames.size === 0) {
-          for (const entityClassName in metas) {
-            if (!entityClasses.hasOwnProperty(entityClassName)) {
-              entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, metas[entityClassName]);
-            }
-          }
-          callback();
-        }
-      };
-      for (const entityClassName of entityClassNames) {
-        if (!entityClasses.hasOwnProperty(entityClassName)) {
-          if (!data.entity.hasOwnProperty(entityClassName)) {
-            console.error(`Entity data not found for '${entityClassName}'`);
-            return;
-          } else {
-            const meta = data.entity[entityClassName].content; // TODO validate data
-            metas[entityClassName] = meta;
-            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, meta);
 
-            for (const propertyName in meta) {
-              const settings = meta[propertyName];
-              if (settings.type === 'reference') {
-                const referenceEntityClassName = settings.uri.split('/')[1]; // TODO check
-                waitForEntityClassNames.add(referenceEntityClassName);
-                retrieveMeta(xyz, entityClasses, '/' + referenceEntityClassName, () => {
-                  waitForEntityClassNames.delete(referenceEntityClassName);
-                  waitForAllCallbacks();
-                });
-              }
-            }
+      const waitForAllCallbacks = () => { // check if all reference meta's have been retrieved as well
+        for (const entityClassName of entityClassNames) {
+          if (!xyz.metas.hasOwnProperty(entityClassName)) return;
+        }
+        for (const entityClassName of entityClassNames) {
+          if (!entityClasses.hasOwnProperty(entityClassName)) {
+            entityClasses[entityClassName] = new entity.Class(xyz, entityClassName, xyz.metas[entityClassName]);
           }
+        }
+        callback();
+      };
+
+      for (const entityClassName of entityClassNames) {
+        if (!data.entity.hasOwnProperty(entityClassName)) {
+          console.error(`Entity data not found for '${entityClassName}'`);
+          return;
+        } else {
+          const meta = data.entity[entityClassName].content; // TODO validate data
+          xyz.metas[entityClassName] = meta;
         }
       }
-      waitForEntityClassNames.delete('*');
-      waitForAllCallbacks();
+      for (const entityClassName of entityClassNames) {
+        retrieveEntityClassMeta(xyz, entityClasses, entityClassName, waitForAllCallbacks);
+      }
     });
   }
 };

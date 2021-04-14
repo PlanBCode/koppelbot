@@ -8,16 +8,22 @@ require('./web/ui');
 
 function XYZ () {
   const entityClasses = {};
+  this.metas = {};
 
   this.isAutoIncremented = entityClassName => entity.isAutoIncremented(entityClasses, entityClassName);
   this.getTitlePropertyPath = entityClassName => entity.getTitlePropertyPath(entityClasses, entityClassName);
   this.getDisplayName = (entityClassName, propertyPath) => entity.getDisplayName(entityClasses, entityClassName, propertyPath);
+  this.isAvailable = path => entity.isAvailable(entityClasses, path);
+  this.getContent = uri => entity.getMultiResponse(uri, entityClasses, 'GET');
 
   this.on = (uri, eventName, callback) => on(this, entityClasses, uri, eventName, callback);
   this.ui = (options, WRAPPER) => ui(this, entityClasses, options, WRAPPER);
   this.checkAccess = (uri, method) => entity.checkAccess(entityClasses, uri, method);
 
-  this.getMeta = entityClassName => entityClasses.hasOwnProperty(entityClassName) ? entityClasses[entityClassName].getSettings() : {};
+  this.getMeta = entityClassName => {
+    if (!this.metas.hasOwnProperty(entityClassName)) throw new Error(`${entityClassName} not available.`);
+    return this.metas[entityClassName];
+  };
 
   this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);
   this.head = (uri, callback) => request.head(uri, callback);

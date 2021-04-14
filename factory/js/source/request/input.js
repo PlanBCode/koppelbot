@@ -72,12 +72,12 @@ function updateContents (path, state, method, responseStatus, responseContent, c
   }
 }
 
-exports.handlePrimitive = (element, contents, statusses) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
+exports.handlePrimitive = (element, contents, statusses) => (path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted) => {
   if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
   if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
+  // DEBUG console.log('Input::handlePrimitive', path, method, entityId, queryString, 'entityExisted', entityExisted);
 
   const state = new State(method);
-
   if (contents.hasOwnProperty(entityId)) {
     updateContents(path, state, method, responseStatus, responseContent, contents, entityId);
   } else if (entityId === '*') {
@@ -88,16 +88,16 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
     switch (responseStatus) {
       case 200:
         if (typeof responseContent !== 'undefined') {
-          state.setChanged(); // TODO if new array value then Created
-          // for post and put methods, if no responseContent is returned, use the the requestContent instead
-          if ((method === 'PUT' || method === 'POST' || method === 'PATCH') && responseContent === null) {
-            contents[entityId] = requestContent;
-          } else {
-            contents[entityId] = responseContent;
-          }
           if (method === 'DELETE') {
             if (path.length === 0) state.setRemoved();
             else state.setChanged();
+          } else {
+            state.setCreated();
+            state.setChanged();
+            // for post and put methods, if no responseContent is returned, use the the requestContent instead
+            contents[entityId] = ((method === 'PUT' || method === 'POST' || method === 'PATCH') && responseContent === null)
+              ? requestContent
+              : responseContent;
           }
         }
         break;
@@ -122,7 +122,7 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
     }
   }
   statusses[entityId] = state.getStatus();
-  element.callListeners(state, entityId, method);
+  element.callListeners(state, entityId, queryString, entityExisted);
   return state;
 };
 
@@ -190,16 +190,21 @@ function getSubContent (content, propertyName, subPath) {
   }
 }
 
-exports.handle = (element, statusses, subProperties, entities) => (path, method, entityId, responseStatus, responseContent, requestContent) => {
+exports.handle = (element, statusses, subProperties, entities) => (path, method, entityId, responseStatus, responseContent, requestContent, queryString, entityExisted) => {
   if (typeof entityId !== 'string') throw new TypeError('entityId not a string.');
   if (typeof responseStatus !== 'number') throw new TypeError('responseStatus not a number.');
 
   const state = new State(method);
 
+  // TODO handle other methods?
   if (entities) { // only for entity
-    if (!entities.hasOwnProperty(entityId)) state.setCreated();
+    if (!entities.hasOwnProperty(entityId) && method === 'GET') {
+      entityExisted = false;
+      state.setCreated(); // TODO here lies the problem!!
+    } else entityExisted = true;
     entities[entityId] = true; // TODO hier moet meer mee
   }
+  // DEBUG console.log('Input::handle', path, entityId, queryString, 'entityExisted', entityExisted);
 
   if (responseStatus === 207) {
     for (const subPropertyName in subProperties) {
@@ -217,7 +222,7 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
           const subResponseContent = getSubContent(subProperty207Wrapper.content, subPropertyName, subPath);
           const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
           const subProperty = subProperties[subPropertyName];
-          const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent);
+          const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent, queryString, entityExisted);
           state.addSubState(subState);
         }
       }
@@ -229,12 +234,11 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
         const subResponseContent = getSubContent(responseContent, subPropertyName, subPath);
         const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
         const subProperty = subProperties[subPropertyName];
-        const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent);
+        const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent, queryString, entityExisted);
         state.addSubState(subState);
       }
     }
   }
   statusses[entityId] = state.getStatus();
-  element.callListeners(state, entityId);
   return state;
 };
