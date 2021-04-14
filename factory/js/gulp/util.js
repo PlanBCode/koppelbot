@@ -10,7 +10,9 @@ exports.baseName = function baseName (str) {
 };
 
 const handleError = cb => (error, stdout, stderr) => {
-  if (error !== null) console.error(`Error: ${error}\n ${stderr}`);
+  if (error !== null) {
+    console.error(`Error: ${error}\n ${stdout} ${stderr}`);
+  }
   cb();
 };
 
