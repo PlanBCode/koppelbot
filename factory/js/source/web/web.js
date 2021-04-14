@@ -95,7 +95,7 @@ exports.setQueryParameters = function (queryParameters, operator = '=', queryStr
   for (const queryParameterName in queryParameters) {
     const value = queryParameters[queryParameterName];
     let subChanged;
-    [subChanged, updatedQueryString] = updateQueryParameter(queryParameterName, value, operator, queryString);
+    [subChanged, updatedQueryString] = updateQueryParameter(queryParameterName, value, operator, updatedQueryString);
     if (subChanged) changed = true;
   }
 
