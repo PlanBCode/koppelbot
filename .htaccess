@@ -1,6 +1,9 @@
 php_flag display_errors on
 RewriteEngine On
 
+# Pass-through letsencrypt challenges
+RewriteRule .well-known/(.*) .well-known/$1 [L]
+
 # Relay all calls to https
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
