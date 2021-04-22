@@ -1,11 +1,12 @@
 // parse choices from attribute string if required
 function getChoices (item) {
   let choices = item.getSetting('choices');
-  if (typeof choices === 'string')
-    if (choices.startsWith('[')) choices = JSON.parse(choices);
+  if (typeof choices === 'string') {
+    if (choices.startsWith('[') || choices.startsWith('{')) choices = JSON.parse(choices);
     else choices = choices.split(',');
+  }
 
-  if (!(choices instanceof Array)) choices = [];
+  if (typeof choices !== 'object' || choices === null) choices = [];
   return choices;
 }
 
@@ -30,12 +31,13 @@ exports.actions = {
 
     const subSettings = item.getSetting('subType') || {}; // TODO use
     const content = item.getContent();
-    for (const choice of choices) {
+    for (const key in choices) {
+      const value = choices instanceof Array ? choices[key] : key;
+      const text = choices[key];
       const OPTION = document.createElement('OPTION');
-      if (choice === content) OPTION.selected = true;
-
-      OPTION.innerText = choice; // TODO render choice content
-      // OPTION.value = choice;
+      if (value === content) OPTION.selected = true;
+      OPTION.value = value;
+      OPTION.innerText = text; // TODO render choice content
       // item.renderSubElement('view', ??, item.getStatus(), choice, subSettings, options);
       SELECT.appendChild(OPTION);
     }
@@ -51,13 +53,18 @@ exports.actions = {
   },
   view: function (item) {
     const subSettings = item.getSetting('subType') || {};
-    // not item.onChange required this is handled by this:
-    const TAG = item.renderSubElement('view', [], item.getStatus(), item.getContent(), subSettings, item.getOptions());
+    // TODO MAYBE no item.onChange required this is handled by this:
+    const choices = getChoices(item) || [];
+    const choice = choices instanceof Array
+      ? item.getContent()
+      : choices[item.getContent()];
+    const TAG = item.renderSubElement('view', [], item.getStatus(), choice, subSettings, item.getOptions());
     return TAG;
   },
   validateContent: function (item) {
     const choices = getChoices(item);
-    if (!(choices instanceof Array)) return false;
-    return choices.indexOf(item.getContent()) !== -1;
+    if (typeof choices !== 'object' || choices === null) return false;
+    if (choices instanceof Array) return choices.includes(item.getContent());
+    return choices.hasOwnProperty(item.getContent());
   }
 };
