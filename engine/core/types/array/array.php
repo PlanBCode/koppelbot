@@ -28,4 +28,22 @@ class Type_array extends Type
             $subTypeClass::validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings)
             );
     }
+
+    static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
+    {
+        //TODO also stringify setting
+        if(array_key_exists('separator', $settings)){
+          $stringifiedContent = implode($settings['separator'],$newContent);
+          return ProcessResponse(200, $stringifiedContent); // TODO catch error?
+        } else return new ProcessResponse(200, $newContent);
+    }
+
+    static function processAfterConnector(string $method, &$content, array &$settings): ProcessResponse
+    {
+      //TODO also stringify setting
+      if(array_key_exists('separator', $settings)){
+        $parsedContent = explode($settings['separator'],$content);
+        return new ProcessResponse(200, $parsedContent);
+      } else return new ProcessResponse(200, $content);
+    }
 }
