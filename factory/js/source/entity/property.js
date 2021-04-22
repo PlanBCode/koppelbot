@@ -28,7 +28,9 @@ exports.constructor = function Property (xyz, parent, propertyName, settings) {
       const referenceEntityClassName = settings.uri.split('/')[1];// TODO check
       const meta = xyz.getMeta(referenceEntityClassName);
       for (const subPropertyName in meta) {
-        subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, meta[subPropertyName]);
+        if (meta[subPropertyName].type !== 'reference') { // no nested references
+          subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, meta[subPropertyName]);
+        }
       }
     } else {
       for (const subPropertyName in settings.signature) {

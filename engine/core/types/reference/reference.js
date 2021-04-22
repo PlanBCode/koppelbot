@@ -25,8 +25,9 @@ exports.actions = {
       const referenceUri = '/' + referenceEntityClassName + '/' + referenceEntityId +
        (titlePropertyPath === null ? '' : '/' + titlePropertyPath.join('/'));
       // TODO options : display:'flat'
-
-      item.ui({uri: referenceUri, display: 'title', onReady: item.getOption('onReady')}, SPAN);
+      if (referenceEntityId) {
+        item.ui({uri: referenceUri, display: 'title', onReady: item.getOption('onReady')}, SPAN);
+      } else SPAN.innerHTML = '-';
     };
     changeHandler(item);
     return SPAN;
