@@ -42,7 +42,7 @@ class Type_array extends Type
     {
       //TODO also stringify setting
       if(array_key_exists('separator', $settings)){
-        $parsedContent = explode($settings['separator'],$content);
+        $parsedContent = empty($content)  ? [] :  explode($settings['separator'],$content);
         return new ProcessResponse(200, $parsedContent);
       } else return new ProcessResponse(200, $content);
     }

@@ -25,4 +25,31 @@ class Type_object extends Type
         $subTypeClass = Type::get($subTypeName);
         return count($subPropertyPath) <= 1 || $subTypeClass::validateSubPropertyPath(array_slice($subPropertyPath, 1), $subSettings);
     }
+
+    static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
+    {
+        //TODO also stringify setting
+        if(array_key_exists('separator', $settings)){
+          $stringifiedContent = '';
+          foreach ($value as $key => $value) {
+            if($stringifiedContent!=='') $stringifiedContent.=',';
+            $stringifiedContent.= $key.":".$value;
+          }
+          return ProcessResponse(200, $stringifiedContent); // TODO catch error?
+        } else return new ProcessResponse(200, $newContent);
+    }
+
+    static function processAfterConnector(string $method, &$content, array &$settings): ProcessResponse
+    {
+      //TODO also stringify setting
+      if(array_key_exists('separator', $settings)){
+        $keyValuePairs = empty($content) ? [] :  explode($settings['separator'],$content);
+        $parsedContent = [];
+        foreach ($keyValuePairs as $keyValuePair) {
+          $keyValue = explode(':',$keyValuePair);
+          $parsedContent[$keyValue[0]] = $keyValue[1];
+        }
+        return new ProcessResponse(200, $parsedContent);
+      } else return new ProcessResponse(200, $content);
+    }
 }
