@@ -112,13 +112,15 @@ exports.actions = {
       const TR = document.createElement('TR');
       const TD_key = document.createElement('TD');
       const TD_value = document.createElement('TD');
-      if (keySubSettings === null) TD_key.innerText = key;
+      if (keySubSettings === null) TD_key.innerHTML = key + '&nbsp;:&nbsp;';
       else {
         const TAG_key = item.renderSubElement('view', ['_key_'], item.getStatus(), key, keySubSettings, subOptions);
         TD_key.appendChild(TAG_key);
+        const SPAN_colon = document.createElement('SPAN');
+        SPAN_colon.innerHTML = '&nbsp;:&nbsp;';
+        TD_key.appendChild(SPAN_colon);
       }
       TR.appendChild(TD_key);
-      console.log('view:', key, subContent, subSettings, subOptions);
       const TAG = item.renderSubElement('view', [key], item.getStatus(), subContent, subSettings, subOptions);
       TD_value.appendChild(TAG);
       TR.appendChild(TD_value);

@@ -31,8 +31,10 @@ class Type_array extends Type
 
     static function processBeforeConnector(string $method, &$newContent, &$currentContent, array &$settings): ProcessResponse
     {
-        //TODO also stringify setting
-        if(array_key_exists('separator', $settings)){
+        if(array_get($settings, 'stringify', false)){
+          $stringifiedContent = json_encode($newContent);
+          return ProcessResponse(200, $stringifiedContent); // TODO catch error?
+        } else if(array_key_exists('separator', $settings)){
           $stringifiedContent = implode($settings['separator'],$newContent);
           return ProcessResponse(200, $stringifiedContent); // TODO catch error?
         } else return new ProcessResponse(200, $newContent);
@@ -41,7 +43,18 @@ class Type_array extends Type
     static function processAfterConnector(string $method, &$content, array &$settings): ProcessResponse
     {
       //TODO also stringify setting
-      if(array_key_exists('separator', $settings)){
+      $stringify = array_get($settings, 'stringify', false);
+      if($stringify){
+        $parsedContent = json_decode($content);
+        if(is_null($parsedContent)){
+          if(is_null($content) || $content === 'null' || $content === ""){ // parsing didn't fail, it just return null
+              return  new ProcessResponse(200, $parsedContent);
+           } else {
+             $error = 'Failed to parse JSON.';
+             return new ProcessResponse(500, $error); // TODO add json error?
+          }
+        } else return new ProcessResponse(200, $parsedContent);
+      }else if(array_key_exists('separator', $settings)){
         $parsedContent = empty($content)  ? [] :  explode($settings['separator'],$content);
         return new ProcessResponse(200, $parsedContent);
       } else return new ProcessResponse(200, $content);
