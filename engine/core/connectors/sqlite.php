@@ -119,6 +119,7 @@ class Connector_sqlite extends Connector
 
         $keysPerTable = [];
         $entityIdsPerTable = [];
+        $idPropertyPerTable = [];
         foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
           $propertyPath = $propertyRequest->getPropertyPath();
           $propertyName = $propertyPath[0]; //TODO check
@@ -134,6 +135,13 @@ class Connector_sqlite extends Connector
             $entityIdsPerTable[$table] = [];
           }
           $keysPerTable[$table][$key] = $propertyRequest;
+          $entityClassName = $propertyRequest->getEntityClassName();
+          $accessGroups = [];
+          $entityClass = EntityClass::get($entityClassName,$accessGroups);
+          $idPropertyName = $entityClass->getIdPropertyName();
+          $idPropertyPath = [$idPropertyName];
+          $idProperty = $entityClass->getProperty($idPropertyPath);
+          $idPropertyPerTable[$table] = $idProperty->getConnectorSetting('key', $idPropertyName);
           foreach($entityIds as $entityId){
             $entityIdsPerTable[$table][$entityId] = true;
           }
@@ -147,7 +155,7 @@ class Connector_sqlite extends Connector
         }
 
         foreach($keysPerTable as $table=>$keys){
-          $idKey='ID'; //TODO determine id properly /match with $propertyRequest?
+          $idKey=$idPropertyPerTable[$table];
           $entityIds = $entityIdsPerTable[$table];
           $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table);
           $result = $this->db->query($queryString);

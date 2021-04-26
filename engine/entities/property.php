@@ -79,7 +79,7 @@ class  PropertyRequest
         } else {
 
             $this->property = $propertyOrError;
-            if($this->property->getTypeName() === 'reference') $this->propertyPath = [$propertyPath[0]];            
+            if($this->property->getTypeName() === 'reference') $this->propertyPath = [$propertyPath[0]];
             $this->content = $propertyContent;
             $this->status = 200;
             $connectorSettings = $this->property->getConnectorSettings();
@@ -159,7 +159,12 @@ class  PropertyRequest
         $this->entityIdList = $entityIdList;
     }
 
-    public function getEntityClass(): string //TODO rename getEntityClassName
+    public function getEntityClass(): string //TODO depricate
+    {
+        return $this->entityClassName;
+    }
+
+    public function getEntityClassName(): string //TODO rename getEntityClassName
     {
         return $this->entityClassName;
     }
