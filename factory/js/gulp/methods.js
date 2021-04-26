@@ -11,7 +11,11 @@ const generateRequiresFile = (name, component) => function generateRequiresFile 
   forEachFile(`../../engine/core/${name}/*:../../custom/*/${name}/*`,
     file => cb => {
       const id = baseName(file.path);
-      const folder = '../../../engine/core'; // TODO could also be custom/something
+      const splitPath = file.path.split('/');
+      const moduleName = splitPath[splitPath.length - 3];
+      const folder = moduleName === 'core'
+        ? '../../../engine/core'
+        : `../../../custom/${moduleName}`;
       if (name === 'types') {
         js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
         js += `exports.${baseName(file.path)}.json = require('${folder}/${name}/${id}/${id}.json');\n\n`;

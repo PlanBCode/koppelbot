@@ -48,16 +48,29 @@ const retrieveEntityClassMeta = (xyz, entityClasses, entityClassName, callback) 
   const referencedEntityClassNames = new Set();
   for (const propertyName in meta) {
     const settings = meta[propertyName];
-    if (settings.type === 'reference') {
-      const referenceEntityClassName = settings.uri.split('/')[1]; // TODO check
-      if (!xyz.metas.hasOwnProperty(referenceEntityClassName)) referencedEntityClassNames.add(referenceEntityClassName);
+    const moreReferencedEntityClassNames = getReferencedEntityClassNames(settings);
+    for (const referenceEntityClassName of moreReferencedEntityClassNames) {
+      if (entityClassName !== referenceEntityClassName && !xyz.metas.hasOwnProperty(referenceEntityClassName)) referencedEntityClassNames.add(referenceEntityClassName);
     }
   }
   if (referencedEntityClassNames.size === 0) callback();
-  else {
-    retrieveMeta(xyz, entityClasses, '/' + [...referencedEntityClassNames].join(','), callback);
-  }
+  else retrieveMeta(xyz, entityClasses, '/' + [...referencedEntityClassNames].join(','), callback);
 };
+
+function getReferencedEntityClassNames (settings) {
+  const referencedEntityClassNames = [];
+  if (settings.hasOwnProperty('subType')) {
+    referencedEntityClassNames.push(...getReferencedEntityClassNames(settings.subType));
+  }
+  if (settings.hasOwnProperty('keyType')) {
+    referencedEntityClassNames.push(...getReferencedEntityClassNames(settings.keyType));
+  }
+  if (settings.type === 'reference') {
+    const referenceEntityClassName = settings.uri.split('/')[1];
+    referencedEntityClassNames.push(referenceEntityClassName);
+  }
+  return referencedEntityClassNames;
+}
 
 const retrieveMeta = (xyz, entityClasses, uri, callback) => {
   const requestedEntityClassNames = uri.split(';') // '/a;/b' -> ['/a','/b,c']
@@ -68,7 +81,6 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
     .filter(entityClassName => entityClassName !== '')
     // TODO unique?
     ;
-
   const entityClassNames = requestedEntityClassNames.filter(entityClass => !entityClasses.hasOwnProperty(entityClass));
   if (entityClassNames.length === 0) callback();
   else {
@@ -100,15 +112,22 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
         }
         callback();
       };
-
+      const moreReferencedEntityClassNames = [];
       for (const entityClassName of entityClassNames) {
         if (!data.entity.hasOwnProperty(entityClassName)) {
           console.error(`Entity data not found for '${entityClassName}'`);
           return;
         } else {
           const meta = data.entity[entityClassName].content; // TODO validate data
+          for (const propertyName in meta) {
+            const settings = meta[propertyName];
+            moreReferencedEntityClassNames.push(...getReferencedEntityClassNames(settings));
+          }
           xyz.metas[entityClassName] = meta;
         }
+      }
+      for (const entityClassName of moreReferencedEntityClassNames) {
+        if (!xyz.hasOwnProperty(entityClassName) && !entityClassNames.includes(entityClassName)) entityClassNames.push(entityClassName);
       }
       for (const entityClassName of entityClassNames) {
         retrieveEntityClassMeta(xyz, entityClasses, entityClassName, waitForAllCallbacks);

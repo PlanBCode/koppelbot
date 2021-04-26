@@ -93,12 +93,12 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
   const displayListeners = [];
   for (const requestUri of requestUris) {
     const availableListeners = xyz.on(requestUri, 'available', (entityClassName, entityId, node, eventName, requestId) => {
-      if (WRAPPER.entityIds.hasOwnProperty(entityId)) return;
+      if (WRAPPER.entityIds.hasOwnProperty(entityClassName + '_' + requestId + '_' + entityId)) return;
       const path = uriTools.pathFromUri(requestUri);
       path[1] = entityId;
 
       if (xyz.isAvailable(path)) { // TODO move to listeners?
-        WRAPPER.entityIds[entityId] = true;
+        WRAPPER.entityIds[entityClassName + '_' + requestId + '_' + entityId] = true;
         const entityPath = requestUri.split('/');
         entityPath[2] = entityId;
         const entityUri = entityPath.join('/');
@@ -107,8 +107,8 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
       }
     });
     const removedListeners = xyz.on(requestUri, 'removed', (entityClassName, entityId, node, eventName, requestId) => {
-      if (!WRAPPER.entityIds.hasOwnProperty(entityId)) return;
-      delete WRAPPER.entityIds[entityId];
+      if (!WRAPPER.entityIds.hasOwnProperty(entityClassName + '_' + requestId + '_' + entityId)) return;
+      delete WRAPPER.entityIds[entityClassName + '_' + requestId + '_' + entityId];
       removeDisplay(xyz, uri, options, WRAPPER)(entityClassName, entityId, node, eventName, requestId);
     });
     displayListeners.push(...availableListeners, ...removedListeners);

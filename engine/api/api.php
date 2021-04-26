@@ -279,7 +279,7 @@ class ApiRequest extends HttpRequest2
                 $query = new Query($propertyRequest->getQuery()->checkToggle('expand')?'expand':''); //TODO use reference uri querystring?
                 $content = ''; // $propertyRequest->getContent(); //TODO stringify for POST/PATH/PUT reference requests
                 $requestUri = '/'.$referenceEntityClassName."/".$referenceEntityId."/".$referenceSubUri;
-                $referenceRequestId = $propertyRequest->getUri($entityId);
+                $referenceRequestId = $propertyRequest->getRequestId();
 
                 $propertyResponseByReference[$referenceRequestId] = $propertyResponse;
                 $pathsByReference[$referenceRequestId] = array_merge([$referenceEntityClassName,$referenceEntityId],$referencePropertyPath);

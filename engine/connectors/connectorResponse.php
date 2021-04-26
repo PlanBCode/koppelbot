@@ -40,7 +40,7 @@ class ConnectorResponse extends Response
     public function merge(ConnectorResponse &$connectorResponse): ConnectorResponse
     {
         $this->addStatus($connectorResponse->getStatus());
-        foreach ($connectorResponse->requestResponses as $requestId => $requestResponse) {
+        foreach ($connectorResponse->requestResponses as $requestId => $requestResponse) {//TODO byReference
             if (!array_key_exists($requestId, $this->requestResponses)) {
                 $this->requestResponses[$requestId] = $requestResponse;
             } else {

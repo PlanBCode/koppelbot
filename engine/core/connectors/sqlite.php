@@ -24,7 +24,7 @@ class Connector_sqlite extends Connector
     //TODO &
     static protected function getConnectorString(array &$settings, string $method, string $entityClass, string $entityId, array &$propertyPath, Query &$query): string
     {
-        return $method.'_'.array_get($settings, 'path');
+        return $method.'_'.array_get($settings, 'path').'_'.$entityClass;
     }
 
     protected function open(): bool
@@ -69,7 +69,7 @@ class Connector_sqlite extends Connector
       return $queryString;
     }
 
-    protected function handleResults(string $method, string $idKey, &$result, ConnectorRequest &$connectorRequest, ConnectorResponse &$connectorResponse)//TODO : void
+    protected function handleResults(string $method, string $idKey, &$result, PropertyRequest &$propertyRequest, ConnectorRequest &$connectorRequest, ConnectorResponse &$connectorResponse)//TODO : void
     {
       if(!$result){
         $error = $this->db->lastErrorMsg();
@@ -79,7 +79,6 @@ class Connector_sqlite extends Connector
       }else if($method === 'GET'){
         while($row = $result->fetchArray()){
           foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
-
             $propertyPath = $propertyRequest->getPropertyPath();
             $propertyName = $propertyPath[0]; //TODO check
             $entityId = (string)$row[$idKey];
@@ -120,7 +119,7 @@ class Connector_sqlite extends Connector
 
         $keysPerTable = [];
         $entityIdsPerTable = [];
-        foreach ($connectorRequest->getPropertyRequests() as $propertyRequest) {
+        foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
           $propertyPath = $propertyRequest->getPropertyPath();
           $propertyName = $propertyPath[0]; //TODO check
 
@@ -152,8 +151,7 @@ class Connector_sqlite extends Connector
           $entityIds = $entityIdsPerTable[$table];
           $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table);
           $result = $this->db->query($queryString);
-
-          $this->handleResults($method, $idKey, $result, $connectorRequest, $connectorResponse);
+          $this->handleResults($method, $idKey, $result, $propertyRequest, $connectorRequest, $connectorResponse);
         }
         $this->close();
         return $connectorResponse;
