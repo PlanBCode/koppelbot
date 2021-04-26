@@ -127,22 +127,25 @@ exports.handlePrimitive = (element, contents, statusses) => (path, method, entit
 };
 
 function zipSubPaths (subPaths) {
+  if (subPaths.length === 1) return subPaths[0];
+  if (subPaths.length === 0) return [];
   const path = [];
-  const xMatch = false;
-  const minLength = Math.max(...subPaths.map(subPath => subPath.length));
-  for (let i = 0; i < minLength; ++i) {
-    let x;
-    for (const subPath of subPaths) {
-      if (typeof x === 'undefined') x = subPath[0];
-      else if (x !== subPath[0]) { // [[...,'a','b'],[...,'b','c']] => [...,'a.b,c.d']
+  const maxLength = Math.max(...subPaths.map(subPath => subPath.length));
+  for (let i = 0; i < maxLength; ++i) {
+    const firstPathValue = subPaths[0][i];
+    for (let j = 1; j < subPaths.length; ++j) {
+      const subPath = subPaths[j];
+      // values differ for paths at i, the paths diverge
+      if (firstPathValue !== subPath[i]) { // [[...,'a','b'],[...,'b','c']] => [...,'a.b,c.d']
         const tails = subPaths.map(subPath => subPath.slice(i).join('.'));
         path.push(tails.join(','));
         return path;
       }
     }
-    if (!xMatch) path.push(x); // [[...,'a',...],[...,'a',...]] => [...,'a',...]
+    // all subPaths contains the same value at i, add it
+    path.push(firstPathValue); // [[...,'a',...],[...,'a',...]] => [...,'a',...]
   }
-  return path;
+  return path; // perfectly matches subPaths
 }
 /*
 
@@ -205,9 +208,11 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
   }
   // DEBUG console.log('Input::handle', path, entityId, queryString, 'entityExisted', entityExisted);
 
-  if (responseStatus === 207) {
-    for (const subPropertyName in subProperties) {
-      if (responseContent.hasOwnProperty(subPropertyName)) {
+  if (responseStatus === 207 && responseContent !== null && typeof responseContent === 'object') {
+    for (const subPropertyName in responseContent) {
+      const subPropertyPath = subPropertyName.split('.');
+      const baseSubPropertyName = subPropertyPath[0];
+      if (subProperties.hasOwnProperty(baseSubPropertyName)) {
         const subProperty207Wrapper = responseContent[subPropertyName];
         if (subProperty207Wrapper === null || typeof subProperty207Wrapper !== 'object' ||
                     !subProperty207Wrapper.hasOwnProperty('status') ||
@@ -216,23 +221,25 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
           // TODO reponse is in error
           console.error('error response in wrong format');
         } else {
-          const subPath = getSubPath(path, subPropertyName);
+          const subPath = getSubPath(path, baseSubPropertyName);
           const subStatus = subProperty207Wrapper.status;
           const subResponseContent = getSubContent(subProperty207Wrapper.content, subPropertyName, subPath);
           const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
-          const subProperty = subProperties[subPropertyName];
+          const subProperty = subProperties[baseSubPropertyName];
           const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent, queryString, entityExisted, requestId);
           state.addSubState(subState);
         }
       }
     }
-  } else {
-    for (const subPropertyName in subProperties) {
-      if (responseContent !== null && typeof responseContent === 'object' && responseContent.hasOwnProperty(subPropertyName)) {
-        const subPath = getSubPath(path, subPropertyName);
+  } else if (responseContent !== null && typeof responseContent === 'object') {
+    for (const subPropertyName in responseContent) {
+      const subPropertyPath = subPropertyName.split('.');
+      const baseSubPropertyName = subPropertyPath[0];
+      if (subProperties.hasOwnProperty(baseSubPropertyName)) {
+        const subPath = getSubPath(path, baseSubPropertyName);// getSubPath(path, subPropertyName);
         const subResponseContent = getSubContent(responseContent, subPropertyName, subPath);
         const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
-        const subProperty = subProperties[subPropertyName];
+        const subProperty = subProperties[baseSubPropertyName];
         const subState = subProperty.handleInput(subPath, method, entityId, responseStatus, subResponseContent, subRequestContent, queryString, entityExisted, requestId);
         state.addSubState(subState);
       }

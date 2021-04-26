@@ -11,7 +11,7 @@ const validateSubPropertyPath = (types) => (type, subPropertyPath) => {
   return types[type].validateSubPropertyPath(subPropertyPath);
 };
 
-exports.constructor = function Property (xyz, parent, propertyName, settings) {
+exports.constructor = function Property (xyz, parent, propertyName, settings, depth = 0) {
   listener.Handler.call(this);
 
   const subProperties = {};
@@ -28,13 +28,13 @@ exports.constructor = function Property (xyz, parent, propertyName, settings) {
       const referenceEntityClassName = settings.uri.split('/')[1];// TODO check
       const meta = xyz.getMeta(referenceEntityClassName);
       for (const subPropertyName in meta) {
-        if (meta[subPropertyName].type !== 'reference') { // no nested references
-          subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, meta[subPropertyName]);
+        if (meta[subPropertyName].type !== 'reference' || depth < 5) { // no nested references
+          subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, meta[subPropertyName], depth + 1);
         }
       }
     } else {
       for (const subPropertyName in settings.signature) {
-        subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, settings.signature[subPropertyName]);
+        subProperties[subPropertyName] = new Property(xyz, this, subPropertyName, settings.signature[subPropertyName], depth + 1);
       }
     }
   }
