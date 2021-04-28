@@ -1,4 +1,5 @@
 <?php
+define('DEFAULT_LIMIT', 1000);
 
 class QueryStatement
 {
@@ -208,7 +209,7 @@ class Query
         return array_unique($propertyNames);
     }
 
-    public function getMatchingEntityIds(string $entityClassList, &$content, array $accessGroups): array
+    public function getMatchingEntityIdsAndRange(string $entityClassList, &$content, array $accessGroups): array
     {
         $entityClassNames = explode(',',$entityClassList);
         $entityIds = [];
@@ -260,11 +261,13 @@ class Query
         }
         // limit & offset
         $offset = $this->getOption('offset', 0);
-        if($offset !== 0 || $this->hasOption('limit')){
-          $DEFAULT_LIMIT = 1000;
-          $limit = $this->getOption('limit', max(count($entityIds), $DEFAULT_LIMIT));
-          $entityIds = array_slice($entityIds, $offset, $limit);
-        }
-        return $entityIds;
+        $range = count($entityIds);
+        $limit = $this->getOption('limit', max($range, DEFAULT_LIMIT));
+        $entityIds = array_slice($entityIds, $offset, $limit);
+        return [
+          "entityIds" => $entityIds,
+          "range" => $range,
+          "limit" => $limit
+        ];
     }
 }

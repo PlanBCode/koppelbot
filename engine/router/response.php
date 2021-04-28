@@ -122,6 +122,7 @@ class HttpResponse2 extends Response
     {
         $this->status = $status;
         $this->content =& $content;
+        $headers['Content-Length'] = strlen($content);
         $this->headers =& $headers;
     }
 
