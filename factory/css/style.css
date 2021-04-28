@@ -306,3 +306,24 @@ Pending Request Indicator
     transform: rotate(359deg);
   }
 }
+
+
+/* ====================================================================================================
+SHARE
+==================================================================================================== */
+
+.xyz-share {
+  cursor: pointer;
+  background-color: rgb(76, 175, 80);
+  color: white;
+  border-style: none;
+  border-radius: 5px;
+  background-image: url('./share.png');
+  background-repeat: no-repeat;
+  background-position: 2px center;
+  background-size: 16px 16px;
+  display: inline-block;
+  padding-left: 20px;
+  padding-right: 4px;
+  font-size: 10pt;
+}
