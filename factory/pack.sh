@@ -8,7 +8,12 @@ echo "[i] Pack : start"
 
 cd "$XYZ_HOME/factory/js" || exit 1
 
-"$WEBPACK" --config "$XYZ_HOME/factory/js/conf/webpack.conf.js" --mode development
+MODE="$1"
+if [ -z "$MODE" ]; then
+  MODE='production'
+fi
+
+"$WEBPACK" --config "$XYZ_HOME/factory/js/conf/webpack.conf.js" --mode "$MODE"
 
 if [ $? -ne 0 ]; then
   echo "[!] Pack : Failed"
