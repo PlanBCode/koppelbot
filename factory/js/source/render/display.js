@@ -142,17 +142,47 @@ const renderUiElement = (xyz, options, WRAPPER) => {
     xyz.get(uri);
   };
 
+  const contentVariables = {};
+
+  const variableNames = uriTools.getVariableNamesFromUri(uri);
+  const variableListeners = {}; // variableName -> {listener, resolvedVariableName}
+
   const onChange = () => {
-    const resolvedUri = uriTools.resolveVariablesInUri(uri);
+    updateVariableListeners();
+    const resolvedUri = uriTools.resolveVariablesInUri(uri, contentVariables);
+    console.log(1, contentVariables, uri, resolvedUri);
     if (uriTools.uriHasUnresolvedVariables(resolvedUri)) uiElementWaitingForInput(display, displayItem);
     else readyCallback(resolvedUri);
   };
 
-  const variableNames = uriTools.getVariableNamesFromUri(uri);
-  for (const variableName of variableNames) variables.onVariable(variableName, onChange);
+  console.log(2, uri, variableNames);
+  const updateVariableListeners = () => {
+    for (const variableName of variableNames) {
+      const resolvedVariableName = uriTools.resolveVariablesInUri(variableName, contentVariables);
+      if (uriTools.uriHasUnresolvedVariables(resolvedVariableName)) continue;
+      // if resolvement did not change anything, do nothing
+      if (variableListeners.hasOwnProperty(variableName) && variableListeners[variableName].resolvedVariableName === resolvedVariableName) continue;
+
+      let listener;
+      if (resolvedVariableName.startsWith('/')) {
+        listener = xyz.on(resolvedVariableName, 'touched', (entityClassName, entityId, node, eventName, requestId) => {
+          console.log(1, contentVariables, uri, resolvedUri);
+
+          const content = node.getContent(); // TODO check if object with getContent function
+          contentVariables[resolvedVariableName] = content;
+          onChange();
+        });
+        console.log(3, resolvedVariableName);
+      } else {
+        listener = variables.onVariable(resolvedVariableName, onChange);
+      }
+      variableListeners[variableName] = {listener, resolvedVariableName};
+    }
+  };
+  updateVariableListeners();
 
   const waitCallback = () => uiElementWaitingForInput(display, displayItem);
-  registerUri(xyz, uri, readyCallback, waitCallback, options.dynamic);
+  registerUri(xyz, uri, contentVariables, readyCallback, waitCallback, options.dynamic);
 };
 
 // DISPLAY DATA REFRESHING TODO : NEEDS TO BE IMPROVED
@@ -162,21 +192,23 @@ const uriCallbacks = {};
 function refresh () {
   for (let uri in uriCallbacks) {
     const xyz = uriCallbacks[uri][0].xyz;
-    uri = uriTools.resolveVariablesInUri(uri);
+    const contentVariables = uriCallbacks[uri][0].contentVariables; // TODO fix
+    uri = uriTools.resolveVariablesInUri(uri, contentVariables);
     // uri starting without '/' are input variables
     if (!uriTools.uriHasUnresolvedVariables(uri) && uri.startsWith('/')) xyz.get(uri);
   }
 }
 
 function handleUri (uri, callbacks) {
-  uri = uriTools.resolveVariablesInUri(uri);
+  const contentVariables = callbacks.contentVariables;
+  uri = uriTools.resolveVariablesInUri(uri, contentVariables);
   if (typeof callbacks.wait === 'function') callbacks.wait(uri);
   if (!uriTools.uriHasUnresolvedVariables(uri)) callbacks.ready(uri);
 }
 
 // TODO parametrize refresh rate / throttle
-const registerUri = (xyz, uri, readyCallback, waitCallback, dynamic = false) => {
-  const callbacks = {xyz, ready: readyCallback, wait: waitCallback};
+const registerUri = (xyz, uri, contentVariables, readyCallback, waitCallback, dynamic = false) => {
+  const callbacks = {xyz, ready: readyCallback, wait: waitCallback, contentVariables};
 
   if (dynamic) { // skip updates for non dynamic
     if (!uriCallbacks.hasOwnProperty(uri)) uriCallbacks[uri] = [callbacks];
@@ -186,6 +218,6 @@ const registerUri = (xyz, uri, readyCallback, waitCallback, dynamic = false) => 
   handleUri(uri, callbacks);
 };
 
-setInterval(refresh, 1000);
+setInterval(refresh, 1000); // TODO clean up
 
 exports.renderUiElement = renderUiElement;

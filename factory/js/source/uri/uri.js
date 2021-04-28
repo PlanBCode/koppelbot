@@ -106,21 +106,37 @@ function parseAggregationFromUri (uri) {
   return {uri, aggregations, labels};
 }
 
-const variableRegex = /\$(\w+|\{\w+\})/g;
+// handle '$variableName'
+// '${variableName}'
+//  '${/entityClassName/entityId/propertyName}'
+//  '${/entityClassName/$otherVariable/propertyName}'
+const variableNameRegex = /\$(\w+|\{[\w/${}]+\})/g;
 
-function resolveVariablesInUri (uri) {
-  return uri.replace(variableRegex,
-    (_, variableName) => variables.hasVariable(variableName) ? variables.getVariable(variableName) : '$' + variableName
+function resolveVariablesInUri (uri, contentVariables) {
+  // TODO handle nested variables
+  return uri.replace(variableNameRegex,
+    (_, variableName) => {
+      if (variableName.startsWith('{') && variableName.endsWith('}')) variableName = variableName.substr(1, variableName.length - 2);
+      variableName = resolveVariablesInUri(variableName, contentVariables); // handle nested variables
+      if (variables.hasVariable(variableName)) return variables.getVariable(variableName);
+      else if (contentVariables.hasOwnProperty(variableName)) return contentVariables[variableName];
+      else return '${' + variableName + '}';
+    }
   );
 }
 
 function getVariableNamesFromUri (uri) {
   const variableNames = [];
+  const nestedVariableNames = [];
   let match;
-  while ((match = variableRegex.exec(uri))) {
+  while ((match = variableNameRegex.exec(uri))) {
     let variableName = match[1];
     if (variableName.startsWith('{') && variableName.endsWith('}')) variableName = variableName.substr(1, variableName.length - 2);
+    if (variableName.includes('$')) nestedVariableNames.push(variableName);
     variableNames.push(variableName);
+  }
+  for (const nestedVariableName of nestedVariableNames) { // cannot be done inside while loop above, as exec has internal counter
+    variableNames.push(...getVariableNamesFromUri(nestedVariableName));
   }
   return variableNames;
 }
