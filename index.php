@@ -134,9 +134,16 @@ $status = $response->getStatus();
 if ($isCli && array_get($options, 'verbose', false)) {
     echo 'Response:' . PHP_EOL;
     echo ' - status      : ' . $status . PHP_EOL;
-    //TODO headers
-}
-
-$response->echo();
+    $headers = $response->getHeaders();
+    if(empty($headers)){
+      echo ' - headers     : none'. PHP_EOL;
+    } else {
+      echo ' - headers      '. PHP_EOL;
+      foreach ($headers as $key => &$value) {
+        echo "   - $key: $value ". PHP_EOL;
+      }
+    }
+    $response->echo(false);
+} else $response->echo();
 
 if ($isCli && $status !== 200) exit($status); // Nb: exit code is 0-255 so 404 becomes 404%256 = 148

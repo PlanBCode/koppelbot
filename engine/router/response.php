@@ -125,6 +125,11 @@ class HttpResponse2 extends Response
         $this->headers =& $headers;
     }
 
+    public function getHeaders(): array
+    {
+      return  $this->headers;
+    }
+
     private function echoHeaders()//TODO : void
     {
         foreach ($this->headers as $key => $value) {
@@ -142,10 +147,10 @@ class HttpResponse2 extends Response
         echo $this->content;
     }
 
-    public function echo(): int
+    public function echo(bool $includeHeaders = true): int
     {
         $this->echoStatus();
-        $this->echoHeaders();
+        if($includeHeaders) $this->echoHeaders();
         $this->echoContent();
         return $this->status;
     }
