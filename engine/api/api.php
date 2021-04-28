@@ -194,6 +194,8 @@ class ApiRequest extends HttpRequest2
     /** @var string[] */
     protected $accessGroups;
 
+    protected $outHeaders = [];
+
     public function __construct(string $method, string $uri, string $queryString, array $headers, string $content, array $accessGroups)
     {
         $this->errors = [];
@@ -371,7 +373,13 @@ class ApiRequest extends HttpRequest2
           $queryContent = $requestResponse->getContent();
 
           //TODO handle failure
-          $entityIds = $query->getMatchingEntityIds($entityClassList, $queryContent, $this->accessGroups);
+          $result = $query->getMatchingEntityIdsAndRange($entityClassList, $queryContent, $this->accessGroups);
+          $entityIds = $result['entityIds'];
+          $range = $result['range'];
+          $limit = $result['limit'];
+
+          $this->outHeaders["XYZ-Range-$entityClassList-$requestId"] = $range;
+          $this->outHeaders["XYZ-Limit-$entityClassList-$requestId"] = $limit;
 
           if(empty($entityIds)) return [];
           $entityIdList = implode(',', $entityIds);
@@ -424,26 +432,30 @@ class ApiRequest extends HttpRequest2
           return $content;
         }
     }
-    protected function stringifyContent(&$content, $status, Query& $query, array &$path): string
+    protected function stringifyContent(&$content, $status, Query& $query, array &$path, array &$headers): string
     {
         //TODO handle for multi requests
         $output = $query->getOption('output');
         if($output ==='json' || is_null($output)){
+          $headers['Content-Type'] = 'application/json';
           if (!$query->checkToggle('expand') && !is_array($content)) { // default to json
             return json_simpleEncode($content);
           } else {
-            return json_encode($content, JSON_PRETTY_PRINT);
+            return json_encode($content); //TODO toggle for JSON_PRETTY_PRINT
           }
         }else if($output === 'csv' && $status === 200){
+          $headers['Content-Type'] = 'text/csv';
           require_once('output/csv.php');
           return outputCSV($content, $query, $path);
         }else if($output === 'sql' && $status === 200){
           require_once('output/sql.php');
           return outputSQL($content, $query, $path);
         }else if($output === 'xml' && $status === 200){
+          $headers['Content-Type'] = 'application/xml';
           require_once('output/xml.php');
           return outputXML($content, $query, $path);
         }else if($output === 'yaml'){
+          $headers['Content-Type'] = 'text/yaml';
           require_once('output/yaml.php');
           return outputYAML($content, $query, $path);
         }else if($output === 'php'){
@@ -482,7 +494,8 @@ class ApiRequest extends HttpRequest2
       if($status === 207){
         $content = $this->createNonSingularContent($requestResponses);
         $this->nullifyHead207Response($content);
-        $stringContent =  json_encode($content, JSON_PRETTY_PRINT);
+        $headers['Content-Type'] = 'application/json';
+        $stringContent =  json_encode($content); //TODO toggle for JSON_PRETTY_PRINT
       }else $stringContent = '';
       return new HttpResponse2($status, $stringContent, $headers);
     }
@@ -525,7 +538,7 @@ class ApiRequest extends HttpRequest2
                   return new HttpResponse2(400, $errorStringContent, $headers);
                 }
             }
-            $headers = [];
+            $headers = $this->outHeaders;
             $path = array_slice(explode('/', $this->uri), 1); // '/a/b/c' -> ['a','b','c']
 
             if (isSingularPath($path) && !$this->query->checkToggle('expand')) {
@@ -541,7 +554,7 @@ class ApiRequest extends HttpRequest2
                 if(is_null($property)) return  new HttpResponse2($status, $content, $headers);
                 return $property->serveContent($status, $content);
             } else if(count($requestResponses) === 1){
-              $stringContent = $this->stringifyContent($content, $status, $this->query, $path);
+              $stringContent = $this->stringifyContent($content, $status, $this->query, $path, $headers);
               return new HttpResponse2($status, $stringContent, $headers);
             } else if(count($requestResponses) === 0){
               $stringContent ='[]';
@@ -552,7 +565,8 @@ class ApiRequest extends HttpRequest2
                   $content[$requestId] = ["status" => $requestResponses[$requestId]->getStatus(), "content" => $requestContent];
                 }
               }
-              $stringContent = json_encode($content, JSON_PRETTY_PRINT);
+              $headers['Content-Type'] = 'application/json';
+              $stringContent = json_encode($content); //TODO toggle for JSON_PRETTY_PRINT
               return new HttpResponse2($status, $stringContent, $headers);
             }
         }

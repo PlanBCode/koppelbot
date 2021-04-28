@@ -1,7 +1,8 @@
-const renderUiCreate = require('./create').renderUiCreate;
-const renderUiLogin = require('./login').renderUiLogin;
-const renderUiElement = require('./display').renderUiElement;
-const renderUiInput = require('../variables/input').renderUiInput;
+const {renderUiCreate} = require('./create');
+const {renderUiShare} = require('./share');
+const {renderUiLogin} = require('./login');
+const {renderUiElement} = require('./display');
+const {renderUiInput} = require('../variables/input');
 
 const DEFAULT_TAG = 'DIV';
 
@@ -37,6 +38,7 @@ const ui = (xyz, entityClasses, options, WRAPPER) => {
   if (options.display === 'input') renderUiInput(xyz, options, WRAPPER);
   else if (options.display === 'create') renderUiCreate(xyz, entityClasses, options, WRAPPER);
   else if (options.display === 'login') renderUiLogin(xyz, options, WRAPPER);
+  else if (options.display === 'share') renderUiShare(xyz, options, WRAPPER);
   else renderUiElement(xyz, options, WRAPPER);
   return WRAPPER;
 };

@@ -277,11 +277,24 @@ Pending Request Indicator
   left: 50vw;
   top: 50vh;
   transform: translate(-50%, -50%);
+}
+
+#xyz-pendingRequestIndicator div {
+  width: 68px;
+  height: 68px;
   background-image: url('./pendingIndicator.png');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 64px 64px;
   animation: rotation 2s linear infinite;
+}
+
+#xyz-pendingRequestIndicator span {
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
 }
 
 @keyframes rotation {
@@ -292,4 +305,25 @@ Pending Request Indicator
   to {
     transform: rotate(359deg);
   }
+}
+
+
+/* ====================================================================================================
+SHARE
+==================================================================================================== */
+
+.xyz-share {
+  cursor: pointer;
+  background-color: rgb(76, 175, 80);
+  color: white;
+  border-style: none;
+  border-radius: 5px;
+  background-image: url('./share.png');
+  background-repeat: no-repeat;
+  background-position: 2px center;
+  background-size: 16px 16px;
+  display: inline-block;
+  padding-left: 20px;
+  padding-right: 4px;
+  font-size: 10pt;
 }

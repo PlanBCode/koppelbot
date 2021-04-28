@@ -6,6 +6,7 @@
   "scripts": {
     "test": "sh ../test.sh",
     "build": "sh ../build.sh",
+    "pack": "sh ../pack.sh development",
     "audit": "sh ../audit.sh force"
   },
   "keywords": [],
