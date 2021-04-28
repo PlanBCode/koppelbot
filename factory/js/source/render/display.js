@@ -164,9 +164,11 @@ const renderUiElement = (xyz, options, WRAPPER) => {
       if (variableListeners.hasOwnProperty(variableName) && variableListeners[variableName].resolvedVariableName === resolvedVariableName) continue;
 
       let listener;
+      variableListeners[variableName] = {listener, resolvedVariableName};
+
       if (resolvedVariableName.startsWith('/')) {
         listener = xyz.on(resolvedVariableName, 'touched', (entityClassName, entityId, node, eventName, requestId) => {
-          console.log(1, contentVariables, uri, resolvedUri);
+          console.log(4, contentVariables, uri, entityClassName, entityId, node, eventName, requestId);
 
           const content = node.getContent(); // TODO check if object with getContent function
           contentVariables[resolvedVariableName] = content;
@@ -176,7 +178,7 @@ const renderUiElement = (xyz, options, WRAPPER) => {
       } else {
         listener = variables.onVariable(resolvedVariableName, onChange);
       }
-      variableListeners[variableName] = {listener, resolvedVariableName};
+      variableListeners[variableName].listener = listener;
     }
   };
   updateVariableListeners();

@@ -147,7 +147,9 @@ exports.display = {
             const TR_header = TABLE_entity.firstChild;
             const entityId = TABLE_entity.entityId;
             if (selectedEntityId === entityId) TR_header.classList.add('xyz-item-selected');
-            else TR_header.classList.remove('xyz-item-selected');
+            else if (TR_header && TR_header.classList.contains('xyz-item-header')) {
+              TR_header.classList.remove('xyz-item-selected');
+            }
           }
         });
       }

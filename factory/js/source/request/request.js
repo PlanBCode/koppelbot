@@ -242,6 +242,7 @@ function getPartial (uri, entityClasses, dataCallback, originalUri, originalOffs
     const isMultiRequest = (responseObjectContent instanceof Array) && nextPageUri.includes(';');
     const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
     const {totalCount, currentCount} = getEntityCount(status, responseObjectContents, page, getResponseHeader);
+    if (!pendingGets.hasOwnProperty(originalUri)) pendingGets[originalUri] = {};
     pendingGets[originalUri].totalCount = totalCount;
     pendingGets[originalUri].currentCount = currentCount;
     if (totalCount > currentCount) { // could be more
