@@ -150,12 +150,10 @@ const renderUiElement = (xyz, options, WRAPPER) => {
   const onChange = () => {
     updateVariableListeners();
     const resolvedUri = uriTools.resolveVariablesInUri(uri, contentVariables);
-    console.log(1, contentVariables, uri, resolvedUri);
     if (uriTools.uriHasUnresolvedVariables(resolvedUri)) uiElementWaitingForInput(display, displayItem);
     else readyCallback(resolvedUri);
   };
 
-  console.log(2, uri, variableNames);
   const updateVariableListeners = () => {
     for (const variableName of variableNames) {
       const resolvedVariableName = uriTools.resolveVariablesInUri(variableName, contentVariables);
@@ -168,13 +166,14 @@ const renderUiElement = (xyz, options, WRAPPER) => {
 
       if (resolvedVariableName.startsWith('/')) {
         listener = xyz.on(resolvedVariableName, 'touched', (entityClassName, entityId, node, eventName, requestId) => {
-          console.log(4, contentVariables, uri, entityClassName, entityId, node, eventName, requestId);
-
-          const content = node.getContent(); // TODO check if object with getContent function
-          contentVariables[resolvedVariableName] = content;
-          onChange();
+          if (typeof node === 'object' && node !== null && typeof node.getContent === 'function') {
+            let content = node.getContent();
+            if (content instanceof Array) content = content.join(',');
+            contentVariables[resolvedVariableName] = content;
+            onChange();
+          }
         });
-        console.log(3, resolvedVariableName);
+        if (!xyz.isAvailable(resolvedVariableName.split('/').slice(1))) xyz.get(resolvedVariableName);
       } else {
         listener = variables.onVariable(resolvedVariableName, onChange);
       }

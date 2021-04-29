@@ -110,7 +110,7 @@ function parseAggregationFromUri (uri) {
 // '${variableName}'
 //  '${/entityClassName/entityId/propertyName}'
 //  '${/entityClassName/$otherVariable/propertyName}'
-const variableNameRegex = /\$(\w+|\{[\w/${}]+\})/g;
+const variableNameRegex = /\$(\w+|\{[\w/${}*,]+\})/g;
 
 function resolveVariablesInUri (uri, contentVariables) {
   // TODO handle nested variables
