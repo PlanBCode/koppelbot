@@ -36,3 +36,13 @@
   text-shadow: 1px 1px black;
   color: white;
 }
+
+.xyz-map-search {
+  position: absolute;
+  top: 0;
+  left: 80px;
+  width: calc(100% - 90px);
+  border-radius: 5px;
+  border-style: none;
+  padding: 4px;
+}

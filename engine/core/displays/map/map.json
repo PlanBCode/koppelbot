@@ -5,6 +5,8 @@
     "location" : {"info":"Define which property should be used for location.", "type":"string", "default":"location"},
     "markUserLocation" : {"info":"Whether to show the users location.", "type":"bool", "default":false},
     "hideMessages" : {"info":"Whether to hide state messages.", "type":"bool", "default":false},
+    "showSearchBar" : {"info":"Whether to show the search bar.", "type":"bool", "default":false},
+    "searchPlaceholder" : {"info":"Text to display in search bar.", "type":"string", "default":"Search"},
     "waitingForInputMessage" : {"info":"Text to display while waiting for input.", "type":"string", "default":"Waiting for input..."},
     "waitingForDataMessage" : {"info":"Text to display while waiting for data.", "type":"string", "default":"Waiting for data..."},
     "waitingForEmptyMessage" : {"info":"Text to display when empty.", "type":"string", "default":"No items to display."}

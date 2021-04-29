@@ -4,6 +4,9 @@
 TODO?label  define a label property to use
  */
 const {getStateMessage} = require('../item/item');
+const {renderSearchBar} = require('./search/search');
+const {renderMarkUserLocation} = require('./markUserLocation/markUserLocation');
+
 let SCRIPT; // to dynamically load dependency;
 
 function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth) {
@@ -174,46 +177,6 @@ function initializeMap (display) {
     });
   });
 
-  const locationPropertyName = display.getOption('location') || 'geojson';
-
-  const markUserLocation = locationResponse => {
-    const format = new ol.format.GeoJSON(); // TODO parametrize
-    const coordinates = [locationResponse.coords.latitude, locationResponse.coords.longitude];
-    const data = {type: 'Feature', geometry: {type: 'Point', coordinates}, properties: null};
-
-    const features = format.readFeatures(data);
-
-    const iconFeature = features[0];
-
-    iconFeature.setStyle(
-      new ol.style.Style({
-        image: new ol.style.Icon({
-          color: 'lightblue',
-          crossOrigin: 'anonymous',
-          src: 'vanwieisdestad/bigdot.png', // TODO parametrize
-          scale: 0.2 // TODO parametrize
-        })
-      })
-    );
-    if (DIV_create) {
-      iconFeature.onclick = event => {
-        DIV_create.patch({[locationPropertyName]: {type: 'Point', coordinates}});
-        DIV_create.style.display = 'block';
-        event.stopPropagation();
-        return false;
-      };
-    }
-
-    // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
-    // TODO how do we handle changes to feature?
-    WRAPPER.vectorLayer.getSource().addFeature(iconFeature);
-  };
-  if (display.getOption('markUserLocation')) {
-    markUserLocation({coords: {accuracy: 20, latitude: 591095.2514266643, longitude: 6816187.834250114}});
-    /* navigator.geolocation.getCurrentPosition(markUserLocation, error => {
-      console.error(error);// TODO enable when mock is done
-    }); */
-  }
   const BUTTON_zoomin = document.getElementsByClassName('ol-zoom-in')[0];
   const BUTTON_zoomout = document.getElementsByClassName('ol-zoom-out')[0];
   const BUTTON_zoomfit = document.createElement('button');
@@ -225,6 +188,8 @@ function initializeMap (display) {
   BUTTON_zoomfit.onclick = () => zoomToFit(WRAPPER);
   const DIV_buttons = BUTTON_zoomin.parentNode;
   DIV_buttons.insertBefore(BUTTON_zoomfit, BUTTON_zoomin);
+  renderMarkUserLocation(display, ol, DIV_create);
+  renderSearchBar(display, ol);
 }
 
 function initializeOpenLayers (callback) {
@@ -238,6 +203,7 @@ function initializeOpenLayers (callback) {
 
 function zoomToFit (WRAPPER) {
   const extent = ol.extent.createEmpty();
+  console.log('extent', extent);
   ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
   WRAPPER.map.getView().fit(extent, {padding: [100, 100, 100, 100]});
 }
