@@ -15,10 +15,17 @@ abstract class Connector
             return self::$connectorClasses[$typeName];
         } else {
             // TODO an instance of Type_xxx should not be needed, we only use static functions
-            $fileName = './engine/core/connectors/' . $typeName . '.php'; // TODO or custom/connectors
+            $fileName = './engine/core/connectors/' . $typeName . '.php';
             if (!file_exists($fileName)) {
+              $found = false;
+              foreach (glob("./custom/*/connectors/" . $typeName . '.php') as $filePath) {
+                $fileName = $filePath;
+                $found = true;
+              }
+              if(!$found){
                 echo 'ERROR Type ' . $typeName . ' : file does not exist!';
                 return null;
+              }
             }
 
             require_once $fileName;
@@ -97,7 +104,7 @@ abstract class Connector
                 foreach ($propertyRequests as $propertyRequest){
                   if ($propertyRequest->getMethod() === 'POST') {
                     $entityClassName = $propertyRequest->getEntityClass();
-                    $entityIdList = $propertyRequest->getEntityId(); // should not be '*'
+                    $entityIdList = $propertyRequest->getEntityIdList(); // should not be '*'
                     $entityIds = explode(',', $entityIdList);
                     $newEntityIds = [];
                     foreach ($entityIds as $entityId) {

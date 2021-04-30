@@ -326,7 +326,7 @@ class ApiRequest extends HttpRequest2
               addRequestResponse($connectorRequest, $requestResponses); // need to track which id's have been added
               foreach($postIdPropertyRequests as &$postIdPropertyRequest){ // map '$entityClassName/$stub' to '$entityClassName/$maxAutoIncrementedId'
                 $entityClassName = $postIdPropertyRequest->getEntityClass();
-                $entityId = $postIdPropertyRequest->getEntityId();
+                $entityId = $postIdPropertyRequest->getEntityIdList();
                 $stubUri = $entityClassName . '/' . $entityId;
                 $requestId = $postIdPropertyRequest->getRequestId();
                 $requestResponse = $requestResponses[$requestId]; //TODO check
