@@ -42,7 +42,35 @@
   top: 0;
   left: 80px;
   width: calc(100% - 90px);
+}
+
+.xyz-map-search > input {
   border-radius: 5px;
   border-style: none;
   padding: 4px;
+  width: 100%;
+}
+
+.xyz-map-search > div.xyz-map-search-results {
+  background-color: white;
+  font-size: 75%;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result {
+  cursor: pointer;
+  padding: 5px;
+  background-color: white;
+  font-size: 11px;
+  width: calc(100% - 10px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:first-child {
+  font-weight: bold;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
+  background-color: lightblue;
 }

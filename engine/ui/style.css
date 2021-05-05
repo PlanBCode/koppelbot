@@ -1,5 +1,102 @@
 /* This file is created by gulpfile.js using the css definitions of engine/core and factory/css */
 
+table.xyz-create,
+table.xyz-item,
+table.xyz-list {
+  padding: 0;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
+table tbody:first-child tr.xyz-create-header,
+table tbody:first-child tr.xyz-list-header,
+table tbody:first-child tr.xyz-item-header {
+  background-color: darkslateblue;
+  color: white;
+}
+
+table.xyz-create tr:nth-child(even),
+table.xyz-item tr:nth-child(even),
+table.xyz-list tr:nth-child(even) {
+  background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-list,
+.xyz-item {
+  width: 100%;
+}
+
+table.xyz-list > tr.xyz-list-selectable,
+table.xyz-list > tbody > tr.xyz-list-selectable {
+  cursor: pointer;
+}
+
+table.xyz-list > tr.xyz-list-selectable:hover,
+table.xyz-list > tbody > tr.xyz-list-selectable:hover {
+  background-color: lightblue;
+}
+
+table.xyz-list > tr.xyz-list-selected,
+table.xyz-list > tbody > tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
+
+tr.xyz-list-foldable {
+  cursor: pointer;
+}
+
+tr.xyz-list-foldable td:first-child::before {
+  content: "\00A0-\00A0";
+}
+
+tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
+  content: "\00A0+\00A0";
+}
+
+.xyz-list-sorted-asc::before {
+  content: "\00A0\21E3\00A0";
+}
+
+.xyz-list-sorted-desc::before {
+  content: "\00A0\21E1\00A0";
+}
+
+tr.xyz-list-search > td {
+  padding: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgrey;
+}
+
+tr.xyz-list-search > td > input {
+  width: 100%;
+  display: block;
+  border-style: none;
+  outline-style: none;
+  padding: 3;
+  font-size: inherit;
+  margin: 0;
+}
+
+.xyz-list-search-clear {
+  margin-top: -1.7em;
+  display: block;
+  float: right;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.xyz-list-search-clear::before {
+  content: "\2715";
+}
 html,
 body {
   padding: 0;
@@ -329,6 +426,82 @@ SHARE
   padding-right: 4px;
   font-size: 10pt;
 }
+.xyz-map-wrapper {
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-zoom-fit {
+  height: 2em;
+  width: 2em;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.ol-rotate-reset,
+.ol-attribution {
+  display: none;
+}
+
+.xyz-map {
+  position: relative;
+}
+
+.xyz-map-message {
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 100;
+  right: 0;
+  top: 3px;
+  text-shadow: 1px 1px black;
+  color: white;
+}
+
+.xyz-map-search {
+  position: absolute;
+  top: 0;
+  left: 80px;
+  width: calc(100% - 90px);
+}
+
+.xyz-map-search > input {
+  border-radius: 5px;
+  border-style: none;
+  padding: 4px;
+  width: 100%;
+}
+
+.xyz-map-search > div.xyz-map-search-results {
+  background-color: white;
+  font-size: 75%;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result {
+  cursor: pointer;
+  padding: 5px;
+  background-color: white;
+  font-size: 11px;
+  width: calc(100% - 10px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:first-child {
+  font-weight: bold;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
+  background-color: lightblue;
+}
 table.xyz-item > tr.xyz-item-selected.xyz-item-header {
   background-color: yellow;
   color: black;
@@ -385,151 +558,6 @@ table.xyz-item-maximized span.xyz-item-minimize,
 table.xyz-item-minimized span.xyz-item-maximize,
 table.xyz-item-minimized > tbody {
   display: none !important;
-}
-table.xyz-create,
-table.xyz-item,
-table.xyz-list {
-  padding: 0;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-.xyz-list-header,
-.xyz-create-header,
-.xyz-item-header,
-table tbody:first-child tr.xyz-create-header,
-table tbody:first-child tr.xyz-list-header,
-table tbody:first-child tr.xyz-item-header {
-  background-color: darkslateblue;
-  color: white;
-}
-
-table.xyz-create tr:nth-child(even),
-table.xyz-item tr:nth-child(even),
-table.xyz-list tr:nth-child(even) {
-  background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-list,
-.xyz-item {
-  width: 100%;
-}
-
-table.xyz-list > tr.xyz-list-selectable,
-table.xyz-list > tbody > tr.xyz-list-selectable {
-  cursor: pointer;
-}
-
-table.xyz-list > tr.xyz-list-selectable:hover,
-table.xyz-list > tbody > tr.xyz-list-selectable:hover {
-  background-color: lightblue;
-}
-
-table.xyz-list > tr.xyz-list-selected,
-table.xyz-list > tbody > tr.xyz-list-selected {
-  background-color: yellow;
-}
-
-td.xyz-list-icon {
-  width: 30px;
-  max-width: 30px;
-}
-
-tr.xyz-list-foldable {
-  cursor: pointer;
-}
-
-tr.xyz-list-foldable td:first-child::before {
-  content: "\00A0-\00A0";
-}
-
-tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
-  content: "\00A0+\00A0";
-}
-
-.xyz-list-sorted-asc::before {
-  content: "\00A0\21E3\00A0";
-}
-
-.xyz-list-sorted-desc::before {
-  content: "\00A0\21E1\00A0";
-}
-
-tr.xyz-list-search > td {
-  padding: 0;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: lightgrey;
-}
-
-tr.xyz-list-search > td > input {
-  width: 100%;
-  display: block;
-  border-style: none;
-  outline-style: none;
-  padding: 3;
-  font-size: inherit;
-  margin: 0;
-}
-
-.xyz-list-search-clear {
-  margin-top: -1.7em;
-  display: block;
-  float: right;
-  margin-right: 5px;
-  cursor: pointer;
-}
-
-.xyz-list-search-clear::before {
-  content: "\2715";
-}
-.xyz-map-wrapper {
-}
-
-.ol-zoom-in,
-.ol-zoom-out,
-.ol-zoom-fit {
-  height: 2em;
-  width: 2em;
-  margin: 2px;
-  float: left;
-  background-color: darkslateblue;
-  color: white;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.ol-rotate-reset,
-.ol-attribution {
-  display: none;
-}
-
-.xyz-map {
-  position: relative;
-}
-
-.xyz-map-message {
-  pointer-events: none;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 100;
-  right: 0;
-  top: 3px;
-  text-shadow: 1px 1px black;
-  color: white;
-}
-
-.xyz-map-search {
-  position: absolute;
-  top: 0;
-  left: 80px;
-  width: calc(100% - 90px);
-  border-radius: 5px;
-  border-style: none;
-  padding: 4px;
 }
 div.xyz-timeline-wrapper {
     position: relative;
