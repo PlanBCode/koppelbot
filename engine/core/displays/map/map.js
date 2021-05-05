@@ -120,6 +120,7 @@ function initializeMap (display) {
       zoom: 3
     })
   });
+
   WRAPPER.map = map;
   const DIV_create = display.showCreateButton();
   let lastClickTimeStamp;
@@ -135,6 +136,7 @@ function initializeMap (display) {
       lastClickTimeStamp = event.originalEvent.timeStamp;
       if (typeof feature.onclick === 'function') feature.onclick();
     } else if (DIV_create) {
+      const locationPropertyName = display.getOption('location') || 'geojson';
       DIV_create.patch({[locationPropertyName]: {type: 'Point', coordinates: event.coordinate}});
       DIV_create.style.display = 'block';
     }
@@ -185,11 +187,39 @@ function initializeMap (display) {
   BUTTON_zoomout.title = 'Zoom out';
   BUTTON_zoomin.title = 'Zoom in';
   BUTTON_zoomfit.title = 'Zoom to fit';
-  BUTTON_zoomfit.onclick = () => zoomToFit(WRAPPER);
+  BUTTON_zoomfit.onclick = () => {
+    delete WRAPPER.zoomToFit; // remove zoom to fit limitation
+    zoomToFit(WRAPPER);
+  };
   const DIV_buttons = BUTTON_zoomin.parentNode;
   DIV_buttons.insertBefore(BUTTON_zoomfit, BUTTON_zoomin);
   renderMarkUserLocation(display, ol, DIV_create);
   renderSearchBar(display, ol);
+
+  if (display.hasOption('viewBoxSelect')) {
+    const variableName = display.getOption('viewBoxSelect');
+    let busy = false;
+    map.on('moveend', () => {
+      if (busy) return;
+      busy = true;
+      const mapExtent = WRAPPER.map.getView().calculateExtent();
+      display.setVariable(variableName, mapExtent.join(','));
+      busy = false;
+    });
+    const onChange = value => {
+      WRAPPER.zoomToFit = false; // prevent zoom to fit overriding variable data
+      if (busy) return;
+      busy = true;
+      if (typeof value !== 'string') return;
+      const extent = value.split(',').map(Number);
+      WRAPPER.map.getView().fit(extent);
+      busy = false;
+    };
+    display.onVariable(variableName, onChange);
+    if (display.hasVariable(variableName)) {
+      onChange(display.getVariable(variableName));
+    }
+  }
 }
 
 function initializeOpenLayers (callback) {
@@ -260,8 +290,7 @@ exports.display = {
           // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
           // TODO how do we handle changes to feature?
           WRAPPER.vectorLayer.getSource().addFeature(feature);
-
-          zoomToFit(WRAPPER);
+          if (WRAPPER.zoomToFit !== false) zoomToFit(WRAPPER);
         }
       }
     });

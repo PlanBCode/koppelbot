@@ -374,8 +374,9 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
   // TODO docs
   this.onVariable = (variableName, callback) => variables.onVariable(variableName, callback);
   this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
-  this.getVariable = (variableName) => variables.getVariable(variableName);
-  this.clearVariable = (variableName) => variables.clearVariable(variableName);
+  this.hasVariable = variableName => variables.hasVariable(variableName);
+  this.getVariable = variableName => variables.getVariable(variableName);
+  this.clearVariable = variableName => variables.clearVariable(variableName);
   this.getTitlePropertyPath = (entityClassName_ = entityClassName) => xyz.getTitlePropertyPath(entityClassName_);
   this.xyz = xyz; // TODO encapsulate
 };

@@ -12,7 +12,11 @@
       <td id="main" style="width:70%; text-align:center; position: relative;" rowspan="2">
         <div id="zoom-to-amersfoort" title="Zoom to Amersfoort">Amersfoort</div>
         <div id="resizer"></div>
-        <xyz id="map" style="height:100%; width:100%" uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs" hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"/>
+        <xyz id="map" style="height:100%; width:100%"
+          uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs"
+          hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"
+          viewBoxSelect="view"
+        />
       </td>
       <td valign="top"style="background-color:#EFEFEF; height: calc(100vh - 50px);">
         <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart" multiSelect="EigenaarIDs" select="eigenaar" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
