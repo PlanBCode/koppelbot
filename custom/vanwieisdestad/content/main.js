@@ -10,7 +10,7 @@ function onLoad () {
     } else return false;
   };
   const tryZoom = () => setTimeout(() => {
-    if (!zoomToAmersfoort()) tryZoom();
+    if (!xyz.hasVariable('view') && !zoomToAmersfoort()) tryZoom();
   }, 100);
   tryZoom();
 
