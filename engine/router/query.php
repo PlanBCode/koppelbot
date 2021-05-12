@@ -3,57 +3,14 @@ define('DEFAULT_LIMIT', 1000);
 
 class QueryStatement
 {
-    static protected function eq($lhs, $rhs): bool
-    {
-      if(is_string($rhs)){
-        return $rhs === '*' || in_array($lhs,explode(',',$rhs));
-      }else{
-        return $lhs == $rhs;
-      }
-    }
-
-    static protected function eqq($lhs, $rhs): bool
-    {
-      return $lhs == $rhs;
-    }
-
-    static protected function neq($lhs, $rhs): bool
-    {
-      if(is_string($rhs)){
-        return $rhs !== '*' && !in_array($lhs,explode(',',$rhs));
-      }else{
-        return $lhs != $rhs;
-      }
-    }
-
-    static protected function lt($lhs, $rhs): bool
-    {
-        return $lhs < $rhs;
-    }
-
-    static protected function gt($lhs, $rhs): bool
-    {
-        return $lhs > $rhs;
-    }
-
-    static protected function leq($lhs, $rhs): bool
-    {
-        return $lhs <= $rhs;
-    }
-
-    static protected function geq($lhs, $rhs): bool
-    {
-        return $lhs >= $rhs;
-    }
-
     static protected $comparisonOperators = [
-        '==' => 'eq',
-        '===' => 'eqq',
-        '!=' => 'neq',
-        '<' => 'lt',
-        '>' => 'gt',
-        '<=' => 'leq',
-        '>=' => 'geq'
+        '===' => 'EQQ',
+        '==' => 'EQ',
+        '!=' => 'NEQ',
+        '<=' => 'LEQ',
+        '>=' => 'GEQ',
+        '<' => 'LT',
+        '>' => 'GT'
     ];
 
     protected $lhs;
@@ -99,19 +56,18 @@ class QueryStatement
         }
     }
 
-    public function match(&$entityContent): bool
+    public function match(&$entityContent, &$entityClass): bool
     {
         if ($this->operator === '') return true;
         if ($this->operator === '=') return true;
-
         //TODO use .property notation for rhs red = "red" , .red = $entityContent['red']
-        $comparisonFunctionName = array_get(self::$comparisonOperators, $this->operator);
+        $comparisonFunctionName = 'operator' . array_get(self::$comparisonOperators, $this->operator);
         if (is_null($comparisonFunctionName)) return false;
-
         $propertyPath = explode('.', $this->lhs);
         $jsonActionResponse = json_get($entityContent, $propertyPath);
         if (!$jsonActionResponse->succeeded()) return false;
-        return call_user_func_array(['self', $comparisonFunctionName], [$jsonActionResponse->content, $this->rhs]);
+        $typeName = $entityClass->getProperty($propertyPath)->getTypeName();
+        return call_user_func_array(['Type_'.$typeName, $comparisonFunctionName], [$jsonActionResponse->content, $this->rhs]);
     }
 
     public function checkToggle(): bool
@@ -209,7 +165,7 @@ class Query
         return array_unique($propertyNames);
     }
 
-    public function getMatchingEntityIdsAndRange(string $entityClassList, &$content, array $accessGroups): array
+    public function getMatchingEntityIdsAndRange(string $entityClassList, &$content, array &$accessGroups): array
     {
         $entityClassNames = explode(',',$entityClassList);
         $entityIds = [];
@@ -217,11 +173,12 @@ class Query
         //TODO handle multi class requests
         foreach ($entityClassNames as $entityClassName) {
           if(array_key_exists($entityClassName,$content)){
+            $entityClass = EntityClass::get($entityClassName, $accessGroups);
             $entityClassContent = $content[$entityClassName];
-            foreach ($entityClassContent as $entityId => $entityContent) {
+            foreach ($entityClassContent as $entityId => &$entityContent) {
                 $flagMatch = true;
                 foreach ($this->queryStatements as $queryStatement) {
-                    if (!$queryStatement->match($entityContent)) {
+                    if (!$queryStatement->match($entityContent, $entityClass)) {
                         $flagMatch = false;
                         break;
                     }

@@ -162,6 +162,47 @@ abstract class Type
         $headers =['Content-Type' => 'application/json'];
         return new HttpResponse2($status, $stringContent, $headers);
     }
+
+    static public function operatorEQ($lhs, $rhs): bool
+    {
+      if(is_string($rhs)){
+        return $rhs === '*' || in_array($lhs,explode(',',$rhs));
+      }else{
+        return $lhs == $rhs;
+      }
+    }
+
+    static public function operatorEQQ($lhs, $rhs): bool
+    {
+      return $lhs == $rhs;
+    }
+
+    static public function operatorNEQ(&$lhs, &$rhs): bool
+    {
+        return is_string($rhs)
+          ? $rhs !== '*' && !in_array($lhs,explode(',',$rhs))
+          : $lhs != $rhs;      
+    }
+
+    static public function operatorLT(&$lhs, &$rhs): bool
+    {
+        return $lhs < $rhs;
+    }
+
+    static public function operatorGT(&$lhs, &$rhs): bool
+    {
+        return $lhs > $rhs;
+    }
+
+    static public function operatorLEQ(&$lhs, &$rhs): bool
+    {
+        return $lhs <= $rhs;
+    }
+
+    static public function operatorGEQ(&$lhs, &$rhs): bool
+    {
+        return $lhs >= $rhs;
+    }
 }
 
 class Type_type extends Type
