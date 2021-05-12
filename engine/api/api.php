@@ -1,4 +1,5 @@
 <?php
+define('PAGE_SIZE',1000); // align with factory/js/source/request/request.js
 
 require 'internal.php';
 
@@ -208,7 +209,7 @@ class ApiRequest extends HttpRequest2
         $this->errors[] = new ApiError($status, $errorMessage, $path);
     }
 
-    public function getQueryConnectorRequests(string $requestUri, Query &$query): array
+    public function getQueryRequestsParameters(string $requestUri, Query &$query): array
     {
         $path = explode('/', $requestUri); //TODO helper function to split uri properly
         $entityClassList = count($path) > 1 ? $path[1] : '*';
@@ -218,8 +219,7 @@ class ApiRequest extends HttpRequest2
         if ($query->hasOption('sortBy')) $propertyNames[] = $query->getOption('sortBy');
 
         if ($query->hasOption('search')) $propertyNames = ['*'];
-        else if( count($propertyNames) === 0 && $query->hasOption('offset') || $query->hasOption('limit')){
-
+        else if( count($propertyNames) === 0 && ($query->hasOption('offset') || $query->hasOption('limit'))){
           //TODO error on multiple classes
           //TODO solve for multiple classes
           $entityClassName = $entityClassList;
@@ -229,13 +229,11 @@ class ApiRequest extends HttpRequest2
         }
         if (count($propertyNames) === 0) return [];
 
-        //TODO check for trees -> dot notation
-
-        $propertyPath = explode('.', $propertyNames[0]);
+        // dot notation will be resolved further down the line
+        $propertyPath = [implode(',',$propertyNames )];//TODO
         $requestUri = '/' . $entityClassList . '/' . $entityIdList . '/' . implode(',',$propertyNames); //TODO tree
         $queryString = mergeQueryStrings($this->queryString, 'expand');
-        $otherQuery = new Query($queryString);
-        return getConnectorRequests($this, 'GET', $requestUri, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
+        return [$requestUri, $entityClassList, $entityIdList, $propertyPath, $queryString];
     }
 
 
@@ -337,6 +335,55 @@ class ApiRequest extends HttpRequest2
         return $this->resolveReferenceResponses($requestResponses, $remainingConnectorRequests, $remappedAutoIncrementedUris);
     }
 
+    protected function applyQueryFiltering($originalEntityIdList, $requestUri, $query)
+    {
+      [$requestUri, $entityClassList, $entityIdList, $propertyPath, $queryString] = $this->getQueryRequestsParameters($requestUri, $query);
+      if(is_null($requestUri)) return $originalEntityIdList;
+
+      $originalLimit = $query->hasOption('limit')? intval($query->getOption('limit')) : DEFAULT_LIMIT;
+      $originalOffset = $query->hasOption('offset')? intval($query->getOption('offset')) : 0;
+
+      $xoffset = 0;   // Note note offset, do not use query offset as we then do not know if it has been cut properly
+      $limit = PAGE_SIZE; // Note, do not use query limit as we may need to scan more items to find enough to match query limit
+
+      $entityIds = []; // entityIds matching filter criterea
+      $range = 0; // Total available
+      $more = true;
+      // Retrieve query responses in page batches
+      // Loop through pages untill we've collected  sufficient data
+      while($more){
+        $queryString = "limit=$limit&xoffset=$offset&expand";  // note not offset
+        //TODO use mergeQueryStrings to include original query filters, without limit and offset
+        //TODO but we need sql connector to be able to check if it can allow filter/limit with given query filters
+
+        $otherQuery = new Query($queryString);
+        $queryConnectorRequests = getConnectorRequests($this, 'GET', $requestUri, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
+
+        $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
+        //TODO check $requestResponse
+        /** @var RequestResponse */
+        $requestResponse = array_values($queryRequestResponses)[0];
+        $status = $requestResponse->getStatus();
+        if($status !== 200) return null;
+        $queryContent = $requestResponse->getContent();
+        //TODO handle failure
+        $moreEntityIds = $query->getMatchingEntityIdsAndRange($entityClassList, $queryContent, $this->accessGroups);
+        array_push($entityIds, ...$moreEntityIds);
+        $range += count($moreEntityIds);
+        $offset += PAGE_SIZE;
+        if(count(array_keys($queryContent[$entityClassList])) < PAGE_SIZE) $more = false; // there are no more results
+        else if(count($entityIds) >= $originalLimit + $originalOffset) $more = false; // we've found enough
+      }
+
+      $range = count($entityIds);
+      $this->outHeaders["XYZ-Range-$entityClassList-$requestId"] = $range;
+      if(empty($entityIds)) return [];
+
+      $entityIds = array_slice($entityIds, $originalOffset, $originalLimit); // cut what's not needed
+      $entityIdList = implode(',', $entityIds);
+      return $entityIdList;
+    }
+
     protected function getRequestResponse($requestId, string $requestUri, string &$requestContent): array
     {
       $split = explode('?',$requestUri);
@@ -358,32 +405,12 @@ class ApiRequest extends HttpRequest2
         if(count($queryPropertyNames)>0) $propertyPath[0] .= ',' . implode(',', $queryPropertyNames);
       }
 
-      // First retrieve query responses
-      $queryConnectorRequests = $this->getQueryConnectorRequests($requestUri, $query);
-      $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
-      if (count($queryRequestResponses) > 0) {
+      $entityIdList = $this->applyQueryFiltering($entityIdList, $requestUri, $query);
+      if(is_null($entityIdList)){
+          $this->addError($status, 'Bad filter request');
+          return [];
+      }else if(is_array($entityIdList)) return [];
 
-          /** @var RequestResponse */
-          $requestResponse = array_values($queryRequestResponses)[0];
-          $status =   $requestResponse->getStatus();
-          if($status !== 200){
-            $this->addError($status, 'Bad filter request');
-            return [];
-          }
-          $queryContent = $requestResponse->getContent();
-
-          //TODO handle failure
-          $result = $query->getMatchingEntityIdsAndRange($entityClassList, $queryContent, $this->accessGroups);
-          $entityIds = $result['entityIds'];
-          $range = $result['range'];
-          $limit = $result['limit'];
-
-          $this->outHeaders["XYZ-Range-$entityClassList-$requestId"] = $range;
-          $this->outHeaders["XYZ-Limit-$entityClassList-$requestId"] = $limit;
-
-          if(empty($entityIds)) return [];
-          $entityIdList = implode(',', $entityIds);
-      }
       /*TODO optimization compare connector strings in $queryConnectorRequests and  $connectorRequests.
       then decide to first get the query id's and update the $connectorRequests
       before getting the actual data

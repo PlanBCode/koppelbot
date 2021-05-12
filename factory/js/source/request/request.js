@@ -1,3 +1,5 @@
+const PAGE_SIZE = 1000; // align with engine/api/api.php
+
 const entity = require('../entity/entity.js');
 const {setQueryParameter, getQueryParameter, multiSetQueryParameters, pathFromUri} = require('../uri/uri.js');
 
@@ -195,7 +197,6 @@ const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, c
 exports.post = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'POST', uri, content, callback);
 exports.patch = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PATCH', uri, content, callback);
 exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PUT', uri, content, callback);
-const PAGE_SIZE = 1000;
 
 function getEntityCount (status, responseObjectContents, page, getResponseHeader) {
   let maxEntityPageCount = 0;

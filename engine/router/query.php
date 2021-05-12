@@ -72,6 +72,12 @@ class QueryStatement
         return call_user_func_array(['Type_'.$typeName, $comparisonFunctionName], array(&$jsonActionResponse->content, &$this->rhs));
     }
 
+    public function toString(): string
+    {
+      return ($this->lhs?$this->lhs:'').($this->operator?$this->operator:'').($this->rhs?$this->rhs:'');
+    }
+
+
     public function checkToggle(): bool
     {
         return $this->operator === '' || ($this->operator === '=' && ($this->rhs === 'true' || $this->rhs === '1'));
@@ -218,15 +224,6 @@ class Query
                 return $property->sort($entityContentA, $entityContentB); // Perform sorting, return -1, 0, 1
             });
         }
-        // limit & offset
-        $offset = $this->getOption('offset', 0);
-        $range = count($entityIds);
-        $limit = $this->getOption('limit', max($range, DEFAULT_LIMIT));
-        $entityIds = array_slice($entityIds, $offset, $limit);
-        return [
-          "entityIds" => $entityIds,
-          "range" => $range,
-          "limit" => $limit
-        ];
+        return $entityIds;
     }
 }

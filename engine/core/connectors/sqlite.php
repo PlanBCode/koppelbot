@@ -38,9 +38,12 @@ class Connector_sqlite extends Connector
       if($this->db) $this->db->close();
     }
 
-    protected function constructQueryString(string $method, array &$keys, string $idKey, array &$entityIds, string $table): string
+    protected function constructQueryString(string $method, array &$keys, string $idKey, array &$entityIds, string $table, bool $useFilters): string
     {
       $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN (\''. implode('\',\'',array_keys($entityIds)).'\')');
+
+      $query = array_values($keys)[0]->getQuery();
+
       if($method === 'GET'){
         $queryString = 'SELECT '.$idKey;
         foreach($keys as $key=>$propertyRequest){
@@ -56,8 +59,14 @@ class Connector_sqlite extends Connector
           }else{
             $queryString .= ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
           }
+
         }
         $queryString .=' FROM '.$table . $whereString;
+        if( $useFilters) {
+          //TODO use other filters if possible
+          if( $query->hasOption('limit')) $queryString.=' LIMIT ' . intval($query->getOption('limit'));
+          if( $query->hasOption('xoffset')) $queryString.=' OFFSET ' . intval($query->getOption('xoffset')); // note not offset
+        }
       } else if($method === 'DELETE'){
         $queryString ='DELETE FROM '.$table. $whereString;
       } else if($method === 'HEAD'){
@@ -117,24 +126,46 @@ class Connector_sqlite extends Connector
           return $connectorResponse;
         }
 
-        $keysPerTable = [];
-        $entityIdsPerTable = [];
+
+        // $table => $requestId => $key => $property
+        $keysPerTablePerRequestId = [];
+        // $table => $requestId => $entityId => true
+        $entityIdsPerTablePerRequestId = [];
+        // $table => $requestId  => true|false
+        $allowFilterAtConnectorPerTablePerRequestId = []; // if no external data is used for filter, we can do it in SQL
+        // $table => $idProperty
         $idPropertyPerTable = [];
+
         foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
           $propertyPath = $propertyRequest->getPropertyPath();
           $propertyName = $propertyPath[0]; //TODO check
 
           $entityIdList = $propertyRequest->getEntityIdList();
           $entityIds = explode(',',$entityIdList);
+          $requestId = $propertyRequest->getRequestId();
 
           $connectorSettings = $propertyRequest->getProperty()->getConnectorSettings();
           $table = array_get($connectorSettings, 'table'); //TODO default to entityClassName;
           $key = array_get($connectorSettings, 'key', $propertyName); ;
-          if(!array_key_exists($table, $keysPerTable)) {
-            $keysPerTable[$table] = [];
-            $entityIdsPerTable[$table] = [];
+          if(!array_key_exists($table, $keysPerTablePerRequestId)) {
+            $keysPerTablePerRequestId[$table] = [];
+            $entityIdsPerTablePerRequestId[$table] = [];
+            $allowFilterAtConnectorPerTablePerRequestId[$table] = [];
           }
-          $keysPerTable[$table][$key] = $propertyRequest;
+          if(!array_key_exists($requestId, $keysPerTablePerRequestId[$table])) {
+            $keysPerTablePerRequestId[$table][$requestId] = [];
+            $entityIdsPerTablePerRequestId[$table][$requestId] = [];
+            $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId] = true;
+          }
+
+          // If no propertyNames are used by query then we can implement the requested limit and offset
+          // TODO check if only already used propertyNames in this table are used, then it's also ok
+          if(count($propertyRequest->getQuery()->getAllUsedPropertyNames())){
+            $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId] = false;
+          }
+
+
+          $keysPerTablePerRequestId[$table][$requestId][$key] = $propertyRequest;
           $entityClassName = $propertyRequest->getEntityClassName();
           $accessGroups = [];
           $entityClass = EntityClass::get($entityClassName,$accessGroups);
@@ -143,7 +174,7 @@ class Connector_sqlite extends Connector
           $idProperty = $entityClass->getProperty($idPropertyPath);
           $idPropertyPerTable[$table] = $idProperty->getConnectorSetting('key', $idPropertyName);
           foreach($entityIds as $entityId){
-            $entityIdsPerTable[$table][$entityId] = true;
+            $entityIdsPerTablePerRequestId[$table][$requestId][$entityId] = true;
           }
         }
 
@@ -154,12 +185,14 @@ class Connector_sqlite extends Connector
           return $connectorResponse;
         }
 
-        foreach($keysPerTable as $table=>$keys){
-          $idKey=$idPropertyPerTable[$table];
-          $entityIds = $entityIdsPerTable[$table];
-          $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table);
-          $result = $this->db->query($queryString);
-          $this->handleResults($method, $idKey, $result, $propertyRequest, $connectorRequest, $connectorResponse);
+        foreach($keysPerTablePerRequestId as $table => &$keysPerRequestId){
+          foreach($keysPerRequestId as $requestId => &$keys){
+            $idKey=$idPropertyPerTable[$table];
+            $entityIds = $entityIdsPerTablePerRequestId[$table][$requestId];
+            $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table, $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId]);
+            $result = $this->db->query($queryString);
+            $this->handleResults($method, $idKey, $result, $propertyRequest, $connectorRequest, $connectorResponse);
+          }
         }
         $this->close();
         return $connectorResponse;
