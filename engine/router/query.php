@@ -8,6 +8,7 @@ class QueryStatement
         '==' => 'EQ',
         '!==' => 'NEQQ',
         '!=' => 'NEQ',
+        '>=<' => 'OVERLAP',
         '<>' => 'IN',
         '><' => 'OUT',
         '<=' => 'LEQ',

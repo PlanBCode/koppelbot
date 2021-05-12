@@ -219,7 +219,12 @@ abstract class Type
     {
         return false;
     }
-}
+    // lhs>=<rhs
+    static public function operatorOVERLAP(&$lhs, &$rhs): bool
+    {
+        return false;
+    }
+  }
 
 class Type_type extends Type
 {
