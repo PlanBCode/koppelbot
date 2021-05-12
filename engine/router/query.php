@@ -68,7 +68,7 @@ class QueryStatement
         $jsonActionResponse = json_get($entityContent, $propertyPath);
         if (!$jsonActionResponse->succeeded()) return false;
         $typeName = $entityClass->getProperty($propertyPath)->getTypeName();
-        return call_user_func_array(['Type_'.$typeName, $comparisonFunctionName], [$jsonActionResponse->content, $this->rhs]);
+        return call_user_func_array(['Type_'.$typeName, $comparisonFunctionName], array(&$jsonActionResponse->content, &$this->rhs));
     }
 
     public function checkToggle(): bool
