@@ -71,6 +71,19 @@ exports.constructor = function Property (xyz, parent, propertyName, settings, de
   this.getPropertyPath = () => this.getPath('*').slice(2);
   this.getSubUri = () => this.getPath('*').slice(2).join('/');
 
+  this.getSubProperty = subPropertPathOrName => {
+    if (typeof propertPathOrName === 'string') {
+      if (subProperties.hasOwnProperty(subPropertPathOrName)) {
+        return subProperties[subPropertPathOrName].getProperty(subPropertPathOrName.slice(1));
+      } else console.error(`Sub Property ${subPropertPathOrName} not found!`);
+    } else if (subPropertPathOrName instanceof Array) {
+      if (subPropertPathOrName.length === 0) return this;
+      else if (subProperties.hasOwnProperty(subPropertPathOrName[0])) {
+        return subProperties[subPropertPathOrName[0]].getProperty(subPropertPathOrName.slice(1));
+      } else console.error(`Sub Property ${subPropertPathOrName} not found!`);
+    } else console.error('Expected string sub property name or array sub property path.');
+  };
+
   this.getEntityClassName = () => parent.getEntityClassName();
 
   this.getParent = () => parent;
@@ -258,6 +271,8 @@ exports.constructor = function Property (xyz, parent, propertyName, settings, de
       return null;
     }
   };
+
+  this.getTypeName = () => type;
 
   this.render = (action, options, entityId) => {
     const hasRenderMethod = types.hasOwnProperty(type) && types[type].hasOwnProperty(action);

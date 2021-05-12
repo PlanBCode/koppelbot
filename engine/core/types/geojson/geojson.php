@@ -33,7 +33,7 @@ function getBoundingBox(array &$geojson) : array
         if($count === 0) return [];
         $bbox = array_merge($geojson['coordinates'][0],$geojson['coordinates'][0]); // [x0,y0,x0,y0]
         for($i=1; $i<$count; ++$i){
-          $bboxi = array_merge($geojson['coordinates'][$i],$geojson['coordinates'][$i]);
+          $bboxi = array_merge($geojson['coordinates'][$i],$geojson['coordinates'][$i]); // [xi,yi,xi,yi]
           mergeBoundingBoxes($bbox, $bboxi);
         }
       case 'GeometryCollection':
@@ -64,7 +64,7 @@ function getBoundingBox(array &$geojson) : array
 
 class Type_geojson extends Type_json
 {
-  // lhs<>rhs whether feature overlaps with bounding box;
+  // lhs>=<rhs whether feature overlaps with bounding box;
   static public function operatorOVERLAP(&$lhs, &$rhs): bool
   {
       $bbox = explode(',',$rhs);

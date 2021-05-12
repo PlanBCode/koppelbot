@@ -9,7 +9,7 @@ function isValidCoordinate (coordinate) {
 
 function isValidArrayOfSubType (array, isValidSubFunction) {
   if (!(array instanceof Array)) return false;
-  for (let member of array) {
+  for (const member of array) {
     if (!isValidSubFunction(member)) return false;
   }
   return true;
@@ -84,7 +84,6 @@ exports.actions = {
               SVG.setAttributeNS(null, 'r', '10');
               SVG.setAttributeNS(null, 'fill', color);
               SVG.setAttributeNS(null, 'stroke', 'black'); // TODO parametrize
-              SVG;
               // TODO other cases
           }
         }
@@ -98,5 +97,6 @@ exports.actions = {
     if (!json.actions.validateContent(item)) return false; // check if valid json
     const content = item.getContent();
     return isValidGeometry(content) || isValidFeature(content);
-  }
+  },
+  operatorOVERLAP: (lhs, rhs) => true
 };

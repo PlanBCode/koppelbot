@@ -163,6 +163,7 @@ abstract class Type
         return new HttpResponse2($status, $stringContent, $headers);
     }
 
+    //align with factory/js/source/type/operations.js
     // lhs==rhs
     static public function operatorEQ($lhs, $rhs): bool
     {

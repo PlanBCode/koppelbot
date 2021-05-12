@@ -3,7 +3,7 @@ define('DEFAULT_LIMIT', 1000);
 
 class QueryStatement
 {
-    static protected $comparisonOperators = [
+    static protected $comparisonOperators = [ //align with factory/js/source/type/operations.js
         '===' => 'EQQ',
         '==' => 'EQ',
         '!==' => 'NEQQ',

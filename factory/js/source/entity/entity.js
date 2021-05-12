@@ -1,8 +1,9 @@
-const Property = require('./property.js').constructor;
-const listener = require('./listener.js');
-const uriTools = require('../uri/uri.js');
-const json = require('../web/json.js');
-const response = require('./response.js');
+const Property = require('./property').constructor;
+const listener = require('./listener');
+const uriTools = require('../uri/uri');
+const json = require('../web/json');
+const response = require('./response');
+const {operate} = require('../type/operations');
 
 const input = require('../request/input.js');
 const {getQueryParameter} = require('../web/web');
@@ -152,6 +153,19 @@ function EntityClass (xyz, entityClassName, rawSettings) {
       }
     }
     return TABLE;
+  };
+
+  this.getProperty = propertPathOrName => {
+    if (typeof propertPathOrName === 'string') {
+      if (properties.hasOwnProperty(propertPathOrName)) {
+        return properties[propertPathOrName].getSubProperty(propertPathOrName.slice(1));
+      } else console.error(`Property ${propertPathOrName} not found!`);
+    } else if (propertPathOrName instanceof Array) {
+      if (propertPathOrName.length === 0) return this;
+      else if (properties.hasOwnProperty(propertPathOrName[0])) {
+        return properties[propertPathOrName[0]].getSubProperty(propertPathOrName.slice(1));
+      } else console.error(`Property ${propertPathOrName} not found!`);
+    } else console.error('Expected string property name or array property path.');
   };
 
   this.getTitlePropertyPath = () => {
@@ -310,9 +324,13 @@ function EntityClass (xyz, entityClassName, rawSettings) {
         for (const propertyName in queryFilters) {
           const propertyPath = propertyName.split('.');
           const [operator, rhs] = queryFilters[propertyName];
+          // TODO handle rhs starting with a .
+          //
+          const property = this.getProperty(propertyPath);
+          const typeName = property.getTypeName();
           const propertyContent = json.get(entityContent, propertyPath);
           const lhs = propertyContent ? propertyContent.getContent() : null;
-          if (rhs == lhs) filteredEntityIds.push(entityId); // TODO use operator
+          if (operate(typeName, operator, lhs, rhs)) filteredEntityIds.push(entityId);
         }
       }
       return filteredEntityIds;
