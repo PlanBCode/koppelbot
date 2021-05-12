@@ -6,7 +6,10 @@ class QueryStatement
     static protected $comparisonOperators = [
         '===' => 'EQQ',
         '==' => 'EQ',
+        '!==' => 'NEQQ',
         '!=' => 'NEQ',
+        '<>' => 'IN',
+        '><' => 'OUT',
         '<=' => 'LEQ',
         '>=' => 'GEQ',
         '<' => 'LT',
@@ -49,11 +52,9 @@ class QueryStatement
         //todo this only catches color==red
         // TODO color1==color2  (how to distinguish between color="red" color=red ?)  solution: use .red for rhs columns
         // TODO (color==red|color==blue)
-        if (array_key_exists($this->operator, self::$comparisonOperators)) {
-            return [$this->lhs];
-        } else {
-            return [];
-        }
+        return array_key_exists($this->operator, self::$comparisonOperators)
+            ? [$this->lhs]
+            : [];
     }
 
     public function match(&$entityContent, &$entityClass): bool

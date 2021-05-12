@@ -163,6 +163,7 @@ abstract class Type
         return new HttpResponse2($status, $stringContent, $headers);
     }
 
+    // lhs==rhs
     static public function operatorEQ($lhs, $rhs): bool
     {
       if(is_string($rhs)){
@@ -171,37 +172,52 @@ abstract class Type
         return $lhs == $rhs;
       }
     }
-
+    // lhs===rhs
     static public function operatorEQQ($lhs, $rhs): bool
     {
       return $lhs == $rhs;
     }
-
+    // lhs!=rhs
     static public function operatorNEQ(&$lhs, &$rhs): bool
     {
         return is_string($rhs)
           ? $rhs !== '*' && !in_array($lhs,explode(',',$rhs))
-          : $lhs != $rhs;      
+          : $lhs != $rhs;
     }
-
+    // lhs!==rhs
+    static public function operatorNEQQ(&$lhs, &$rhs): bool
+    {
+        return $lhs != $rhs;
+    }
+    // lhs<rhs
     static public function operatorLT(&$lhs, &$rhs): bool
     {
         return $lhs < $rhs;
     }
-
+    // lhs>rhs
     static public function operatorGT(&$lhs, &$rhs): bool
     {
         return $lhs > $rhs;
     }
-
+    // lhs<=rhs
     static public function operatorLEQ(&$lhs, &$rhs): bool
     {
         return $lhs <= $rhs;
     }
-
+    // lhs>=rhs
     static public function operatorGEQ(&$lhs, &$rhs): bool
     {
         return $lhs >= $rhs;
+    }
+    // lhs<>rhs
+    static public function operatorIN(&$lhs, &$rhs): bool
+    {
+        return false;
+    }
+    // lhs><rhs
+    static public function operatorOUT(&$lhs, &$rhs): bool
+    {
+        return false;
     }
 }
 
