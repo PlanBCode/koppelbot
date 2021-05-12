@@ -398,7 +398,7 @@ class ApiRequest extends HttpRequest2
       $originalUri = $this->uri.'?'.$this->queryString;
       $requestUris = explode(';',$originalUri); // reconstruct the full uri
       $isMultiRequest = count($requestUris)>1;
-      $requestContents = $isMultiRequest ? json_decode($this->content): null;
+      $requestContents = $isMultiRequest ? json_decode($this->content, true): null;
       $connectorRequests = [];
       foreach($requestUris as $requestId => $requestUri){
         $requestContent = $isMultiRequest && is_array($requestContents)
