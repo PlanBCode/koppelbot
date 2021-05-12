@@ -81,6 +81,15 @@ class ContentRequest extends HttpRequest2
       //TODO insert sitemap into html header
       //TODO insert xyz js (only if there are xyz tags)
       if(pathinfo($fileName, PATHINFO_EXTENSION) === 'html') $fileContent = replaceXyzTags($fileContent);
+
+      // handle gzip encoding
+      if(array_key_exists('Accept-Encoding',$this->headers)){
+        foreach(explode(',',$this->headers['Accept-Encoding']) as &$encoding){
+          [$algorithm, $arguments] = explode(';',$encoding);
+          if( $algorithm === 'gzip') $headers['Content-Encoding'] = 'gzip';
+        }
+      }
+      
       return new ContentResponse($status, $fileContent, $headers);
     }
 

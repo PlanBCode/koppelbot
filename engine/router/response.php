@@ -120,9 +120,12 @@ class HttpResponse2 extends Response
 
     public function __construct(int $status, string &$content, array &$headers = [])
     {
+        if(array_get($headers, 'Content-Encoding') === 'gzip'){
+          $this->content = gzencode($content,2);
+        }else $this->content =& $content;
+
         $this->status = $status;
-        $this->content =& $content;
-        $headers['Content-Length'] = strlen($content);
+        $headers['Content-Length'] = strlen($this->content);
         $this->headers =& $headers;
     }
 

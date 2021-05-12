@@ -539,6 +539,15 @@ class ApiRequest extends HttpRequest2
                 }
             }
             $headers = $this->outHeaders;
+
+            // handle gzip encoding
+            if(array_key_exists('Accept-Encoding',$this->headers)){
+              foreach(explode(',',$this->headers['Accept-Encoding']) as &$encoding){
+                [$algorithm, $arguments] = explode(';',$encoding);
+                if( $algorithm === 'gzip') $headers['Content-Encoding'] = 'gzip';
+              }
+            }
+
             $path = array_slice(explode('/', $this->uri), 1); // '/a/b/c' -> ['a','b','c']
 
             if (isSingularPath($path) && !$this->query->checkToggle('expand')) {
