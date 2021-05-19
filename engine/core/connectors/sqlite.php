@@ -38,10 +38,8 @@ class Connector_sqlite extends Connector
       if($this->db) $this->db->close();
     }
 
-    protected function constructQueryString(string $method, array &$keys, string $idKey, array &$entityIds, string $table, bool $useFilters): string
+    protected function constructQueryString(string $method, array &$keys, string $idPropertyName, string $idKey, EntityClass &$entityClass, array &$entityIds, string $table, bool $useFilters, Query &$query): string
     {
-      $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN (\''. implode('\',\'',array_keys($entityIds)).'\')');
-
       $query = array_values($keys)[0]->getQuery();
 
       if($method === 'GET'){
@@ -61,12 +59,64 @@ class Connector_sqlite extends Connector
           }
 
         }
-        $queryString .=' FROM '.$table . $whereString;
-        if( $useFilters) {
-          //TODO use other filters if possible
-          if( $query->hasOption('limit')) $queryString.=' LIMIT ' . intval($query->getOption('limit'));
-          if( $query->hasOption('xoffset')) $queryString.=' OFFSET ' . intval($query->getOption('xoffset')); // note not offset
+
+        $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN (\''. implode('\',\'',array_keys($entityIds)).'\')');
+
+        $filterString = '';
+        foreach ($query->getFilters() as &$queryFilter) {
+          [&$lhs, &$operator, &$rhs] = $queryFilter;
+          $lhsPropertyPath = [$lhs];
+          if($entityClass->hasProperty($lhsPropertyPath)){
+            $property = $entityClass->getProperty($lhsPropertyPath);
+            $typeName = $property->getTypeName();
+            $a = '';
+            if($typeName === 'id' || $typeName === 'number' || $typeName === 'reference'){
+              if($operator === '==='){
+                $a = $lhs .'='.$rhs.'';//TODO check
+              }else if($operator === '==' && $rhs!=='*'){
+                $a = $lhs .' IN (\''.  $rhs.'\')';//TODO check
+              }else if($operator === '!='){
+                $a = $rhs === '*'
+                  ? 'FALSE'
+                  : 'NOT '. $lhs .' IN (\''.  $rhs.'\')';//TODO check
+              } else if($operator === '!=='){
+                $a = $lhs .'<>'.$rhs.'';//TODO check
+              } else if($operator === '>=' || $operator === '<=' || $operator === '<' || $operator === '>'){
+                $a = $lhs .'='.$rhs.'';//TODO check
+              }
+            }else if($typeName === 'string'){
+              if($operator === '=='){ //TODO ===
+                $a = $lhs .'="'.$rhs.'"';//TODO check
+              } else if($operator === '!='){ //TODO !==
+                $a = $lhs .'<>"'.$rhs.'"';//TODO check
+              }
+            }else if($typeName === 'geojson'){
+              if($operator === '>=<'){
+                [$xMin,$yMin,$xMax,$yMax] = explode(',',$rhs); //TODO intval
+                $a = "
+                  ( $xMin <= json_extract(geojson, '\$.bbox[2]')
+                    AND $yMin <= json_extract(geojson, '\$.bbox[3]')
+                    AND $xMax >= json_extract(geojson, '\$.bbox[0]')
+                    AND $yMax >= json_extract(geojson, '\$.bbox[1]')
+                  )";//TODO check
+              }
+            }
+            if($a !== '') $filterString .= ($filterString===''?'':' AND') . ' '.$a;
+          }
         }
+        if($filterString !== ''){
+          if($whereString !== '') $whereString .= ' AND '.$filterString;
+          else $whereString = ' WHERE '.$filterString;
+        }
+
+        $queryString .=' FROM '.$table . $whereString;
+
+        //if( $useFilters) {
+          if( $query->hasOption('limit')) $queryString.=' LIMIT ' . intval($query->getOption('limit'));
+          else $queryString.=' LIMIT -1';
+          if( $query->hasOption('xoffset')) $queryString.=' OFFSET ' . intval($query->getOption('xoffset')); // note not offset
+        //}
+
       } else if($method === 'DELETE'){
         $queryString ='DELETE FROM '.$table. $whereString;
       } else if($method === 'HEAD'){
@@ -134,7 +184,7 @@ class Connector_sqlite extends Connector
         // $table => $requestId  => true|false
         $allowFilterAtConnectorPerTablePerRequestId = []; // if no external data is used for filter, we can do it in SQL
         // $table => $idProperty
-        $idPropertyPerTable = [];
+        $entityClassPerTable = [];
 
         foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
           $propertyPath = $propertyRequest->getPropertyPath();
@@ -164,15 +214,12 @@ class Connector_sqlite extends Connector
             $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId] = false;
           }
 
-
           $keysPerTablePerRequestId[$table][$requestId][$key] = $propertyRequest;
           $entityClassName = $propertyRequest->getEntityClassName();
           $accessGroups = [];
           $entityClass = EntityClass::get($entityClassName,$accessGroups);
-          $idPropertyName = $entityClass->getIdPropertyName();
-          $idPropertyPath = [$idPropertyName];
-          $idProperty = $entityClass->getProperty($idPropertyPath);
-          $idPropertyPerTable[$table] = $idProperty->getConnectorSetting('key', $idPropertyName);
+          $entityClassPerTable[$table] = $entityClass;
+
           foreach($entityIds as $entityId){
             $entityIdsPerTablePerRequestId[$table][$requestId][$entityId] = true;
           }
@@ -187,9 +234,16 @@ class Connector_sqlite extends Connector
 
         foreach($keysPerTablePerRequestId as $table => &$keysPerRequestId){
           foreach($keysPerRequestId as $requestId => &$keys){
-            $idKey=$idPropertyPerTable[$table];
+            $entityClass=$entityClassPerTable[$table];
             $entityIds = $entityIdsPerTablePerRequestId[$table][$requestId];
-            $queryString = $this->constructQueryString($method, $keys, $idKey, $entityIds, $table, $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId]);
+
+            $idPropertyName = $entityClass->getIdPropertyName();
+            $idPropertyPath = [$idPropertyName];
+            $idProperty = $entityClass->getProperty($idPropertyPath);
+            $idKey = $idProperty->getConnectorSetting('key', $idPropertyName);
+
+            $queryString = $this->constructQueryString($method, $keys, $idPropertyName, $idKey, $entityClass, $entityIds, $table, $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId], $propertyRequest->getQuery());
+
             $result = $this->db->query($queryString);
             $this->handleResults($method, $idKey, $result, $propertyRequest, $connectorRequest, $connectorResponse);
           }

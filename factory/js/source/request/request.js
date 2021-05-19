@@ -4,7 +4,7 @@ const entity = require('../entity/entity.js');
 const {setQueryParameter, getQueryParameter, multiSetQueryParameters, pathFromUri} = require('../uri/uri.js');
 
 const pendingGets = {
-  // uri -> {originalLimit, currentCount}
+  // uri -> {}
 };
 const pendingRequests = [];
 
@@ -12,16 +12,6 @@ function renderPendingRequestIndicator () {
   let DIV_pendingRequestIndicator = document.getElementById('xyz-pendingRequestIndicator');
 
   if (pendingRequests.length > 0) {
-    let total = 0;
-    let count = 0;
-    for (const uri in pendingGets) {
-      if (pendingGets[uri].hasOwnProperty('totalCount')) {
-        const {totalCount, currentCount} = pendingGets[uri];
-        total += totalCount;
-        count += currentCount;
-      }
-    }
-    const progress = total === 0 ? 0 : count / total;
     if (!DIV_pendingRequestIndicator) {
       DIV_pendingRequestIndicator = document.createElement('DIV');
       const SPAN_pendingRequestProgress = document.createElement('SPAN');
@@ -30,7 +20,8 @@ function renderPendingRequestIndicator () {
       DIV_pendingRequestIndicator.appendChild(DIV_pendingRequestAnimation);
       document.body.appendChild(DIV_pendingRequestIndicator);
     }
-    DIV_pendingRequestIndicator.firstChild.innerHTML = Math.floor(100 * progress) + '%';
+    DIV_pendingRequestIndicator.firstChild.innerHTML = '';// pendingRequests.length;
+
     DIV_pendingRequestIndicator.id = 'xyz-pendingRequestIndicator';
     DIV_pendingRequestIndicator.style.display = 'block';
   } else if (DIV_pendingRequestIndicator) DIV_pendingRequestIndicator.style.display = 'none';
@@ -198,27 +189,26 @@ exports.post = (entityClasses, uri, content, callback) => handleModifyRequest(en
 exports.patch = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PATCH', uri, content, callback);
 exports.put = (entityClasses, uri, content, callback) => handleModifyRequest(entityClasses, 'PUT', uri, content, callback);
 
-function getEntityCount (status, responseObjectContents, page, getResponseHeader) {
+function getEntityCount (status, responseObjectContents) {
   let maxEntityPageCount = 0;
-  let totalCount = 0;
-  let totalCurrentCount = 0;
-  for (let requestId = 0; requestId < responseObjectContents.length; ++requestId) {
-    const responseObjectContent = responseObjectContents[requestId];
-    for (const entityClassName in responseObjectContent) {
-      const entityClassTotalCount = Number(getResponseHeader(`XYZ-Range-${entityClassName}-${requestId}`));
-      totalCount += entityClassTotalCount;
-      // TODO check
-      const entityClassContent = status === 207
-        ? responseObjectContent[entityClassName].content
-        : responseObjectContent[entityClassName];
-      const entityIds = Object.keys(entityClassContent); // TODO check
-      const pageCount = entityIds.length;
-      if (pageCount > maxEntityPageCount) maxEntityPageCount = pageCount;
-      const currentCount = page * PAGE_SIZE + pageCount;
-      totalCurrentCount += currentCount;
+  let entityCount = 0;
+  if (status >= 200 && status <= 299) {
+    for (let requestId = 0; requestId < responseObjectContents.length; ++requestId) {
+      const responseObjectContent = responseObjectContents[requestId];
+      for (const entityClassName in responseObjectContent) {
+        // TODO check
+        const entityClassContent = status === 207
+          ? responseObjectContent[entityClassName].content
+          : responseObjectContent[entityClassName];
+        const entityIds = Object.keys(entityClassContent); // TODO check
+
+        const pageCount = entityIds.length;
+        if (pageCount > maxEntityPageCount) maxEntityPageCount = pageCount;
+        entityCount += pageCount;
+      }
     }
   }
-  return {totalCount, currentCount: totalCurrentCount};
+  return entityCount;
 }
 
 function getPartial (uri, entityClasses, dataCallback, originalUri, originalOffset, originalLimit, offset, page = 0) {
@@ -242,15 +232,14 @@ function getPartial (uri, entityClasses, dataCallback, originalUri, originalOffs
     // determine if we need to get another page
     const isMultiRequest = (responseObjectContent instanceof Array) && nextPageUri.includes(';');
     const responseObjectContents = isMultiRequest ? responseObjectContent : [responseObjectContent];
-    const {totalCount, currentCount} = getEntityCount(status, responseObjectContents, page, getResponseHeader);
+    const entityCount = getEntityCount(status, responseObjectContents, page, getResponseHeader);
     if (!pendingGets.hasOwnProperty(originalUri)) pendingGets[originalUri] = {};
-    pendingGets[originalUri].totalCount = totalCount;
-    pendingGets[originalUri].currentCount = currentCount;
-    if (totalCount > currentCount) { // could be more
-      getPartial(nextPageUri, entityClasses, dataCallback, originalUri, originalOffset, originalLimit, offset + PAGE_SIZE, page + 1);
+    if (entityCount === PAGE_SIZE) { // could be more
+      getPartial(originalUri, entityClasses, dataCallback, originalUri, originalOffset, originalLimit, offset + PAGE_SIZE, page + 1);
     } else {
       delete pendingGets[uri];
     }
+
     renderPendingRequestIndicator();
   });
 }
@@ -263,7 +252,7 @@ exports.get = (xyz, entityClasses, uri, dataCallback) => {
     // TODO get the data from cache if already in cache
     const originalLimit = getQueryParameter(uri, 'limit');
     const originalOffset = getQueryParameter(uri, 'offset');
-    pendingGets[uri] = {originalLimit, currentCount: 0};
+    pendingGets[uri] = {};
     getPartial(uri, entityClasses, dataCallback, uri, originalLimit, originalOffset);
   });
 };

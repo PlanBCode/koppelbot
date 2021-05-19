@@ -31,6 +31,10 @@ class QueryStatement
         $this->lhs = $matches[1];
         $this->operator = $matches[2];
         $this->rhs = $matches[3];
+        if(!($this->operator) && !($this->rhs)){ // 'toggle' -> 'toggle=true'
+          $this->operator = '=';
+          $this->rhs = 'true';
+        }
     }
 
     public function getLhs()//TODO : ?string
@@ -60,8 +64,8 @@ class QueryStatement
 
     public function match(&$entityContent, &$entityClass): bool
     {
-        if ($this->operator === '') return true;
-        if ($this->operator === '=') return true;
+        if ($this->operator === '') return true; // not a filter
+        if ($this->operator === '=') return true; // not a filter
         //TODO use .property notation for rhs red = "red" , .red = $entityContent['red']
         $comparisonFunctionName = 'operator' . array_get(self::$comparisonOperators, $this->operator);
         if (is_null($comparisonFunctionName)) return false;
@@ -105,7 +109,7 @@ class Query
     public function add(string $queryString): Query
     {
         $query = new Query($queryString);
-        foreach ($this->queryStatements as $queryStatement) {
+        foreach ($this->queryStatements as &$queryStatement) {
             //TODO deduplicate
             $query->queryStatements[] = $queryStatement;
         }
@@ -119,7 +123,7 @@ class Query
 
     public function hasOption(string $variableName): bool
     {
-        foreach ($this->queryStatements as $queryStatement) {
+        foreach ($this->queryStatements as &$queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {
                 if ($queryStatement->isOption()) return true;
             }
@@ -129,7 +133,7 @@ class Query
 
     public function getOption(string $variableName, $default = null)//TODO : ?string
     {
-        foreach ($this->queryStatements as $queryStatement) {
+        foreach ($this->queryStatements as &$queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {
                 $operator = $queryStatement->getOperator();
                 if ($operator === '=') {
@@ -142,7 +146,7 @@ class Query
 
     public function checkToggle(string $variableName): bool
     {
-        foreach ($this->queryStatements as $queryStatement) {
+        foreach ($this->queryStatements as &$queryStatement) {
             if ($queryStatement->getLhs() === $variableName) {
                 if ($queryStatement->checkToggle()) return true;
             }
@@ -153,7 +157,7 @@ class Query
     public function getOptions(): array
     {
         $options = [];
-        foreach ($this->queryStatements as $queryStatement) {
+        foreach ($this->queryStatements as &$queryStatement) {
             if ($queryStatement->getOperator() === '=') {
                 $options[$queryStatement->getLhs()] = $queryStatement->getRhs();
             }
@@ -164,7 +168,7 @@ class Query
     public function getAllUsedPropertyNames(): array
     {
         $propertyNames = [];
-        foreach ($this->queryStatements as $queryStatement) {
+        foreach ($this->queryStatements as &$queryStatement) {
             $propertyNamesUsedByStatement = $queryStatement->getAllUsedPropertyNames();
             if (count($propertyNamesUsedByStatement) > 0) {
                 array_push($propertyNames, ...$propertyNamesUsedByStatement);
@@ -225,5 +229,16 @@ class Query
             });
         }
         return $entityIds;
+    }
+
+    public function getFilters(): array
+    {
+        $filters = [];
+        foreach ($this->queryStatements as &$queryStatement) {
+            if ($queryStatement->getOperator() !== '=') {
+                $filters[] = [$queryStatement->getLhs(),$queryStatement->getOperator(),$queryStatement->getRhs()];
+            }
+        }
+        return $filters;
     }
 }
