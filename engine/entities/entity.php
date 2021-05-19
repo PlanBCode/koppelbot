@@ -74,6 +74,18 @@ class EntityClass
       return null;
     }
 
+    public function hasProperty(array &$propertyPath): bool
+    {
+      if (count($propertyPath) === 0) return false;
+      $propertyName = $propertyPath[0];
+      if (!is_string($propertyName)) return false;
+      $property = array_get($this->properties, $propertyName);
+      if (!$property) return false;
+      if (count($propertyPath) === 1) return true;
+      $subPropertyPath = array_slice($propertyPath, 1);
+      return $property->hasProperty($subPropertyPath);
+    }
+
     public function getProperty(array &$propertyPath)//TODO : ?Property
     {
         if (count($propertyPath) === 0) return null;
@@ -312,7 +324,7 @@ class EntityResponse extends Response
     {
         return $this->requestObject;
     }
-    
+
     public function getIdPropertyName()
     {
       return $this->entityClass->getIdPropertyName();
