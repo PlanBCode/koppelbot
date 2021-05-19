@@ -122,6 +122,15 @@ const renderUiElement = (xyz, options, WRAPPER) => {
   options.uri = uri;
   options.labels = labels;
   options.aggregations = aggregations;
+  for (const optionName of ['select', 'multiSelect', 'viewBoxSelect']) {
+    if (options[optionName]) {
+      const [propertyName, defaultValue] = options[optionName].split('=');
+      if (typeof defaultValue !== 'undefined') {
+        if (!variables.hasVariable(propertyName)) variables.setVariable(propertyName, defaultValue);
+        options[optionName] = propertyName;
+      }
+    }
+  }
   WRAPPER.classList.add('xyz-ui-wrapper');
   const displayName = options.display || DEFAULT_DISPLAYNAME;
   if (!displays.hasOwnProperty(displayName)) throw new Error('Unrecognized displayName.');

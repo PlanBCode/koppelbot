@@ -215,10 +215,9 @@ function initializeMap (display) {
       WRAPPER.map.getView().fit(extent);
       busy = false;
     };
+
     display.onVariable(variableName, onChange);
-    if (display.hasVariable(variableName)) {
-      onChange(display.getVariable(variableName));
-    }
+    if (display.hasVariable(variableName)) onChange(display.getVariable(variableName));
   }
 }
 
