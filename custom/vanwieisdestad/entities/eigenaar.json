@@ -16,6 +16,18 @@
       "key": "ID"
     }
   },
+  "aantal": {
+    "type": "number",
+    "connector": {
+      "key": "Aantal"
+    }
+  },
+  "oppervlakte": {
+    "type": "number",
+    "connector": {
+      "key": "Oppervlakte"
+    }
+  },
   "name" : {
     "displayName": "Naam",
     "title": true,
