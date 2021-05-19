@@ -26,8 +26,6 @@ function getBoundingBox(array &$geojson) : array
         return array_merge($geojson['coordinates'],$geojson['coordinates']); // [x,y,x,y]
       case 'MultiPoint':
       case 'LineString':
-      case 'MultiLineString':
-      case 'Polygon':
         if (!array_key_exists('coordinates', $geojson)) return [];
         $count = count($geojson['coordinates']);
         if($count === 0) return [];
@@ -36,6 +34,22 @@ function getBoundingBox(array &$geojson) : array
           $bboxi = array_merge($geojson['coordinates'][$i],$geojson['coordinates'][$i]); // [xi,yi,xi,yi]
           mergeBoundingBoxes($bbox, $bboxi);
         }
+        return $bbox;
+      case 'MultiLineString':
+      case 'Polygon':
+        if (!array_key_exists('coordinates', $geojson)) return [];
+        $count = count($geojson['coordinates']);
+        if($count === 0) return [];
+        $bbox = array_merge($geojson['coordinates'][0][0],$geojson['coordinates'][0][0]); // [x00,y00,x00,y00]
+        for($i=0; $i<$count; ++$i){
+          $coordinates = &$geojson['coordinates'][$i];
+          for($j=$i==0?1:0; $j<count($coordinates); ++$j){
+            $bboxi = array_merge($coordinates[$j],$coordinates[$j]); // [xij,yij,xij,yij]
+            //echo "BBOI ".serialize($bboxi)."\n";
+            mergeBoundingBoxes($bbox, $bboxi);
+          }
+        }
+        return $bbox;
       case 'GeometryCollection':
         if (!array_key_exists('geometries', $geojson)) return [];
         $count = count($geojson['geometries']);
