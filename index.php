@@ -69,14 +69,14 @@ if ($isCli) {
     $headers = getallheaders();
     $uri = strtok($_SERVER["REQUEST_URI"], '?');
     $method = $_SERVER['REQUEST_METHOD'];
-    $queryString = array_get($_SERVER, 'QUERY_STRING', '');
+    $queryString = rawurldecode(array_get($_SERVER, 'QUERY_STRING', ''));
     $content = @file_get_contents('php://input');
 } else {
     $headers = getallheaders();
     $uri = substr(strtok($_SERVER["REQUEST_URI"], '?'), strlen(dirname($_SERVER['SCRIPT_NAME'])));
     if(substr($uri,0,1)!=='/') $uri = '/'.$uri;
     $method = $_SERVER['REQUEST_METHOD'];
-    $queryString = array_get($_SERVER, 'QUERY_STRING', '');
+    $queryString = rawurldecode(array_get($_SERVER, 'QUERY_STRING', ''));
     $content = @file_get_contents('php://input');
 }
 
