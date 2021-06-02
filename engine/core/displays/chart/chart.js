@@ -154,6 +154,7 @@ exports.display = {
           TD_groupBy.innerText = groupByLabel;
           TR_header.appendChild(TD_groupBy);
           const type = display.getNode(groupByPropertyName).getSetting('type');
+          TD_groupBy.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + groupByLabel;
           sortTableOnClick(TABLE, TD_groupBy, type, display.hasOption('showSearchBar') ? 2 : 1);
         }
         if (display.hasOption('select')) {
@@ -185,6 +186,7 @@ exports.display = {
             title += '&nbsp;(' + renderUnit(propertyNode.getSetting('unit')) + ')';
           }
           TD_header.innerHTML = title;
+          TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
           let type = getAggregationType(aggregator);
           if (!type) type = display.getNode(propertyName).getSetting('type'); // fallback for untyped aggregations
           sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);

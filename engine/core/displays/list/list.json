@@ -8,6 +8,7 @@
     "showHeader" : {"info":"Whether to show the table header.", "type":"bool", "default":true},
     "showSearchBar" : {"info":"Whether to show a search interface.", "type":"bool", "default":false},
     "searchPlaceholder" : {"info":"Searchbar placeholder text.", "type":"string", "default":"Search"},
+    "sortByToolTipPrefix" : {"info":"Sorting tooltip prefix text.", "type":"string", "default":"Sort by"},
     "showCreateButton" : {"info":"Whether to show a button to a create interface.", "type":"bool", "default":false},
     "createButtonText" : {"info":"Define a custom text for the create button.", "type":"string", "default":"+"},
     "waitingForInputMessage" : {"info":"Text to display while waiting for input.", "type":"string", "default":"Waiting for input..."},

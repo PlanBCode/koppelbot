@@ -199,14 +199,18 @@ exports.display = {
       const flatNodes = display.getFlatNodes();
       if (flatNodes.constructor !== Object) {
         const TD_header = document.createElement('TD');
-        TD_header.innerHTML = display.getEntityClassName();
+        const title = display.getEntityClassName();
+        TD_header.innerHTML = title;
+        TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
         TR_header.appendChild(TD_header);
         const type = flatNodes.getSetting('type');
         sortTableOnClick(TABLE, TD_header, type);
       } else {
         for (const flatPropertyName in flatNodes) {
           const TD_header = document.createElement('TD');
-          TD_header.innerText = display.getDisplayName(flatPropertyName);
+          const title = display.getDisplayName(flatPropertyName);
+          TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
+          TD_header.innerText = title;
           const type = flatNodes[flatPropertyName].getSetting('type');
           sortTableOnClick(TABLE, TD_header, type);
           TR_header.appendChild(TD_header);

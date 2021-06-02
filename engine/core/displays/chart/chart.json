@@ -8,6 +8,7 @@
     "searchPlaceholder" : {"info":"Searchbar placeholder text.", "type":"string", "default":"Search"},
     "flavor" : {"info":"Type of chart: table, bar,line,etc", "type":"enum","choices":["table", "line", "bar", "rader", "doughnut", "pie", "polarArea", "bubble", "scatter"]},
     "showLegend" : {"info":"Whether to display the legend", "type":"bool","TODO":"TODO"},
+    "sortByToolTipPrefix" : {"info":"Sorting tooltip prefix text.", "type":"string", "default":"Sort by"},
     "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "groupby" : {"info":"By which property to group aggregations.", "type":"string","TODO":"TODO"},
     "waitingForInputMessage" : {"info":"Text to display while waiting for input.", "type":"string", "default":"Waiting for input..."},
