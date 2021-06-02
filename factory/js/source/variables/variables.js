@@ -92,7 +92,7 @@ function selectAdd (entityClassName, entityId, selectVariableName, selectUri) {
   } else selectVariable(entityClassName, entityId, selectVariableName, selectUri);
 }
 
-function selectRemove (entityClassName, entityId, selectVariableName) {
+function selectRemove (entityClassName, entityId, selectVariableName, allEntities) {
   // TODO how to handle mixed entityClasses?
   if (!hasVariable(selectVariableName)) return; // nothing selected, so nothing to do
   const uri = getVariable(selectVariableName);
@@ -100,14 +100,27 @@ function selectRemove (entityClassName, entityId, selectVariableName) {
   const includeEntityClass = false; // TODO
   const offset = includeEntityClass ? 1 : 0;
   if (path.length <= offset) return;
-  const entityIds = path[offset].split(',');
-  const index = entityIds.indexOf(entityId);
-  if (index !== -1) entityIds.splice(index, 1);
-  if (entityIds.length === 0) selectVariable(undefined, undefined, selectVariableName);
-  else {
-    path[offset] = entityIds.join(',');
+  const selection = path[offset];
+  if (selection === '*') { // '*' - 'c' = ['a','b']
+    if (typeof allEntities !== 'object' || allEntities === null) return;
+    const allEntityIds = Object.keys(allEntities)
+      .map(slug => slug.split('_')[2]); // '$entityClassName_$requestId_$entityId' => entityId
+    if (!allEntityIds.hasOwnProperty(entityId)) return;
+    const selectedEntityIds = allEntityIds.filter(id => id !== entityId);
+    if (selectedEntityIds.length === 0) selectVariable(undefined, undefined, selectVariableName);
+    path[offset] = selectedEntityIds.join(',');
     const newUri = includeEntityClass ? uriTools.uriFromPath(path) : path[offset];
     setVariable(selectVariableName, newUri);
+  } else {
+    const entityIds = selection.split(',');
+    const index = entityIds.indexOf(entityId);
+    if (index !== -1) entityIds.splice(index, 1);
+    if (entityIds.length === 0) selectVariable(undefined, undefined, selectVariableName);
+    else {
+      path[offset] = entityIds.join(',');
+      const newUri = includeEntityClass ? uriTools.uriFromPath(path) : path[offset];
+      setVariable(selectVariableName, newUri);
+    }
   }
 }
 

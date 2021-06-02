@@ -239,7 +239,9 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @param  {string} [entityId_]        TODO
    * @returns {void}                 TODO
    */
-  this.multiSelectRemove = (entityClassName_ = entityClassName, entityId_ = entityId) => variables.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
+  this.multiSelectRemove = (entityClassName_ = entityClassName, entityId_ = entityId) => {
+    return variables.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'), WRAPPER.entityIds);
+  };
   /**
    * [multiSelectNone description]
    * @returns {void} TODO
@@ -251,7 +253,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
     * @returns {void}                 TODO
     */
   this.multiSelectToggle = (entityClassName_ = entityClassName, entityId_ = entityId) => {
-    if (this.isMultiSelected(entityClassName_, entityId_)) variables.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'));
+    if (this.isMultiSelected(entityClassName_, entityId_)) variables.selectRemove(entityClassName_, entityId_, this.getOption('multiSelect'), WRAPPER.entityIds);
     else variables.selectAdd(entityClassName_, entityId_, this.getOption('multiSelect'));
   };
   /**
