@@ -327,3 +327,53 @@ SHARE
   padding-right: 4px;
   font-size: 10pt;
 }
+
+#xyz-share-popup {
+  position: fixed;
+  left: 50vw;
+  top: 50vh;
+  width: 50vw;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  z-index: 1000;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+}
+
+#xyz-share-href {
+  background-color: rgb(240, 240, 240);
+  border-radius: 5px;
+  display: block;
+  width: 100%;
+  border-style: none;
+  padding: 4px;
+  height: 75px;
+}
+
+#xyz-share-email,
+#xyz-share-copy,
+#xyz-share-cancel {
+  color: white;
+  border-style: none;
+  border-radius: 5px;
+  display: inline-block;
+  margin: 2px;
+  padding-left: 2px;
+  cursor: pointer;
+  padding-right: 2px;
+  word-break: break-all;
+  float: right;
+}
+
+#xyz-share-copy {
+  background-color: rgb(76, 175, 80);
+}
+
+#xyz-share-email {
+  background-color: rgb(76, 175, 80);
+}
+
+#xyz-share-cancel {
+  background-color: rgb(175, 76, 80);
+}
