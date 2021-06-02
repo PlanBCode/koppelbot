@@ -23,7 +23,7 @@ table.xyz-list {
   font-size: 10pt;
 }
 
-#zoom-to-amersfoort {
+/* #zoom-to-amersfoort {
   position: absolute;
   z-index: 50;
   right: 3px;
@@ -35,7 +35,7 @@ table.xyz-list {
   padding-left: 4px;
   padding-right: 4px;
   cursor: pointer;
-}
+} */
 
 #locatie > table.xyz-item > tbody > tr:nth-child(6) > td:nth-child(2) {
   height: 200px;

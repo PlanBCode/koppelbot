@@ -9,50 +9,15 @@ options
 const {getStateMessage} = require('../item/item');
 
 function sortTable (TABLE, columnIndex, ascending, type) {
-  let switching = true;
   const THEAD = TABLE.firstChild;
   const TBODY = THEAD.nextElementSibling;
-
-  /* Make a loop that will continue until
-  no switching has been done: */
-  while (switching) {
-    // Start by saying: no switching is done:
-    switching = false;
-
-    const rows = TBODY.rows;
-    /* Loop through all table rows (except the
-    first, which contains table headers): */
-    let shouldSwitch, i;
-    for (i = 0; i < rows.length - 1; i++) {
-      // Start by saying there should be no switching:
-      shouldSwitch = false;
-      /* Get the two elements you want to compare,
-      one from current row and one from the next: */
-      let x = rows[i].getElementsByTagName('TD')[columnIndex].innerHTML;
-      let y = rows[i + 1].getElementsByTagName('TD')[columnIndex].innerHTML;
-      if (type === 'number') {
-        x = Number(x);
-        y = Number(y);
-      } else {
-        x = x.toLowerCase();
-        y = y.toLowerCase();
-      }
-      // Check if the two rows should switch place:
-
-      if ((ascending && x > y) ||
-      (!ascending && x < y)) {
-        // If so, mark as a switch and break the loop:
-        shouldSwitch = true;
-        break;
-      }
-    }
-    if (shouldSwitch) {
-      /* If a switch has been marked, make the switch
-      and mark that a switch has been done: */
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      switching = true;
-    }
-  }
+  const array = [...TBODY.rows].map(row => ({row, value: row.getElementsByTagName('TD')[columnIndex].innerText}));
+  if (type === 'number') {
+    if (ascending) array.sort((x, y) => Number(x.value) - Number(y.value));
+    else array.sort((x, y) => Number(y.value) - Number(x.value));
+  } else if (ascending) array.sort((x, y) => x.value.localeCompare(y.value));
+  else array.sort((x, y) => y.value.localeCompare(x.value));
+  array.forEach(({row}) => TBODY.appendChild(row));
 }
 
 function sortTableOnClick (TABLE, TD_header, type) {
@@ -92,7 +57,7 @@ function addSearchBox (display, TR_header, TABLE) {
     const TR_search = document.createElement('TR');
     const TD_search = document.createElement('TD');
     const INPUT_search = document.createElement('INPUT');
-    INPUT_search.placeholder = 'search';
+    INPUT_search.placeholder = display.getOption('searchPlaceholder') || 'Search';
     const search = INPUT_search.oninput = INPUT_search.onpaste = () => {
       const needle = INPUT_search.value.toUpperCase();
       for (const TR of TBODY.children) {

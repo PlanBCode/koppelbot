@@ -10,25 +10,36 @@
   <table width="100%" height="100%">
     <tr>
       <td id="main" style="width:70%; text-align:center; position: relative;" rowspan="2">
-        <div id="zoom-to-amersfoort" title="Zoom to Amersfoort">Amersfoort</div>
+        <!--<div id="zoom-to-amersfoort" title="Zoom to Amersfoort">Amersfoort</div>-->
         <div id="resizer"></div>
-        <xyz id="map" style="height:100%; width:100%"
-          uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs"
+        <xyz
+          id="map"
+          style="height:100%; width:100%"
+          searchPlaceholder="Zoek op adres"
+          uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs&geojson>=<$view"
           hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"
-          viewBoxSelect="view"
+          viewBoxSelect="view=599842.2834046325,6828347.071935917,600135.6954529143,6828578.049652248"
         />
       </td>
       <td valign="top"style="background-color:#EFEFEF; height: calc(100vh - 50px);">
-        <xyz uri="/locatie/*/Percelen=count(EigenaarID),Oppervlakte=sum(Oppervlakte)" hideMessages showSearchBar="true" color="EigenaarID" groupby="Eigenaar=EigenaarID" display="chart" multiSelect="EigenaarIDs" select="eigenaar" flavor="table" style="height:100%; overflow-y:scroll; overflow-x:hidden;"/>
+        <xyz
+            uri="/eigenaar/*/Eigenaar=name,Percelen=aantal,Oppervlakte=oppervlakte"
+            hideMessages
+            showSearchBar="true"
+            color="name"
+            display="list"
+            multiSelect="EigenaarIDs"
+            select="eigenaar"
+            searchPlaceholder="Zoek op eigenaar"
+            style="height:100%; overflow-y:scroll; overflow-x:hidden;"
+          />
       </td>
     </tr>
-    <!--tr>
-      <td style="background-color:white;">
-        <xyz uri="/locatie/*/count(EigenaarID)?EigenaarID==$EigenaarIDs" groupby="EigenaarID" hideMessages select="eigenaar" display="chart" showLegend="false" flavor="pie"/>
-      </td>
-    </tr-->
     <tr><td style="font-size: 10pt; vertical-align: bottom; padding-right: 10px; height:40px;">
-      <xyz display="share" shareButtonText="Delen"/>
+      <xyz
+      title="Deel deze weergave met anderen."
+      display="share" shareButtonText="Delen"
+      />
       <i style="float:right;"><a href="https://koppelbot.org">Powered by Koppelbot</a></i></td></tr>
   </table>
   <img id="logo" src="./vanwieisdestad/vanwieisamersfoort.png"/>
