@@ -29,21 +29,21 @@ exports.operate = function operate (typeName, operator, lhs, rhs) {
   if (type.hasOwnProperty('operator' + operator)) return type['operator' + operator](lhs, rhs);
   else { // use default operators
     switch (operator) { // align with engine/core/types/type/type.php
-      case '===' : return lhs == rhs; // non strict equal comparison is on purpose
-      case '==' : return typeof rhs === 'string'
+      case 'EQQ' : return lhs == rhs; // non strict equal comparison is on purpose
+      case 'EQ' : return typeof rhs === 'string'
         ? rhs === '*' || rhs.split(',').includes(String(lhs))
         : lhs == rhs; // non strict equal comparison is on purpose
-      case '!==': return lhs != rhs; // non strict equal comparison is on purpose
-      case '!=': return typeof rhs === 'string'
+      case 'NEQQ': return lhs != rhs; // non strict equal comparison is on purpose
+      case 'NEQ': return typeof rhs === 'string'
         ? rhs !== '*' || !rhs.split(',').includes(String(lhs))
         : lhs != rhs; // non strict equal comparison is on purpose
-      case '>=<': return false;
-      case '><' : return false;
-      case '<>' : return false;
-      case '<=' : return lhs <= rhs;
-      case '>=' : return lhs >= rhs;
-      case '<' : return lhs < rhs;
-      case '>' : return lhs > rhs;
+      case 'OVERLAP': return false;
+      case 'IN' : return false;
+      case 'OUT' : return false;
+      case 'LEQ' : return lhs <= rhs;
+      case 'GEQ' : return lhs >= rhs;
+      case 'LT' : return lhs < rhs;
+      case 'GT' : return lhs > rhs;
     }
   }
 };

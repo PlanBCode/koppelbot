@@ -234,7 +234,6 @@ function EntityClass (xyz, entityClassName, rawSettings) {
 
   this.handleInput = (path, queryString, method, entityClassStatus, entityClassContent, requestContent, entityIds, requestId) => {
     // DEBUG  console.log('Entity::handleInput', requestId, path, queryString,entityIds);
-
     if (entityClassStatus === 207) {
       for (const entityId of entityIds) {
         const entity207Wrapper = entityClassContent[entityId];
@@ -311,9 +310,8 @@ function EntityClass (xyz, entityClassName, rawSettings) {
     const entityIds = entityIdList === '*'
       ? Object.keys(entities)
       : entityIdList.split(',').filter(entityId => entities.hasOwnProperty(entityId));
-    if (!queryString) {
-      return entityIds;
-    } else {
+    if (!queryString) return entityIds;
+    else {
       const entityPath = this.getPath(entityIdList).slice(1);
       const queryFilters = uriTools.getQueryFilters('?' + queryString);
       if (Object.keys(queryFilters).length === 0) return entityIds;
@@ -321,6 +319,7 @@ function EntityClass (xyz, entityClassName, rawSettings) {
       const content = this.getEntityClassResponse(entityPath, 'get');
       for (const entityId in content) {
         const entityContent = content[entityId];
+        let filter = true;
         for (const propertyName in queryFilters) {
           const propertyPath = propertyName.split('.');
           const [operator, rhs] = queryFilters[propertyName];
@@ -330,8 +329,12 @@ function EntityClass (xyz, entityClassName, rawSettings) {
           const typeName = property.getTypeName();
           const propertyContent = json.get(entityContent, propertyPath);
           const lhs = propertyContent ? propertyContent.getContent() : null;
-          if (operate(typeName, operator, lhs, rhs)) filteredEntityIds.push(entityId);
+          if (!operate(typeName, operator, lhs, rhs)) {
+            filter = false;
+            break;
+          }
         }
+        if (filter) filteredEntityIds.push(entityId);
       }
       return filteredEntityIds;
     }

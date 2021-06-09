@@ -64,7 +64,10 @@ class Connector_sqlite extends Connector
 
         $filterString = '';
         foreach ($query->getFilters() as &$queryFilter) {
-          [&$lhs, &$operator, &$rhs] = $queryFilter;
+          $x = $queryFilter;
+          $lhs = $x[0];
+          $operator = $x[1];
+          $rhs = $x[2];
           $lhsPropertyPath = [$lhs];
           if($entityClass->hasProperty($lhsPropertyPath)){
             $property = $entityClass->getProperty($lhsPropertyPath);
@@ -74,7 +77,7 @@ class Connector_sqlite extends Connector
               if($operator === '==='){
                 $a = $lhs .'='.$rhs.'';//TODO check
               }else if($operator === '==' && $rhs!=='*'){
-                $a = $lhs .' IN (\''.  $rhs.'\')';//TODO check
+                $a = $lhs .' IN (\''. implode("','",explode(',',$rhs)).'\')';//TODO check
               }else if($operator === '!='){
                 $a = $rhs === '*'
                   ? 'FALSE'
@@ -92,7 +95,11 @@ class Connector_sqlite extends Connector
               }
             }else if($typeName === 'geojson'){
               if($operator === '>=<'){
-                [$xMin,$yMin,$xMax,$yMax] = explode(',',$rhs); //TODO intval
+                $bbox = explode(',',$rhs);
+                $xMin = $bbox[0];//TODO intval
+                $yMin = $bbox[1];//TODO intval
+                $xMax = $bbox[2];//TODO intval
+                $yMax = $bbox[3];//TODO intval
                 $a = "
                   ( $xMin <= json_extract(geojson, '\$.bbox[2]')
                     AND $yMin <= json_extract(geojson, '\$.bbox[3]')
@@ -241,8 +248,8 @@ class Connector_sqlite extends Connector
             $idPropertyPath = [$idPropertyName];
             $idProperty = $entityClass->getProperty($idPropertyPath);
             $idKey = $idProperty->getConnectorSetting('key', $idPropertyName);
-
-            $queryString = $this->constructQueryString($method, $keys, $idPropertyName, $idKey, $entityClass, $entityIds, $table, $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId], $propertyRequest->getQuery());
+            $query = $propertyRequest->getQuery();
+            $queryString = $this->constructQueryString($method, $keys, $idPropertyName, $idKey, $entityClass, $entityIds, $table, $allowFilterAtConnectorPerTablePerRequestId[$table][$requestId], $query);
 
             $result = $this->db->query($queryString);
             $this->handleResults($method, $idKey, $result, $propertyRequest, $connectorRequest, $connectorResponse);
