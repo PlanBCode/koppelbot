@@ -83,13 +83,15 @@ class ContentRequest extends HttpRequest2
       if(pathinfo($fileName, PATHINFO_EXTENSION) === 'html') $fileContent = replaceXyzTags($fileContent);
 
       // handle gzip encoding
-      if(array_key_exists('Accept-Encoding',$this->headers)){
+      /*if(array_key_exists('Accept-Encoding',$this->headers)){
         foreach(explode(',',$this->headers['Accept-Encoding']) as &$encoding){
-          [$algorithm, $arguments] = explode(';',$encoding);
-          if( $algorithm === 'gzip') $headers['Content-Encoding'] = 'gzip';
+          $x = explode(';',$encoding);
+          $algorithm = $x[0];
+          $arguments = $x[1];
+          //if( $algorithm === 'gzip') $headers['Content-Encoding'] = 'gzip';
         }
-      }
-      
+      }*/
+
       return new ContentResponse($status, $fileContent, $headers);
     }
 
