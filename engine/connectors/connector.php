@@ -15,10 +15,10 @@ abstract class Connector
             return self::$connectorClasses[$typeName];
         } else {
             // TODO an instance of Type_xxx should not be needed, we only use static functions
-            $fileName = './engine/core/connectors/' . $typeName . '.php';
+            $fileName = './engine/core/connectors/'.$typeName .'/'. $typeName . '.php';
             if (!file_exists($fileName)) {
               $found = false;
-              foreach (glob("./custom/*/connectors/" . $typeName . '.php') as $filePath) {
+              foreach (glob("./custom/*/connectors/" .$typeName .'/' . $typeName . '.php') as $filePath) {
                 $fileName = $filePath;
                 $found = true;
               }

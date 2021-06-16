@@ -1,0 +1,31 @@
+{
+  "_": {
+    "connector": {
+      "type": "directory",
+      "parse": "json",
+      "path": "custom/*/connectors/*/:engine/core/connectors/*/",
+      "extension": "json"
+    },
+    "access": {
+      "read": [
+        "guest"
+      ]
+    }
+  },
+  "id": {
+    "type": "string",
+    "index": true,
+    "connector": {
+      "key": "key"
+    }
+  },
+  "content": {
+    "type": "object",
+    "subType": {
+      "type": "type"
+    },
+    "connector": {
+      "key": "content"
+    }
+  }
+}
