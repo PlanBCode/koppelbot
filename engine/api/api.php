@@ -337,8 +337,14 @@ class ApiRequest extends HttpRequest2
 
     protected function applyQueryFiltering($requestId, $originalEntityIdList, $requestUri, Query &$query)
     {
-      [$requestUri, $entityClassList, $entityIdList, $propertyPath, $queryString] = $this->getQueryRequestsParameters($requestUri, $query);
-      if(is_null($requestUri)) return $originalEntityIdList;
+      $x = $this->getQueryRequestsParameters($requestUri, $query);
+      if(empty($x)) return $originalEntityIdList;
+      $requestUri = $x[0];
+      $entityClassList= $x[1];
+      $entityIdList= $x[2];
+      $propertyPath= $x[3];
+      $queryString= $x[4];
+
 
       $originalLimit = $query->hasOption('limit')? intval($query->getOption('limit')) : DEFAULT_LIMIT;
       $originalOffset = $query->hasOption('offset')? intval($query->getOption('offset')) : 0;
@@ -353,9 +359,13 @@ class ApiRequest extends HttpRequest2
       //
       $queryFilterString = "";
       foreach ($query->getFilters() as &$queryFilter) {
-        [&$lhs, &$operator, &$rhs] = $queryFilter;
+        $x = $queryFilter;
+        $lhs = $x[0];
+        $operator = $x[1];
+        $rhs = $x[2];
         $queryFilterString.="&$lhs$operator$rhs";
       }
+      $offset=0;
 
       while($more){
         $queryString = "limit=$limit&xoffset=$offset&expand$queryFilterString";  // note: not offset
@@ -363,7 +373,6 @@ class ApiRequest extends HttpRequest2
 
         $otherQuery = new Query($queryString);
         $queryConnectorRequests = getConnectorRequests($this, 'GET', $requestUri, '', $entityClassList, $entityIdList, $propertyPath, $otherQuery, $this->accessGroups);
-
         $queryRequestResponses = $this->getRequestResponses2($queryConnectorRequests);
         if(empty($queryRequestResponses)) break;
         /** @var RequestResponse */
@@ -570,15 +579,16 @@ class ApiRequest extends HttpRequest2
             $headers = $this->outHeaders;
 
             // handle gzip encoding
-            if(array_key_exists('Accept-Encoding',$this->headers)){
+            /*if(array_key_exists('Accept-Encoding',$this->headers)){
               foreach(explode(',',$this->headers['Accept-Encoding']) as &$encoding){
-                [$algorithm, $arguments] = explode(';',$encoding);
-                if( $algorithm === 'gzip') $headers['Content-Encoding'] = 'gzip';
+                //$x = explode(';',$encoding);
+                //$algorithm = $x[0];
+                //$arguments = $x[1];
+                //if( $algorithm === 'gzip') $headers['Content-Encoding'] = 'gzip';
               }
-            }
+            }*/
 
             $path = array_slice(explode('/', $this->uri), 1); // '/a/b/c' -> ['a','b','c']
-
             if (isSingularPath($path) && !$this->query->checkToggle('expand')) {
                 $entityClassName = $path[0];
                 $entityClass = EntityClass::get($entityClassName, $this->accessGroups);
@@ -595,8 +605,15 @@ class ApiRequest extends HttpRequest2
               $stringContent = $this->stringifyContent($content, $status, $this->query, $path, $headers);
               return new HttpResponse2($status, $stringContent, $headers);
             } else if(count($requestResponses) === 0){
-              $stringContent ='[]';
-              return new HttpResponse2($status, $stringContent, $headers);
+              $allEntities = count($path) <2 || $path[1] === '*';
+              $hasFilters = $this->query->hasFilters();
+              if($allEntities || $hasFilters){ // if searching for * or with filters, return empty
+                $stringContent ='[]';
+                return new HttpResponse2($status, $stringContent, $headers);
+              } else { // if searching something explicit, return 404
+                $stringContent = '';
+                return new HttpResponse2(404, $stringContent, $headers);
+              }
             }else {
               if($status === 207){
                 foreach($content as $requestId => &$requestContent){

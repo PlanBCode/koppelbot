@@ -55,6 +55,11 @@ class EntityClass
     /** @var string */
     protected $entityClassName;
 
+    public function getEntityClassName():string
+    {
+      return $this->entityClassName;
+    }
+
     protected function __construct(string $entityClassName, array &$meta)
     {
         $this->entityClassName = $entityClassName;

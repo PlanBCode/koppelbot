@@ -38,30 +38,9 @@ class Connector_sqlite extends Connector
       if($this->db) $this->db->close();
     }
 
-    protected function constructQueryString(string $method, array &$keys, string $idPropertyName, string $idKey, EntityClass &$entityClass, array &$entityIds, string $table, bool $useFilters, Query &$query): string
+    protected function constructWhereString(string $method, array &$keys, string $idPropertyName, string $idKey, EntityClass &$entityClass, array &$entityIds, string $table, bool $useFilters, Query &$query): string
     {
-      $query = array_values($keys)[0]->getQuery();
-
-      if($method === 'GET'){
-        $queryString = 'SELECT '.$idKey;
-        foreach($keys as $key=>$propertyRequest){
-          $propertyPath = $propertyRequest->getPropertyPath();
-          $propertyName = $propertyPath[0]; //TODO check
-          $queryString .= ', ';
-          if(strpos($key,'.')!== false){
-            $keyPath = explode('.',$key);
-            $baseKey = $keyPath[0];
-            $subKeyPath = array_slice($keyPath,1);
-            $subKey = implode('.',$subKeyPath);
-            $queryString .= 'json_extract('.$baseKey.', \'$.'.$subKey.'\') AS '.$propertyName;
-          }else{
-            $queryString .= ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
-          }
-
-        }
-
         $whereString = array_key_exists('*',$entityIds) ? '' : (' WHERE '.$idKey.' IN (\''. implode('\',\'',array_keys($entityIds)).'\')');
-
         $filterString = '';
         foreach ($query->getFilters() as &$queryFilter) {
           $x = $queryFilter;
@@ -116,6 +95,31 @@ class Connector_sqlite extends Connector
           else $whereString = ' WHERE '.$filterString;
         }
 
+        return $whereString;
+    }
+
+    protected function constructQueryString(string $method, array &$keys, string $idPropertyName, string $idKey, EntityClass &$entityClass, array &$entityIds, string $table, bool $useFilters, Query &$query): string
+    {
+      $query = array_values($keys)[0]->getQuery();
+
+      if($method === 'GET'){
+        $queryString = 'SELECT '.$idKey;
+        foreach($keys as $key => $propertyRequest){ //TODO by ref
+          $propertyPath = $propertyRequest->getPropertyPath();
+          $propertyName = $propertyPath[0]; //TODO check
+          $queryString .= ', ';
+          if(strpos($key,'.')!== false){
+            $keyPath = explode('.',$key);
+            $baseKey = $keyPath[0];
+            $subKeyPath = array_slice($keyPath,1);
+            $subKey = implode('.',$subKeyPath);
+            $queryString .= 'json_extract('.$baseKey.', \'$.'.$subKey.'\') AS '.$propertyName;
+          }else{
+            $queryString .= ($key === $propertyName ? $key : ($key. ' AS '. $propertyName));
+          }
+
+        }
+        $whereString = $this->constructWhereString($method, $keys, $idPropertyName, $idKey, $entityClass, $entityIds, $table,  $useFilters, $query);
         $queryString .=' FROM '.$table . $whereString;
 
         //if( $useFilters) {
@@ -125,10 +129,53 @@ class Connector_sqlite extends Connector
         //}
 
       } else if($method === 'DELETE'){
+        $whereString = $this->constructWhereString($method, $keys, $idPropertyName, $idKey, $entityClass, $entityIds, $table,  $useFilters, $query);
         $queryString ='DELETE FROM '.$table. $whereString;
       } else if($method === 'HEAD'){
         $queryString ='SELECT '.$idKey.' FROM '.$table. $whereString;
+      }else if($method === 'PUT'){
+
+         $queryString = 'INSERT INTO '.$table. ' ';
+         $entityClassContent = [];
+         foreach($keys as $key=>$propertyRequest){
+           $propertyPath = $propertyRequest->getPropertyPath();
+           $content =  $propertyRequest->getContent();
+           foreach($entityIds as $entityId => $entityContent){
+             if(!array_key_exists($entityId, $entityClassContent)) $entityClassContent[$entityId] = [];
+             $entityClassContent[$entityId][$key] = $content;
+           }
+         }
+         $first = true;
+         foreach($entityClassContent as $entityId=>$entityContent){
+           if($first){
+              $queryString .=  "('" . implode("','",array_keys($entityContent)). "') VALUES";
+              $first = false;
+            } else $queryString .= ',';
+            $queryString .=  "('" . implode("','",array_values($entityContent)). "')";
+         }
+      } else if($method === 'PATCH' ){
+        $queryString = 'UPDATE '.$table. ' SET ';
+        $first = true;
+        foreach($keys as $key=>$propertyRequest){
+          $propertyPath = $propertyRequest->getPropertyPath();
+          $content =  $propertyRequest->getContent();
+          $propertyName = $propertyPath[0]; //TODO check
+          if($first) $first = false;
+          else $queryString .= ', ';
+
+          if(strpos($key,'.')!== false){
+            $keyPath = explode('.',$key);
+            $baseKey = $keyPath[0];
+            $subKeyPath = array_slice($keyPath,1);
+            $subKey = implode('.',$subKeyPath);
+            $queryString .= 'json_extract('.$baseKey.', \'$.'.$subKey.'\') AS '.$propertyName;
+          }else{
+            $queryString .=  $key . " = '$content'";
+          }
+          echo $queryString."\n";
+        }
       }
+
       //TODO PUT/POST ->insert
       // TODO PATCH -> update
       //TODO sort, order left join
@@ -166,9 +213,33 @@ class Connector_sqlite extends Connector
             $connectorResponse->add(404, $propertyRequest, $entityId,  null);
           }
         }
-      }else{//TODO DELETE, PATCH, PUT,POST
+      }else if($method==='PATCH'){
+        foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
+          $entityId = (string)$row[$idKey];
+          $content = null;
+          $connectorResponse->add(200, $propertyRequest, $entityId, $content);
+        }
+      }else if($method === 'DELETE' || $method === 'PUT'){//TODO POST
+        foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
+          $entityId = (string)$row[$idKey];
+          $content = null;
+          $connectorResponse->add(200, $propertyRequest, $entityId, $content);
+        }
+      }else{
         $content = 'Method not yet supported';
         $connectorResponse->add(500, $propertyRequest, '*', $content);
+      }
+    }
+
+    private function patch(connectorRequest &$connectorRequest): ConnectorResponse
+    {
+      foreach ($connectorRequest->getPropertyRequests() as &$propertyRequest) {
+        $propertyPath = $propertyRequest->getPropertyPath();
+        $propertyName = $propertyPath[0]; //TODO check
+
+        $entityIdList = $propertyRequest->getEntityIdList();
+        $entityIds = explode(',',$entityIdList);
+        $requestId = $propertyRequest->getRequestId();
       }
     }
 
@@ -177,12 +248,11 @@ class Connector_sqlite extends Connector
         $connectorResponse = new ConnectorResponse();
 
         $method = $connectorRequest->getFirstPropertyRequest()->getMethod();
-        if($method !== 'GET' && $method !== 'HEAD') { //TODO DELETE,POST,PUT,PATCH
+        if($method === 'POST') { //TODO POST,PUT
           $content = 'Method not yet supported';
           $connectorResponse->add(400, $connectorRequest->getFirstPropertyRequest(), '*', $content);
           return $connectorResponse;
         }
-
 
         // $table => $requestId => $key => $property
         $keysPerTablePerRequestId = [];
@@ -228,7 +298,8 @@ class Connector_sqlite extends Connector
           $entityClassPerTable[$table] = $entityClass;
 
           foreach($entityIds as $entityId){
-            $entityIdsPerTablePerRequestId[$table][$requestId][$entityId] = true;
+            $content = $propertyRequest->getContent();
+            $entityIdsPerTablePerRequestId[$table][$requestId][$entityId] = $content;
           }
         }
 

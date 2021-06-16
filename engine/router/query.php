@@ -241,4 +241,13 @@ class Query
         }
         return $filters;
     }
+
+
+    public function hasFilters(): bool
+    {
+        foreach ($this->queryStatements as &$queryStatement) {
+            if ($queryStatement->getOperator() !== '=') return true;
+        }
+        return false;
+    }
 }

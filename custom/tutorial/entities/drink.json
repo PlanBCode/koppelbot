@@ -1,9 +1,9 @@
 {
   "_": {
     "connector": {
-      "type": "file",
-      "parse": "json",
-      "path": "data/drinks.json"
+      "type": "sqlite",
+      "path": "custom/tutorial/data/tutorial.sqlite",
+      "table": "drinks"
     },
     "access" : {
       "read" : ["guest"],
@@ -14,16 +14,13 @@
     "type": "reference",
     "uri" : "/fruit/*",
     "connector": {
-      "key": ".ingredient"
+      "key": "ingredient"
     }
   },
   "name": {
     "type": "string",
     "index": true,
     "title": true,
-    "required": true,
-    "connector": {
-      "key": "key"
-    }
+    "required": true
   }
 }

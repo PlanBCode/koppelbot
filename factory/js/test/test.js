@@ -102,10 +102,28 @@ curl('GET', '/fruit/*/color')
   })
   .run('Fruit: get color');
 
+curl('GET', '/drink/wine,orangejuice/name')
+  .statusShouldMatch(200)
+  .contentShouldMatch({orangejuice: 'orangejuice', wine: 'wine'})
+  .run('Drink: get drinks');
+
+curl('PATCH', '/drink/wine/ingredient', 'apple')
+  .statusShouldMatch(200)
+  .runSync('Drink: rename ingredient');
+
+curl('GET', '/drink/wine/ingredient')
+  .statusShouldMatch(200)
+  .contentShouldMatch('apple')
+  .runSync('Drink: check renamed ingredient');
+
+curl('PATCH', '/drink/wine/ingredient', 'grape')
+  .statusShouldMatch(200)
+  .runSync('Drink: undo rename ingredient');
+
 curl('GET', '/drink/wine/ingredient/size')
   .statusShouldMatch(200)
   .contentShouldMatch('small')
-  .run('Drink: get ingredient size');
+  .runSync('Drink: get ingredient size');
 
 curl('GET', '/drink/wine/ingredient.size,name')
   .statusShouldMatch(200)
@@ -113,7 +131,16 @@ curl('GET', '/drink/wine/ingredient.size,name')
     ingredient: 'small',
     name: 'wine'
   })
-  .run('Drink: get name and ingredient size');
+  .runSync('Drink: get name and ingredient size');
+
+curl('GET', '/drink?ingredient==banana')
+  .statusShouldMatch(200)
+  .contentShouldMatch([])
+  .runSync('Drink: empty result from filter search');
+
+curl('GET', '/drink/wiskey')
+  .statusShouldMatch(404)
+  .runSync('Drink: empty result from explicit search');
 
 curl('GET', '/fruit/*?color==green')
   .statusShouldMatch(200)
