@@ -1,0 +1,26 @@
+{
+  "_": {
+    "connector": {
+      "type": "querystorage",
+      "root" : "colorscheme"
+    },
+    "access": {
+      "write": [
+        "guest"
+      ]
+    }
+  },
+  "id": {
+    "type": "id",
+    "connector": {
+      "index": true,
+      "key": "key"
+    }
+  },
+  "name": {
+    "connector": {
+      "key": "value"
+    },
+    "type": "string"
+  }
+}

@@ -355,7 +355,8 @@ SHARE
 
 #xyz-share-email,
 #xyz-share-copy,
-#xyz-share-cancel {
+#xyz-share-cancel,
+.xyz-button-cancel {
   color: white;
   border-style: none;
   border-radius: 5px;
@@ -376,65 +377,33 @@ SHARE
   background-color: rgb(76, 175, 80);
 }
 
-#xyz-share-cancel {
+#xyz-share-cancel,
+.xyz-button-cancel {
   background-color: rgb(175, 76, 80);
 }
-table.xyz-item > tr.xyz-item-selected.xyz-item-header {
-  background-color: yellow;
-  color: black;
+
+#xyz-colorpicker {
+  position: fixed;
+  left: 50vw;
+  top: 50vh;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: 100vw;
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
 }
 
-td.xyz-item-key {
-  vertical-align: top;
-}
-
-span.xyz-item-deselect {
-  font-size: 75%;
-  line-height: 30px;
-}
-
-span.xyz-item-deselect,
-span.xyz-item-maximize,
-span.xyz-item-minimize {
-  float: right;
+.xyz-colorpicker-color {
   cursor: pointer;
-  margin-right: 5px;
+  width: 50px;
+  height: 50px;
+  display: inline-block;
 }
 
-span.xyz-item-deselect::before {
-  content: "\2715";
-}
-
-span.xyz-item-maximize::before {
-  content: "\2610";
-}
-
-span.xyz-item-minimize::before {
-  content: "_";
-}
-
-table.xyz-item-minimized > thead {
-  cursor: pointer;
-}
-
-table.xyz-item-maximized span.xyz-item-maximize::before,
-table.xyz-item-minimized span.xyz-item-minimize::before {
-  content: "\2750";
-}
-
-table.xyz-item-maximized {
-  z-index: 100000 !important;
-  position: fixed !important;
-  height: 100vh !important;
-  width: 100vw !important;
-  top: 0 !important;
-  left: 0 !important;
-}
-
-table.xyz-item-maximized span.xyz-item-minimize,
-table.xyz-item-minimized span.xyz-item-maximize,
-table.xyz-item-minimized > tbody {
-  display: none !important;
+.xyz-colorpicker-color:hover {
+  transform: scale(1.1, 1.1);
 }
 table.xyz-create,
 table.xyz-item,
@@ -609,6 +578,63 @@ tr.xyz-list-search > td > input {
 .xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
   background-color: lightblue;
 }
+table.xyz-item > tr.xyz-item-selected.xyz-item-header {
+  background-color: yellow;
+  color: black;
+}
+
+td.xyz-item-key {
+  vertical-align: top;
+}
+
+span.xyz-item-deselect {
+  font-size: 75%;
+  line-height: 30px;
+}
+
+span.xyz-item-deselect,
+span.xyz-item-maximize,
+span.xyz-item-minimize {
+  float: right;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+span.xyz-item-deselect::before {
+  content: "\2715";
+}
+
+span.xyz-item-maximize::before {
+  content: "\2610";
+}
+
+span.xyz-item-minimize::before {
+  content: "_";
+}
+
+table.xyz-item-minimized > thead {
+  cursor: pointer;
+}
+
+table.xyz-item-maximized span.xyz-item-maximize::before,
+table.xyz-item-minimized span.xyz-item-minimize::before {
+  content: "\2750";
+}
+
+table.xyz-item-maximized {
+  z-index: 100000 !important;
+  position: fixed !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+table.xyz-item-maximized span.xyz-item-minimize,
+table.xyz-item-minimized span.xyz-item-maximize,
+table.xyz-item-minimized > tbody {
+  display: none !important;
+}
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -671,25 +697,7 @@ div.xyz-timeline-line {
 }.xyz-title.xyz-selected {
   background-color: yellow;
 }
-
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}@charset "UTF-8";
+@charset "UTF-8";
 
 /*!
  * Pikaday
@@ -928,7 +936,25 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
-.xyz-login a {
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}.xyz-login a {
   color: blue;
   cursor: pointer;
   margin: 5px;

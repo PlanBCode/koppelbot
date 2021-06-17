@@ -261,6 +261,8 @@ exports.display = {
       const TD = document.createElement('TD');
       TD.className = 'xyz-list-icon';
       const color = display.getColor();
+      TD.onclick = display.manageColor();
+      TD.style.cursor = 'pointer';
       TD.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>`;
       TR_entity.appendChild(TD);
     }
