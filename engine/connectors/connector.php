@@ -22,19 +22,16 @@ abstract class Connector
                 $fileName = $filePath;
                 $found = true;
               }
-              if(!$found){
-                echo 'ERROR Type ' . $typeName . ' : file does not exist!';
-                return null;
+              if(!$found) {
+                // TODO provice error for client side connectors
+                return 'ERROR: Connector ' . $typeName . ' : file not found!';
               }
             }
 
             require_once $fileName;
 
             $connectorClass = 'Connector_' . $typeName;
-            if (!class_exists($connectorClass)) {
-                echo 'ERROR Connector ' . $typeName . ' : class is not defined!';
-                return null;
-            }
+            if (!class_exists($connectorClass)) return "ERROR: Class $connectorClass is not defined!";
         }
         /* TODO this does not work without instantiating:
             if (!is_subclass_of($typeClass, 'Connector')) {
@@ -73,7 +70,10 @@ abstract class Connector
         $method = $requestObject->getMethod();
 
         $connectorClass = self::getConnectorClass($typeName);
-
+        if(substr($connectorClass,0,6)==='ERROR:'){
+          //TODO, pass error? echo ">> ".$connectorClass."\n";
+          return "ERROR";
+        }
         $connectorString = $typeName . '_' . $connectorClass::getConnectorString($connectorSettings, $method, $entityClass, $entityId, $propertyPath, $query);
 
         if (!array_key_exists($connectorString, self::$connectors)) {

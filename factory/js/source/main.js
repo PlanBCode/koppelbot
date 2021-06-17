@@ -26,7 +26,7 @@ function XYZ () {
   };
 
   this.get = (uri, callback) => request.get(this, entityClasses, uri, callback);
-  this.head = (uri, callback) => request.head(uri, callback);
+  this.head = (uri, callback) => request.head(entityClasses, uri, callback);
   this.post = (uri, content, callback) => request.post(entityClasses, uri, content, callback);
   this.patch = (uri, content, callback) => request.patch(entityClasses, uri, content, callback);
   this.put = (uri, content, callback) => request.put(entityClasses, uri, content, callback);

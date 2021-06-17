@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const {forEachFile, baseName, read, write, execute, watchGulp} = require('./util.js');
 
-// generate a requires file for types|displays
+// generate a requires file for types|displays|clientConnectors
 const generateRequiresFile = (name, component) => function generateRequiresFile (cb) {
   let js = name === 'types'
     ? `// This file is created by gulpfile.js using the definitions of engine/core/${name}/*/*.js:custom/*/${name}/*/*.js. \n\n`
@@ -16,11 +16,16 @@ const generateRequiresFile = (name, component) => function generateRequiresFile 
       const folder = moduleName === 'core'
         ? '../../../engine/core'
         : `../../../custom/${moduleName}`;
-      if (name === 'types') {
-        js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
-        js += `exports.${baseName(file.path)}.json = require('${folder}/${name}/${id}/${id}.json');\n\n`;
-      } else if (id !== 'create') {
-        js += `exports.${baseName(file.path)} = require('${folder}/${name}/${id}/${id}.js').${component};\n`;
+      const jsFileName = `${folder}/${name}/${id}/${id}.js`;
+
+      if (fs.existsSync('./build/' + jsFileName)) {
+        if (name === 'types') {
+          js += `exports.${baseName(file.path)} = require('${jsFileName}').${component};\n`;
+          js += `exports.${baseName(file.path)}.json = require('${folder}/${name}/${id}/${id}.json');\n\n`;
+        } else if (id !== 'create') {
+          if (component) js += `exports.${baseName(file.path)} = require('${jsFileName}').${component};\n`;
+          else js += `exports.${baseName(file.path)} = require('${jsFileName}');\n`;
+        }
       }
       cb();
     }
@@ -156,6 +161,8 @@ exports.audit = audit;
 const pack = execute('sh ../pack.sh');
 exports.pack = pack;
 
+const generateClientConnectorsFile = generateRequiresFile('connectors');
+
 const generateTypesFile = generateRequiresFile('types', 'actions');
 exports.generateTypesFile = generateTypesFile;
 
@@ -173,6 +180,6 @@ const generateDocs = gulp.parallel(
   generateDoc('./source/main.js', 'XYZ', 'xyz')
 
 );
-exports.build = gulp.series(generateCssFile, generateTypesFile, generateDisplaysFile, audit, pack, generateDocs);
+exports.build = gulp.series(generateCssFile, generateClientConnectorsFile, generateTypesFile, generateDisplaysFile, audit, pack, generateDocs);
 exports.generateDocs = generateDocs;
 exports.watchGulp = watchGulp;

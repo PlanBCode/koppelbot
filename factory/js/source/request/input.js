@@ -1,5 +1,5 @@
 const json = require('../web/json');
-const State = require('../entity/state.js').State;
+const {State} = require('../entity/state.js');
 
 function changed (a, b) {
   switch (typeof a) {
@@ -223,7 +223,7 @@ exports.handle = (element, statusses, subProperties, entities) => (path, method,
         } else {
           const subPath = getSubPath(path, baseSubPropertyName);
           const subStatus = subProperty207Wrapper.status;
-          const subResponseContent = getSubContent(subProperty207Wrapper.content, subPropertyName, subPath);
+          const subResponseContent = getSubContent({[subPropertyName]: subProperty207Wrapper.content}, subPropertyName, subPath);
           const subRequestContent = getSubContent(requestContent, subPropertyName, subPath);
           const subProperty = subProperties[baseSubPropertyName];
           const subState = subProperty.handleInput(subPath, method, entityId, subStatus, subResponseContent, subRequestContent, queryString, entityExisted, requestId);

@@ -21,6 +21,7 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
     const SPAN_message = document.createElement('SPAN');
 
     const displayMessage = (message, error) => {
+      if (error) console.error(error);
       // TODO use error to change styling of message
       SPAN_message.innerText = typeof message === 'undefined' ? '' : message;
     };
@@ -30,8 +31,6 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
       // TODO check newData
       for (const key in data) delete data[key]; // reset data  //TODO add defaults
       for (const key in newData) data[key] = newData[key];
-
-      console.log('create.patch', JSON.stringify(data), JSON.stringify(newData));
       const newTABLE = entityClass.createCreator(options, data, INPUT_submit, displayMessage);
       TAG.insertBefore(newTABLE, TABLE);
       TAG.removeChild(TABLE);
@@ -45,24 +44,24 @@ const renderUiCreate = (xyz, entityClasses, options, TAG) => {
           displayMessage('Failed to create: ' + errorString, true);
         } else {
           displayMessage('Created');
-          patch({});
+          patch({}); // reset
         }
       };
-      if (entityClass.isAutoIncremented()) // POST
+      if (entityClass.isAutoIncremented()) { // POST
+        displayMessage('Creating...');
         xyz.post(uri, {[entityClassName]: {new: data}}, displayCreatedMessage);
-      else { // PUT
+      } else { // PUT
         const entityId = entityClass.getIdFromContent(data);
         displayMessage('Creating...');
         xyz.head(uri + '/' + entityId, status => {
-          if (status !== 200) { // only if entity does not yet exist
+          if (status == 404) { // only if entity does not yet exist
             xyz.put(uri + '/' + entityId, {[entityClassName]: {[entityId]: data}}, displayCreatedMessage);
             if (typeof options.onSubmit === 'function') options.onSubmit(data);
-          } else
-            displayMessage('Failed: ' + entityId + ' already exists.');
+          } else displayMessage('Failed: ' + entityId + ' already exists.');
         });
       }
     };
-    TAG.patch = patch;
+    TAG.patch = (...args) => { console.log('TAG.patch', args); patch(...args); };
     TAG.appendChild(TABLE);
     TAG.appendChild(INPUT_submit);
     TAG.appendChild(SPAN_message);

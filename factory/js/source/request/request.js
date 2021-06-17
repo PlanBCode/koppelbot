@@ -2,11 +2,47 @@ const PAGE_SIZE = 1000; // align with engine/api/api.php
 
 const entity = require('../entity/entity.js');
 const {setQueryParameter, getQueryParameter, multiSetQueryParameters, pathFromUri} = require('../uri/uri.js');
-
+const {isClientSideEntityClass, clientSideRequest} = require('./clientside');
 const pendingGets = {
   // uri -> {}
 };
 const pendingRequests = [];
+
+function check207SubStatus (status, content) {
+  if (status === 207) {
+    if (typeof content !== 'object' ||
+     content === null ||
+     !content.hasOwnProperty('status') ||
+   !content.hasOwnProperty('content') ||
+   typeof content.content !== 'object'
+    ) {
+      console.error('Ill formated 207 response', content);
+      return false;
+    } else {
+      if (content.content === null) return content.status >= 200 && content.status <= 299;
+      for (const subKey in content.content) {
+        if (!check207SubStatus(content.status, content.content[subKey])) return false;
+      }
+      return true;
+    }
+  } else return status >= 200 && status <= 299;
+}
+
+function check207Status (status, content) {
+  console.log('checkStatus', status, content);
+  if (status === 207) {
+    if (typeof content !== 'object') {
+      if (content === null) return status >= 200 && status <= 299;
+      console.error('Ill formated 207 response', content);
+      return false;
+    } else {
+      for (const key in content) {
+        if (!check207SubStatus(status, content[key])) return false;
+      }
+      return true;
+    }
+  } else return status >= 200 && status <= 299;
+}
 
 function renderPendingRequestIndicator () {
   let DIV_pendingRequestIndicator = document.getElementById('xyz-pendingRequestIndicator');
@@ -27,7 +63,7 @@ function renderPendingRequestIndicator () {
   } else if (DIV_pendingRequestIndicator) DIV_pendingRequestIndicator.style.display = 'none';
 }
 
-function request (method, uri, data, callback) {
+function request (entityClasses, method, uri, requestContent, callback) {
   // TODO set content type and length headers
   // TODO allow for multiple hosts by prepending http(s)://..
   const location = window.location.origin + '/';
@@ -35,6 +71,10 @@ function request (method, uri, data, callback) {
   renderPendingRequestIndicator();
   uri = uri.split(';').map(requestUri => setQueryParameter(requestUri, 'expand', 'true')).join(';');
   uri = encodeURI(uri);
+
+  const entityClassName = uri.split('?')[0].split('/')[1];
+  if (isClientSideEntityClass(entityClasses, entityClassName)) return clientSideRequest(entityClasses, method, uri, requestContent, callback);
+
   pendingRequests.push(uri);
 
   const xhr = new window.XMLHttpRequest();
@@ -51,7 +91,7 @@ function request (method, uri, data, callback) {
       callback(status, content, header => xhr.getResponseHeader(header));
     }
   };
-  xhr.send(data);
+  xhr.send(requestContent);
 }
 
 const retrieveEntityClassMeta = (xyz, entityClasses, entityClassName, callback) => {
@@ -96,7 +136,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
   if (entityClassNames.length === 0) callback();
   else {
     const metaUri = setQueryParameter('/entity/' + entityClassNames.join(','), 'expand', 'true');
-    request('GET', metaUri, undefined, (status, content) => {
+    request(entityClasses, 'GET', metaUri, undefined, (status, content) => {
       // TODO check status
       // console.log(metaUri, content);
       let data;
@@ -149,7 +189,7 @@ const retrieveMeta = (xyz, entityClasses, uri, callback) => {
 exports.retrieveMeta = retrieveMeta;
 
 exports.delete = (entityClasses, uri, callback) => {
-  request('DELETE', uri, null, (status, response) => {
+  request(entityClasses, 'DELETE', uri, null, (status, response) => {
     // TODO handle multi requests
     // console.log('delete response: ' + uri + ' ' + response);
     const responseContent = JSON.parse(response);
@@ -158,8 +198,19 @@ exports.delete = (entityClasses, uri, callback) => {
   });
 };
 
-exports.head = (uri, callback) => {
-  request('HEAD', uri, null, (status, response) => {
+exports.head = (entityClasses, uri, callback) => {
+  request(entityClasses, 'HEAD', uri, null, (status, stringResponse) => {
+    if (status === 207) {
+      let response;
+      try {
+        response = JSON.parse(stringResponse);
+      } catch (error) {
+        console.error('Parsing error for HEAD response', error);
+        status = 500;
+      }
+      status = check207Status(status, response) ? 200 : 404;
+    }
+
     // TODO handle multi requests?
     // console.log('head response: ' + uri + ' ' + status + ' ' + response);
     if (typeof callback === 'function') callback(status); // TODO pass state
@@ -169,7 +220,7 @@ exports.head = (uri, callback) => {
 const handleModifyRequest = (entityClasses, method, uri, requestObjectContent, callback) => {
   const requestStringContent = JSON.stringify(requestObjectContent);
   // console.log(method + ' request: ' + uri + ' ' + requestStringContent);
-  request(method, uri, requestStringContent, (status, responseStringContent) => {
+  request(entityClasses, method, uri, requestStringContent, (status, responseStringContent) => {
     // TODO handle multi requests
     // console.log(method + ' response:' + responseStringContent, uri);
     let responseObjectContent;
@@ -216,7 +267,7 @@ function getPartial (uri, entityClasses, dataCallback, originalUri, originalOffs
   if (typeof originalOffset === 'undefined') originalOffset = 0;
   const limit = typeof originalLimit === 'undefined' ? PAGE_SIZE : Math.min(PAGE_SIZE, originalLimit);
   const nextPageUri = multiSetQueryParameters(uri, {limit, offset});
-  request('GET', nextPageUri, undefined, (status, responseStringContent, getResponseHeader) => {
+  request(entityClasses, 'GET', nextPageUri, undefined, (status, responseStringContent, getResponseHeader) => {
     let responseObjectContent;
     try {
       responseObjectContent = JSON.parse(responseStringContent);
@@ -224,7 +275,6 @@ function getPartial (uri, entityClasses, dataCallback, originalUri, originalOffs
       console.error('GET', nextPageUri, responseStringContent, e);
       return;
     }
-
     entity.handleMultiInput('GET', nextPageUri, status, responseObjectContent, null, entityClasses);
 
     if (typeof dataCallback === 'function') dataCallback(); // TODO remove but still used by accessListener
