@@ -1,6 +1,7 @@
 const uriTools = require('../uri/uri.js');
 const response = require('../entity/response.js');
 const variables = require('../variables/variables.js');
+const {showColorPicker} = require('./colorpicker');
 
 let DIV_tmpColor;
 
@@ -8,7 +9,15 @@ let DIV_tmpColor;
 const hashCode = string => string.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
 const colors = ['red', 'green', 'blue', 'yellow', 'pink', 'cyan', 'orange', 'purple'];
 const getColor = string => {
-  if (isNaN(string)) { // integers are colors, we don't want that
+  if (variables.hasVariable('colorscheme')) {
+    const colorScheme = Object.fromEntries(
+      variables.getVariable('colorscheme')
+        .split(',')
+        .map(keyValue => keyValue.split(':'))
+    );
+    if (colorScheme.hasOwnProperty(string)) string = colorScheme[string];
+  }
+  if (isNaN(string)) { // integers are colors too, we don't want that
     if (!DIV_tmpColor) DIV_tmpColor = document.createElement('DIV');
     DIV_tmpColor.style.color = string; // this only works if it's a valid css color
     if (DIV_tmpColor.style.color) return DIV_tmpColor.style.color;
@@ -162,21 +171,47 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
 
     return typeof titleContent === 'undefined' ? fallback : titleContent;
   };
+
+  const getColorString = string => {
+    if (typeof string === 'string') {
+      // nothing to do
+    } else if (this.hasOption('color')) {
+      const colorPropertyName = this.getOption('color');
+      if (!this.hasNode(colorPropertyName)) return null;
+      string = this.getNode(colorPropertyName).getContent();// TODO check
+      if (typeof string === 'number') string = string.toString();
+    } else string = entityClassName + '/' + entityId;
+    if (typeof string !== 'string') return null; // can't make heads or tails of this, just return black
+    return string;
+  };
   /**
    * @param  {[string]} string TODO
    * @returns {string} The color associated with the content.
    */
   this.getColor = string => {
-    if (typeof string === 'string') {
-      // nothing to do
-    } else if (this.hasOption('color')) {
-      const colorPropertyName = this.getOption('color');
-      if (!this.hasNode(colorPropertyName)) return 'black';
-      string = this.getNode(colorPropertyName).getContent();// TODO check
-      if (typeof string === 'number') string = string.toString();
-    } else string = entityClassName + '/' + entityId;
-    if (typeof string !== 'string') return 'black'; // can't make heads or tails of this, just return black
-    return getColor(string);
+    string = getColorString(string);
+    return string === null ? 'black' : getColor(string);
+  };
+
+  /**
+   * Shows color scheme editor
+   * @returns {function}       an function that shows the color scheme editor
+   */
+  this.manageColor = () => () => {
+    const color = this.getColor();
+    showColorPicker(colors, color, color => {
+      const string = getColorString();
+      const colorScheme = variables.hasVariable('colorscheme')
+        ? Object.fromEntries(
+          variables.getVariable('colorscheme')
+            .split(',')
+            .map(keyValue => keyValue.split(':'))
+        )
+        : {};
+      colorScheme[string] = color;
+      const newColorScheme = Object.entries(colorScheme).map(([key, value]) => `${key}:${value}`).join(',');
+      variables.setVariable('colorscheme', newColorScheme);
+    });
   };
   /**
    * [onSelect description]

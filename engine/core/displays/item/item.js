@@ -213,6 +213,8 @@ exports.display = {
         const SPAN_color = document.createElement('SPAN');
         SPAN_color.style.verticalAlign = 'middle';
         const color = displayItem.getColor();
+        SPAN_color.onclick = displayItem.manageColor();
+        SPAN_color.style.cursor = 'pointer';
         SPAN_color.innerHTML = `<svg width="20" height="20"><circle cx="10" cy="10" r="10" fill="${color}"/></svg>&nbsp;`;
         TD_header.appendChild(SPAN_color);
       }

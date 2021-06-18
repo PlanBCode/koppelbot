@@ -202,7 +202,7 @@ function initializeMap (display) {
     map.on('moveend', () => {
       if (busy) return;
       busy = true;
-      const mapExtent = WRAPPER.map.getView().calculateExtent();
+      const mapExtent = WRAPPER.map.getView().calculateExtent().map(Math.round);
       display.setVariable(variableName, mapExtent.join(','));
       busy = false;
     });
