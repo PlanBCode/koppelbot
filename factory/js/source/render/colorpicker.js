@@ -16,6 +16,7 @@ function showColorPicker (colors, currentColor, callback) {
     const BUTTON_cancel = document.createElement('DIV');
     BUTTON_cancel.innerHTML = '&#10005; cancel';
     BUTTON_cancel.className = 'xyz-button-cancel';
+    BUTTON_cancel.style.marginTop = '8px';
     BUTTON_cancel.onclick = () => { DIV.style.display = 'none'; };
     DIV.appendChild(BUTTON_cancel);
 
@@ -26,7 +27,7 @@ function showColorPicker (colors, currentColor, callback) {
   for (const DIV_color of [...DIV.children]) {
     if (DIV_color.className === 'xyz-colorpicker-color') {
       const color = DIV_color.style.backgroundColor;
-      if (color === currentColor) DIV_color.style.transform = 'scale(1.1,1.1)';
+      DIV_color.style.transform = color === currentColor ? 'scale(1.1,1.1)' : null;
       DIV_color.onclick = () => {
         callback(color);
         DIV.style.display = 'none';

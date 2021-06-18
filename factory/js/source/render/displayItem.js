@@ -198,7 +198,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @returns {function}       an function that shows the color scheme editor
    */
   this.manageColor = () => () => {
-    const color = getColor();
+    const color = this.getColor();
     showColorPicker(colors, color, color => {
       const string = getColorString();
       const colorScheme = variables.hasVariable('colorscheme')

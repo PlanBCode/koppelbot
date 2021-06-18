@@ -206,7 +206,9 @@ exports.display = {
         const type = flatNodes.getSetting('type');
         sortTableOnClick(TABLE, TD_header, type);
       } else {
+        const hiddenColumns = display.hasOption('hide') ? display.getOption('hide').split(',') : [];
         for (const flatPropertyName in flatNodes) {
+          if (hiddenColumns.includes(flatPropertyName)) continue;
           const TD_header = document.createElement('TD');
           const title = display.getDisplayName(flatPropertyName);
           TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
@@ -279,7 +281,9 @@ exports.display = {
       TD_entityContent.appendChild(TAG);
       TR_entity.appendChild(TD_entityContent);
     } else {
+      const hiddenColumns = display.hasOption('hide') ? display.getOption('hide').split(',') : [];
       for (const flatPropertyName in columns) {
+        if (hiddenColumns.includes(flatPropertyName)) continue;
         const TD_flatProperty = document.createElement('TD');
         const node = columns[flatPropertyName];
         const TAG = node.render(display.getAction(), display.getSubOptions(flatPropertyName));

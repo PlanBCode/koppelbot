@@ -97,7 +97,8 @@ class UiRequest extends HttpRequest2
           '.file_get_contents('./engine/ui/ui.js').'
           </script>
           ';
-          return new DocResponse('ui' . $this->uri, $this->getQuery(), $body);
+          $query = $this->getQuery();
+          return new DocResponse('ui' . $this->uri, $query, $body);
         }
     }
 }
