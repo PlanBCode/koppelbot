@@ -175,18 +175,20 @@ exports.display = {
           const label = aggregator + '(' + propertyName + ')';
           const TD_header = document.createElement('TD');
           const labels = display.getOption('labels');
-          let title;
-          if (labels && labels.hasOwnProperty(label)) title = display.getDisplayName(label);
-          else {
-            const displayLabel = aggregator + '(' + display.getDisplayName(propertyName) + ')';
-            title = displayLabel;
+          let title, toolTip;
+          if (labels && labels.hasOwnProperty(label)) {
+            title = display.getDisplayName(label);
+            toolTip = display.getDisplayName(label, false);
+          } else {
+            title = aggregator + '(' + display.getDisplayName(propertyName) + ')';
+            toolTip = aggregator + '(' + display.getDisplayName(propertyName, false) + ')';
           }
           const propertyNode = display.getNode(propertyName);
           if (propertyNode.hasSetting('unit')) {
             title += '&nbsp;(' + renderUnit(propertyNode.getSetting('unit')) + ')';
           }
           TD_header.innerHTML = title;
-          TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
+          TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + toolTip;
           let type = getAggregationType(aggregator);
           if (!type) type = display.getNode(propertyName).getSetting('type'); // fallback for untyped aggregations
           sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);

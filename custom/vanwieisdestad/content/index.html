@@ -15,7 +15,7 @@
         <xyz
           id="map"
           style="height:100%; width:100%"
-          searchPlaceholder="Zoek op adres"
+          searchPlaceholder="Zoek op adres, buurt of wijk"
           uri="/locatie/*/geojson,EigenaarID?EigenaarID==$EigenaarIDs&geojson>=<$view"
           hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"
           viewBoxSelect="view=599842.2834046325,6828347.071935917,600135.6954529143,6828578.049652248"
@@ -23,7 +23,7 @@
       </td>
       <td valign="top"style="background-color:#EFEFEF; height: calc(100vh - 50px);">
         <xyz
-            uri="/eigenaar/*/id,Eigenaar=name,Percelen=aantal,Oppervlakte=oppervlakte"
+            uri="/eigenaar/*/id,Eigenaar=name,Percelen=aantal,Oppervlakte(m^2)=oppervlakte"
             hideMessages
             showSearchBar="true"
             hide="id"
