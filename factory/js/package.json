@@ -16,6 +16,6 @@
     "gulp": "^4.0.2",
     "jsdom": "^16.2.2",
     "webpack": "^5.11.1",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^4.7.2"
   }
 }
