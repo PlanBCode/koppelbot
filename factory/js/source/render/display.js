@@ -5,6 +5,8 @@ const {DisplayItem} = require('./displayItem.js');
 const DEFAULT_ACTION = 'view';
 const DEFAULT_DISPLAYNAME = 'item';
 
+const uiElements = [];
+
 const displayListenersPerWrapper = new Map();
 
 const uiElementWaitingForData = (display, displayItem) => {
@@ -117,7 +119,7 @@ const addListeners = (xyz, uri, options, WRAPPER) => {
   displayListenersPerWrapper.set(WRAPPER, displayListeners);
 };
 
-const renderUiElement = (xyz, options, WRAPPER) => {
+function UiElement (xyz, options, WRAPPER) {
   const {uri, aggregations, labels} = uriTools.parseAggregationFromUri(options.uri);
   options.uri = uri;
   options.labels = labels;
@@ -193,6 +195,11 @@ const renderUiElement = (xyz, options, WRAPPER) => {
 
   const waitCallback = () => uiElementWaitingForInput(display, displayItem);
   registerUri(xyz, uri, contentVariables, readyCallback, waitCallback, options.dynamic);
+}
+
+const renderUiElement = (xyz, options, WRAPPER) => {
+  const uiElement = new UiElement(xyz, options, WRAPPER);
+  uiElements.push(uiElement);
 };
 
 // DISPLAY DATA REFRESHING TODO : NEEDS TO BE IMPROVED
