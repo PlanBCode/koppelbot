@@ -7,7 +7,20 @@ let DIV_tmpColor;
 
 // string to int
 const hashCode = string => string.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
-const colors = ['red', 'green', 'blue', 'yellow', 'pink', 'cyan', 'orange', 'purple'];
+const colors = [
+  '#a6cee3',
+  '#1f78b4',
+  '#b2df8a',
+  '#33a02c',
+  '#fb9a99',
+  '#e31a1c',
+  '#fdbf6f',
+  '#ff7f00',
+  '#cab2d6',
+  '#6a3d9a',
+  '#ffff99',
+  '#b15928'
+];
 const getColor = string => {
   if (variables.hasVariable('colorscheme')) {
     const colorScheme = Object.fromEntries(
@@ -143,11 +156,15 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @return {string}              TODO
    */
 
-  this.getDisplayName = propertyPath => {
+  this.getDisplayName = (propertyPath, parseToHTML = true) => {
     if (typeof propertyPath === 'string')propertyPath = [propertyPath];
     const labels = this.getOption('labels');
-    if (labels && labels.hasOwnProperty(propertyPath[0])) return labels[propertyPath[0]];
-    else return xyz.getDisplayName(entityClassName, propertyPath);
+    const displayName = labels && labels.hasOwnProperty(propertyPath[0])
+      ? labels[propertyPath[0]]
+      : xyz.getDisplayName(entityClassName, propertyPath);
+    return parseToHTML
+      ? displayName.replace(/\^\w+/, x => `<sup>${x.substring(1)}</sup>`)
+      : displayName;
   };
   /**
    * [getPropertyPath description]
