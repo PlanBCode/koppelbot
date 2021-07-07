@@ -155,7 +155,7 @@ exports.display = {
           TR_header.appendChild(TD_groupBy);
           const type = display.getNode(groupByPropertyName).getSetting('type');
           TD_groupBy.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + groupByLabel;
-          sortTableOnClick(TABLE, TD_groupBy, type, display.hasOption('showSearchBar') ? 2 : 1);
+          sortTableOnClick(display, TABLE, TD_groupBy, type, groupByPropertyName);
         }
         if (display.hasOption('select')) {
           display.onSelect(selectEntityId => {
@@ -191,7 +191,7 @@ exports.display = {
           TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + toolTip;
           let type = getAggregationType(aggregator);
           if (!type) type = display.getNode(propertyName).getSetting('type'); // fallback for untyped aggregations
-          sortTableOnClick(TABLE, TD_header, type, display.hasOption('showSearchBar') ? 2 : 1);
+          sortTableOnClick(display, TABLE, TD_header, type, label);
           TR_header.appendChild(TD_header);
         }
         THEAD.appendChild(TR_header);

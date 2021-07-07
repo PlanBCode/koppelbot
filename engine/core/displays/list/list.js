@@ -20,7 +20,7 @@ function sortTable (TABLE, columnIndex, ascending, type) {
   array.forEach(({row}) => TBODY.appendChild(row));
 }
 
-function sortTableOnClick (TABLE, TD_header, type) {
+function sortTableOnClick (display, TABLE, TD_header, type, propertyName) {
   TD_header.style.cursor = 'pointer';
   TD_header.classList.add('xyz-list-unsorted');
 
@@ -42,10 +42,6 @@ function sortTableOnClick (TABLE, TD_header, type) {
           TD_other.classList.remove('xyz-list-sorted-desc');
           TD_header.classList.add('xyz-list-sorted-asc');
         }
-      } else {
-        TD_header.classList.add('xyz-list-unsorted');
-        TD_other.classList.remove('xyz-list-sorted-asc');
-        TD_other.classList.remove('xyz-list-sorted-desc');
       }
       ++i;
     }
@@ -213,7 +209,7 @@ exports.display = {
         TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
         TR_header.appendChild(TD_header);
         const type = flatNodes.getSetting('type');
-        sortTableOnClick(TABLE, TD_header, type);
+        sortTableOnClick(display, TABLE, TD_header, type);
       } else {
         const hiddenColumns = display.hasOption('hide') ? display.getOption('hide').split(',') : [];
         for (const flatPropertyName in flatNodes) {
@@ -224,7 +220,7 @@ exports.display = {
           TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + toolTip;
           TD_header.innerHTML = title;
           const type = flatNodes[flatPropertyName].getSetting('type');
-          sortTableOnClick(TABLE, TD_header, type);
+          sortTableOnClick(display, TABLE, TD_header, type, flatPropertyName);
           TR_header.appendChild(TD_header);
         }
       }

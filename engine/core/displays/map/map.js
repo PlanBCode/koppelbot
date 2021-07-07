@@ -30,7 +30,7 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
       return new ol.style.Style({
         image: new ol.style.Circle({
           stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth}),
-          radius: 50,
+          radius: 5,
           fill: new ol.style.Fill({color: fillColor})
         })
       });
