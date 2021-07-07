@@ -93,10 +93,8 @@ function fixHeaderOnScroll (WRAPPER, THEAD, TBODY) {
     const BUTTONs = WRAPPER.getElementsByClassName('xyz-ui-edit');
 
     if (BUTTONs.length > 0) {
-      console.log(WRAPPER.scrollTop);
       for (const BUTTON of BUTTONs) BUTTON.style.bottom = -WRAPPER.scrollTop + 'px';
     }
-    console.log(BUTTONs);
     if (WRAPPER.scrollTop > 0) {
       if (THEAD.style.position !== 'fixed') {
         const TR_header = THEAD.childNodes[0];
