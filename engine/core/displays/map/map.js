@@ -8,6 +8,8 @@ const {renderSearchBar} = require('./search/search');
 const {renderMarkUserLocation} = require('./markUserLocation/markUserLocation');
 
 const HIGHLIGHT_COLOR = 'yellow';
+const MINIMAL_PIXEL_DIMENSION = 15; // features smaller than this will be represented by a circle
+
 let SCRIPT; // to dynamically load dependency;
 
 function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth) {
@@ -22,24 +24,25 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
 
   const geometryType = feature.getGeometry().getType();
   const highlightStyle = (feature, resolution) => {
+    // console.log('resolution', minPixelSize);
+
     if (geometryType === 'Point') {
       return new ol.style.Style({
         image: new ol.style.Circle({
           stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth}),
-          radius: 5,
+          radius: 50,
           fill: new ol.style.Fill({color: fillColor})
         })
       });
-    } else if (WRAPPER.selectedFeature === feature) {
+    } else {
       const extent = feature.getGeometry().getExtent();
+      const pixelTopLeft = WRAPPER.map.getPixelFromCoordinate(ol.extent.getTopLeft(extent));
+      const pixelBottomRight = WRAPPER.map.getPixelFromCoordinate(ol.extent.getBottomRight(extent));
 
-      const topLeft = WRAPPER.map.getPixelFromCoordinate(ol.extent.getTopLeft(extent));
-      const bottomRight = WRAPPER.map.getPixelFromCoordinate(ol.extent.getBottomRight(extent));
+      const pixelWidth = pixelBottomRight[0] - pixelTopLeft[0];
+      const pixelHeight = pixelBottomRight[1] - pixelTopLeft[1];
 
-      const width = bottomRight[0] - topLeft[0];
-      const height = bottomRight[1] - topLeft[1];
-
-      if (width < 15 || height < 15) {
+      if (pixelWidth < MINIMAL_PIXEL_DIMENSION || pixelHeight < MINIMAL_PIXEL_DIMENSION) {
         if (!feature.iconFeature) {
           const coord = [];
           coord[0] = (extent[2] - extent[0]) / 2 + extent[0];
@@ -69,12 +72,6 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
           stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth})
         });
       }
-    } else {
-      if (feature.iconFeature) feature.iconFeature.setStyle(new ol.style.Style({}));
-      return new ol.style.Style({
-        fill: new ol.style.Fill({color: fillColor}),
-        stroke: new ol.style.Stroke({color: strokeColor, width: strokeWidth})
-      });
     }
   };
   feature.setStyle(highlightStyle);
