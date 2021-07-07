@@ -7,6 +7,7 @@ const {getStateMessage} = require('../item/item');
 const {renderSearchBar} = require('./search/search');
 const {renderMarkUserLocation} = require('./markUserLocation/markUserLocation');
 
+const HIGHLIGHT_COLOR = 'yellow';
 let SCRIPT; // to dynamically load dependency;
 
 function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth) {
@@ -145,7 +146,6 @@ function initializeMap (display) {
   });
 
   let highlightedFeature = null;
-  let highlightedFeatureOriginalStyle = null;
   // change mouse cursor when over marker
   map.on('pointermove', function (e) {
     if (e.dragging) return;
@@ -165,15 +165,18 @@ function initializeMap (display) {
     if (alreadyHighlighted) return;
 
     if (highlightedFeature !== null) {
-      highlightedFeature.setStyle(highlightedFeatureOriginalStyle);
+      const resolution = 10; // TODO
+      const fillColor = highlightedFeature.getStyle()(highlightedFeature, resolution).getFill().getColor();
+      const strokeColor = WRAPPER.selectedFeature === highlightedFeature ? HIGHLIGHT_COLOR : fillColor;
+      setFeatureStyle(WRAPPER, highlightedFeature, fillColor, strokeColor, 3);
       highlightedFeature = null;
     }
     map.forEachFeatureAtPixel(e.pixel, feature => {
       if (highlightedFeature === feature) return true;
-      highlightedFeatureOriginalStyle = feature.getStyle();
       highlightedFeature = feature;
-      const fillColor = 'rgba(255,255,0,1)';
-      const strokeColor = feature.getStyle && feature.getStyle().getFill ? feature.getStyle().getFill() : 'blue';
+      const resolution = 10; // TODO
+      const fillColor = feature.getStyle()(feature, resolution).getFill().getColor();
+      const strokeColor = HIGHLIGHT_COLOR;
       setFeatureStyle(WRAPPER, feature, fillColor, strokeColor, 3);
       return true;
     });
@@ -275,7 +278,7 @@ exports.display = {
           const setStyle = (isSelected, feature_ = feature) => {
             if (isSelected) WRAPPER.selectedFeature = feature_;
             else if (WRAPPER.selectedFeature === feature_) WRAPPER.selectedFeature = null;
-            const strokeColor = isSelected ? 'yellow' : fillColor;
+            const strokeColor = isSelected ? HIGHLIGHT_COLOR : fillColor;
             const strokeWidth = isSelected ? 3 : 1;
             setFeatureStyle(WRAPPER, feature_, fillColor, strokeColor, strokeWidth);
           };
