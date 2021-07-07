@@ -1,0 +1,93 @@
+nav {
+  position: fixed;
+  top: 50px;
+  width: calc(100vw - 350px);
+  height: 30px;
+  left: 180px;
+  border-color: rgb(170, 170, 170);
+  border-width: 2px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+  overflow: visible;
+  padding-right: 50px;
+}
+
+nav > img {
+  transform: translate(-150px, -58px);
+  vertical-align: top;
+}
+
+nav > a {
+  text-decoration: none;
+  float: right;
+  margin-left: 30px;
+  color: white;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 1px;
+}
+
+nav > span {
+  display: inline-block;
+  width: 18px;
+  float: right;
+  margin-left: 8px;
+  padding-bottom: 1px;
+}
+
+nav > a:nth-of-type(1),
+nav > span:nth-of-type(1) {
+  background-color: rgba(0, 111, 171, 150);
+}
+
+nav > a:nth-of-type(2),
+nav > span:nth-of-type(2) {
+  background-color: rgba(140, 0, 84, 150);
+}
+
+nav > a:nth-of-type(3),
+nav > span:nth-of-type(3) {
+  background-color: rgba(226, 128, 0, 150);
+}
+
+.kaart {
+  border-style: solid;
+  border-width: 1px;
+  width: 200px;
+  height: 200px;
+  display: inline-block;
+  margin: 20px;
+}
+
+.container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+}
+
+.container > div {
+  padding-left: 25vw;
+  padding-right: 25vw;
+  text-align: center;
+  scroll-snap-align: start;
+  height: calc(100vh - 200px);
+  padding-top: 200px;
+}
+
+.container div:nth-of-type(1) {
+  background: blanchedalmond;
+  color: black;
+}
+
+.container div:nth-of-type(2) {
+  background: azure;
+}
+
+.container div:nth-of-type(3) {
+  background: blanchedalmond;
+}
+
+.container div:nth-of-type(4) {
+  background: lightcoral;
+  color: white;
+}
