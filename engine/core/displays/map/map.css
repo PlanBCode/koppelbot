@@ -21,6 +21,13 @@
   display: none;
 }
 
+.ol-zoom-in:disabled,
+.ol-zoom-out:disabled,
+.ol-zoom-fit:disabled,
+.ol-rotate-reset:disabled {
+  background-color: darkgrey;
+}
+
 .xyz-map {
   position: relative;
 }

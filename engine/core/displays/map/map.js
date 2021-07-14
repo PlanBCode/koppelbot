@@ -3,6 +3,8 @@
 /*
 TODO?label  define a label property to use
  */
+exports.zoomTo = zoomTo;
+
 const {getStateMessage} = require('../item/item');
 const {renderSearchBar} = require('./search/search');
 const {renderMarkUserLocation} = require('./markUserLocation/markUserLocation');
@@ -24,8 +26,6 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
 
   const geometryType = feature.getGeometry().getType();
   const highlightStyle = (feature, resolution) => {
-    // console.log('resolution', minPixelSize);
-
     if (geometryType === 'Point') {
       return new ol.style.Style({
         image: new ol.style.Circle({
@@ -75,6 +75,63 @@ function setFeatureStyle (WRAPPER, feature, fillColor, strokeColor, strokeWidth)
     }
   };
   feature.setStyle(highlightStyle);
+}
+
+function checkMaxDimension (display, extent) {
+  const WRAPPER = display.getWRAPPER();
+  const BUTTON_zoomout = WRAPPER.getElementsByClassName('ol-zoom-out')[0];
+  if (!display.hasOption('maxAllowedViewSize')) {
+    BUTTON_zoomout.removeAttribute('disabled');
+  } else {
+    const width = Math.abs(extent[2] - extent[0]);
+    const height = Math.abs(extent[3] - extent[1]);
+    const maxDimension = Math.max(width, height);
+    const maxAllowedDimension = display.getOption('maxAllowedViewSize');
+    if (maxAllowedDimension >= maxDimension) {
+      BUTTON_zoomout.setAttribute('disabled', true);
+    } else {
+      BUTTON_zoomout.removeAttribute('disabled');
+    }
+  }
+}
+
+function limitExtent (display, extent) {
+  if (!display.hasOption('maxAllowedViewSize')) return false;
+  const width = Math.abs(extent[2] - extent[0]);
+  const height = Math.abs(extent[3] - extent[1]);
+  const maxDimension = Math.max(width, height);
+  const maxAllowedDimension = display.getOption('maxAllowedViewSize');
+  if (maxDimension > maxAllowedDimension) { // View is too large
+    const centerX = extent[0] + width * 0.5;
+    const centerY = extent[1] + height * 0.5;
+    if (maxDimension === width) { // need to crop horizontally
+      extent[0] = centerX - maxAllowedDimension * 0.5;
+      extent[2] = centerX + maxAllowedDimension * 0.5;
+      extent[1] = centerY - maxAllowedDimension * 0.5 * height / width;
+      extent[3] = centerY + maxAllowedDimension * 0.5 * height / width;
+    } else { // need to crop vertically
+      extent[0] = centerX - maxAllowedDimension * 0.5 * width / height;
+      extent[2] = centerX + maxAllowedDimension * 0.5 * width / height;
+      extent[1] = centerY - maxAllowedDimension * 0.5;
+      extent[3] = centerY + maxAllowedDimension * 0.5;
+    }
+    return true;
+  } else return false;
+}
+
+function zoomTo (extent, display) {
+  const WRAPPER = display.getWRAPPER();
+  const padding = 0; // 100
+  limitExtent(display, extent);
+  checkMaxDimension(display, extent);
+  WRAPPER.map.getView().fit(extent, {padding: [padding, padding, padding, padding]});
+}
+
+function zoomToFit (display) {
+  const WRAPPER = display.getWRAPPER();
+  const extent = ol.extent.createEmpty();
+  ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
+  zoomTo(extent, display);
 }
 
 function initializeMap (display) {
@@ -128,7 +185,7 @@ function initializeMap (display) {
       if (lastClickTimeStamp) {
         if (event.originalEvent.timeStamp - 500 <= lastClickTimeStamp) {
           const extent = (feature.mainFeature || feature).getGeometry().getExtent();
-          WRAPPER.map.getView().fit(extent, {padding: [100, 100, 100, 100]});
+          zoomTo(extent, display);
         }
       }
       lastClickTimeStamp = event.originalEvent.timeStamp;
@@ -163,36 +220,53 @@ function initializeMap (display) {
 
     if (highlightedFeature !== null) {
       const resolution = 10; // TODO
-      const fillColor = highlightedFeature.getStyle()(highlightedFeature, resolution).getFill().getColor();
-      const strokeColor = WRAPPER.selectedFeature === highlightedFeature ? HIGHLIGHT_COLOR : fillColor;
-      setFeatureStyle(WRAPPER, highlightedFeature, fillColor, strokeColor, 3);
+      const style1 = highlightedFeature.getStyle();
+      const style = typeof style1 === 'function'
+        ? style1(highlightedFeature, resolution)
+        : style1;
+      const fill = style.getFill();
+      if (fill) {
+        const fillColor = fill.getColor();
+        const strokeColor = WRAPPER.selectedFeature === highlightedFeature ? HIGHLIGHT_COLOR : fillColor;
+        setFeatureStyle(WRAPPER, highlightedFeature, fillColor, strokeColor, 3);
+      }
       highlightedFeature = null;
     }
     map.forEachFeatureAtPixel(e.pixel, feature => {
       if (highlightedFeature === feature) return true;
       highlightedFeature = feature;
       const resolution = 10; // TODO
-      const fillColor = feature.getStyle()(feature, resolution).getFill().getColor();
-      const strokeColor = HIGHLIGHT_COLOR;
-      setFeatureStyle(WRAPPER, feature, fillColor, strokeColor, 3);
+      const style1 = feature.getStyle();
+      const style = typeof style1 === 'function'
+        ? style1(highlightedFeature, resolution)
+        : style1;
+
+      const fill = style.getFill();
+      if (fill) {
+        const fillColor = fill.getColor();
+        const strokeColor = HIGHLIGHT_COLOR;
+        setFeatureStyle(WRAPPER, feature, fillColor, strokeColor, 3);
+      }
       return true;
     });
   });
 
   const BUTTON_zoomin = document.getElementsByClassName('ol-zoom-in')[0];
   const BUTTON_zoomout = document.getElementsByClassName('ol-zoom-out')[0];
-  const BUTTON_zoomfit = document.createElement('button');
-  BUTTON_zoomfit.innerHTML = '&boxplus;';
-  BUTTON_zoomfit.className = 'ol-zoom-fit';
   BUTTON_zoomout.title = 'Zoom out';
   BUTTON_zoomin.title = 'Zoom in';
-  BUTTON_zoomfit.title = 'Zoom to fit';
-  BUTTON_zoomfit.onclick = () => {
-    delete WRAPPER.zoomToFit; // remove zoom to fit limitation
-    zoomToFit(WRAPPER);
-  };
-  const DIV_buttons = BUTTON_zoomin.parentNode;
-  DIV_buttons.insertBefore(BUTTON_zoomfit, BUTTON_zoomin);
+  if (!display.hasOption('showFitToDataButton') || display.getOption('showFitToDataButton')) {
+    const BUTTON_zoomfit = document.createElement('button');
+    BUTTON_zoomfit.innerHTML = '&boxplus;';
+    BUTTON_zoomfit.className = 'ol-zoom-fit';
+    BUTTON_zoomfit.title = 'Zoom to fit';
+    BUTTON_zoomfit.onclick = () => {
+      delete WRAPPER.zoomToFit; // remove zoom to fit limitation
+      zoomToFit(display);
+    };
+    const DIV_buttons = BUTTON_zoomin.parentNode;
+    DIV_buttons.insertBefore(BUTTON_zoomfit, BUTTON_zoomin);
+  }
   renderMarkUserLocation(display, ol, DIV_create);
   renderSearchBar(display, ol);
 
@@ -202,9 +276,16 @@ function initializeMap (display) {
     map.on('moveend', () => {
       if (busy) return;
       busy = true;
-      const mapExtent = WRAPPER.map.getView().calculateExtent().map(Math.round);
-      display.setVariable(variableName, mapExtent.join(','));
-      busy = false;
+      const extent = WRAPPER.map.getView().calculateExtent().map(Math.round);
+      const tooLarge = limitExtent(display, extent);
+      if (tooLarge) {
+        busy = false;
+        zoomTo(extent, display);
+      } else {
+        checkMaxDimension(display, extent);
+        display.setVariable(variableName, extent.join(','));
+        busy = false;
+      }
     });
     const onChange = value => {
       WRAPPER.zoomToFit = false; // prevent zoom to fit overriding variable data
@@ -212,7 +293,7 @@ function initializeMap (display) {
       busy = true;
       if (typeof value !== 'string') return;
       const extent = value.split(',').map(Number);
-      WRAPPER.map.getView().fit(extent);
+      zoomTo(extent, display);
       busy = false;
     };
 
@@ -228,12 +309,6 @@ function initializeOpenLayers (callback) {
     SCRIPT.onload = callback;
     document.head.append(SCRIPT);
   } else callback();
-}
-
-function zoomToFit (WRAPPER) {
-  const extent = ol.extent.createEmpty();
-  ol.extent.extend(extent, WRAPPER.vectorLayer.getSource().getExtent());
-  WRAPPER.map.getView().fit(extent, {padding: [100, 100, 100, 100]});
 }
 
 exports.display = {
@@ -289,7 +364,7 @@ exports.display = {
           // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
           // TODO how do we handle changes to feature?
           WRAPPER.vectorLayer.getSource().addFeature(feature);
-          if (WRAPPER.zoomToFit !== false) zoomToFit(WRAPPER);
+          if (WRAPPER.zoomToFit !== false) zoomToFit(displayItem);
         }
       }
     });

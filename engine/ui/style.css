@@ -462,6 +462,92 @@ table.xyz-item-minimized span.xyz-item-maximize,
 table.xyz-item-minimized > tbody {
   display: none !important;
 }
+.xyz-map-wrapper {
+}
+
+.ol-zoom-in,
+.ol-zoom-out,
+.ol-zoom-fit {
+  height: 2em;
+  width: 2em;
+  margin: 2px;
+  float: left;
+  background-color: darkslateblue;
+  color: white;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.ol-rotate-reset,
+.ol-attribution {
+  display: none;
+}
+
+.ol-zoom-in:disabled,
+.ol-zoom-out:disabled,
+.ol-zoom-fit:disabled,
+.ol-rotate-reset:disabled {
+  background-color: darkgrey;
+}
+
+.xyz-map {
+  position: relative;
+}
+
+.xyz-map-message {
+  pointer-events: none;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 100;
+  right: 0;
+  top: 3px;
+  text-shadow: 1px 1px black;
+  color: white;
+}
+
+.xyz-map-search {
+  position: absolute;
+  top: 0;
+  left: 100px;
+  width: calc(100% - 110px);
+}
+
+.xyz-map-search > input {
+  margin: 2px;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: lightgrey;
+  padding: 4px;
+  width: 100%;
+}
+
+.xyz-map-search > div.xyz-map-search-results {
+  background-color: white;
+  font-size: 75%;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result {
+  cursor: pointer;
+  padding: 5px;
+  background-color: white;
+  font-size: 11px;
+  width: calc(100% - 10px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:first-child {
+  font-weight: bold;
+}
+
+.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
+  background-color: lightblue;
+}
 table.xyz-create,
 table.xyz-item,
 table.xyz-list {
@@ -563,84 +649,8 @@ tr.xyz-list-search > td > input {
 .xyz-list-search-clear::before {
   content: "\2715";
 }
-.xyz-map-wrapper {
-}
-
-.ol-zoom-in,
-.ol-zoom-out,
-.ol-zoom-fit {
-  height: 2em;
-  width: 2em;
-  margin: 2px;
-  float: left;
-  background-color: darkslateblue;
-  color: white;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.ol-rotate-reset,
-.ol-attribution {
-  display: none;
-}
-
-.xyz-map {
-  position: relative;
-}
-
-.xyz-map-message {
-  pointer-events: none;
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  z-index: 100;
-  right: 0;
-  top: 3px;
-  text-shadow: 1px 1px black;
-  color: white;
-}
-
-.xyz-map-search {
-  position: absolute;
-  top: 0;
-  left: 100px;
-  width: calc(100% - 110px);
-}
-
-.xyz-map-search > input {
-  margin: 2px;
-  border-radius: 5px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: lightgrey;
-  padding: 4px;
-  width: 100%;
-}
-
-.xyz-map-search > div.xyz-map-search-results {
-  background-color: white;
-  font-size: 75%;
-}
-
-.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result {
-  cursor: pointer;
-  padding: 5px;
-  background-color: white;
-  font-size: 11px;
-  width: calc(100% - 10px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:first-child {
-  font-weight: bold;
-}
-
-.xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
-  background-color: lightblue;
+.xyz-title.xyz-selected {
+  background-color: yellow;
 }
 div.xyz-timeline-wrapper {
     position: relative;
@@ -701,8 +711,58 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}.xyz-title.xyz-selected {
-  background-color: yellow;
+}
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}.xyz-login a {
+  color: blue;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.xyz-login a:hover {
+  text-decoration: underline;
+}
+
+.xyz-login-message {
+  background-color: khaki;
+  color: black;
+  border-radius: 5px;
+  text-align: center;
+  animation-iteration-count: 1;
+  animation-duration: 10s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes xyz-login-hide {
+  from {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  to {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+.xyz-login-capslock-notifier {
+  color: red;
 }
 @charset "UTF-8";
 
@@ -943,59 +1003,6 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
-
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}.xyz-login a {
-  color: blue;
-  cursor: pointer;
-  margin: 5px;
-}
-
-.xyz-login a:hover {
-  text-decoration: underline;
-}
-
-.xyz-login-message {
-  background-color: khaki;
-  color: black;
-  border-radius: 5px;
-  text-align: center;
-  animation-iteration-count: 1;
-  animation-duration: 10s;
-  animation-fill-mode: forwards;
-}
-
-@keyframes xyz-login-hide {
-  from {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  to {
-    visibility: hidden;
-    opacity: 0;
-  }
-}
-
-.xyz-login-capslock-notifier {
-  color: red;
-}
 
 .xyz-reference {
     cursor: pointer;
