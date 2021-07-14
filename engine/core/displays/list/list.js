@@ -1,3 +1,7 @@
+exports.setupSortTable = setupSortTable;
+exports.addSearchBox = addSearchBox;
+exports.fixHeaderOnScroll = fixHeaderOnScroll;
+
 /*
 
 options
@@ -8,47 +12,88 @@ options
 
 const {getStateMessage} = require('../item/item');
 
-function sortTable (TABLE, columnIndex, ascending, type) {
+function sortTable (TABLE, columnIndex, ascending, type, TD_header) {
   const THEAD = TABLE.firstChild;
   const TBODY = THEAD.nextElementSibling;
-  const array = [...TBODY.rows].map(row => ({row, value: row.getElementsByTagName('TD')[columnIndex].innerText}));
+  const array = [...TBODY.rows].map(TR => ({TR, value: TR.getElementsByTagName('TD')[columnIndex].innerText}));
   if (type === 'number') {
     if (ascending) array.sort((x, y) => Number(x.value) - Number(y.value));
     else array.sort((x, y) => Number(y.value) - Number(x.value));
   } else if (ascending) array.sort((x, y) => x.value.localeCompare(y.value));
   else array.sort((x, y) => y.value.localeCompare(x.value));
-  array.forEach(({row}) => TBODY.appendChild(row));
+
+  array.forEach(({TR}) => TBODY.appendChild(TR));
+
+  if (ascending) {
+    TD_header.classList.add('xyz-list-sorted-asc');
+    TD_header.classList.remove('xyz-list-sorted-desc');
+  } else {
+    TD_header.classList.add('xyz-list-sorted-desc');
+    TD_header.classList.remove('xyz-list-sorted-asc');
+  }
+  TD_header.classList.remove('xyz-list-unsorted');
 }
 
-function sortTableOnClick (display, TABLE, TD_header, type, propertyName) {
-  TD_header.style.cursor = 'pointer';
-  TD_header.classList.add('xyz-list-unsorted');
+function sortTableBySortString (sortString, display, TABLE, TD_headers, types, propertyNames) {
+  if (!sortString) return; // nothing to do
+  const TR_header = TABLE.firstChild.firstChild;
+  const TD_header0 = TD_headers[0];
+  const offset = [...TR_header.children].indexOf(TD_header0);
 
-  TD_header.onclick = () => {
-    let columnIndex;
-    let i = 0;
-    let ascending;
-    const TR_header = TD_header.parentNode.childNodes;
-    for (const TD_other of TR_header) {
-      if (TD_other === TD_header) {
-        columnIndex = i;
-        TD_header.classList.remove('xyz-list-unsorted');
-        if (TD_header.classList.contains('xyz-list-sorted-asc')) {
-          ascending = false;
-          TD_other.classList.remove('xyz-list-sorted-asc');
-          TD_header.classList.add('xyz-list-sorted-desc');
-        } else {
-          ascending = true;
-          TD_other.classList.remove('xyz-list-sorted-desc');
-          TD_header.classList.add('xyz-list-sorted-asc');
-        }
-      }
-      ++i;
+  for (const sort of sortString.split(',')) {
+    const ascending = !sort.startsWith('-');
+    const propertyName = sort.startsWith('-') || sort.startsWith('+')
+      ? sort.substr(1)
+      : sort;
+    const columnIndex = propertyNames.indexOf(propertyName);
+    if (columnIndex !== -1) {
+      const type = types[columnIndex] || 'string';
+      const TD_header = TD_headers[columnIndex];
+      sortTable(TABLE, columnIndex + offset, ascending, type, TD_header);
     }
-    sortTable(TABLE, columnIndex, ascending, type);
-  };
+  }
 }
-exports.sortTableOnClick = sortTableOnClick;
+
+function getSortString (display) {
+  if (display.hasOption('sortby')) {
+    const sortVariableName = display.getOption('sortby');
+    return display.hasVariable(sortVariableName)
+      ? display.getVariable(sortVariableName)
+      : display.hasOption('sort')
+        ? display.getOption('sort')
+        : null;
+  } else if (display.hasOption('sort')) return display.getOption('sort');
+  else return null;
+}
+
+function setupSortTable (display, TABLE, TD_headers, types, propertyNames) {
+  for (let i = 0; i < TD_headers.length; ++i) {
+    const TD_header = TD_headers[i];
+    TD_header.style.cursor = 'pointer';
+    TD_header.classList.add('xyz-list-unsorted');
+    const propertyName = propertyNames[i];
+
+    TD_header.onclick = () => { // 'a,propertyName,-b' ->  'a,-b,propertyName'
+      const ascending = !TD_header.classList.contains('xyz-list-sorted-asc');
+      const sortString = getSortString(display);
+      const newSortString = (sortString === null ? [] : sortString.split(','))
+        .filter(sort => sort === 'propertyName' || sort === '-' + propertyName || sort === '+' + propertyName)
+        .concat(ascending
+          ? propertyName
+          : '-' + propertyName)
+        .join(',');
+      sortTableBySortString(newSortString, display, TABLE, TD_headers, types, propertyNames);
+
+      if (display.hasOption('sortby')) {
+        const sortVariableName = display.getOption('sortby');
+        display.setVariable(sortVariableName, newSortString);
+      }
+    };
+  }
+
+  const sortString = getSortString(display);
+  sortTableBySortString(sortString, display, TABLE, TD_headers, types, propertyNames);
+}
 
 function addSearchBox (display, TR_header, TABLE) {
   if (display.getOption('showSearchBar')) {
@@ -81,8 +126,6 @@ function addSearchBox (display, TR_header, TABLE) {
     THEAD.appendChild(TR_search);
   }
 }
-
-exports.addSearchBox = addSearchBox;
 
 function fixHeaderOnScroll (WRAPPER, THEAD, TBODY) {
   WRAPPER.onscroll = () => {
@@ -132,8 +175,6 @@ function fixHeaderOnScroll (WRAPPER, THEAD, TBODY) {
     }
   };
 }
-
-exports.fixHeaderOnScroll = fixHeaderOnScroll;
 
 exports.display = {
   waitingForInput: display => {
@@ -202,6 +243,9 @@ exports.display = {
       }
 
       const flatNodes = display.getFlatNodes();
+      const TD_headers = [];
+      const types = [];
+      const propertyNames = [];
       if (flatNodes.constructor !== Object) {
         const TD_header = document.createElement('TD');
         const title = display.getEntityClassName();
@@ -209,7 +253,10 @@ exports.display = {
         TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + title;
         TR_header.appendChild(TD_header);
         const type = flatNodes.getSetting('type');
-        sortTableOnClick(display, TABLE, TD_header, type);
+
+        types.push(type);
+        propertyNames.push('*');
+        TD_headers.push(TD_header);
       } else {
         const hiddenColumns = display.hasOption('hide') ? display.getOption('hide').split(',') : [];
         for (const flatPropertyName in flatNodes) {
@@ -220,7 +267,9 @@ exports.display = {
           TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + toolTip;
           TD_header.innerHTML = title;
           const type = flatNodes[flatPropertyName].getSetting('type');
-          sortTableOnClick(display, TABLE, TD_header, type, flatPropertyName);
+          types.push(type);
+          propertyNames.push(flatPropertyName);
+          TD_headers.push(TD_header);
           TR_header.appendChild(TD_header);
         }
       }
@@ -236,6 +285,8 @@ exports.display = {
         });
       }
       THEAD.appendChild(TR_header);
+      setupSortTable(display, TABLE, TD_headers, types, propertyNames);
+
       addSearchBox(display, TR_header, TABLE);
     }
     display.showUiEditButton();

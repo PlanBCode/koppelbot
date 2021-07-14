@@ -1,7 +1,7 @@
 // https://www.chartjs.org/docs/latest/developers/updates.html
 const Chart = require('chart.js');
 const {renderUnit} = require('../../types/number/number');
-const {sortTableOnClick, addSearchBox, fixHeaderOnScroll } = require('../list/list');
+const {setupSortTable, addSearchBox, fixHeaderOnScroll } = require('../list/list');
 const {getStateMessage} = require('../item/item');
 
 // TODO mixed
@@ -146,6 +146,9 @@ exports.display = {
           TD_color.className = 'xyz-list-icon';
           TR_header.appendChild(TD_color);
         }
+        const TD_headers = [];
+        const types = [];
+        const propertyNames = [];
         if (display.hasOption('groupby')) {
           let groupByPropertyName = display.getOption('groupby');
           let groupByLabel = groupByPropertyName;
@@ -155,7 +158,9 @@ exports.display = {
           TR_header.appendChild(TD_groupBy);
           const type = display.getNode(groupByPropertyName).getSetting('type');
           TD_groupBy.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + groupByLabel;
-          sortTableOnClick(display, TABLE, TD_groupBy, type, groupByPropertyName);
+          TD_headers.push(TD_groupBy);
+          types.push(type);
+          propertyNames.push(groupByPropertyName);
         }
         if (display.hasOption('select')) {
           display.onSelect(selectEntityId => {
@@ -191,10 +196,15 @@ exports.display = {
           TD_header.title = (display.getOption('sortByToolTipPrefix') || 'Sort by') + ' ' + toolTip;
           let type = getAggregationType(aggregator);
           if (!type) type = display.getNode(propertyName).getSetting('type'); // fallback for untyped aggregations
-          sortTableOnClick(display, TABLE, TD_header, type, label);
+          TD_headers.push(TD_header);
+          types.push(type);
+          propertyNames.push(label);
           TR_header.appendChild(TD_header);
         }
+
         THEAD.appendChild(TR_header);
+        setupSortTable(display, TABLE, TD_headers, types, propertyNames);
+
         addSearchBox(display, TR_header, TABLE);
       }
 
