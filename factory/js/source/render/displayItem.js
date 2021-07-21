@@ -247,7 +247,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
     if (this.hasOption('multiSelect')) variables.onVariable(this.getOption('multiSelect'), callback);
   };
   const select = (entityClassName_, entityId_) => {
-    variables.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'));
+    variables.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'), this.getOption('selectIncludeClass'));
     if (this.hasOption('onChange')) {
       const onChange = this.getOption('onChange');
       if (typeof onChange === 'function') onChange();
@@ -312,12 +312,12 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
     * [multiSelectNone description]
     * @returns {void} TODO
     */
-  this.multiSelectAll = () => variables.select('*', '*', this.getOption('multiSelect'));
+  this.multiSelectAll = () => variables.select('*', '*', this.getOption('multiSelect'), '', this.getOption('selectIncludeClass'));
   /**
    * Include all items in the multi selection. This sets the multi select variable to '*'.
    * @returns {void} TODO
    */
-  this.multiSelectNone = () => variables.select(undefined, undefined, this.getOption('multiSelect'));
+  this.multiSelectNone = () => variables.select(undefined, undefined, this.getOption('multiSelect'), '', this.getOption('selectIncludeClass'));
   /**
    * Clear the multi selection if multiSelect option is defined. This clears the multi select variable.
    * @param  {string} [entityClassName_] TODO

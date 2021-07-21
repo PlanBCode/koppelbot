@@ -59,17 +59,15 @@ const setVariables = (variableObject) => {
   for (const variableName in variableObject) { setVariable(variableName, variableObject[variableName]); }
 };
 
-const selectVariable = (entityClassName, entityId, variableNameOrCallback, selectUri) => {
+const selectVariable = (entityClassName, entityId, variableNameOrCallback, selectUri = '', includeEntityClass = false) => {
   if (typeof variableNameOrCallback === 'string') {
     if (typeof entityId === 'undefined' && typeof entityClassName === 'undefined') {
       clearVariable(variableNameOrCallback);
     } else {
       const uriPostfix = selectUri || '';
-      const includeEntityClass = false; // TODO
       const value = includeEntityClass
         ? '/' + entityClassName + '/' + entityId
         : entityId;
-
       setVariable(variableNameOrCallback, value + uriPostfix);
     }
   } else if (typeof variableNameOrCallback === 'function') variableNameOrCallback(entityClassName, entityId);
