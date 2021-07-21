@@ -219,6 +219,8 @@ function initializeMap (display) {
     if (alreadyHighlighted) return;
 
     if (highlightedFeature !== null) {
+      if(highlightedFeature.displayItem) highlightedFeature.displayItem.unhighlight();
+
       const resolution = 10; // TODO
       const style1 = highlightedFeature.getStyle();
       const style = typeof style1 === 'function'
@@ -234,7 +236,10 @@ function initializeMap (display) {
     }
     map.forEachFeatureAtPixel(e.pixel, feature => {
       if (highlightedFeature === feature) return true;
+
       highlightedFeature = feature;
+      if(highlightedFeature.displayItem) highlightedFeature.displayItem.highlight();
+
       const resolution = 10; // TODO
       const style1 = feature.getStyle();
       const style = typeof style1 === 'function'
@@ -323,8 +328,12 @@ exports.display = {
   empty: displayItem => {
     const WRAPPER = displayItem.getWRAPPER();
     const DIV_message = WRAPPER.firstChild;
-    if (DIV_message) DIV_message.innerText = '';
-    if (WRAPPER.vectorSource) WRAPPER.vectorSource.clear();
+    if (DIV_message) DIV_message.innerText = '';    
+    if (WRAPPER.vectorSource){ // clean up
+      const features = WRAPPER.vectorSource.getFeatures();
+      for(const feature of features) if(feature.displayItem) feature.displayItem.remove();
+      WRAPPER.vectorSource.clear();
+     }
   },
 
   first: displayItem => {},
@@ -355,11 +364,20 @@ exports.display = {
             setFeatureStyle(WRAPPER, feature_, fillColor, strokeColor, strokeWidth);
           };
           setStyle(displayItem.isSelected());
+          feature.displayItem = displayItem;
+
           feature.onclick = () => {
             if (WRAPPER.selectedFeature) setStyle(false, WRAPPER.selectedFeature); // deselect previous selection
             setStyle(true);
             displayItem.select();
           };
+
+          displayItem.onHighlight(
+            () => setStyle(true),
+            () => setStyle(false),
+          )
+
+
 
           // TODO const SVG_entity = content[locationPropertyName].render(display.getAction(), {...display.getSubOptions(locationPropertyName), color, svg: true});
           // TODO how do we handle changes to feature?
@@ -370,8 +388,8 @@ exports.display = {
     });
   },
   remove: displayItem => {
-    const WRAPPER = displayItem.getWRAPPER();
-    const entityId = displayItem.getEntityId();
+    //const WRAPPER = displayItem.getWRAPPER();
+    //const entityId = displayItem.getEntityId();
     // TODO
   }
 };

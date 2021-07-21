@@ -324,6 +324,7 @@ exports.display = {
           const TR = document.createElement('TR');
           TR.groupId = groupId;
           TR.entityId = entityId;
+
           if (display.hasOption('select')) {
             const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
             const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
@@ -335,6 +336,7 @@ exports.display = {
               display.select(selectEntityClassName, selectEntityId);
             };
           }
+
           if (display.hasOption('multiSelect')) {
             const selectEntityClassName = display.hasOption('groupby') ? undefined : entityClassName;
             const selectEntityId = display.hasOption('groupby') ? groupId : entityId;
@@ -352,6 +354,16 @@ exports.display = {
             TD.appendChild(INPUT_checkbox);
             TR.appendChild(TD);
           }
+
+          if (display.hasOption('highlight')) {
+            TR.onmouseenter = () => display.highlight(groupId);
+            TR.onmouseleave = () => display.unhighlight(groupId);
+            display.onHighlight(
+              () => TR.classList.add('xyz-highlighted'),
+              () => TR.classList.remove('xyz-highlighted'),
+            )
+          }
+
           if (display.hasOption('color')) {
             const TD = document.createElement('TD');
             TD.className = 'xyz-list-icon';

@@ -102,16 +102,16 @@ exports.getVariables = () => variables.getVariables();
  * @param {[type]} value TODO
  * @returns {void}
  */
-exports.setVariable = (variableName, value) => variables.setVariable(variableName, value);
+exports.setVariable = (variableName, value, updateQuery = true) => variables.setVariable(variableName, value, updateQuery);
 /**
  * TODO
  * @param {Object} values TODO
  * @returns {void}
  */
-exports.setVariables = values => variables.setVariables(values);
+exports.setVariables = (values, updateQuery = true) => variables.setVariables(values, updateQuery);
 /**
  * TODO
  * @param {[type]} queryParameterName TODO
  * @returns {void}
  */
-exports.clearVariable = queryParameterName => variables.clearVariable(queryParameterName);
+exports.clearVariable = (queryParameterName, updateQuery = true) => variables.clearVariable(queryParameterName, updateQuery);

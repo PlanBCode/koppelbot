@@ -7,7 +7,8 @@ body {
   font-family: Palanquin, sans-serif;
 }
 
-input[type='submit'] {
+input[type='submit'],
+.xyz-button {
   background-color: rgb(76, 175, 80);
   border: none;
   border-radius: 5px;
@@ -441,11 +442,16 @@ table.xyz-list > tbody > tr.xyz-list-selectable {
 
 table.xyz-list > tr.xyz-list-selectable:hover,
 table.xyz-list > tbody > tr.xyz-list-selectable:hover {
-  background-color: lightblue;
+  background-color: yellow;
 }
 
 table.xyz-list > tr.xyz-list-selected,
 table.xyz-list > tbody > tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+table.xyz-list > tr.xyz-highlighted,
+table.xyz-list > tbody > tr.xyz-highlighted {
   background-color: yellow;
 }
 
@@ -649,66 +655,7 @@ table.xyz-item-minimized > tbody {
 .xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
   background-color: lightblue;
 }
-div.xyz-timeline-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-div.xyz-timeline-node {
-    transform: translate(-50%,-50%);
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
-    background-color: green;
-}
-
-div.xyz-timeline-connector {
-    z-index:1;
-    position: absolute;
-    width: 100px;
-    height: 4px;
-    background-color: green;
-}
-
-div.xyz-timeline-label {
-    z-index:2;
-    position: absolute;
-    padding:10px;
-    color:white;
-    border-radius: 10px;
-    background-color: green;
-}
-
-div.xyz-timeline-label:hover {
-    cursor: pointer;
-    background-color: rgb(0,200,0);
-}
-div.xyz-timeline-label.xyz-list-selected {
-    color:black;
-    background-color: yellow;
-}
-
-div.xyz-timeline-line-creator {
-    position: absolute;
-    width:10px;
-    height:10px;
-    pointer-events: none;
-    cursor: none;
-    /*display: none;*/
-}
-
-
-div.xyz-timeline-line {
-    transform: translate(-50%,-50%);
-    position: absolute;
-    top:50%;
-    left:50%;
-    height: 100%;
-    width:2px;
-    background-color: black;
-}.xyz-title.xyz-selected {
+.xyz-title.xyz-selected {
   background-color: yellow;
 }
 @charset "UTF-8";
@@ -950,7 +897,66 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
+div.xyz-timeline-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
 
+div.xyz-timeline-node {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background-color: green;
+}
+
+div.xyz-timeline-connector {
+    z-index:1;
+    position: absolute;
+    width: 100px;
+    height: 4px;
+    background-color: green;
+}
+
+div.xyz-timeline-label {
+    z-index:2;
+    position: absolute;
+    padding:10px;
+    color:white;
+    border-radius: 10px;
+    background-color: green;
+}
+
+div.xyz-timeline-label:hover {
+    cursor: pointer;
+    background-color: rgb(0,200,0);
+}
+div.xyz-timeline-label.xyz-list-selected {
+    color:black;
+    background-color: yellow;
+}
+
+div.xyz-timeline-line-creator {
+    position: absolute;
+    width:10px;
+    height:10px;
+    pointer-events: none;
+    cursor: none;
+    /*display: none;*/
+}
+
+
+div.xyz-timeline-line {
+    transform: translate(-50%,-50%);
+    position: absolute;
+    top:50%;
+    left:50%;
+    height: 100%;
+    width:2px;
+    background-color: black;
+}
 .xyz-file-container {
     background-color: darkgray;
     padding: 10px;
@@ -1005,9 +1011,9 @@ http://nicolasgallagher.com/micro-clearfix-hack/
 }
 
 .xyz-reference {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .xyz-reference:hover {
-    background-color: lightblue;
+  text-decoration: underline;
 }

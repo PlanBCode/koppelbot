@@ -5,7 +5,8 @@ body {
   font-family: Palanquin, sans-serif;
 }
 
-input[type='submit'] {
+input[type='submit'],
+.xyz-button {
   background-color: rgb(76, 175, 80);
   border: none;
   border-radius: 5px;

@@ -54,6 +54,7 @@ function flatten (source) {
 }
 
 exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entityClassName, entityId, node, requestUri, requestId) {
+  const variableListners = []; // keep track so we can clean them up
   /**
    * Whether this is part of a multi request
    * @returns {bool} Whether this is part of a multi request
@@ -149,7 +150,10 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @param  {Function} callback     TODO
    * @returns {void}                TODO
    */
-  this.onVariable = (variableName, callback) => variables.onVariable(variableName, callback);
+  this.onVariable = (variableName, callback) => {
+    variableListners.push({variableName, callback});
+    variables.onVariable(variableName, callback);
+  };
   /**
    * [getDisplayName description]
    * @param  {Array} propertyPath TODO
@@ -236,7 +240,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @returns {void}            TODO
    */
   this.onSelect = callback => {
-    if (this.hasOption('select')) variables.onVariable(this.getOption('select'), callback);
+    if (this.hasOption('select')) this.onVariable(this.getOption('select'), callback);
   };
   /**
    * [onSelect description]
@@ -244,8 +248,9 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
    * @returns {void}            TODO
    */
   this.onMultiSelect = callback => {
-    if (this.hasOption('multiSelect')) variables.onVariable(this.getOption('multiSelect'), callback);
+    if (this.hasOption('multiSelect')) this.onVariable(this.getOption('multiSelect'), callback);
   };
+
   const select = (entityClassName_, entityId_) => {
     variables.select(entityClassName_, entityId_, this.getOption('select'), this.getOption('selectUri'), this.getOption('selectIncludeClass'));
     if (this.hasOption('onChange')) {
@@ -327,6 +332,60 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
   this.isMultiSelected = (entityClassName_, entityId_) =>
     variables.isSelected(entityClassName_ || entityClassName, entityId_ || entityId, this.getOption('multiSelect')) ||
     variables.isSelected(entityClassName_ || entityClassName, '*', this.getOption('multiSelect'));
+
+  // highlight="$variableName:$propertyName,..."
+  const getHighlightVariables = () => this.getOption('highlight')
+    .split(',')
+    .map(variableNamepropertyNamePair => variableNamepropertyNamePair.split(':'));
+
+  /**
+   * [onHighlight description]
+   * @param  {Function} highlightCallback TODO
+   * @param  {Function} unHighlightCallback TODO
+   * @returns {void}
+   */
+  this.onHighlight = (highlightCallback, unHighlightCallback) => {
+    if (this.hasOption('highlight')) {
+      for (const [variableName, propertyName] of getHighlightVariables()) {
+        this.onVariable(variableName, value => {
+          if ( // TODO check hasNode?
+            typeof value !== 'undefined' &&
+            (
+              (propertyName && String(value) === String(this.getNode(propertyName.split('.')).getContent())) ||
+              (!propertyName && String(value) === String(entityId))
+            )
+          ) {
+            if (typeof highlightCallback === 'function') highlightCallback();
+          } else if (typeof unHighlightCallback === 'function') unHighlightCallback();
+        });
+      }
+    }
+  };
+
+  /**
+   * Triggers highlighting
+   * @returns {void}
+   */
+  this.highlight = () => {
+    if (this.hasOption('highlight')) {
+      for (const [variableName, propertyName] of getHighlightVariables()) {
+        if (propertyName) variables.setVariable(variableName, String(this.getNode(propertyName.split('.')).getContent()), false);
+        else variables.setVariable(variableName, entityId, false);
+      }
+    }
+  };
+  /**
+   * Triggers unhighlighting
+   * @returns {void}
+   */
+  this.unhighlight = () => {
+    if (this.hasOption('highlight')) {
+      for (const [variableName] of getHighlightVariables()) {
+        variables.clearVariable(variableName, false);
+      }
+    }
+  };
+
   /**
    * Whether to show an interface to create new entity
    * @returns {void}
@@ -348,7 +407,7 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
         }
       };
 
-      xyz.on(this.getRequestUri(), 'access:put', access => { // detect access changes
+      xyz.on(this.getRequestUri(), 'access:put', access => { // detect access changes //TODO add to clean up
         INPUT.disabled = !access;
       });
 
@@ -426,11 +485,18 @@ exports.DisplayItem = function DisplayItem (xyz, action, options, WRAPPER, entit
     // TODO
   };
   // TODO docs
-  this.onVariable = (variableName, callback) => variables.onVariable(variableName, callback);
   this.setVariable = (variableName, value) => variables.setVariable(variableName, value);
   this.hasVariable = variableName => variables.hasVariable(variableName);
   this.getVariable = variableName => variables.getVariable(variableName);
   this.clearVariable = variableName => variables.clearVariable(variableName);
   this.getTitlePropertyPath = (entityClassName_ = entityClassName) => xyz.getTitlePropertyPath(entityClassName_);
   this.xyz = xyz; // TODO encapsulate
+  /**
+   * Do clean up tasks such as remove listeners
+   */
+  this.remove = () => {
+    for (const {variableName, callback} of variableListners) {
+      variables.clearOnVariable(variableName, callback);
+    }
+  };
 };

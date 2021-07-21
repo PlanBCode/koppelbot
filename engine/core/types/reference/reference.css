@@ -1,8 +1,8 @@
 
 .xyz-reference {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .xyz-reference:hover {
-    background-color: lightblue;
+  text-decoration: underline;
 }

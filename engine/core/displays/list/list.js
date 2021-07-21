@@ -316,6 +316,16 @@ exports.display = {
       TD_checkbox.appendChild(INPUT_checkbox);
       TR_entity.appendChild(TD_checkbox);
     }
+
+    if (display.hasOption('highlight')) {
+      TR_entity.onmouseenter = () => display.highlight();
+      TR_entity.onmouseleave = () => display.unhighlight();
+      display.onHighlight(
+        () => TR_entity.classList.add('xyz-highlighted'),
+        () => TR_entity.classList.remove('xyz-highlighted'),
+      )
+    }
+
     if (display.hasOption('color')) {
       const TD = document.createElement('TD');
       TD.className = 'xyz-list-icon';

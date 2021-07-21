@@ -17,8 +17,29 @@ function onVariable (variableNameEventName, callback) {
   // TODO return listener handle that can be cleared
 }
 
-const handleVariableChange = (variableName, eventName) => {
-  web.setQueryParameter(variableName, variables[variableName]);
+
+
+function clearOnVariable (variableNameEventName, callback) {
+  if (typeof callback !== 'function') throw new TypeError('Expected callback function.');
+  if (typeof variableNameEventName !== 'string') return;
+  let [variableName, eventName] = variableNameEventName.split(':');
+  if (!eventName) eventName = 'change';
+  if (!['change', 'clear', 'create'].includes(eventName)) throw new Error(`Illegal variable event '${eventName}'`);
+
+  if (!variableCallbacks.hasOwnProperty(variableName)) return
+  if (!variableCallbacks[variableName].hasOwnProperty(eventName)) return
+  const callbacks = variableCallbacks[variableName][eventName];
+  const index = callbacks.indexOf(callback);
+  if(index === -1) return;
+  // clean up
+  callbacks.splice(index,1);
+  if(callbacks.length === 0) delete variableCallbacks[variableName][eventName];
+  if(Object.keys(variableCallbacks[variableName]).length === 0) delete variableCallbacks[variableName];
+}
+
+
+const handleVariableChange = (variableName, eventName, updateQuery = true) => {
+  if(updateQuery) web.setQueryParameter(variableName, variables[variableName]);
   if (variableCallbacks.hasOwnProperty(variableName)) {
     const value = variables[variableName];
     if (variableCallbacks[variableName].hasOwnProperty('change')) {
@@ -42,21 +63,21 @@ const getVariable = (variableName, fallback) => variables.hasOwnProperty(variabl
 
 const getVariables = () => JSON.parse(JSON.stringify(variables));
 
-const clearVariable = variableName => {
+const clearVariable = (variableName, updateQuery = true) => {
   delete variables[variableName];
-  handleVariableChange(variableName, 'clear');
+  handleVariableChange(variableName, 'clear', updateQuery);
 };
 
-const setVariable = (variableName, value) => {
+const setVariable = (variableName, value, updateQuery = true) => {
   if (value !== variables[variableName]) {
     const isNew = !variables.hasOwnProperty(variableName);
     variables[variableName] = value;
-    handleVariableChange(variableName, isNew ? 'create' : 'change');
+    handleVariableChange(variableName, isNew ? 'create' : 'change', updateQuery);
   }
 };
 
-const setVariables = (variableObject) => {
-  for (const variableName in variableObject) { setVariable(variableName, variableObject[variableName]); }
+const setVariables = (variableObject, updateQuery = true) => {
+  for (const variableName in variableObject) { setVariable(variableName, variableObject[variableName], updateQuery); }
 };
 
 const selectVariable = (entityClassName, entityId, variableNameOrCallback, selectUri = '', includeEntityClass = false) => {
@@ -148,3 +169,4 @@ exports.setVariable = setVariable;
 exports.setVariables = setVariables;
 exports.clearVariable = clearVariable;
 exports.onVariable = onVariable;
+exports.clearOnVariable = clearOnVariable;

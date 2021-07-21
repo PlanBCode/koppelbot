@@ -43,6 +43,7 @@
           display="map"
           showFitToDataButton="false"
           viewBoxSelect="view=599842.2834046325,6828347.071935917,600135.6954529143,6828578.049652248"
+          highlight="highlightLocatie,highlightEigenaar:EigenaarID"
         />
       </td>
       <td valign="top"style="background-color:#EFEFEF; height: calc(100vh - 50px);">
@@ -52,6 +53,7 @@
             hideMessages
             showSearchBar="true"
             hide="id"
+            highlight="highlightEigenaar:EigenaarID"
             groupby="EigenaarID"
             color="EigenaarID"
             display="chart"
@@ -74,7 +76,8 @@
 
   <div id="drilldown">
     <xyz id="locatie" color="EigenaarID"
-      uri="/locatie/$locatie/Type,Eigenaar=EigenaarID,Oppervlakte,Bron=DocumentID.Bron,Datum=DocumentID.Datum,Eigenschappen"
+      geojson_navigate="view"
+      uri="/locatie/$locatie/Type,Locatie=geojson,Eigenaar=EigenaarID,Oppervlakte,Bron=DocumentID.Bron,Datum=DocumentID.Datum,Eigenschappen"
       hideMessages select="locatie" display="item" group="drilldown"/>
 
     <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id" hideMessages select="eigenaar" display="item" group="drilldown"/>
@@ -87,7 +90,9 @@
       hideMessages
       select="locatie"
       showCreateButton="false"
-      display="list" />
+      display="list"
+      highlight="highlightLocatie"
+       />
     </div>
 
 </body>
