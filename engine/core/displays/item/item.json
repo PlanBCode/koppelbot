@@ -6,6 +6,7 @@
     "selectIncludeClass" : {"info":"Whether to include the entity class of selection.", "type":"bool", "default":"false"},
     "multiSelect" : {"info":"Whether to allow multiple entities to be selected.", "type":"string", "default":false},
     "showTitle" : {"info":"Whether to show the title bar.", "type":"bool", "default":true},
+    "group" : {"info":"Group a set of item views that will alternate", "type":"string"},
     "showLabels" : {"info":"Whether to show property labels", "type":"bool", "default":true},
     "showDeleteButton" : {"info":"Whether to show a button to a delete interface.", "type":"bool", "default":false},
     "showEditbutton" : {"info":"Whether to show a button to a edit interface.", "type":"bool", "default":false},

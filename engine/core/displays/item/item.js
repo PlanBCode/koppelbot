@@ -97,6 +97,8 @@ function getStateMessage (displayItem, messageType) {
 
 exports.getStateMessage = getStateMessage;
 
+const WRAPPERSbyGroup = {};
+
 exports.display = {
   /**
    * [waitingForInput description]
@@ -132,6 +134,21 @@ exports.display = {
    */
   first: displayItem => {
     const WRAPPER = displayItem.getWRAPPER();
+    if(displayItem.hasOption('group')){
+      const selectionVariableName = displayItem.getOption('select');
+      const group = displayItem.getOption('group');
+      if(WRAPPERSbyGroup.hasOwnProperty(group)){
+        for(const [WRAPPER_other, otherSelectionVariableName] of WRAPPERSbyGroup[group].entries()){
+          if(WRAPPER_other !== WRAPPER){
+            displayItem.clearVariable(otherSelectionVariableName);
+          }
+        }
+        WRAPPERSbyGroup[group].set(WRAPPER, selectionVariableName);
+      }else{
+        WRAPPERSbyGroup[group] = new Map([[WRAPPER,selectionVariableName]]);
+      }
+
+    }
     WRAPPER.innerHTML = '';
     if (displayItem.getOption('showCreateButton') === true) displayItem.showCreateButton();
 

@@ -15,8 +15,10 @@
         <xyz
           id="map"
           style="height:100%; width:100%"
+          maxAllowedViewSize="1000"
           showSearchBar="true"
           searchContext="Amersfoort"
+          searchPlaceholder="Spring naar een wijk"
           searchPresets="
           Binnenstad,
           De Koppel,
@@ -35,9 +37,10 @@
           Vathorst,
           Vermeerkwartier,
           Zielhorst"
-          searchPlaceholder="Spring naar een wijk"
           uri="/locatie/*/geojson,EigenaarID?geojson>=<$view"
-          hideMessages showCreateButton="false" color="EigenaarID" location="geojson" select="locatie" display="map"
+          hideMessages showCreateButton="false" color="EigenaarID" location="geojson"
+          select="locatie"
+          display="map"
           showFitToDataButton="false"
           viewBoxSelect="view=599842.2834046325,6828347.071935917,600135.6954529143,6828578.049652248"
         />
@@ -68,7 +71,24 @@
       <i style="float:right;"><a href="https://koppelbot.org">Powered by Koppelbot</a></i></td></tr>
   </table>
   <img id="logo" src="/vanwieisamersfoort/vanwieisamersfoort.png"/>
-  <xyz id="locatie" style="max-height:50vh;" color="EigenaarID" uri="/locatie/$locatie/Type,Eigenaar=EigenaarID,Oppervlakte,Bron=DocumentID.Bron,Datum=DocumentID.Datum,Eigenschappen" hideMessages select="locatie" display="item"/>
-  <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id" hideMessages select="locatie" select="eigenaar" display="item"/>
+
+  <div id="drilldown">
+    <xyz id="locatie" color="EigenaarID"
+      uri="/locatie/$locatie/Type,Eigenaar=EigenaarID,Oppervlakte,Bron=DocumentID.Bron,Datum=DocumentID.Datum,Eigenschappen"
+      hideMessages select="locatie" display="item" group="drilldown"/>
+
+    <xyz id="eigenaar" uri="/eigenaar/$eigenaar/*" color="id" hideMessages select="eigenaar" display="item" group="drilldown"/>
+
+    <xyz id="locatiesBijEigenaar"
+      uri="/locatie/*/Locaties=id,EigenaarID?EigenaarID==$eigenaar"
+      sortByToolTipPrefix="Sorteer op"
+      hide="EigenaarID"
+      color="EigenaarID"
+      hideMessages
+      select="locatie"
+      showCreateButton="false"
+      display="list" />
+    </div>
+
 </body>
 </html>
