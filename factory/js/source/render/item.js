@@ -222,6 +222,8 @@ function TypeItem (xyz, baseUri, subPropertyPath, status, content, settings, opt
   this.select = (entityClassName, entityId) => variables.select(entityClassName, entityId, this.getOption('select'), this.getOption('selectUri'));
 
   this.getTitlePropertyPath = entityClassName => xyz.getTitlePropertyPath(entityClassName || this.getEntityClassName());
+
+  this.setVariable = (variableName, value, updateQuery) => variables.setVariable(variableName, value, updateQuery);
 }
 
 exports.TypeItem = TypeItem;

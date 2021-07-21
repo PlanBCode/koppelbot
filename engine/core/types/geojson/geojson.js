@@ -67,7 +67,19 @@ exports.actions = {
     } else return json.actions.edit(item);
   },
   view: item => {
-    if (item.getOption('svg')) {
+    if(item.hasOption('navigate')){
+      const SPAN = document.createElement('SPAN')
+      SPAN.className = 'xyz-button';
+      SPAN.innerHTML = '&#9872;';
+      SPAN.onclick = () => {
+        const content =  item.getContent();
+        if(typeof content  ==='object' && content !== null && content.hasOwnProperty('bbox')){
+          item.setVariable(item.getOption('navigate'), content.bbox.join(','));
+        }
+      }
+      return SPAN;
+
+    /*}else if (item.getOption('svg')) {
       const SVG = document.createElementNS(xmlns, 'circle');
       const color = item.getOption('color') || 'red';
 
@@ -90,7 +102,7 @@ exports.actions = {
       };
       onChangeHandler(item);
       item.onChange(onChangeHandler);
-      return SVG;
+      return SVG;*/
     } else return json.actions.view(item);
   },
   validateContent: function (item) {
