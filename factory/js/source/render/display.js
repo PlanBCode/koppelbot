@@ -43,9 +43,12 @@ const uiElementEntity = (display, displayItem) => {
 };
 
 const uiElementRemove = (display, displayItem) => {
-  if (display && display.hasOwnProperty('remove')) { display.remove(displayItem); } else {
+  if (display && display.hasOwnProperty('remove')) {
+     display.remove(displayItem);
+   } else {
     // TODO a default way of handeling stuff
   }
+  displayItem.remove();
 };
 
 const renderDisplay = (xyz, uri, options, WRAPPER) => (entityClassName, entityId, node, eventName, requestId) => { // XYZ123
