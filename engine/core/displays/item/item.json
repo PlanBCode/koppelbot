@@ -3,6 +3,7 @@
     "action": {"info":"Which action to perform", "type":"enum","choices":["view","edit"],"default":"view"},
     "color" : {"info":"Which property to use for the color", "type":"string","TODO":"TODO"},
     "select" : {"info":"Define a variable that stores the selection of this list.", "type":"string"},
+    "selectIncludeClass" : {"info":"Whether to include the entity class of selection.", "type":"bool", "default":"false"},
     "multiSelect" : {"info":"Whether to allow multiple entities to be selected.", "type":"string", "default":false},
     "showTitle" : {"info":"Whether to show the title bar.", "type":"bool", "default":true},
     "showLabels" : {"info":"Whether to show property labels", "type":"bool", "default":true},
