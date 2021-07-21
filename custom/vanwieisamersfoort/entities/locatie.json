@@ -11,6 +11,7 @@
   },
   "id": {
     "type": "id",
+    "title": true,
     "autoIncrement": true,
     "connector": {
       "key": "ID"
