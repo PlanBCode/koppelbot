@@ -125,7 +125,7 @@ function UiElement (xyz, options, WRAPPER) {
   options.labels = labels;
   options.aggregations = aggregations;
   for (const optionName of ['select', 'multiSelect', 'viewBoxSelect']) {
-    if (options[optionName]) {
+    if (typeof options[optionName] === 'string') {
       const [propertyName, defaultValue] = options[optionName].split('=');
       if (typeof defaultValue !== 'undefined') {
         if (!variables.hasVariable(propertyName)) variables.setVariable(propertyName, defaultValue);
