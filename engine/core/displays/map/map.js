@@ -87,10 +87,10 @@ function checkMaxDimension (display, extent) {
     const height = Math.abs(extent[3] - extent[1]);
     const maxDimension = Math.max(width, height);
     const maxAllowedDimension = display.getOption('maxAllowedViewSize');
-    if (maxAllowedDimension >= maxDimension) {
-      BUTTON_zoomout.setAttribute('disabled', true);
-    } else {
+    if (maxAllowedDimension > maxDimension) {
       BUTTON_zoomout.removeAttribute('disabled');
+    } else {
+      BUTTON_zoomout.setAttribute('disabled', true);
     }
   }
 }
