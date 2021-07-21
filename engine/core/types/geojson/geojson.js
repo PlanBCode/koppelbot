@@ -70,7 +70,8 @@ exports.actions = {
     if(item.hasOption('navigate')){
       const SPAN = document.createElement('SPAN')
       SPAN.className = 'xyz-button';
-      SPAN.innerHTML = '&#9872;';
+      SPAN.innerHTML = item.getOption('navigateLabel') || 'Navigate to';
+      SPAN.style.padding = '0px 5px';
       SPAN.onclick = () => {
         const content =  item.getContent();
         if(typeof content  ==='object' && content !== null && content.hasOwnProperty('bbox')){

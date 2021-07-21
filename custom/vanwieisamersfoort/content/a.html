@@ -10,7 +10,6 @@
   <table width="100%" height="100%">
     <tr>
       <td id="main" style="width:70%; text-align:center; position: relative;" rowspan="2">
-        <!--<div id="zoom-to-amersfoort" title="Zoom to Amersfoort">Amersfoort</div>-->
         <div id="resizer"></div>
         <xyz
           id="map"
@@ -77,6 +76,7 @@
   <div id="drilldown">
     <xyz id="locatie" color="EigenaarID"
       geojson_navigate="view"
+      geojson_navigateLabel="Navigeer naar locatie"
       uri="/locatie/$locatie/Type,Locatie=geojson,Eigenaar=EigenaarID,Oppervlakte,Bron=DocumentID.Bron,Datum=DocumentID.Datum,Eigenschappen"
       hideMessages select="locatie" display="item" group="drilldown"/>
 
