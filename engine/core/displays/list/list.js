@@ -195,14 +195,14 @@ exports.display = {
     display.showUiEditButton();
   },
   first: display => {
+    const WRAPPER = display.getWRAPPER();
+    const TABLE = WRAPPER.firstChild;
+    const THEAD = document.createElement('THEAD');
+    const TBODY = document.createElement('TBODY');
+    TABLE.appendChild(THEAD);
+    TABLE.appendChild(TBODY);
     if (display.getOption('showHeader') !== false) {
-      const WRAPPER = display.getWRAPPER();
-      const TABLE = WRAPPER.firstChild;
-      const THEAD = document.createElement('THEAD');
-      const TBODY = document.createElement('TBODY');
       fixHeaderOnScroll(WRAPPER, THEAD, TBODY);
-      TABLE.appendChild(THEAD);
-      TABLE.appendChild(TBODY);
       const TR_header = document.createElement('TR');
       TR_header.className = 'xyz-list-header';
       if (display.getOption('multiSelect')) {
@@ -357,6 +357,7 @@ exports.display = {
       TR_entity.classList.add('xyz-list-selectable');
       TR_entity.onclick = () => display.select();
     }
+
     const THEAD = TABLE.firstChild;
     const TBODY = THEAD.nextElementSibling;
     TBODY.appendChild(TR_entity);

@@ -405,6 +405,107 @@ SHARE
 .xyz-colorpicker-color:hover {
   transform: scale(1.1, 1.1);
 }
+table.xyz-create,
+table.xyz-item,
+table.xyz-list {
+  padding: 0;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.xyz-list-header,
+.xyz-create-header,
+.xyz-item-header,
+table tbody:first-child tr.xyz-create-header,
+table tbody:first-child tr.xyz-list-header,
+table tbody:first-child tr.xyz-item-header {
+  background-color: darkslateblue;
+  color: white;
+}
+
+table.xyz-create tr:nth-child(even),
+table.xyz-item tr:nth-child(even),
+table.xyz-list tr:nth-child(even) {
+  background: rgba(155, 155, 155, 0.2);
+}
+
+.xyz-list,
+.xyz-item {
+  width: 100%;
+}
+
+table.xyz-list > tr.xyz-list-selectable,
+table.xyz-list > tbody > tr.xyz-list-selectable {
+  cursor: pointer;
+}
+
+table.xyz-list > tr.xyz-list-selectable:hover,
+table.xyz-list > tbody > tr.xyz-list-selectable:hover {
+  background-color: lightblue;
+}
+
+table.xyz-list > tr.xyz-list-selected,
+table.xyz-list > tbody > tr.xyz-list-selected {
+  background-color: yellow;
+}
+
+td.xyz-list-icon {
+  width: 30px;
+  max-width: 30px;
+}
+
+tr.xyz-list-foldable {
+  cursor: pointer;
+}
+
+tr.xyz-list-foldable td:first-child::before {
+  content: "\00A0-\00A0";
+}
+
+tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
+  content: "\00A0+\00A0";
+}
+
+.xyz-list-unsorted::before {
+  content: "\00A0\21F5\00A0";
+}
+
+.xyz-list-sorted-asc::before {
+  content: "\00A0\21E3\00A0";
+}
+
+.xyz-list-sorted-desc::before {
+  content: "\00A0\21E1\00A0";
+}
+
+tr.xyz-list-search > td {
+  padding: 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: lightgrey;
+}
+
+tr.xyz-list-search > td > input {
+  width: 100%;
+  display: block;
+  border-style: none;
+  outline-style: none;
+  padding: 3;
+  font-size: inherit;
+  margin: 0;
+}
+
+.xyz-list-search-clear {
+  margin-top: -1.7em;
+  display: block;
+  float: right;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.xyz-list-search-clear::before {
+  content: "\2715";
+}
 table.xyz-item > tr.xyz-item-selected.xyz-item-header {
   background-color: yellow;
   color: black;
@@ -548,110 +649,6 @@ table.xyz-item-minimized > tbody {
 .xyz-map-search > div.xyz-map-search-results > div.xyz-map-search-result:hover {
   background-color: lightblue;
 }
-table.xyz-create,
-table.xyz-item,
-table.xyz-list {
-  padding: 0;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-.xyz-list-header,
-.xyz-create-header,
-.xyz-item-header,
-table tbody:first-child tr.xyz-create-header,
-table tbody:first-child tr.xyz-list-header,
-table tbody:first-child tr.xyz-item-header {
-  background-color: darkslateblue;
-  color: white;
-}
-
-table.xyz-create tr:nth-child(even),
-table.xyz-item tr:nth-child(even),
-table.xyz-list tr:nth-child(even) {
-  background: rgba(155, 155, 155, 0.2);
-}
-
-.xyz-list,
-.xyz-item {
-  width: 100%;
-}
-
-table.xyz-list > tr.xyz-list-selectable,
-table.xyz-list > tbody > tr.xyz-list-selectable {
-  cursor: pointer;
-}
-
-table.xyz-list > tr.xyz-list-selectable:hover,
-table.xyz-list > tbody > tr.xyz-list-selectable:hover {
-  background-color: lightblue;
-}
-
-table.xyz-list > tr.xyz-list-selected,
-table.xyz-list > tbody > tr.xyz-list-selected {
-  background-color: yellow;
-}
-
-td.xyz-list-icon {
-  width: 30px;
-  max-width: 30px;
-}
-
-tr.xyz-list-foldable {
-  cursor: pointer;
-}
-
-tr.xyz-list-foldable td:first-child::before {
-  content: "\00A0-\00A0";
-}
-
-tr.xyz-list-foldable.xyz-list-folded td:first-child::before {
-  content: "\00A0+\00A0";
-}
-
-.xyz-list-unsorted::before {
-  content: "\00A0\21F5\00A0";
-}
-
-.xyz-list-sorted-asc::before {
-  content: "\00A0\21E3\00A0";
-}
-
-.xyz-list-sorted-desc::before {
-  content: "\00A0\21E1\00A0";
-}
-
-tr.xyz-list-search > td {
-  padding: 0;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: lightgrey;
-}
-
-tr.xyz-list-search > td > input {
-  width: 100%;
-  display: block;
-  border-style: none;
-  outline-style: none;
-  padding: 3;
-  font-size: inherit;
-  margin: 0;
-}
-
-.xyz-list-search-clear {
-  margin-top: -1.7em;
-  display: block;
-  float: right;
-  margin-right: 5px;
-  cursor: pointer;
-}
-
-.xyz-list-search-clear::before {
-  content: "\2715";
-}
-.xyz-title.xyz-selected {
-  background-color: yellow;
-}
 div.xyz-timeline-wrapper {
     position: relative;
     width: 100%;
@@ -711,58 +708,8 @@ div.xyz-timeline-line {
     height: 100%;
     width:2px;
     background-color: black;
-}
-.xyz-file-container {
-    background-color: darkgray;
-    padding: 10px;
-    margin:0;
-    overflow:scroll;
-    height: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    max-height: calc(70vh - 20px);
-}
-
-.xyz-file-flat {
-    font-family: monospace;
-    white-space: pre-wrap;
-    /*box-shadow: 2px 2px 2px;*/
-    background-color: white;
-    padding: 10px;
-}.xyz-login a {
-  color: blue;
-  cursor: pointer;
-  margin: 5px;
-}
-
-.xyz-login a:hover {
-  text-decoration: underline;
-}
-
-.xyz-login-message {
-  background-color: khaki;
-  color: black;
-  border-radius: 5px;
-  text-align: center;
-  animation-iteration-count: 1;
-  animation-duration: 10s;
-  animation-fill-mode: forwards;
-}
-
-@keyframes xyz-login-hide {
-  from {
-    visibility: visible;
-    opacity: 1;
-  }
-
-  to {
-    visibility: hidden;
-    opacity: 0;
-  }
-}
-
-.xyz-login-capslock-notifier {
-  color: red;
+}.xyz-title.xyz-selected {
+  background-color: yellow;
 }
 @charset "UTF-8";
 
@@ -1003,6 +950,59 @@ http://nicolasgallagher.com/micro-clearfix-hack/
     cursor: help;
 }
 
+
+.xyz-file-container {
+    background-color: darkgray;
+    padding: 10px;
+    margin:0;
+    overflow:scroll;
+    height: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    max-height: calc(70vh - 20px);
+}
+
+.xyz-file-flat {
+    font-family: monospace;
+    white-space: pre-wrap;
+    /*box-shadow: 2px 2px 2px;*/
+    background-color: white;
+    padding: 10px;
+}.xyz-login a {
+  color: blue;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.xyz-login a:hover {
+  text-decoration: underline;
+}
+
+.xyz-login-message {
+  background-color: khaki;
+  color: black;
+  border-radius: 5px;
+  text-align: center;
+  animation-iteration-count: 1;
+  animation-duration: 10s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes xyz-login-hide {
+  from {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  to {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+.xyz-login-capslock-notifier {
+  color: red;
+}
 
 .xyz-reference {
     cursor: pointer;
